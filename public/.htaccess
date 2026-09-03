@@ -1,0 +1,63 @@
+# =============================================================
+# Startip OS — configuração para hospedagem Apache (Hostinger)
+# =============================================================
+
+# Força o tipo MIME correto (senão o navegador recusa o JS como "módulo"
+# e a página fica em branco).
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType text/css .css
+  AddType image/svg+xml .svg
+</IfModule>
+
+# ---------- Roteamento SPA ----------
+# Toda rota que não for um arquivo/pasta real cai no index.html.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# ---------- Cache ----------
+<IfModule mod_headers.c>
+  # index.html nunca é cacheado (atualizações aparecem na hora).
+  <FilesMatch "index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+
+  # Assets com hash no nome (Vite) podem ser cacheados por 1 ano.
+  <FilesMatch "\.(js|css|woff2?|ttf|png|jpg|jpeg|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # ---------- Headers de segurança ----------
+  # Impede o site de ser embutido em iframe (clickjacking).
+  Header always set X-Frame-Options "DENY"
+  # Impede o navegador de "adivinhar" o MIME (XSS via arquivo com tipo errado).
+  Header always set X-Content-Type-Options "nosniff"
+  # Não vaza URL completa no Referer.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Nega APIs sensíveis por padrão (webcam, mic, geolocalização, pagamentos).
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+  # HTTPS obrigatório por 1 ano (só ativa depois que o SSL da Hostinger estiver estável).
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # ---------- CSP ----------
+  # Só permite executar código do próprio domínio e falar com o Supabase
+  # (URL vazia é substituída na hora — ver observações no README).
+  # Ajuste os hosts se você trocar de Supabase / adicionar CDN.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; child-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+</IfModule>
+
+# ---------- Compressão ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+# ---------- Bloqueio de arquivos sensíveis ----------
+<FilesMatch "^(\.env.*|package(-lock)?\.json|\.git|README\.md|\.htaccess)$">
+  Require all denied
+</FilesMatch>

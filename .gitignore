@@ -1,0 +1,41 @@
+# Segredos e ambiente
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+config/secrets.php
+config.php
+
+# Dependências
+node_modules/
+vendor/
+__pycache__/
+.venv/
+venv/
+
+# Build / cache
+dist/
+build/
+.next/
+.cache/
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Uploads temporários
+uploads/tmp/
+tmp/
+# Supabase CLI temp
+supabase/.temp/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Vite build artifacts (mantemos só o .ts)
+vite.config.d.ts
+vite.config.js

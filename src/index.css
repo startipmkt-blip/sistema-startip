@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Tema: default é dark. `.light` no <html> troca pra claro sem precisar
+   reescrever o app inteiro — filtramos elementos scuros comuns via CSS. */
+:root {
+  color-scheme: dark;
+}
+html.light {
+  color-scheme: light;
+}
+
+/* Fundo escuro com degradê azul da marca (#1E9BE0) + brilhos sutis. */
+body {
+  @apply font-sans text-slate-200 antialiased;
+  background-color: #05080f;
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(30, 155, 224, 0.3), transparent 60%),
+    radial-gradient(900px 520px at 110% 8%, rgba(64, 176, 233, 0.16), transparent 55%),
+    linear-gradient(180deg, #071019 0%, #05080f 100%);
+  background-attachment: fixed;
+}
+
+/* ====== MODO CLARO ======
+   Sobrescreve as classes escuras mais usadas no design system. Não é 100%
+   fiel ao dark, mas dá uma leitura confortável em ambientes iluminados. */
+html.light body {
+  color: #1e293b;
+  background-color: #f1f5f9;
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(30, 155, 224, 0.15), transparent 60%),
+    radial-gradient(900px 520px at 110% 8%, rgba(64, 176, 233, 0.08), transparent 55%),
+    linear-gradient(180deg, #eef2f7 0%, #f8fafc 100%);
+}
+/* Blocos "vidro" viram fundo branco suave com borda cinza. */
+html.light .glass,
+html.light .glass-strong {
+  background-color: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #1e293b;
+}
+/* Backgrounds slate escuros → cinza claro. */
+html.light [class*="bg-slate-950"],
+html.light [class*="bg-slate-900"],
+html.light [class*="bg-slate-800"] { background-color: #ffffff !important; }
+html.light [class*="bg-white/5"],
+html.light [class*="bg-white/[0.02]"],
+html.light [class*="bg-white/[0.03]"],
+html.light [class*="bg-white/[0.055]"],
+html.light [class*="bg-white/[0.09]"],
+html.light [class*="bg-white/10"] { background-color: rgba(15, 23, 42, 0.04) !important; }
+/* Textos slate claros → slate escuros. */
+html.light [class*="text-slate-100"],
+html.light [class*="text-slate-200"],
+html.light [class*="text-slate-300"] { color: #1e293b !important; }
+html.light [class*="text-slate-400"],
+html.light [class*="text-slate-500"] { color: #64748b !important; }
+html.light [class*="text-white"]:not([class*="hover:text"]) { color: #0f172a !important; }
+/* Bordas brancas com alpha → cinza claro. */
+html.light [class*="border-white/5"],
+html.light [class*="border-white/10"],
+html.light [class*="border-white/15"] { border-color: rgba(15, 23, 42, 0.1) !important; }
+/* Botões brand mantêm fundo azul mas texto branco continua legível. */
+html.light [class*="bg-brand-500"],
+html.light [class*="bg-brand-600"],
+html.light [class*="bg-brand-700"] { color: white !important; }
+
+/* Fundo do body claro em vez de escuro (regra específica que não é catch-all). */
+html.light body { background-color: #f1f5f9 !important; }
+/* Preservar semânticas coloridas (bg-red-*, bg-emerald-*, bg-amber-* etc). Só neutralizar slate/white. */
+
+/* Inputs, selects, textareas: fundo claro + texto escuro + borda visível. */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
+}
+html.light input::placeholder,
+html.light textarea::placeholder { color: #94a3b8 !important; }
+html.light [class*="[color-scheme:dark]"] { color-scheme: light !important; }
+
+/* Placeholder tokens do design system (design usa bg-white/5 nos inputs). */
+html.light [class*="bg-white/5"] input,
+html.light [class*="bg-white/5"] textarea,
+html.light [class*="bg-white/5"] select { background-color: #ffffff !important; }
+
+/* Botões secundários com texto branco → texto escuro no light. */
+html.light button[class*="text-slate-100"],
+html.light button[class*="text-slate-200"],
+html.light button[class*="text-slate-300"] { color: #1e293b !important; }
+
+/* Barra lateral (Sidebar) — usa bg-white/[0.03]; força um branco quase sólido para contraste. */
+html.light aside[class*="border-r"] { background-color: rgba(255, 255, 255, 0.9) !important; }
+
+/* Topbar — o mesmo. */
+html.light header[class*="border-b"][class*="backdrop-blur"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* NavLink ativo (usa bg-gradient-brand) — cobre com azul sólido. */
+html.light a[class*="bg-gradient-brand"] {
+  background: linear-gradient(135deg, #1e9be0 0%, #14669b 100%) !important;
+  color: white !important;
+}
+
+/* Badges com tone verde/âmbar/vermelho: garantir texto escuro no light. */
+html.light [class*="bg-emerald-500/15"],
+html.light [class*="bg-amber-500/15"],
+html.light [class*="bg-red-500/10"],
+html.light [class*="bg-blue-500/15"],
+html.light [class*="bg-brand-500/15"] {
+  color: #0f172a !important;
+}
+
+/* Kanban / cards com backdrop-blur em fundo escuro — clarear. */
+html.light [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+}
+
+/* Scrollbar mais visível no light. */
+html.light * { scrollbar-color: rgba(15, 23, 42, 0.3) transparent; }
+html.light *::-webkit-scrollbar-thumb { background-color: rgba(15, 23, 42, 0.25); }
+
+/* Sombras — reforça sombras leves em cards claros. */
+html.light [class*="shadow-glass"] {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Títulos em Poppins. */
+h1, h2, h3, h4 {
+  @apply font-display;
+}
+
+@layer components {
+  .glass {
+    @apply rounded-2xl border border-white/10 bg-white/[0.055] shadow-glass backdrop-blur-xl;
+  }
+  .glass-strong {
+    @apply rounded-2xl border border-white/10 bg-white/[0.09] shadow-glass backdrop-blur-xl;
+  }
+  .glass-field {
+    @apply rounded-xl border border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500;
+  }
+  .gradient-brand {
+    @apply bg-gradient-brand text-white;
+  }
+}
+
+/* Scrollbar discreta. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.4);
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Startip OS",
+  "short_name": "Startip",
+  "description": "Sistema operacional interno da Startip — CRM WhatsApp, clientes, financeiro, agenda e produção.",
+  "start_url": "/inicio",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#0EA5E9",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "CRM",       "short_name": "CRM",       "url": "/crm" },
+    { "name": "Agenda",    "short_name": "Agenda",    "url": "/agenda" },
+    { "name": "Demandas",  "short_name": "Demandas",  "url": "/demandas" }
+  ]
+}

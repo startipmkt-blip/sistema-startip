@@ -1,0 +1,29 @@
+# =============================================================
+# Startip OS — configuração para hospedagem Apache (Hostinger)
+# =============================================================
+
+# Força o tipo MIME correto (senão o navegador recusa o JS como "módulo"
+# e a página fica em branco).
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType text/css .css
+  AddType image/svg+xml .svg
+</IfModule>
+
+# Roteamento SPA: toda rota que não for um arquivo/pasta real cai no index.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Evita que o servidor guarde o index.html em cache (para você ver as
+# atualizações na hora).
+<IfModule mod_headers.c>
+  <FilesMatch "index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+</IfModule>
