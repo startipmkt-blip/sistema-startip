@@ -12,24 +12,24 @@ interface ModuloCard {
 
 const OPERACIONAL: ModuloCard[] = [
   { numero: '01', label: 'Gestão de Clientes', emoji: '👥', to: '/clientes',           modulo: 'clientes' },
-  { numero: '02', label: 'CRM · WhatsApp',     emoji: '💬', to: '/crm',                modulo: 'crm' },
-  { numero: '03', label: 'Social Media',       emoji: '📱', to: '/social-media',       modulo: 'social-media' },
-  { numero: '04', label: 'Video Maker',        emoji: '🎬', to: '/video-maker',        modulo: 'video-maker' },
-  { numero: '05', label: 'Webdesigner',        emoji: '🎨', to: '/webdesigner',        modulo: 'webdesigner' },
-  { numero: '06', label: 'Turbo AI',           emoji: '✨', to: '/turbo-ai',           modulo: 'turbo-ai' },
-  { numero: '07', label: 'Aprovação',          emoji: '✅', to: '/aprovacao-conteudo', modulo: 'aprovacao-conteudo' },
-  { numero: '08', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
+  { numero: '02', label: 'Gestor de Tráfego',  emoji: '🎯', to: '/trafego',            modulo: 'diretoria' },
+  { numero: '03', label: 'CRM · WhatsApp',     emoji: '💬', to: '/crm',                modulo: 'crm' },
+  { numero: '04', label: 'Designer',           emoji: '🎨', to: '/designer',           modulo: 'conteudo' },
+  { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
+  { numero: '06', label: 'Aprovação',          emoji: '✅', to: '/aprovacao-conteudo', modulo: 'aprovacao-conteudo' },
+  { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '09', label: 'Empresas (PIN)',     emoji: '🏢', to: '/empresas-admin',     modulo: 'empresas-admin' },
-  { numero: '10', label: 'Agenda',             emoji: '📅', to: '/agenda',             modulo: 'agenda' },
-  { numero: '11', label: 'Diretoria',          emoji: '📊', to: '/diretoria',          modulo: 'diretoria' },
-  { numero: '12', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
-  { numero: '13', label: 'Marketplace',        emoji: '🛒', to: '/marketplace-admin',  modulo: 'marketplace-admin' },
-  { numero: '14', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
-  { numero: '15', label: 'Links de cadastro',  emoji: '🔗', to: '/links-cadastro',     modulo: 'links-cadastro' },
-  { numero: '16', label: 'Área do Cliente',    emoji: '🌐', to: '/area-cliente',       modulo: 'area-cliente' },
+  { numero: '08', label: 'Empresas (PIN)',     emoji: '🏢', to: '/empresas-admin',     modulo: 'empresas-admin' },
+  { numero: '09', label: 'Agenda',             emoji: '📅', to: '/agenda',             modulo: 'agenda' },
+  { numero: '10', label: 'Diretoria',          emoji: '📊', to: '/diretoria',          modulo: 'diretoria' },
+  { numero: '11', label: 'Video Maker',        emoji: '🎬', to: '/video-maker',        modulo: 'video-maker' },
+  { numero: '12', label: 'Webdesigner',        emoji: '🖌️', to: '/webdesigner',        modulo: 'webdesigner' },
+  { numero: '13', label: 'Turbo AI',           emoji: '✨', to: '/turbo-ai',           modulo: 'turbo-ai' },
+  { numero: '14', label: 'Marketplace',        emoji: '🛒', to: '/marketplace-admin',  modulo: 'marketplace-admin' },
+  { numero: '15', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
+  { numero: '16', label: 'Links de cadastro',  emoji: '🔗', to: '/links-cadastro',     modulo: 'links-cadastro' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {

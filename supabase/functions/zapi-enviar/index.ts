@@ -268,6 +268,128 @@ serve(async (req) => {
         status: 200, headers: { ...CORS, 'content-type': 'application/json' },
       });
     }
+    case 'location': {
+      // Envia coordenadas geográficas. Aceita lat/lng obrigatórios + descrição opcional.
+      const lat = Number(body?.latitude);
+      const lng = Number(body?.longitude);
+      if (!isFinite(lat) || !isFinite(lng)) {
+        return new Response('latitude e longitude obrigatórios', { status: 400, headers: CORS });
+      }
+      const nome = String(body?.nome ?? '').trim();
+      const endereco = String(body?.endereco ?? '').trim();
+      endpoint = 'send-location';
+      payload = { phone: telefone, latitude: lat, longitude: lng, title: nome || undefined, address: endereco || undefined };
+      const rl = await fetch(`${baseUrl()}/${endpoint}`, {
+        method: 'POST', headers: jsonHeaders(), body: JSON.stringify(payload),
+      });
+      if (!rl.ok) {
+        const msg = await rl.text();
+        return new Response(`Z-API: ${msg}`, { status: 502, headers: CORS });
+      }
+      const respZapi = await rl.json().catch(() => ({} as any));
+      const waId: string | null = respZapi?.messageId ?? respZapi?.id ?? null;
+      const rotulo = nome || endereco || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      await sbUser.from('crm_mensagens').insert({
+        lead_id: leadId, telefone, direcao: 'enviada',
+        conteudo: `📍 ${rotulo}`,
+        tipo: 'texto', wa_message_id: waId,
+      });
+      return new Response(JSON.stringify({ ok: true, acao: 'location', wa_message_id: waId }), {
+        status: 200, headers: { ...CORS, 'content-type': 'application/json' },
+      });
+    }
+    case 'buttons': {
+      // Envia mensagem com até 3 botões de resposta rápida.
+      const texto = String(body?.texto ?? '').trim();
+      const botoes: { id?: string; label: string }[] = Array.isArray(body?.botoes)
+        ? body.botoes.map((b: any) => ({ id: b?.id ? String(b.id) : undefined, label: String(b?.label ?? '').trim() })).filter((b: any) => b.label)
+        : [];
+      if (!texto || botoes.length === 0 || botoes.length > 3) {
+        return new Response('texto e 1-3 botões obrigatórios', { status: 400, headers: CORS });
+      }
+      const rb = await fetch(`${baseUrl()}/send-button-list`, {
+        method: 'POST', headers: jsonHeaders(),
+        body: JSON.stringify({
+          phone: telefone,
+          message: texto,
+          buttonList: {
+            buttons: botoes.map((b, i) => ({ id: b.id ?? String(i + 1), label: b.label })),
+          },
+        }),
+      });
+      if (!rb.ok) {
+        const msg = await rb.text();
+        return new Response(`Z-API: ${msg}`, { status: 502, headers: CORS });
+      }
+      const respZapi = await rb.json().catch(() => ({} as any));
+      const waId: string | null = respZapi?.messageId ?? respZapi?.id ?? null;
+      const preview = `${texto}\n\n${botoes.map((b) => `▸ ${b.label}`).join('\n')}`;
+      await sbUser.from('crm_mensagens').insert({
+        lead_id: leadId, telefone, direcao: 'enviada',
+        conteudo: preview, tipo: 'texto', wa_message_id: waId,
+      });
+      return new Response(JSON.stringify({ ok: true, acao: 'buttons', wa_message_id: waId }), {
+        status: 200, headers: { ...CORS, 'content-type': 'application/json' },
+      });
+    }
+    case 'list': {
+      // Lista interativa com seções e itens selecionáveis.
+      const texto = String(body?.texto ?? '').trim();
+      const tituloLista = String(body?.tituloLista ?? '').trim() || 'Selecione';
+      const rotuloBotao = String(body?.rotuloBotao ?? '').trim() || 'Ver opções';
+      const opcoes: { title: string; description?: string; id?: string }[] = Array.isArray(body?.opcoes)
+        ? body.opcoes.map((o: any) => ({
+            title: String(o?.title ?? '').trim(),
+            description: o?.description ? String(o.description) : undefined,
+            id: o?.id ? String(o.id) : undefined,
+          })).filter((o: any) => o.title)
+        : [];
+      if (!texto || opcoes.length === 0) {
+        return new Response('texto e pelo menos 1 opção obrigatórios', { status: 400, headers: CORS });
+      }
+      const rl = await fetch(`${baseUrl()}/send-option-list`, {
+        method: 'POST', headers: jsonHeaders(),
+        body: JSON.stringify({
+          phone: telefone,
+          message: texto,
+          optionList: {
+            title: tituloLista,
+            buttonLabel: rotuloBotao,
+            options: opcoes.map((o, i) => ({
+              title: o.title,
+              description: o.description ?? '',
+              id: o.id ?? String(i + 1),
+            })),
+          },
+        }),
+      });
+      if (!rl.ok) {
+        const msg = await rl.text();
+        return new Response(`Z-API: ${msg}`, { status: 502, headers: CORS });
+      }
+      const respZapi = await rl.json().catch(() => ({} as any));
+      const waId: string | null = respZapi?.messageId ?? respZapi?.id ?? null;
+      const preview = `📋 ${texto}\n${opcoes.map((o, i) => `${i + 1}. ${o.title}`).join('\n')}`;
+      await sbUser.from('crm_mensagens').insert({
+        lead_id: leadId, telefone, direcao: 'enviada',
+        conteudo: preview, tipo: 'texto', wa_message_id: waId,
+      });
+      return new Response(JSON.stringify({ ok: true, acao: 'list', wa_message_id: waId }), {
+        status: 200, headers: { ...CORS, 'content-type': 'application/json' },
+      });
+    }
+    case 'typing': {
+      // Indicador "digitando..." — não grava mensagem, é só sinal.
+      endpoint = 'send-message-status';
+      payload = { phone: telefone, status: 'composing' };
+      const rt = await fetch(`${baseUrl()}/${endpoint}`, {
+        method: 'POST', headers: jsonHeaders(), body: JSON.stringify(payload),
+      });
+      // Silencia falhas — status é best effort.
+      return new Response(JSON.stringify({ ok: rt.ok }), {
+        status: 200, headers: { ...CORS, 'content-type': 'application/json' },
+      });
+    }
     case 'reaction': {
       const wa = String(body?.waMessageId ?? '');
       if (!wa) return new Response('waMessageId obrigatório', { status: 400, headers: CORS });

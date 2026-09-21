@@ -373,7 +373,19 @@ serve(async (req) => {
     midia_nome: salvo.nome ?? dados.midiaNome,
     midia_duracao: dados.midiaDuracao,
   });
-  if (e2) return new Response(e2.message, { status: 500 });
+  if (e2) {
+    // 23505 = unique_violation. Segunda entrega do mesmo wa_message_id chegou
+    // no mesmo instante que a primeira e ambas passaram no SELECT — o UNIQUE
+    // INDEX (migration 0029) barrou a segunda. Isso é sucesso, não erro.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isDup = (e2 as any).code === '23505' || /duplicate key|unique/i.test(e2.message);
+    if (isDup) {
+      return new Response(JSON.stringify({ ok: true, dedup: true, race: true }), {
+        status: 200, headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response(e2.message, { status: 500 });
+  }
 
   return new Response(JSON.stringify({ ok: true, lead_id: leadId, tipo: dados.tipo }), {
     status: 200, headers: { 'content-type': 'application/json' },

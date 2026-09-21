@@ -145,7 +145,7 @@ export function DemandasPage() {
             <Card className="flex justify-center p-12"><Spinner /></Card>
           ) : aba === 'quadro' ? (
             <KanbanBoard<DemandaView>
-              columns={DEMANDA_COLUNAS.filter((c) => c.id !== 'concluida')}
+              columns={DEMANDA_COLUNAS.filter((c) => c.id !== 'concluida' && (setor === 'socios' || !c.socios_only))}
               items={quadro}
               columnOf={(d) => d.status}
               keyOf={(d) => d.id}

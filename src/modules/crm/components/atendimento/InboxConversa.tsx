@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   useCrmMensagens, useEnviarMensagem, useEtapasCrm,
   useReagirMensagem, useApagarMensagem, useEditarMensagem, useFavoritarMensagem,
+  useEnviarTyping,
 } from '@/modules/crm/api/crmApi';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { useMarcarMonitorado } from '@/modules/crm/api/solicitacoesApi';
@@ -17,7 +18,18 @@ import { AudioRecorder } from './AudioRecorder';
 import { RespostasRapidasModal } from './RespostasRapidasModal';
 import { ContatoModal } from './ContatoModal';
 import { EnqueteModal } from './EnqueteModal';
+import { LocalizacaoModal } from './LocalizacaoModal';
+import { LinkPreviewCard } from './LinkPreviewCard';
 import { EventoModal } from './EventoModal';
+import { BotoesModal } from './BotoesModal';
+import { ListaModal } from './ListaModal';
+import { GrupoMembrosModal } from './GrupoMembrosModal';
+import { NotifBar } from './NotifBar';
+import {
+  useAssumirConversa, useLiberarConversa,
+  useNotasInternas, useAdicionarNota,
+  useRegistrarPresenca, usePresencas,
+} from '@/modules/crm/api/multiAtendenteApi';
 import { useRespostasRapidas, filtrarPorAtalho } from '@/modules/crm/api/respostasRapidasApi';
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
@@ -38,6 +50,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
   const { data: etapas } = useEtapasCrm();
   const { data: operadores } = useOperadores();
   const enviar = useEnviarMensagem();
+  const typing = useEnviarTyping();
   const reagir = useReagirMensagem();
   const apagar = useApagarMensagem();
   const editar = useEditarMensagem();
@@ -49,6 +62,12 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
   const arquivar = useArquivarConversa();
   const atribuir = useAtribuirConversa();
   const mudarEtapa = useMudarEtapa();
+  const assumir = useAssumirConversa();
+  const liberar = useLiberarConversa();
+  const { data: notas } = useNotasInternas(conversa.id);
+  const adicionarNota = useAdicionarNota();
+  useRegistrarPresenca(conversa.id);
+  const { data: presencas } = usePresencas(conversa.id);
 
   const [texto, setTexto] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -60,6 +79,10 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
   const [contatoOpen, setContatoOpen] = useState(false);
   const [enqueteOpen, setEnqueteOpen] = useState(false);
   const [eventoOpen, setEventoOpen] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
+  const [botoesOpen, setBotoesOpen] = useState(false);
+  const [listaOpen, setListaOpen] = useState(false);
+  const [membrosOpen, setMembrosOpen] = useState(false);
   const { lista: templates } = useRespostasRapidas();
   const [respondendo, setRespondendo] = useState<CrmMensagem | null>(null);
   const [reacaoAlvoId, setReacaoAlvoId] = useState<string | null>(null);
@@ -90,9 +113,30 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
     return m;
   }, [mensagens]);
 
+  // Timeline unificada: mensagens + notas internas ordenadas por data.
+  const timelineItens = useMemo(() => {
+    type Item = { tipo: 'msg'; m: CrmMensagem; ts: number } | { tipo: 'nota'; n: { id: string; texto: string; autor_nome: string | null; created_at: string }; ts: number };
+    const itens: Item[] = [];
+    for (const m of (mensagens ?? [])) itens.push({ tipo: 'msg', m, ts: new Date(m.hora).getTime() });
+    for (const n of (notas ?? [])) itens.push({ tipo: 'nota', n, ts: new Date(n.created_at).getTime() });
+    itens.sort((a, b) => a.ts - b.ts);
+    return itens;
+  }, [mensagens, notas]);
+
+  const typingRef = useRef<number | null>(null);
+  const typingUltimoRef = useRef<number>(0);
+
+  const bloqueadoPorAtendente = Boolean(
+    conversa.atendente_id && profile?.id && conversa.atendente_id !== profile.id,
+  );
+
   async function handleEnviar() {
     const t = texto.trim();
     if (!t) return;
+    if (bloqueadoPorAtendente) {
+      alert('Essa conversa está com outro atendente. Assuma antes de enviar.');
+      return;
+    }
     await enviar.mutateAsync({
       leadId: conversa.id, texto: t,
       respondendoWaId: respondendo?.wa_message_id ?? undefined,
@@ -168,6 +212,25 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               {listaOperadores.map((op) => <option key={op.id} value={op.id}>{op.nome}</option>)}
             </select>
           </label>
+          {!conversa.atendente_id && (
+            <button
+              onClick={() => assumir.mutate(conversa.id)}
+              className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20"
+              disabled={assumir.isPending}
+            >
+              🙋 Assumir
+            </button>
+          )}
+          {conversa.atendente_id && conversa.atendente_id === profile?.id && (
+            <button
+              onClick={() => liberar.mutate(conversa.id)}
+              className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
+              disabled={liberar.isPending}
+              title="Devolver pra fila"
+            >
+              🔓 Liberar
+            </button>
+          )}
           <button
             onClick={() => fixar.mutate({ leadId: conversa.id, fixado: !conversa.fixado })}
             className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
@@ -181,6 +244,15 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           >
             {conversa.arquivado ? '📤 Desarquivar' : '📦 Arquivar'}
           </button>
+          {conversa.is_grupo && (
+            <button
+              onClick={() => setMembrosOpen(true)}
+              className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
+              title="Ver participantes do grupo"
+            >
+              👥 Membros
+            </button>
+          )}
           {conversa.is_grupo && (
             <button
               onClick={() =>
@@ -206,18 +278,64 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           >
             ⚡ Templates
           </button>
+          <button
+            onClick={() => {
+              const t = window.prompt('Nota interna (não vai pro cliente):');
+              if (t && t.trim()) adicionarNota.mutate({ leadId: conversa.id, texto: t.trim() });
+            }}
+            className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-200 hover:bg-amber-500/20"
+            title="Nota interna visível só para a equipe"
+          >
+            📝 Nota
+          </button>
+          <NotifBar />
           <Button variant="secondary" onClick={onIrParaFunil}>Ver no funil</Button>
         </div>
       </div>
+
+      {/* Banners multi-atendente */}
+      {bloqueadoPorAtendente && (
+        <div className="flex items-center justify-between gap-3 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-200">
+          <span>⚠️ Esta conversa está com <strong>{conversa.atendente_nome ?? 'outro atendente'}</strong>. Você está em modo leitura.</span>
+          <button
+            onClick={() => assumir.mutate(conversa.id)}
+            className="rounded-md border border-amber-400/50 bg-amber-500/20 px-2 py-1 font-semibold hover:bg-amber-500/30"
+            disabled={assumir.isPending}
+          >Assumir mesmo assim</button>
+        </div>
+      )}
+      {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length > 0 && (
+        <div className="border-b border-white/10 bg-white/5 px-4 py-1.5 text-[11px] text-slate-400">
+          👀 {(presencas ?? []).filter((p) => p.user_id !== profile?.id).map((p) => p.user_nome ?? 'alguém').join(', ')} {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length === 1 ? 'está vendo essa conversa' : 'estão vendo essa conversa'}
+        </div>
+      )}
 
       {/* Timeline */}
       <div className="flex-1 space-y-1 overflow-y-auto px-1 py-4">
         {isLoading ? (
           <div className="flex justify-center py-8"><Spinner /></div>
-        ) : !mensagens || mensagens.length === 0 ? (
+        ) : timelineItens.length === 0 ? (
           <p className="py-8 text-center text-xs text-slate-400">Sem mensagens ainda.</p>
         ) : (
-          mensagens.map((m) => {
+          timelineItens.map((item) => {
+            if (item.tipo === 'nota') {
+              const n = item.n;
+              return (
+                <div key={`n-${n.id}`} className="my-2 flex justify-center">
+                  <div className="max-w-[85%] rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                    <div className="mb-0.5 flex items-center gap-2 text-[10px] uppercase tracking-wide text-amber-300/80">
+                      <span>📝 nota interna</span>
+                      <span>·</span>
+                      <span>{n.autor_nome ?? 'anônimo'}</span>
+                      <span>·</span>
+                      <span>{new Date(n.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div className="whitespace-pre-wrap">{n.texto}</div>
+                  </div>
+                </div>
+              );
+            }
+            const m = item.m;
             const enviada = m.direcao === 'enviada';
             const quote = m.respondendo_id ? mensagensPorId.get(m.respondendo_id) : null;
             return (
@@ -336,7 +454,12 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                     ) : m.tipo && m.tipo !== 'texto' ? (
                       <MidiaBubble msg={m} />
                     ) : (
-                      <div className="whitespace-pre-wrap break-words">{m.texto}</div>
+                      <>
+                        {m.texto && /https?:\/\//i.test(m.texto) && (
+                          <LinkPreviewCard texto={m.texto} mensagemId={m.id} linkPreviewCache={m.link_preview ?? null} />
+                        )}
+                        <div className="whitespace-pre-wrap break-words">{m.texto}</div>
+                      </>
                     )}
 
                     {/* Hora + editada + favorita */}
@@ -467,6 +590,24 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
             >
               📅 Evento
             </button>
+            <button
+              onClick={() => { setAnexoMenuOpen(false); setLocalOpen(true); }}
+              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+            >
+              📍 Localização
+            </button>
+            <button
+              onClick={() => { setAnexoMenuOpen(false); setBotoesOpen(true); }}
+              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+            >
+              🔘 Botões (até 3)
+            </button>
+            <button
+              onClick={() => { setAnexoMenuOpen(false); setListaOpen(true); }}
+              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+            >
+              📋 Lista interativa
+            </button>
           </div>
         )}
 
@@ -526,7 +667,18 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           <>
             <textarea
               value={texto}
-              onChange={(e) => setTexto(e.target.value)}
+              onChange={(e) => {
+                setTexto(e.target.value);
+                if (typingRef.current) window.clearTimeout(typingRef.current);
+                if (e.target.value.trim().length > 0 && !bloqueadoPorAtendente) {
+                  // Ping a Z-API a cada 4s enquanto digita (evita spam)
+                  if (!typingUltimoRef.current || Date.now() - typingUltimoRef.current > 4000) {
+                    typingUltimoRef.current = Date.now();
+                    typing.mutate(conversa.id);
+                  }
+                  typingRef.current = window.setTimeout(() => { typingUltimoRef.current = 0; }, 5000);
+                }
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -601,6 +753,17 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
       <ContatoModal open={contatoOpen} onClose={() => setContatoOpen(false)} leadId={conversa.id} />
       <EnqueteModal open={enqueteOpen} onClose={() => setEnqueteOpen(false)} leadId={conversa.id} />
       <EventoModal open={eventoOpen} onClose={() => setEventoOpen(false)} leadId={conversa.id} />
+      <LocalizacaoModal open={localOpen} onClose={() => setLocalOpen(false)} leadId={conversa.id} />
+      <BotoesModal open={botoesOpen} onClose={() => setBotoesOpen(false)} leadId={conversa.id} />
+      <ListaModal open={listaOpen} onClose={() => setListaOpen(false)} leadId={conversa.id} />
+      {conversa.is_grupo && (
+        <GrupoMembrosModal
+          open={membrosOpen}
+          onClose={() => setMembrosOpen(false)}
+          leadId={conversa.id}
+          nomeGrupo={conversa.nome}
+        />
+      )}
 
       {/* Dados da mensagem */}
       {dadosMsg && (

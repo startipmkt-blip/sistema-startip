@@ -82,6 +82,13 @@ export interface CrmMensagem {
   apagada_para_todos?: boolean;
   favorita_ids?: string[]; // ids de atendentes que favoritaram
   status?: 'enviada' | 'entregue' | 'lida' | 'falhou' | 'apagada' | null;
+  link_preview?: {
+    url: string;
+    title: string | null;
+    description: string | null;
+    image: string | null;
+    site_name: string | null;
+  } | null;
 }
 
 // Uma linha da inbox: lead + últimos metadados de conversa.

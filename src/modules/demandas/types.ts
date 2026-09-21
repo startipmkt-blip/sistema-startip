@@ -1,4 +1,4 @@
-export type DemandaStatus = 'aberta' | 'fazendo' | 'concluida';
+export type DemandaStatus = 'aberta' | 'iuri' | 'domini' | 'fazendo' | 'concluida';
 export type DemandaPrioridade = 'baixa' | 'media' | 'alta';
 export type DemandaSetor = 'socios' | 'trafego' | 'design' | 'geral';
 
@@ -26,8 +26,10 @@ export interface DemandaView extends Demanda {
   cliente_nome: string;
 }
 
-export const DEMANDA_COLUNAS: { id: DemandaStatus; label: string }[] = [
+export const DEMANDA_COLUNAS: { id: DemandaStatus; label: string; socios_only?: boolean }[] = [
   { id: 'aberta', label: 'Aberta' },
+  { id: 'iuri', label: 'Demandas Iuri', socios_only: true },
+  { id: 'domini', label: 'Demandas Domini', socios_only: true },
   { id: 'fazendo', label: 'Em andamento' },
   { id: 'concluida', label: 'Concluída' },
 ];

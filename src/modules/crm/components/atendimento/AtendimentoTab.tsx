@@ -8,6 +8,7 @@ import { InboxSidebar } from './InboxSidebar';
 import { InboxLista } from './InboxLista';
 import { InboxConversa } from './InboxConversa';
 import { useInboxBadge } from '@/modules/crm/hooks/useInboxBadge';
+import { useNotificacoesCrm } from '@/modules/crm/api/notificacoesApi';
 
 interface Props {
   onIrParaFunil: (leadId: string) => void;
@@ -49,6 +50,7 @@ export function AtendimentoTab({ onIrParaFunil }: Props) {
 
   useInboxRealtime();
   useInboxBadge();
+  useNotificacoesCrm();
   const { data: conversasFiltradas, isLoading } = useConversas(filtro, atendente);
   const { data: operadores } = useOperadores();
 

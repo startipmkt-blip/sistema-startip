@@ -123,7 +123,7 @@ async function fetchMensagens(leadId: string): Promise<CrmMensagem[]> {
   }
   const { data, error } = await supabase
     .from('crm_mensagens')
-    .select('id, lead_id, direcao, conteudo, enviada_em, lida, nome_remetente, tipo, midia_path, midia_mime, midia_nome, midia_duracao, wa_message_id, respondendo_id, reacoes, editada_em, apagada_em, apagada_para_todos, favorita_ids, status')
+    .select('id, lead_id, direcao, conteudo, enviada_em, lida, nome_remetente, tipo, midia_path, midia_mime, midia_nome, midia_duracao, wa_message_id, respondendo_id, reacoes, editada_em, apagada_em, apagada_para_todos, favorita_ids, status, link_preview')
     .eq('lead_id', leadId)
     .order('enviada_em', { ascending: true });
   if (error) throw error;
@@ -139,6 +139,7 @@ async function fetchMensagens(leadId: string): Promise<CrmMensagem[]> {
       editada_em?: string | null; apagada_em?: string | null;
       apagada_para_todos?: boolean; favorita_ids?: string[];
       status?: string | null;
+      link_preview?: CrmMensagem['link_preview'];
     };
     return {
       id: row.id,
@@ -161,6 +162,7 @@ async function fetchMensagens(leadId: string): Promise<CrmMensagem[]> {
       apagada_para_todos: row.apagada_para_todos ?? false,
       favorita_ids: row.favorita_ids ?? [],
       status: (row.status as CrmMensagem['status']) ?? null,
+      link_preview: row.link_preview ?? null,
     } as CrmMensagem;
   });
 }
@@ -309,6 +311,45 @@ async function encaminharMensagem(leadId: string, waMessageId: string, paraTelef
   if (error) throw error;
 }
 
+async function enviarLocalizacao(
+  leadId: string, latitude: number, longitude: number, nome: string | null, endereco: string | null,
+): Promise<void> {
+  if (IS_DEMO) return;
+  const { error } = await supabase.functions.invoke('zapi-enviar', {
+    body: { leadId, acao: 'location', latitude, longitude, nome, endereco },
+  });
+  if (error) throw error;
+}
+
+async function enviarBotoes(
+  leadId: string, texto: string, botoes: { label: string; id?: string }[],
+): Promise<void> {
+  if (IS_DEMO) return;
+  const { error } = await supabase.functions.invoke('zapi-enviar', {
+    body: { leadId, acao: 'buttons', texto, botoes },
+  });
+  if (error) throw error;
+}
+
+async function enviarLista(
+  leadId: string, texto: string, tituloLista: string, rotuloBotao: string,
+  opcoes: { title: string; description?: string; id?: string }[],
+): Promise<void> {
+  if (IS_DEMO) return;
+  const { error } = await supabase.functions.invoke('zapi-enviar', {
+    body: { leadId, acao: 'list', texto, tituloLista, rotuloBotao, opcoes },
+  });
+  if (error) throw error;
+}
+
+// "digitando..." — best effort, silencia erros.
+async function enviarTyping(leadId: string): Promise<void> {
+  if (IS_DEMO) return;
+  try {
+    await supabase.functions.invoke('zapi-enviar', { body: { leadId, acao: 'typing' } });
+  } catch { /* ignore */ }
+}
+
 export function useCrmLeads(etiqueta = '') {
   return useQuery({ queryKey: crmKeys.leads(etiqueta), queryFn: () => fetchLeads(etiqueta) });
 }
@@ -432,5 +473,32 @@ export function useEncaminharMensagem() {
   return useMutation({
     mutationFn: (p: { leadId: string; waMessageId: string; paraTelefone: string }) =>
       encaminharMensagem(p.leadId, p.waMessageId, p.paraTelefone),
+  });
+}
+export function useEnviarLocalizacao() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { leadId: string; latitude: number; longitude: number; nome: string | null; endereco: string | null }) =>
+      enviarLocalizacao(p.leadId, p.latitude, p.longitude, p.nome, p.endereco),
+    onSuccess: (_d, p) => qc.invalidateQueries({ queryKey: crmKeys.mensagens(p.leadId) }),
+  });
+}
+export function useEnviarTyping() {
+  return useMutation({ mutationFn: (leadId: string) => enviarTyping(leadId) });
+}
+export function useEnviarBotoes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { leadId: string; texto: string; botoes: { label: string; id?: string }[] }) =>
+      enviarBotoes(p.leadId, p.texto, p.botoes),
+    onSuccess: (_d, p) => qc.invalidateQueries({ queryKey: crmKeys.mensagens(p.leadId) }),
+  });
+}
+export function useEnviarLista() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { leadId: string; texto: string; tituloLista: string; rotuloBotao: string; opcoes: { title: string; description?: string; id?: string }[] }) =>
+      enviarLista(p.leadId, p.texto, p.tituloLista, p.rotuloBotao, p.opcoes),
+    onSuccess: (_d, p) => qc.invalidateQueries({ queryKey: crmKeys.mensagens(p.leadId) }),
   });
 }
