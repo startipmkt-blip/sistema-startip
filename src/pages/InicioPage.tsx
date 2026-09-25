@@ -18,6 +18,7 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
   { numero: '06', label: 'Aprovação',          emoji: '✅', to: '/aprovacao-conteudo', modulo: 'aprovacao-conteudo' },
   { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
+  { numero: '17', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
@@ -30,7 +31,6 @@ const GERENCIAL: ModuloCard[] = [
   { numero: '14', label: 'Marketplace',        emoji: '🛒', to: '/marketplace-admin',  modulo: 'marketplace-admin' },
   { numero: '15', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
   { numero: '16', label: 'Links de cadastro',  emoji: '🔗', to: '/links-cadastro',     modulo: 'links-cadastro' },
-  { numero: '17', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {
