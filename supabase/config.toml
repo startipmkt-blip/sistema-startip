@@ -1,0 +1,16 @@
+project_id = "oxenrjsagtfmdgcrkvzs"
+
+[functions.zapi-webhook]
+verify_jwt = false
+
+[functions.aprovacao-publica]
+verify_jwt = false
+
+[functions.central-cliente]
+verify_jwt = false
+
+[functions.marketplace-publico]
+verify_jwt = false
+
+[functions.onboarding-publico]
+verify_jwt = false
