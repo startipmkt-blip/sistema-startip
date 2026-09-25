@@ -12,14 +12,16 @@ import { DemandaFormModal } from '../components/DemandaFormModal';
 import { SocialMediaPage } from '@/modules/social-media/pages/SocialMediaPage';
 import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
 import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
+import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 
-type Aba = 'demandas' | 'producao' | 'calendario' | 'aprovacao';
+type Aba = 'demandas' | 'producao' | 'calendario' | 'aprovacao' | 'datas';
 
 const ABAS: Array<{ id: Aba; label: string; icone: string }> = [
   { id: 'demandas',    label: 'Demandas',   icone: '📥' },
   { id: 'producao',    label: 'Produção',   icone: '🎨' },
   { id: 'calendario',  label: 'Calendário', icone: '🗓' },
   { id: 'aprovacao',   label: 'Aprovação',  icone: '✅' },
+  { id: 'datas',       label: 'Datas comemorativas', icone: '🎉' },
 ];
 
 export function DesignerPage() {
@@ -51,6 +53,7 @@ export function DesignerPage() {
       {aba === 'producao'    && <ConteudoPage />}
       {aba === 'calendario'  && <SocialMediaPage />}
       {aba === 'aprovacao'   && <AprovacaoConteudoPage />}
+      {aba === 'datas'       && <DatasComemorativasPage />}
     </div>
   );
 }

@@ -40,6 +40,8 @@ import { CadastroPublicoPage } from '@/pages/CadastroPublicoPage';
 import { CentralClientePage } from '@/pages/CentralClientePage';
 import { AprovacaoPublicaPage } from '@/pages/AprovacaoPublicaPage';
 import { PortalAprovacao } from '@/portal/pages/PortalAprovacao';
+import { CalendarioPublicoPage } from '@/pages/CalendarioPublicoPage';
+import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 
 // Padrão para módulos futuros: envolva a page em <RequireModulo modulo="chave">
 // para respeitar a permissão do cargo.
@@ -49,6 +51,7 @@ export const router = createBrowserRouter([
   { path: '/cadastro/:slug', element: <CadastroPublicoPage /> },
   { path: '/central/:slug', element: <CentralClientePage /> },
   { path: '/aprovar/:slug', element: <AprovacaoPublicaPage /> },
+  { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
   { path: '/marketplace', element: <MarketplacePublicoPage /> },
   {
     element: <ProtectedRoute />,
@@ -82,6 +85,7 @@ export const router = createBrowserRouter([
           { path: 'designer', element: <RequireModulo modulo="conteudo"><DesignerPage /></RequireModulo> },
           { path: 'conteudo', element: <Navigate to="/designer" replace /> },
           { path: 'aprovacao-conteudo', element: <RequireModulo modulo="aprovacao-conteudo"><AprovacaoConteudoPage /></RequireModulo> },
+          { path: 'datas-comemorativas', element: <RequireModulo modulo="datas-comemorativas"><DatasComemorativasPage /></RequireModulo> },
           { path: 'demandas', element: <RequireModulo modulo="demandas"><DemandasPage /></RequireModulo> },
           { path: 'usuarios', element: <RequireModulo modulo="usuarios"><UsuariosPage /></RequireModulo> },
           { path: 'contratos', element: <RequireModulo modulo="contratos"><ContratosPage /></RequireModulo> },

@@ -23,6 +23,7 @@ export const navItems: NavItem[] = [
   { label: 'Onboarding', to: '/onboarding', icon: 'onboarding', comingSoon: false },
   { label: 'Designer', to: '/designer', icon: 'conteudo', comingSoon: false },
   { label: 'Aprovação de conteúdo', to: '/aprovacao-conteudo', icon: 'aprovacao', comingSoon: false },
+  { label: 'Datas comemorativas', to: '/datas-comemorativas', icon: 'calendario', comingSoon: false },
   { label: 'Demandas', to: '/demandas', icon: 'demandas', comingSoon: false },
   { label: 'Contratos', to: '/contratos', icon: 'contratos', comingSoon: false },
   { label: 'Links de cadastro', to: '/links-cadastro', icon: 'link', comingSoon: false, equipeOnly: true },

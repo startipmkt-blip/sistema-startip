@@ -2,7 +2,7 @@
 export type IconName =
   | 'home' | 'clientes' | 'crm' | 'financeiro' | 'area-cliente' | 'processos'
   | 'indicacao' | 'onboarding' | 'conteudo' | 'aprovacao' | 'demandas' | 'usuarios'
-  | 'contratos'
+  | 'contratos' | 'calendario'
   | 'plus' | 'search' | 'logout' | 'chevron-right' | 'sparkles' | 'link' | 'bell';
 
 const paths: Record<IconName, string> = {
@@ -19,6 +19,7 @@ const paths: Record<IconName, string> = {
   demandas: 'M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11',
   usuarios: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11',
   contratos: 'M9 12h6M9 16h6M8 3h8l4 4v14H4V3zM16 3v4h4',
+  calendario: 'M4 6h16v15H4zM4 10h16M8 3v4M16 3v4M12 14v4M10 16h4',
   plus: 'M12 5v14M5 12h14',
   search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',

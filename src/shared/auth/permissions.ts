@@ -23,6 +23,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'onboarding', label: 'Onboarding' },
   { key: 'conteudo', label: 'Conteúdo' },
   { key: 'aprovacao-conteudo', label: 'Aprovação de conteúdo' },
+  { key: 'datas-comemorativas', label: 'Datas comemorativas' },
   { key: 'demandas', label: 'Demandas' },
   { key: 'contratos', label: 'Contratos' },
   { key: 'links-cadastro', label: 'Links de cadastro' },
