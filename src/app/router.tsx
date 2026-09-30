@@ -44,6 +44,9 @@ import { CalendarioPublicoPage } from '@/pages/CalendarioPublicoPage';
 import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 import { PainelTvPage } from '@/pages/PainelTvPage';
 import { PainelTvAdminPage } from '@/modules/painel-tv/pages/PainelTvAdminPage';
+import { OtimizacoesListaPage } from '@/modules/otimizacoes/pages/OtimizacoesListaPage';
+import { OtimizacoesClientePage } from '@/modules/otimizacoes/pages/OtimizacoesClientePage';
+import { OtimizacoesPublicaPage } from '@/pages/OtimizacoesPublicaPage';
 
 // Padrão para módulos futuros: envolva a page em <RequireModulo modulo="chave">
 // para respeitar a permissão do cargo.
@@ -55,6 +58,7 @@ export const router = createBrowserRouter([
   { path: '/aprovar/:slug', element: <AprovacaoPublicaPage /> },
   { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
   { path: '/tv/:slug', element: <PainelTvPage /> },
+  { path: '/otim/:token', element: <OtimizacoesPublicaPage /> },
   { path: '/marketplace', element: <MarketplacePublicoPage /> },
   {
     element: <ProtectedRoute />,
@@ -101,6 +105,8 @@ export const router = createBrowserRouter([
           { path: 'diretoria',  element: <RequireModulo modulo="diretoria"><DiretoriaPage /></RequireModulo> },
           { path: 'meta-ads',   element: <RequireModulo modulo="diretoria"><MetaAdsGestorPage /></RequireModulo> },
           { path: 'trafego',    element: <RequireModulo modulo="diretoria"><TrafegoPage /></RequireModulo> },
+          { path: 'otimizacoes', element: <RequireModulo modulo="otimizacoes"><OtimizacoesListaPage /></RequireModulo> },
+          { path: 'otimizacoes/:slug', element: <RequireModulo modulo="otimizacoes"><OtimizacoesClientePage /></RequireModulo> },
           { path: 'marketplace-admin', element: <RequireModulo modulo="marketplace-admin"><MarketplaceAdminPage /></RequireModulo> },
           { path: 'empresas-admin', element: <RequireModulo modulo="empresas-admin"><EmpresasAdminPage /></RequireModulo> },
           { path: 'social-media', element: <Navigate to="/designer" replace /> },

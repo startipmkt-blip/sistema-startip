@@ -34,6 +34,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'video-maker', label: 'Video Maker' },
   { key: 'webdesigner', label: 'Webdesigner' },
   { key: 'diretoria', label: 'Diretoria' },
+  { key: 'otimizacoes', label: 'Otimização de Campanhas' },
   { key: 'marketplace-admin', label: 'Marketplace' },
   { key: 'empresas-admin', label: 'Empresas (PIN)' },
   { key: 'usuarios', label: 'Usuários' },

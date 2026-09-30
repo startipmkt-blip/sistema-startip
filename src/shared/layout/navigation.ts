@@ -34,6 +34,7 @@ export const navItems: NavItem[] = [
   { label: 'Webdesigner', to: '/webdesigner', icon: 'conteudo', comingSoon: false },
   { label: 'Diretoria', to: '/diretoria', icon: 'financeiro', comingSoon: false, equipeOnly: true },
   { label: 'Tráfego Pago', to: '/trafego', icon: 'financeiro', comingSoon: false, equipeOnly: true },
+  { label: 'Otimizações', to: '/otimizacoes', icon: 'financeiro', comingSoon: false, equipeOnly: true },
   { label: 'Marketplace', to: '/marketplace-admin', icon: 'clientes', comingSoon: false, equipeOnly: true },
   { label: 'Empresas (PIN)', to: '/empresas-admin', icon: 'clientes', comingSoon: false, equipeOnly: true },
   { label: 'Usuários', to: '/usuarios', icon: 'usuarios', comingSoon: false },

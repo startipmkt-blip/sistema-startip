@@ -18,20 +18,21 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
   { numero: '06', label: 'Aprovação',          emoji: '✅', to: '/aprovacao-conteudo', modulo: 'aprovacao-conteudo' },
   { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
-  { numero: '17', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
-  { numero: '18', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
+  { numero: '08', label: 'Otimizações',        emoji: '📈', to: '/otimizacoes',        modulo: 'otimizacoes' },
+  { numero: '09', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
+  { numero: '10', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '08', label: 'Empresas (PIN)',     emoji: '🏢', to: '/empresas-admin',     modulo: 'empresas-admin' },
-  { numero: '09', label: 'Agenda',             emoji: '📅', to: '/agenda',             modulo: 'agenda' },
-  { numero: '10', label: 'Diretoria',          emoji: '📊', to: '/diretoria',          modulo: 'diretoria' },
-  { numero: '11', label: 'Video Maker',        emoji: '🎬', to: '/video-maker',        modulo: 'video-maker' },
-  { numero: '12', label: 'Webdesigner',        emoji: '🖌️', to: '/webdesigner',        modulo: 'webdesigner' },
-  { numero: '13', label: 'Turbo AI',           emoji: '✨', to: '/turbo-ai',           modulo: 'turbo-ai' },
-  { numero: '14', label: 'Marketplace',        emoji: '🛒', to: '/marketplace-admin',  modulo: 'marketplace-admin' },
-  { numero: '15', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
-  { numero: '16', label: 'Links de cadastro',  emoji: '🔗', to: '/links-cadastro',     modulo: 'links-cadastro' },
+  { numero: '11', label: 'Empresas (PIN)',     emoji: '🏢', to: '/empresas-admin',     modulo: 'empresas-admin' },
+  { numero: '12', label: 'Agenda',             emoji: '📅', to: '/agenda',             modulo: 'agenda' },
+  { numero: '13', label: 'Diretoria',          emoji: '📊', to: '/diretoria',          modulo: 'diretoria' },
+  { numero: '14', label: 'Video Maker',        emoji: '🎬', to: '/video-maker',        modulo: 'video-maker' },
+  { numero: '15', label: 'Webdesigner',        emoji: '🖌️', to: '/webdesigner',        modulo: 'webdesigner' },
+  { numero: '16', label: 'Turbo AI',           emoji: '✨', to: '/turbo-ai',           modulo: 'turbo-ai' },
+  { numero: '17', label: 'Marketplace',        emoji: '🛒', to: '/marketplace-admin',  modulo: 'marketplace-admin' },
+  { numero: '18', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
+  { numero: '19', label: 'Links de cadastro',  emoji: '🔗', to: '/links-cadastro',     modulo: 'links-cadastro' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {
