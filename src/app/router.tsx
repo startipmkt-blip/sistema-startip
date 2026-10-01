@@ -23,18 +23,10 @@ import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/Aprova
 import { DemandasPage } from '@/modules/demandas/pages/DemandasPage';
 import { UsuariosPage } from '@/modules/usuarios/pages/UsuariosPage';
 import { ContratosPage } from '@/modules/contratos/pages/ContratosPage';
-import { LinksCadastroPage } from '@/modules/onboarding-publico/pages/LinksCadastroPage';
-import { TurboAiPage } from '@/modules/turbo-ai/pages/TurboAiPage';
-import { AgendaPage } from '@/modules/agenda/pages/AgendaPage';
-import { ProducaoPage } from '@/modules/producao/pages/ProducaoPage';
-import { DiretoriaPage } from '@/modules/diretoria/pages/DiretoriaPage';
 import { MetaAdsGestorPage } from '@/modules/meta-ads/pages/MetaAdsGestorPage';
 import { TrafegoPage } from '@/modules/trafego/pages/TrafegoPage';
 import { DesignerPage } from '@/modules/designer/pages/DesignerPage';
 import { Navigate } from 'react-router-dom';
-import { MarketplaceAdminPage } from '@/modules/marketplace/pages/MarketplaceAdminPage';
-import { EmpresasAdminPage } from '@/modules/empresas-admin/pages/EmpresasAdminPage';
-import { PainelClientePage } from '@/modules/painel-cliente/pages/PainelClientePage';
 import { MarketplacePublicoPage } from '@/pages/MarketplacePublicoPage';
 import { CadastroPublicoPage } from '@/pages/CadastroPublicoPage';
 import { CentralClientePage } from '@/pages/CentralClientePage';
@@ -97,20 +89,12 @@ export const router = createBrowserRouter([
           { path: 'demandas', element: <RequireModulo modulo="demandas"><DemandasPage /></RequireModulo> },
           { path: 'usuarios', element: <RequireModulo modulo="usuarios"><UsuariosPage /></RequireModulo> },
           { path: 'contratos', element: <RequireModulo modulo="contratos"><ContratosPage /></RequireModulo> },
-          { path: 'links-cadastro', element: <RequireModulo modulo="links-cadastro"><LinksCadastroPage /></RequireModulo> },
-          { path: 'turbo-ai', element: <RequireModulo modulo="turbo-ai"><TurboAiPage /></RequireModulo> },
-          { path: 'agenda', element: <RequireModulo modulo="agenda"><AgendaPage /></RequireModulo> },
-          { path: 'video-maker', element: <RequireModulo modulo="video-maker"><ProducaoPage tipo="video" /></RequireModulo> },
-          { path: 'webdesigner', element: <RequireModulo modulo="webdesigner"><ProducaoPage tipo="post"  /></RequireModulo> },
-          { path: 'diretoria',  element: <RequireModulo modulo="diretoria"><DiretoriaPage /></RequireModulo> },
           { path: 'meta-ads',   element: <RequireModulo modulo="diretoria"><MetaAdsGestorPage /></RequireModulo> },
+          { path: 'painel-cliente', element: <Navigate to="/area-cliente" replace /> },
           { path: 'trafego',    element: <RequireModulo modulo="diretoria"><TrafegoPage /></RequireModulo> },
           { path: 'otimizacoes', element: <RequireModulo modulo="otimizacoes"><OtimizacoesListaPage /></RequireModulo> },
           { path: 'otimizacoes/:slug', element: <RequireModulo modulo="otimizacoes"><OtimizacoesClientePage /></RequireModulo> },
-          { path: 'marketplace-admin', element: <RequireModulo modulo="marketplace-admin"><MarketplaceAdminPage /></RequireModulo> },
-          { path: 'empresas-admin', element: <RequireModulo modulo="empresas-admin"><EmpresasAdminPage /></RequireModulo> },
           { path: 'social-media', element: <Navigate to="/designer" replace /> },
-          { path: 'painel-cliente', element: <RequireModulo modulo="area-cliente"><PainelClientePage /></RequireModulo> },
         ],
       },
     ],

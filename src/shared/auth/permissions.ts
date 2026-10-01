@@ -27,16 +27,9 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'painel-tv', label: 'Painel TV' },
   { key: 'demandas', label: 'Demandas' },
   { key: 'contratos', label: 'Contratos' },
-  { key: 'links-cadastro', label: 'Links de cadastro' },
-  { key: 'turbo-ai', label: 'Turbo AI' },
-  { key: 'agenda', label: 'Agenda' },
   { key: 'social-media', label: 'Social Media' },
-  { key: 'video-maker', label: 'Video Maker' },
-  { key: 'webdesigner', label: 'Webdesigner' },
-  { key: 'diretoria', label: 'Diretoria' },
+  { key: 'diretoria', label: 'Tráfego Pago' },
   { key: 'otimizacoes', label: 'Otimização de Campanhas' },
-  { key: 'marketplace-admin', label: 'Marketplace' },
-  { key: 'empresas-admin', label: 'Empresas (PIN)' },
   { key: 'usuarios', label: 'Usuários' },
 ];
 

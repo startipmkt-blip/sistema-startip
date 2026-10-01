@@ -44,7 +44,7 @@ export function PainelClientePage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Painel do Cliente" subtitle="Alimente as abas que o cliente vê na Central pública.">
+      <PageHeader title="Painel do cliente" subtitle="Alimente as abas que o cliente vê na Central pública.">
         <Select options={clienteOpts} value={clienteId} onChange={(e) => setClienteId(e.target.value)} />
       </PageHeader>
 

@@ -24,15 +24,7 @@ const OPERACIONAL: ModuloCard[] = [
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '11', label: 'Empresas (PIN)',     emoji: '🏢', to: '/empresas-admin',     modulo: 'empresas-admin' },
-  { numero: '12', label: 'Agenda',             emoji: '📅', to: '/agenda',             modulo: 'agenda' },
-  { numero: '13', label: 'Diretoria',          emoji: '📊', to: '/diretoria',          modulo: 'diretoria' },
-  { numero: '14', label: 'Video Maker',        emoji: '🎬', to: '/video-maker',        modulo: 'video-maker' },
-  { numero: '15', label: 'Webdesigner',        emoji: '🖌️', to: '/webdesigner',        modulo: 'webdesigner' },
-  { numero: '16', label: 'Turbo AI',           emoji: '✨', to: '/turbo-ai',           modulo: 'turbo-ai' },
-  { numero: '17', label: 'Marketplace',        emoji: '🛒', to: '/marketplace-admin',  modulo: 'marketplace-admin' },
-  { numero: '18', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
-  { numero: '19', label: 'Links de cadastro',  emoji: '🔗', to: '/links-cadastro',     modulo: 'links-cadastro' },
+  { numero: '11', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {

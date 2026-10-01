@@ -12,8 +12,34 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatMoney, formatMonth } from '@/shared/lib/format';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
+import { PainelClientePage } from '@/modules/painel-cliente/pages/PainelClientePage';
+
+type SubAba = 'relatorios' | 'painel';
 
 export function AreaClientePage() {
+  const [aba, setAba] = useState<SubAba>('relatorios');
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1 border-b border-white/10">
+        {([
+          { id: 'relatorios', label: '📊 Relatórios' },
+          { id: 'painel', label: '🗂️ Painel do cliente' },
+        ] as const).map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setAba(t.id)}
+            className={`border-b-2 px-4 py-2 text-sm font-medium ${
+              aba === t.id ? 'border-brand-500 text-brand-300' : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >{t.label}</button>
+        ))}
+      </div>
+      {aba === 'relatorios' ? <RelatoriosView /> : <PainelClientePage />}
+    </div>
+  );
+}
+
+function RelatoriosView() {
   const [clienteId, setClienteId] = useState('');
   const { data: relatorios, isLoading } = useRelatorios(clienteId);
   const { data: clientes } = useClientes('');
