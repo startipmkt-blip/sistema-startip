@@ -21,6 +21,7 @@ import { IndicacaoPage } from '@/modules/indicacao/pages/IndicacaoPage';
 import { OnboardingPage } from '@/modules/onboarding/pages/OnboardingPage';
 import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
 import { DemandasPage } from '@/modules/demandas/pages/DemandasPage';
+import { IdeiasPage } from '@/modules/ideias/pages/IdeiasPage';
 import { UsuariosPage } from '@/modules/usuarios/pages/UsuariosPage';
 import { ContratosPage } from '@/modules/contratos/pages/ContratosPage';
 import { MetaAdsGestorPage } from '@/modules/meta-ads/pages/MetaAdsGestorPage';
@@ -87,6 +88,7 @@ export const router = createBrowserRouter([
           { path: 'painel-tv', element: <RequireModulo modulo="painel-tv"><PainelTvAdminPage /></RequireModulo> },
           { path: 'datas-comemorativas', element: <RequireModulo modulo="datas-comemorativas"><DatasComemorativasPage /></RequireModulo> },
           { path: 'demandas', element: <RequireModulo modulo="demandas"><DemandasPage /></RequireModulo> },
+          { path: 'ideias', element: <RequireModulo modulo="ideias"><IdeiasPage /></RequireModulo> },
           { path: 'usuarios', element: <RequireModulo modulo="usuarios"><UsuariosPage /></RequireModulo> },
           { path: 'contratos', element: <RequireModulo modulo="contratos"><ContratosPage /></RequireModulo> },
           { path: 'meta-ads',   element: <RequireModulo modulo="diretoria"><MetaAdsGestorPage /></RequireModulo> },
