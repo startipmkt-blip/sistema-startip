@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
-import type { Ideia, IdeiaCategoria } from '@/modules/ideias/types';
+import type { Ideia } from '@/modules/ideias/types';
 
 const demoIdeias: Ideia[] = [
   { id: '1', titulo: 'Série de reels sobre bastidores', descricao: 'Mostrar o dia a dia da agência em formato de reels semanais.', categoria: 'conteudo', autor_id: null, autor_nome: 'Iuri', fixada: true, created_at: '2026-10-01T10:00:00Z', updated_at: '2026-10-01T10:00:00Z' },
