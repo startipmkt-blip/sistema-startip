@@ -48,11 +48,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Depende só do id: o Supabase reemite SIGNED_IN/TOKEN_REFRESHED com um objeto
+  // session novo ao voltar o foco da aba; reagir a isso desmontava a página inteira.
+  const userId = session?.user?.id ?? null;
+
   useEffect(() => {
     if (IS_DEMO) return;
     let active = true;
     async function loadProfile() {
-      if (!session?.user) {
+      if (!userId) {
         setProfile(null);
         setLoading(false);
         return;
@@ -61,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', userId)
         .maybeSingle();
       if (!active) return;
       if (error) {
@@ -76,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [session]);
+  }, [userId]);
 
   const value = useMemo<AuthContextValue>(() => {
     const isEquipe = profile?.tipo === 'equipe';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useSalvarDemanda,
   useExcluirDemanda,
@@ -30,6 +30,20 @@ const PRIORIDADE_OPTIONS = (Object.keys(PRIORIDADE_LABEL) as DemandaPrioridade[]
   label: PRIORIDADE_LABEL[p],
 }));
 
+const RASCUNHO_KEY = 'startip:demanda-rascunho';
+
+function lerRascunho(): Record<string, unknown> {
+  try {
+    const raw = sessionStorage.getItem(RASCUNHO_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+function limparRascunho() {
+  try { sessionStorage.removeItem(RASCUNHO_KEY); } catch { /* sem storage */ }
+}
+
 export function DemandaFormModal({ open, onClose, demanda }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
@@ -47,19 +61,33 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
     ...(clientes ?? []).map((c) => ({ value: c.id, label: c.nome })),
   ];
 
-  const [form, setForm] = useState({
-    cliente_id: demanda?.cliente_id ?? '',
-    setor: demanda?.setor ?? 'geral',
-    privada: demanda?.privada ?? false,
-    titulo: demanda?.titulo ?? '',
-    responsavel: demanda?.responsavel ?? '',
-    prioridade: demanda?.prioridade ?? 'media',
-    status: demanda?.status ?? 'aberta',
-    prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
+  const [form, setForm] = useState(() => {
+    const base = {
+      cliente_id: demanda?.cliente_id ?? '',
+      setor: demanda?.setor ?? 'geral',
+      privada: demanda?.privada ?? false,
+      titulo: demanda?.titulo ?? '',
+      responsavel: demanda?.responsavel ?? '',
+      prioridade: demanda?.prioridade ?? 'media',
+      status: demanda?.status ?? 'aberta',
+      prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
+    };
+    return demanda ? base : { ...base, ...lerRascunho() };
   });
+
+  // Rascunho de demanda nova: sobrevive a recarregar a página ou trocar de aba.
+  useEffect(() => {
+    if (demanda) return;
+    try { sessionStorage.setItem(RASCUNHO_KEY, JSON.stringify(form)); } catch { /* sem storage */ }
+  }, [form, demanda]);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  function cancelar() {
+    limparRascunho();
+    onClose();
   }
 
   async function handleSalvar() {
@@ -72,6 +100,7 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
       status: form.status as DemandaFormData['status'],
     };
     await salvar.mutateAsync({ id: demanda?.id, dados });
+    limparRascunho();
     onClose();
   }
 
@@ -88,7 +117,7 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
             )}
           </span>
           <span className="flex gap-2">
-            <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+            <Button variant="secondary" onClick={cancelar}>Cancelar</Button>
             <Button onClick={handleSalvar} disabled={salvar.isPending || !form.titulo.trim()}>
               {salvar.isPending ? 'Salvando…' : 'Salvar'}
             </Button>

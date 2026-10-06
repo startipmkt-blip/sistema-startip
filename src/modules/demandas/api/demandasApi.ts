@@ -94,7 +94,19 @@ export function useAtualizarStatusDemanda() {
       const { error } = await supabase.from('demandas').update({ status: p.status } as never).eq('id', p.id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['demandas'] }),
+    // Move o card na tela antes do servidor responder; volta atrás se der erro.
+    onMutate: async (p) => {
+      await qc.cancelQueries({ queryKey: ['demandas'] });
+      const anteriores = qc.getQueriesData<DemandaView[]>({ queryKey: ['demandas'] });
+      qc.setQueriesData<DemandaView[]>({ queryKey: ['demandas'] }, (lista) =>
+        lista?.map((d) => (d.id === p.id ? { ...d, status: p.status } : d)),
+      );
+      return { anteriores };
+    },
+    onError: (_e, _p, ctx) => {
+      ctx?.anteriores.forEach(([key, data]) => qc.setQueryData(key, data));
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['demandas'] }),
   });
 }
 
