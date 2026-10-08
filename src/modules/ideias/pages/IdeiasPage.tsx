@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
@@ -16,6 +17,7 @@ import {
   AUTOR_LABEL,
 } from '@/modules/ideias/types';
 import type { Ideia, IdeiaImportancia } from '@/modules/ideias/types';
+import { CriativosTab } from '@/modules/ideias/criativos/CriativosTab';
 
 type Ordem = 'recentes' | 'antigas' | 'mais_importantes' | 'menos_importantes';
 
@@ -31,7 +33,7 @@ function formatarData(iso: string): string {
   return `${d}/${m}/${y}`;
 }
 
-export function IdeiasPage() {
+function BancoDeIdeiasTab({ pills }: { pills: ReactNode }) {
   const { data: ideias, isLoading } = useIdeias();
 
   const [formOpen, setFormOpen] = useState(false);
@@ -103,8 +105,11 @@ export function IdeiasPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <Spinner />
+      <div className="space-y-6">
+        {pills}
+        <div className="flex items-center justify-center py-24">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -119,6 +124,8 @@ export function IdeiasPage() {
       >
         <Button onClick={abrirNova}>+ Nova ideia</Button>
       </PageHeader>
+
+      {pills}
 
       {/* Indicadores */}
       {!vazio && (
@@ -256,4 +263,44 @@ export function IdeiasPage() {
       />
     </div>
   );
+}
+
+type AbaIdeias = 'banco' | 'criativos';
+
+const ABAS_IDEIAS: { id: AbaIdeias; label: string }[] = [
+  { id: 'banco', label: 'Banco de Ideias' },
+  { id: 'criativos', label: 'Ideias de Criativos' },
+];
+
+export function IdeiasPage() {
+  const [params, setParams] = useSearchParams();
+  const aba: AbaIdeias = params.get('aba') === 'criativos' ? 'criativos' : 'banco';
+
+  function trocar(nova: AbaIdeias) {
+    const p = new URLSearchParams();
+    if (nova === 'criativos') p.set('aba', 'criativos');
+    setParams(p, { replace: true });
+  }
+
+  const pills = (
+    <div className="flex flex-wrap gap-2" role="tablist">
+      {ABAS_IDEIAS.map((a) => (
+        <button
+          key={a.id}
+          role="tab"
+          aria-selected={aba === a.id}
+          onClick={() => trocar(a.id)}
+          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            aba === a.id
+              ? 'bg-brand-500/20 text-brand-100 ring-1 ring-inset ring-brand-400/50'
+              : 'bg-white/5 text-slate-400 ring-1 ring-inset ring-white/10 hover:text-slate-200'
+          }`}
+        >
+          {a.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  return aba === 'criativos' ? <CriativosTab pills={pills} /> : <BancoDeIdeiasTab pills={pills} />;
 }
