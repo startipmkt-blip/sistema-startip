@@ -29,7 +29,7 @@ export interface DemandaView extends Demanda {
 export const DEMANDA_COLUNAS: { id: DemandaStatus; label: string; socios_only?: boolean }[] = [
   { id: 'aberta', label: 'Aberta' },
   { id: 'iuri', label: 'Demandas Iuri', socios_only: true },
-  { id: 'domini', label: 'Demandas Domini', socios_only: true },
+  { id: 'domini', label: 'Demandas Dhomini', socios_only: true },
   { id: 'fazendo', label: 'Em andamento' },
   { id: 'concluida', label: 'Concluída' },
 ];

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useReunioes, useExcluirReuniao, type Reuniao } from '@/modules/reunioes/reunioesApi';
+import { useReunioes, useExcluirReuniao, useBackupReuniaoDrive, type Reuniao } from '@/modules/reunioes/reunioesApi';
 import { ReuniaoFormModal } from '@/modules/reunioes/ReuniaoFormModal';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
@@ -19,6 +19,16 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
   const [formOpen, setFormOpen] = useState(false);
   const [editando, setEditando] = useState<Reuniao | undefined>();
   const [aberta, setAberta] = useState<string | null>(null);
+  const backup = useBackupReuniaoDrive();
+  const [drive, setDrive] = useState<Record<string, { estado: 'enviando' | 'ok' | 'erro'; url?: string | null; msg?: string }>>({});
+
+  function enviarParaDrive(id: string) {
+    setDrive((d) => ({ ...d, [id]: { estado: 'enviando' } }));
+    backup.mutate(id, {
+      onSuccess: (r) => setDrive((d) => ({ ...d, [id]: { estado: 'ok', url: r.pastaUrl } })),
+      onError: (e) => setDrive((d) => ({ ...d, [id]: { estado: 'erro', msg: (e as Error).message } })),
+    });
+  }
 
   if (isLoading) return <Spinner />;
   const reunioes = lista ?? [];
@@ -61,6 +71,34 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                     )}
                     {!somenteLeitura && (
                       <>
+                        {drive[r.id]?.estado === 'enviando' ? (
+                          <span className="text-xs text-slate-400">⏳ Enviando ao Drive…</span>
+                        ) : drive[r.id]?.estado === 'ok' ? (
+                          <span className="flex items-center gap-2 text-xs">
+                            <a
+                              href={drive[r.id]?.url ?? undefined}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="font-medium text-emerald-300 hover:underline"
+                            >
+                              ✅ Salvo no Drive · abrir pasta
+                            </a>
+                            <button className="text-slate-400 hover:underline" onClick={() => enviarParaDrive(r.id)}>reenviar</button>
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2 text-xs">
+                            <button
+                              className="font-medium text-sky-300 hover:underline"
+                              title="Salva o resumo e o PDF na pasta de backup do Drive"
+                              onClick={() => enviarParaDrive(r.id)}
+                            >
+                              ☁ Enviar p/ Drive
+                            </button>
+                            {drive[r.id]?.estado === 'erro' && (
+                              <span className="max-w-[260px] text-red-400" title={drive[r.id]?.msg}>⚠ {drive[r.id]?.msg}</span>
+                            )}
+                          </span>
+                        )}
                         <button className="text-xs font-medium text-slate-300 hover:underline" onClick={() => { setEditando(r); setFormOpen(true); }}>Editar</button>
                         <button className="text-xs font-medium text-red-400 hover:underline" onClick={() => { if (confirm('Excluir esta reunião?')) excluir.mutate(r.id); }}>Excluir</button>
                       </>

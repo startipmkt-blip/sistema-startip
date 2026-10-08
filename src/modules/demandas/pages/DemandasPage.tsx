@@ -10,6 +10,8 @@ import {
   type DemandaStatus,
   type DemandaView,
 } from '@/modules/demandas/types';
+import { useTocadoresAtivos, type Tocador } from '@/modules/demandas/api/cronometroApi';
+import { TocadorModal } from '@/modules/demandas/components/TocadorModal';
 import { DemandaFormModal } from '@/modules/demandas/components/DemandaFormModal';
 import { TarefasRecorrentes } from '@/modules/demandas/components/TarefasRecorrentes';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
@@ -57,6 +59,9 @@ export function DemandasPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editando, setEditando] = useState<DemandaView | undefined>();
   const [aba, setAba] = useState<Aba>('quadro');
+  // Demanda aguardando a escolha de quem vai tocá-la (antes de ir para "Em andamento").
+  const [iniciando, setIniciando] = useState<DemandaView | null>(null);
+  const { data: tocadores } = useTocadoresAtivos();
 
   const setoresVisiveis = DEMANDA_SETORES.filter((s) => !s.adminOnly || isAdmin);
   const [setor, setSetor] = useState<DemandaSetor>(setoresVisiveis[0]?.id ?? 'geral');
@@ -98,8 +103,37 @@ export function DemandasPage() {
     return [...mapa.entries()].sort((a, b) => b[0].localeCompare(a[0]));
   }, [concluidas]);
 
+  function avisarCronometro(r: { cronometroErro?: string } | undefined) {
+    if (r?.cronometroErro) {
+      alert(`A demanda foi atualizada, mas o cronômetro não acompanhou:\n\n${r.cronometroErro}`);
+    }
+  }
+
+  function mover(d: DemandaView, status: DemandaStatus) {
+    atualizarStatus.mutate(
+      { id: d.id, status, titulo: d.titulo, de: d.status },
+      { onSuccess: avisarCronometro },
+    );
+  }
+
   function concluir(d: DemandaView) {
-    atualizarStatus.mutate({ id: d.id, status: 'concluida' });
+    mover(d, 'concluida');
+  }
+
+  // Ir para "Em andamento" exige escolher quem toca; as outras colunas movem direto.
+  function aoMover(d: DemandaView, novaCol: string) {
+    if (novaCol === 'fazendo') setIniciando(d);
+    else mover(d, novaCol as DemandaStatus);
+  }
+
+  function confirmarInicio(tocador: Tocador) {
+    const d = iniciando;
+    if (!d) return;
+    setIniciando(null);
+    atualizarStatus.mutate(
+      { id: d.id, status: 'fazendo', titulo: d.titulo, de: d.status, tocador },
+      { onSuccess: avisarCronometro },
+    );
   }
 
   function criarRapida() {
@@ -145,6 +179,11 @@ export function DemandasPage() {
             <Badge tone={PRIORIDADE_TONE[d.prioridade]}>{PRIORIDADE_LABEL[d.prioridade]}</Badge>
           </div>
           <div className="text-xs text-slate-400">{d.cliente_nome}</div>
+          {tocadores?.[d.id] && (
+            <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+              ⏱ {tocadores[d.id]} está tocando
+            </div>
+          )}
           <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
             <span>👤 {d.responsavel || '—'}</span>
             <span className={atrasada ? 'font-semibold text-red-400' : venceHoje ? 'font-semibold text-amber-300' : ''}>
@@ -237,7 +276,7 @@ export function DemandasPage() {
               columnOf={(d) => d.status}
               keyOf={(d) => d.id}
               renderCard={CARD}
-              onMove={(d, novaCol) => atualizarStatus.mutate({ id: d.id, status: novaCol as DemandaStatus })}
+              onMove={aoMover}
             />
           ) : concluidas.length === 0 ? (
             <Card><EmptyState message="Nenhuma tarefa concluída neste setor ainda." /></Card>
@@ -261,7 +300,7 @@ export function DemandasPage() {
                         <span className="text-xs text-slate-500">📅 {formatDate(d.prazo)}</span>
                         <button
                           type="button"
-                          onClick={() => atualizarStatus.mutate({ id: d.id, status: 'aberta' })}
+                          onClick={() => mover(d, 'aberta')}
                           title="Reabrir demanda"
                           className="ml-3 rounded-md border border-white/10 px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
                         >
@@ -277,6 +316,14 @@ export function DemandasPage() {
 
           {formOpen && (
             <DemandaFormModal open={formOpen} onClose={() => setFormOpen(false)} demanda={editando} />
+          )}
+
+          {iniciando && (
+            <TocadorModal
+              titulo={iniciando.titulo}
+              onEscolher={confirmarInicio}
+              onCancelar={() => setIniciando(null)}
+            />
           )}
         </>
       )}

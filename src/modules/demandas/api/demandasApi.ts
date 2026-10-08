@@ -3,6 +3,7 @@ import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
 import { demoClienteNome } from '@/shared/lib/demoData';
 import type { Demanda, DemandaView } from '@/modules/demandas/types';
+import { iniciarTimerDemanda, pararTimerDemanda, type Tocador } from '@/modules/demandas/api/cronometroApi';
 
 const demoDemandas: Demanda[] = [
   { id: 'd1', cliente_id: 'c1', setor: 'design', privada: false, titulo: 'Criar 4 criativos para agosto', responsavel: 'Designer', prioridade: 'alta', status: 'fazendo', prazo: '2026-08-07', created_at: '2026-08-01T10:00:00Z' },
@@ -48,20 +49,25 @@ export type DemandaFormData = Pick<
   'cliente_id' | 'setor' | 'privada' | 'titulo' | 'responsavel' | 'prioridade' | 'status' | 'prazo'
 >;
 
-async function saveDemanda(id: string | undefined, dados: DemandaFormData): Promise<void> {
+async function saveDemanda(id: string | undefined, dados: DemandaFormData): Promise<string> {
   if (IS_DEMO) {
     if (id) {
       const d = demoDemandas.find((x) => x.id === id);
       if (d) Object.assign(d, dados);
-    } else {
-      demoDemandas.unshift({ id: crypto.randomUUID(), created_at: new Date().toISOString(), ...dados });
+      return id;
     }
-    return;
+    const novo = crypto.randomUUID();
+    demoDemandas.unshift({ id: novo, created_at: new Date().toISOString(), ...dados });
+    return novo;
   }
-  const { error } = id
-    ? await supabase.from('demandas').update(dados as never).eq('id', id)
-    : await supabase.from('demandas').insert(dados as never);
+  if (id) {
+    const { error } = await supabase.from('demandas').update(dados as never).eq('id', id);
+    if (error) throw error;
+    return id;
+  }
+  const { data, error } = await supabase.from('demandas').insert(dados as never).select('id').single();
   if (error) throw error;
+  return (data as unknown as { id: string }).id;
 }
 
 async function deleteDemanda(id: string): Promise<void> {
@@ -70,29 +76,65 @@ async function deleteDemanda(id: string): Promise<void> {
     if (i >= 0) demoDemandas.splice(i, 1);
     return;
   }
+  // Não deixa timer órfão rodando no cronômetro.
+  await pararTimerDemanda(id).catch((e) => console.error('Falha ao parar o cronômetro:', e));
   const { error } = await supabase.from('demandas').delete().eq('id', id);
   if (error) throw error;
+}
+
+// A demanda já foi salva/movida; falha no cronômetro não desfaz isso, só avisa.
+export interface ResultadoCronometro { cronometroErro?: string }
+
+async function sincronizarCronometro(opts: {
+  id: string; titulo?: string; de?: Demanda['status']; para: Demanda['status']; tocador?: Tocador;
+}): Promise<ResultadoCronometro> {
+  try {
+    if (opts.para === 'fazendo' && opts.de !== 'fazendo') {
+      if (!opts.tocador || !opts.titulo) throw new Error('Escolha quem vai tocar a demanda.');
+      await iniciarTimerDemanda({ id: opts.id, titulo: opts.titulo }, opts.tocador);
+    } else if (opts.para !== 'fazendo' && (opts.de === 'fazendo' || opts.de === undefined)) {
+      await pararTimerDemanda(opts.id);
+    }
+    return {};
+  } catch (e) {
+    console.error('Falha ao sincronizar com o cronômetro:', e);
+    return { cronometroErro: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 export function useSalvarDemanda() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (p: { id?: string; dados: DemandaFormData }) => saveDemanda(p.id, p.dados),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['demandas'] }),
+    mutationFn: async (p: {
+      id?: string; dados: DemandaFormData; de?: Demanda['status']; tocador?: Tocador;
+    }): Promise<ResultadoCronometro> => {
+      const id = await saveDemanda(p.id, p.dados);
+      if (IS_DEMO) return {};
+      return sincronizarCronometro({
+        id, titulo: p.dados.titulo, de: p.id ? p.de : undefined, para: p.dados.status, tocador: p.tocador,
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['demandas'] });
+      qc.invalidateQueries({ queryKey: ['cronometro'] });
+    },
   });
 }
 
 export function useAtualizarStatusDemanda() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (p: { id: string; status: Demanda['status'] }) => {
+    mutationFn: async (p: {
+      id: string; status: Demanda['status']; titulo?: string; de?: Demanda['status']; tocador?: Tocador;
+    }): Promise<ResultadoCronometro> => {
       if (IS_DEMO) {
         const d = demoDemandas.find((x) => x.id === p.id);
         if (d) d.status = p.status;
-        return;
+        return {};
       }
       const { error } = await supabase.from('demandas').update({ status: p.status } as never).eq('id', p.id);
       if (error) throw error;
+      return sincronizarCronometro({ id: p.id, titulo: p.titulo, de: p.de, para: p.status, tocador: p.tocador });
     },
     // Move o card na tela antes do servidor responder; volta atrás se der erro.
     onMutate: async (p) => {
@@ -106,7 +148,10 @@ export function useAtualizarStatusDemanda() {
     onError: (_e, _p, ctx) => {
       ctx?.anteriores.forEach(([key, data]) => qc.setQueryData(key, data));
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ['demandas'] }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['demandas'] });
+      qc.invalidateQueries({ queryKey: ['cronometro'] });
+    },
   });
 }
 
@@ -114,6 +159,9 @@ export function useExcluirDemanda() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteDemanda(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['demandas'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['demandas'] });
+      qc.invalidateQueries({ queryKey: ['cronometro'] });
+    },
   });
 }
