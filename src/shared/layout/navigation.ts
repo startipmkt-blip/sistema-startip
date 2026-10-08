@@ -26,6 +26,7 @@ export const navItems: NavItem[] = [
   { label: 'Datas comemorativas', to: '/datas-comemorativas', icon: 'calendario', comingSoon: false },
   { label: 'Demandas', to: '/demandas', icon: 'demandas', comingSoon: false },
   { label: 'Ideias', to: '/ideias', icon: 'sparkles', comingSoon: false },
+  { label: 'Anotações', to: '/anotacoes', icon: 'processos', comingSoon: false },
   { label: 'Contratos', to: '/contratos', icon: 'contratos', comingSoon: false },
   { label: 'Tráfego Pago', to: '/trafego', icon: 'financeiro', comingSoon: false, equipeOnly: true },
   { label: 'Otimizações', to: '/otimizacoes', icon: 'financeiro', comingSoon: false, equipeOnly: true },

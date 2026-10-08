@@ -27,6 +27,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'painel-tv', label: 'Painel TV' },
   { key: 'demandas', label: 'Demandas' },
   { key: 'ideias', label: 'Ideias' },
+  { key: 'anotacoes', label: 'Anotações' },
   { key: 'contratos', label: 'Contratos' },
   { key: 'social-media', label: 'Social Media' },
   { key: 'diretoria', label: 'Tráfego Pago' },
