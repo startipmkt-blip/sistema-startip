@@ -21,10 +21,11 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '08', label: 'Otimizações',        emoji: '📈', to: '/otimizacoes',        modulo: 'otimizacoes' },
   { numero: '09', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
   { numero: '10', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
+  { numero: '11', label: 'Ideias',            emoji: '💡', to: '/ideias',            modulo: 'ideias' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '11', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
+  { numero: '12', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {

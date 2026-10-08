@@ -39,6 +39,7 @@ import { PainelTvAdminPage } from '@/modules/painel-tv/pages/PainelTvAdminPage';
 import { OtimizacoesListaPage } from '@/modules/otimizacoes/pages/OtimizacoesListaPage';
 import { OtimizacoesClientePage } from '@/modules/otimizacoes/pages/OtimizacoesClientePage';
 import { OtimizacoesPublicaPage } from '@/pages/OtimizacoesPublicaPage';
+import { IdeiasPage } from '@/modules/ideias/pages/IdeiasPage';
 
 // Padrão para módulos futuros: envolva a page em <RequireModulo modulo="chave">
 // para respeitar a permissão do cargo.
@@ -94,6 +95,7 @@ export const router = createBrowserRouter([
           { path: 'trafego',    element: <RequireModulo modulo="diretoria"><TrafegoPage /></RequireModulo> },
           { path: 'otimizacoes', element: <RequireModulo modulo="otimizacoes"><OtimizacoesListaPage /></RequireModulo> },
           { path: 'otimizacoes/:slug', element: <RequireModulo modulo="otimizacoes"><OtimizacoesClientePage /></RequireModulo> },
+          { path: 'ideias', element: <RequireModulo modulo="ideias"><IdeiasPage /></RequireModulo> },
           { path: 'social-media', element: <Navigate to="/designer" replace /> },
         ],
       },

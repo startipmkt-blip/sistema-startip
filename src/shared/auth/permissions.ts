@@ -30,6 +30,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'social-media', label: 'Social Media' },
   { key: 'diretoria', label: 'Tráfego Pago' },
   { key: 'otimizacoes', label: 'Otimização de Campanhas' },
+  { key: 'ideias', label: 'Ideias' },
   { key: 'usuarios', label: 'Usuários' },
 ];
 

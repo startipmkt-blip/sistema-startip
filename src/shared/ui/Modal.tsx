@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   open: boolean;
@@ -22,7 +23,9 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
 
   if (!open) return null;
 
-  return (
+  // Portal no <body>: dentro de um cartão com backdrop-blur o `fixed` passa a ser
+  // relativo ao cartão e o modal sai da tela (rodapé com os botões fica cortado).
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
       onClick={onClose}
@@ -48,6 +51,7 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

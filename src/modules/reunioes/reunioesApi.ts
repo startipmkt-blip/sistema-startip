@@ -61,6 +61,28 @@ export function useSalvarReuniao(clienteId: string) {
   });
 }
 
+// Envia resumo + PDF da reunião para a pasta de backup no Google Drive.
+export function useBackupReuniaoDrive() {
+  return useMutation({
+    mutationFn: async (reuniaoId: string): Promise<{ pastaUrl: string | null }> => {
+      if (IS_DEMO) {
+        await new Promise((r) => setTimeout(r, 600));
+        return { pastaUrl: 'https://drive.google.com/' };
+      }
+      const { data, error } = await supabase.functions.invoke('reuniao-backup-drive', { body: { reuniaoId } });
+      if (error) {
+        let msg = error.message;
+        try {
+          const j = await (error as unknown as { context: Response }).context.json();
+          if (j?.erro) msg = j.erro;
+        } catch { /* mantém a mensagem genérica */ }
+        throw new Error(msg);
+      }
+      return { pastaUrl: (data as { pastaUrl?: string | null })?.pastaUrl ?? null };
+    },
+  });
+}
+
 export function useExcluirReuniao(clienteId: string) {
   const qc = useQueryClient();
   return useMutation({

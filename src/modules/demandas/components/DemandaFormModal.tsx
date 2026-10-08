@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useSalvarDemanda,
   useExcluirDemanda,
@@ -13,6 +13,7 @@ import {
   type DemandaSetor,
   type DemandaView,
 } from '@/modules/demandas/types';
+import { TOCADORES, type Tocador } from '@/modules/demandas/api/cronometroApi';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
@@ -29,6 +30,20 @@ const PRIORIDADE_OPTIONS = (Object.keys(PRIORIDADE_LABEL) as DemandaPrioridade[]
   value: p,
   label: PRIORIDADE_LABEL[p],
 }));
+
+const RASCUNHO_KEY = 'startip:demanda-rascunho';
+
+function lerRascunho(): Record<string, unknown> {
+  try {
+    const raw = sessionStorage.getItem(RASCUNHO_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+function limparRascunho() {
+  try { sessionStorage.removeItem(RASCUNHO_KEY); } catch { /* sem storage */ }
+}
 
 export function DemandaFormModal({ open, onClose, demanda }: Props) {
   const salvar = useSalvarDemanda();
@@ -47,23 +62,42 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
     ...(clientes ?? []).map((c) => ({ value: c.id, label: c.nome })),
   ];
 
-  const [form, setForm] = useState({
-    cliente_id: demanda?.cliente_id ?? '',
-    setor: demanda?.setor ?? 'geral',
-    privada: demanda?.privada ?? false,
-    titulo: demanda?.titulo ?? '',
-    responsavel: demanda?.responsavel ?? '',
-    prioridade: demanda?.prioridade ?? 'media',
-    status: demanda?.status ?? 'aberta',
-    prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
+  const [form, setForm] = useState(() => {
+    const base = {
+      cliente_id: demanda?.cliente_id ?? '',
+      setor: demanda?.setor ?? 'geral',
+      privada: demanda?.privada ?? false,
+      titulo: demanda?.titulo ?? '',
+      responsavel: demanda?.responsavel ?? '',
+      prioridade: demanda?.prioridade ?? 'media',
+      status: demanda?.status ?? 'aberta',
+      prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
+    };
+    return demanda ? base : { ...base, ...lerRascunho() };
   });
+
+  // Rascunho de demanda nova: sobrevive a recarregar a página ou trocar de aba.
+  useEffect(() => {
+    if (demanda) return;
+    try { sessionStorage.setItem(RASCUNHO_KEY, JSON.stringify(form)); } catch { /* sem storage */ }
+  }, [form, demanda]);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
   }
 
+  function cancelar() {
+    limparRascunho();
+    onClose();
+  }
+
+  // Entrar em "Em andamento" liga o cronômetro, que precisa saber quem está tocando.
+  const [tocador, setTocador] = useState<Tocador | ''>('');
+  const precisaTocador = form.status === 'fazendo' && demanda?.status !== 'fazendo';
+  const faltaTocador = precisaTocador && !tocador;
+
   async function handleSalvar() {
-    if (!form.titulo.trim()) return;
+    if (!form.titulo.trim() || faltaTocador) return;
     const dados: DemandaFormData = {
       ...form,
       cliente_id: form.cliente_id || null, // vazio => interna
@@ -71,8 +105,17 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
       prioridade: form.prioridade as DemandaPrioridade,
       status: form.status as DemandaFormData['status'],
     };
-    await salvar.mutateAsync({ id: demanda?.id, dados });
+    const r = await salvar.mutateAsync({
+      id: demanda?.id,
+      dados,
+      de: demanda?.status,
+      tocador: tocador || undefined,
+    });
+    limparRascunho();
     onClose();
+    if (r?.cronometroErro) {
+      alert(`A demanda foi salva, mas o cronômetro não acompanhou:\n\n${r.cronometroErro}`);
+    }
   }
 
   return (
@@ -88,8 +131,8 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
             )}
           </span>
           <span className="flex gap-2">
-            <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSalvar} disabled={salvar.isPending || !form.titulo.trim()}>
+            <Button variant="secondary" onClick={cancelar}>Cancelar</Button>
+            <Button onClick={handleSalvar} disabled={salvar.isPending || !form.titulo.trim() || faltaTocador}>
               {salvar.isPending ? 'Salvando…' : 'Salvar'}
             </Button>
           </span>
@@ -148,6 +191,15 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
           />
           <Input id="prazo" type="date" label="Prazo" value={form.prazo ?? ''} onChange={(e) => set('prazo', e.target.value)} />
         </div>
+        {precisaTocador && (
+          <Select
+            id="tocador"
+            label="Quem vai tocar essa demanda? (obrigatório — inicia o cronômetro)"
+            options={[{ value: '', label: '— selecionar —' }, ...TOCADORES.map((t) => ({ value: t, label: t }))]}
+            value={tocador}
+            onChange={(e) => setTocador(e.target.value as Tocador | '')}
+          />
+        )}
       </div>
     </Modal>
   );
