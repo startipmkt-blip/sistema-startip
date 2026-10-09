@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { driveInfo } from '@/modules/gestao-conteudo/types';
 import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
@@ -16,6 +17,8 @@ interface Ideia {
   status: 'pendente' | 'aprovado' | 'reprovado';
   justificativa: string;
   mes_referencia: string;
+  link_drive?: string | null;
+  etapa?: string;
 }
 
 interface Dados {
@@ -38,6 +41,9 @@ function formatMes(mes: string): string {
 
 export function AprovacaoPublicaPage() {
   const { slug = '' } = useParams<{ slug: string }>();
+  const [query] = useSearchParams();
+  const mesDoLink = query.get('mes') ?? undefined;
+  const [previa, setPrevia] = useState<Ideia | null>(null);
   const [dados, setDados] = useState<Dados | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [mes, setMes] = useState<string | null>(null);
@@ -60,7 +66,7 @@ export function AprovacaoPublicaPage() {
     }
   }
 
-  useEffect(() => { void carregar(); /* eslint-disable-line react-hooks/exhaustive-deps */ }, [slug]);
+  useEffect(() => { void carregar(mesDoLink); /* eslint-disable-line react-hooks/exhaustive-deps */ }, [slug]);
 
   async function decidir(id: string, status: 'aprovado' | 'reprovado', just = '') {
     setSalvando(true);
@@ -143,7 +149,9 @@ export function AprovacaoPublicaPage() {
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge tone="slate">{FORMATO_LABEL[i.formato] ?? i.formato}</Badge>
                         <Badge tone={i.status === 'aprovado' ? 'green' : i.status === 'reprovado' ? 'red' : 'amber'}>
-                          {i.status === 'pendente' ? 'Aguardando' : i.status === 'aprovado' ? 'Aprovado' : 'Reprovado'}
+                          {i.status === 'pendente' ? 'Aguardando' : i.status === 'aprovado'
+                            ? (i.etapa === 'programado' ? 'Aprovado · programado' : 'Aprovado')
+                            : 'Reprovado'}
                         </Badge>
                         {i.dia_postagem && (
                           <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
@@ -151,17 +159,42 @@ export function AprovacaoPublicaPage() {
                           </span>
                         )}
                       </div>
+                      {driveInfo(i.link_drive).tipo === 'arquivo' ? (
+                        <button
+                          type="button"
+                          onClick={() => setPrevia(i)}
+                          className="group relative mb-3 block w-full overflow-hidden rounded-xl border border-white/10 bg-black"
+                        >
+                          <img
+                            src={driveInfo(i.link_drive).thumbUrl}
+                            alt={`Prévia de ${i.titulo}`}
+                            loading="lazy"
+                            className="h-48 w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+                          />
+                          <span className="absolute inset-0 grid place-items-center">
+                            <span className="rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white">▶ Ver prévia</span>
+                          </span>
+                        </button>
+                      ) : driveInfo(i.link_drive).abrirUrl ? (
+                        <a
+                          href={driveInfo(i.link_drive).abrirUrl}
+                          target="_blank" rel="noreferrer noopener"
+                          className="mb-3 block rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center text-sm text-brand-300 hover:bg-white/10"
+                        >
+                          Abrir material no Drive ↗
+                        </a>
+                      ) : null}
                       <h3 className="mb-1.5 text-base font-semibold text-slate-100">{i.titulo}</h3>
                       <p className="whitespace-pre-line text-sm leading-relaxed text-slate-300">{i.descricao}</p>
                       {i.status === 'reprovado' && i.justificativa && (
                         <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-300">
-                          <strong>Motivo:</strong> {i.justificativa}
+                          <strong>Alteração pedida:</strong> {i.justificativa}
                         </div>
                       )}
                       {i.status === 'pendente' && (
                         <div className="mt-4 flex gap-2">
                           <Button onClick={() => void decidir(i.id, 'aprovado')} disabled={salvando} className="flex-1">
-                            ✅ Aprovar
+                            ✅ Aprovado
                           </Button>
                           <Button
                             variant="secondary"
@@ -169,7 +202,7 @@ export function AprovacaoPublicaPage() {
                             disabled={salvando}
                             className="flex-1"
                           >
-                            ❌ Reprovar
+                            ❌ Não aprovado
                           </Button>
                         </div>
                       )}
@@ -189,17 +222,17 @@ export function AprovacaoPublicaPage() {
       <Modal
         open={reprovar !== null}
         onClose={() => setReprovar(null)}
-        title={reprovar ? `Por que reprovar "${reprovar.titulo}"?` : ''}
+        title={reprovar ? `Por que não aprovou "${reprovar.titulo}"?` : ''}
       >
         <div className="space-y-3">
           <p className="text-xs text-slate-400">
-            Nos conte o que não ficou bom e o que sugere alterar — isso ajuda a equipe a refazer melhor.
+            Conte o motivo e <strong>qual alteração você quer</strong> — a equipe vai refazer com base no que você escrever.
           </p>
           <textarea
             value={justificativa}
             onChange={(e) => setJustificativa(e.target.value)}
             rows={5}
-            placeholder="Ex: prefiro que o foco seja em X, evitem menção a Y…"
+            placeholder="Ex: trocar a música, deixar o logo maior e cortar os 3 primeiros segundos…"
             className="w-full rounded-md border border-white/10 bg-white/5 p-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
           />
           <div className="flex justify-end gap-2">
@@ -208,10 +241,41 @@ export function AprovacaoPublicaPage() {
               onClick={() => reprovar && void decidir(reprovar.id, 'reprovado', justificativa)}
               disabled={salvando || justificativa.trim().length < 5}
             >
-              Enviar reprovação
+              Enviar pedido de alteração
             </Button>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        open={previa !== null}
+        onClose={() => setPrevia(null)}
+        size="xl"
+        title={previa?.titulo ?? ''}
+      >
+        {previa && driveInfo(previa.link_drive).previewUrl && (
+          <div className="space-y-3">
+            <iframe
+              src={driveInfo(previa.link_drive).previewUrl}
+              title={previa.titulo}
+              allow="autoplay; fullscreen"
+              allowFullScreen
+              className="h-[65vh] w-full rounded-xl border border-white/10 bg-black"
+            />
+            {previa.status === 'pendente' && (
+              <div className="flex gap-2">
+                <Button className="flex-1" disabled={salvando}
+                  onClick={() => { const i = previa; setPrevia(null); void decidir(i.id, 'aprovado'); }}>
+                  ✅ Aprovado
+                </Button>
+                <Button variant="secondary" className="flex-1" disabled={salvando}
+                  onClick={() => { const i = previa; setPrevia(null); setReprovar(i); setJustificativa(''); }}>
+                  ❌ Não aprovado
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </Modal>
     </div>
   );

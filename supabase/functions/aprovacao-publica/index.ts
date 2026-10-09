@@ -49,9 +49,10 @@ serve(async (req) => {
 
     const { data: ideias } = await sb
       .from('conteudo_aprovacao')
-      .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia')
+      .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia, link_drive, etapa')
       .eq('cliente_id', (cli as any).id)
       .eq('mes_referencia', mes)
+      .neq('visivel_cliente', false) // rascunhos internos nunca aparecem para o cliente
       .order('semana', { ascending: true })
       .order('created_at', { ascending: true });
 
@@ -59,7 +60,8 @@ serve(async (req) => {
     const { data: meses } = await sb
       .from('conteudo_aprovacao')
       .select('mes_referencia')
-      .eq('cliente_id', (cli as any).id);
+      .eq('cliente_id', (cli as any).id)
+      .neq('visivel_cliente', false);
     const mesesUnicos = [...new Set((meses ?? []).map((m: any) => m.mes_referencia))]
       .sort((a: string, b: string) => b.localeCompare(a));
 
@@ -83,10 +85,10 @@ serve(async (req) => {
     // valida que a ideia pertence ao cliente do slug
     const { data: ideia } = await sb
       .from('conteudo_aprovacao')
-      .select('id, cliente_id')
+      .select('id, cliente_id, visivel_cliente')
       .eq('id', id)
       .maybeSingle();
-    if (!ideia || (ideia as any).cliente_id !== (cli as any).id) {
+    if (!ideia || (ideia as any).cliente_id !== (cli as any).id || (ideia as any).visivel_cliente === false) {
       return json({ error: 'ideia não pertence a este cliente' }, 403);
     }
 

@@ -22,11 +22,12 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '09', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
   { numero: '10', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
   { numero: '11', label: 'Ideias',            emoji: '💡', to: '/ideias',            modulo: 'ideias' },
-  { numero: '12', label: 'Anotações',          emoji: '📝', to: '/anotacoes',          modulo: 'anotacoes' },
+  { numero: '12', label: 'Gestão de Conteúdo', emoji: '🗂️', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
+  { numero: '13', label: 'Anotações',          emoji: '📝', to: '/anotacoes',          modulo: 'anotacoes' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '13', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
+  { numero: '14', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {
