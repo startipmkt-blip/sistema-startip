@@ -87,6 +87,30 @@ export function AprovacaoPublicaPage() {
     }
   }
 
+  async function aprovarTodos() {
+    const alvo = mes ?? dados?.mes;
+    if (!alvo) return;
+    const n = dados?.ideias.filter((i) => i.status === 'pendente').length ?? 0;
+    if (!confirm(`Aprovar todos os ${n} conteúdos pendentes deste mês?
+
+Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
+    setSalvando(true);
+    try {
+      const r = await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ slug, mes: alvo, acao: 'aprovar_todos' }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body?.error ?? 'erro');
+      await carregar(alvo);
+    } catch (e) {
+      alert((e as Error).message);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
   if (erro) return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <Card className="w-full max-w-md p-6 text-center">
@@ -129,6 +153,14 @@ export function AprovacaoPublicaPage() {
             pendentes === 0 ? '✅ Todos os conteúdos deste mês já foram decididos.' :
               `${pendentes} conteúdo(s) aguardando sua decisão.`}
         </div>
+
+        {pendentes >= 2 && (
+          <div className="flex justify-center">
+            <Button onClick={() => void aprovarTodos()} disabled={salvando}>
+              ✅ Aprovar todos os {pendentes} pendentes
+            </Button>
+          </div>
+        )}
 
         {/* Cards de ideias agrupados por semana */}
         <div className="space-y-6">

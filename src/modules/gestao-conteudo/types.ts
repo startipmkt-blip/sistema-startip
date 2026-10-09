@@ -41,7 +41,58 @@ export interface Post {
   visivel_cliente: boolean;
   enviado_em: string | null;
   decidido_em: string | null;
+  lembrete_em: string | null;
+  lembretes_enviados: number;
   created_at: string;
+}
+
+export interface ConfigGestao {
+  whatsapp_equipe: string | null;
+  avisar_reprovacao: boolean;
+  lembrete_ativo: boolean;
+  lembrete_horas: number;
+  lembrete_maximo: number;
+}
+
+export const CONFIG_PADRAO: ConfigGestao = {
+  whatsapp_equipe: null, avisar_reprovacao: true,
+  lembrete_ativo: true, lembrete_horas: 48, lembrete_maximo: 3,
+};
+
+export type Visao = 'carteira' | 'tabela' | 'semana';
+
+// ---------- datas ----------
+export const DIAS_SEMANA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
+export function isoData(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Segunda-feira da semana de `d`, deslocada em `semanas`. */
+export function segundaDaSemana(d: Date, semanas = 0): Date {
+  const r = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dow = (r.getDay() + 6) % 7; // segunda = 0
+  r.setDate(r.getDate() - dow + semanas * 7);
+  return r;
+}
+
+/** Leva um dia 'YYYY-MM-DD' para o mesmo dia do mês `destino` ('YYYY-MM'), limitando ao fim do mês. */
+export function mesmoDiaEmOutroMes(dia: string | null, destino: string): string | null {
+  if (!dia) return null;
+  const d = Number(dia.slice(8, 10));
+  const [y, m] = destino.split('-').map(Number);
+  const ultimo = new Date(y, m, 0).getDate();
+  return `${destino}-${String(Math.min(d, ultimo)).padStart(2, '0')}`;
+}
+
+export function formatarDuracao(ms: number): string {
+  const min = Math.round(ms / 60000);
+  if (min < 60) return `${Math.max(min, 1)} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h`;
+  const dias = Math.floor(h / 24);
+  const resto = h % 24;
+  return resto ? `${dias}d ${resto}h` : `${dias}d`;
 }
 
 export type PostForm = Pick<
@@ -111,6 +162,22 @@ export function driveInfo(url: string | null | undefined): DriveInfo {
     };
   }
   return { tipo: 'invalido', abrirUrl: bruto };
+}
+
+/** Texto do lembrete manual enviado ao cliente. */
+export function mensagemLembrete(p: { clienteNome: string; qtd: number; link: string }): string {
+  return (
+    `Olá, ${p.clienteNome}! 👋
+
+` +
+    `Passando para lembrar que ${p.qtd === 1 ? 'há 1 conteúdo aguardando' : `há ${p.qtd} conteúdos aguardando`} ` +
+    `a sua aprovação.
+
+É rapidinho — veja a prévia e aprove por aqui:
+${p.link}
+
+Obrigado!`
+  );
 }
 
 /** Texto padrão enviado ao cliente no WhatsApp. */

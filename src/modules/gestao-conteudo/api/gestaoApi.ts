@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
-import type { Etapa, Post, PostForm } from '@/modules/gestao-conteudo/types';
-import { mensagemAprovacao } from '@/modules/gestao-conteudo/types';
+import type { ConfigGestao, Etapa, Post, PostForm } from '@/modules/gestao-conteudo/types';
+import {
+  CONFIG_PADRAO, mensagemAprovacao, mensagemLembrete, mesmoDiaEmOutroMes,
+} from '@/modules/gestao-conteudo/types';
 
 const chaves = {
   mes: (mes: string) => ['gestao-conteudo', 'mes', mes] as const,
@@ -25,6 +27,60 @@ export function usePostsDoMes(mes: string) {
       if (error) throw error;
       return (data ?? []) as unknown as Post[];
     },
+  });
+}
+
+/** Posts com dia de postagem dentro do período (usado na agenda da semana). */
+export function usePostsPeriodo(inicio: string, fim: string) {
+  return useQuery({
+    queryKey: ['gestao-conteudo', 'periodo', inicio, fim] as const,
+    queryFn: async (): Promise<Post[]> => {
+      if (IS_DEMO) return [];
+      const { data, error } = await supabase
+        .from('conteudo_aprovacao')
+        .select('*')
+        .gte('dia_postagem', inicio)
+        .lte('dia_postagem', fim)
+        .order('dia_postagem', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as unknown as Post[];
+    },
+  });
+}
+
+export function useConfigGestao() {
+  return useQuery({
+    queryKey: ['gestao-conteudo-config'] as const,
+    queryFn: async (): Promise<ConfigGestao> => {
+      if (IS_DEMO) return CONFIG_PADRAO;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.from as any)('gestao_conteudo_config').select('*').limit(1).maybeSingle();
+      if (error) throw error;
+      return { ...CONFIG_PADRAO, ...((data ?? {}) as Partial<ConfigGestao>) };
+    },
+  });
+}
+
+export function useSalvarConfigGestao() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (c: ConfigGestao) => {
+      if (IS_DEMO) return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from as any)('gestao_conteudo_config')
+        .update({
+          whatsapp_equipe: c.whatsapp_equipe?.trim() || null,
+          avisar_reprovacao: c.avisar_reprovacao,
+          lembrete_ativo: c.lembrete_ativo,
+          lembrete_horas: c.lembrete_horas,
+          lembrete_maximo: c.lembrete_maximo,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', true);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['gestao-conteudo-config'] }),
   });
 }
 
@@ -166,6 +222,71 @@ export function useEnviarParaAprovacao() {
           .in('id', p.ids);
         throw new Error(await erroDaFuncao(error));
       }
+    },
+    onSuccess: invalidar,
+  });
+}
+
+/** Copia o planejamento do mês anterior como rascunho (sem arquivos nem decisões). */
+export function useCopiarMesAnterior() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: async (p: { clienteId: string; mesOrigem: string; mesDestino: string }): Promise<number> => {
+      if (IS_DEMO) return 0;
+      const { data: origem, error: eO } = await supabase
+        .from('conteudo_aprovacao').select('*')
+        .eq('cliente_id', p.clienteId).eq('mes_referencia', p.mesOrigem);
+      if (eO) throw eO;
+      const { data: destino, error: eD } = await supabase
+        .from('conteudo_aprovacao').select('titulo, semana')
+        .eq('cliente_id', p.clienteId).eq('mes_referencia', p.mesDestino);
+      if (eD) throw eD;
+
+      const jaTem = new Set(((destino ?? []) as unknown as Pick<Post, 'semana' | 'titulo'>[]).map((d) => `${d.semana}|${d.titulo}`));
+      const novos = ((origem ?? []) as unknown as Post[])
+        .filter((o) => !jaTem.has(`${o.semana}|${o.titulo}`))
+        .map((o) => ({
+          cliente_id: p.clienteId,
+          mes_referencia: p.mesDestino,
+          semana: o.semana,
+          titulo: o.titulo,
+          descricao: o.descricao,
+          formato: o.formato,
+          dia_postagem: mesmoDiaEmOutroMes(o.dia_postagem, p.mesDestino),
+          link_drive: null,
+          visivel_cliente: false,
+          etapa: 'em_edicao',
+        }));
+      if (novos.length === 0) return 0;
+      const { error } = await supabase.from('conteudo_aprovacao').insert(novos as never);
+      if (error) throw error;
+      return novos.length;
+    },
+    onSuccess: invalidar,
+  });
+}
+
+/** Lembrete manual: reenvia o link ao cliente e zera o relógio do lembrete automático. */
+export function useLembrarCliente() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: async (p: {
+      clienteId: string; clienteNome: string; slug: string | null | undefined;
+      mes: string; ids: string[];
+    }) => {
+      if (!p.slug) throw new Error('Este cliente ainda não tem link público.');
+      if (p.ids.length === 0) throw new Error('Não há conteúdos aguardando aprovação.');
+      const texto = mensagemLembrete({
+        clienteNome: p.clienteNome, qtd: p.ids.length, link: linkAprovacao(p.slug, p.mes),
+      });
+      const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
+        body: { cliente_id: p.clienteId, texto },
+      });
+      if (error) throw new Error(await erroDaFuncao(error));
+      await supabase
+        .from('conteudo_aprovacao')
+        .update({ lembrete_em: new Date().toISOString() } as never)
+        .in('id', p.ids);
     },
     onSuccess: invalidar,
   });
