@@ -6,13 +6,13 @@ import type { Demanda, DemandaView } from '@/modules/demandas/types';
 import { iniciarTimerDemanda, pararTimerDemanda, type Tocador } from '@/modules/demandas/api/cronometroApi';
 
 const demoDemandas: Demanda[] = [
-  { id: 'd1', cliente_id: 'c1', setor: 'design', privada: false, titulo: 'Criar 4 criativos para agosto', responsavel: 'Designer', prioridade: 'alta', status: 'fazendo', prazo: '2026-08-07', created_at: '2026-08-01T10:00:00Z' },
-  { id: 'd2', cliente_id: 'c2', setor: 'trafego', privada: false, titulo: 'Configurar campanha de remarketing', responsavel: 'Gestor de Tráfego', prioridade: 'alta', status: 'aberta', prazo: '2026-08-09', created_at: '2026-08-02T10:00:00Z' },
-  { id: 'd3', cliente_id: 'c3', setor: 'trafego', privada: false, titulo: 'Otimizar campanha de aula experimental', responsavel: 'Gestor de Tráfego', prioridade: 'media', status: 'aberta', prazo: '2026-08-06', created_at: '2026-08-03T10:00:00Z' },
-  { id: 'd4', cliente_id: 'c2', setor: 'design', privada: false, titulo: 'Ajustar peças da coleção verão', responsavel: 'Designer', prioridade: 'media', status: 'aberta', prazo: '2026-08-10', created_at: '2026-08-02T10:00:00Z' },
-  { id: 'd5', cliente_id: null, setor: 'socios', privada: true, titulo: 'Fechar contratação do novo gestor', responsavel: 'Iuri', prioridade: 'alta', status: 'fazendo', prazo: '2026-08-15', created_at: '2026-08-01T10:00:00Z' },
-  { id: 'd6', cliente_id: null, setor: 'socios', privada: true, titulo: 'Revisar metas do trimestre', responsavel: 'Sócios', prioridade: 'media', status: 'aberta', prazo: '2026-08-25', created_at: '2026-08-01T10:00:00Z' },
-  { id: 'd7', cliente_id: null, setor: 'geral', privada: false, titulo: 'Atualizar site da agência', responsavel: 'Equipe', prioridade: 'baixa', status: 'aberta', prazo: '2026-08-20', created_at: '2026-08-01T10:00:00Z' },
+  { id: 'd1', cliente_id: 'c1', setor: 'design', privada: false, titulo: 'Criar 4 criativos para agosto', descricao: '', responsavel: 'Designer', prioridade: 'alta', status: 'fazendo', prazo: '2026-08-07', created_at: '2026-08-01T10:00:00Z' },
+  { id: 'd2', cliente_id: 'c2', setor: 'trafego', privada: false, titulo: 'Configurar campanha de remarketing', descricao: '', responsavel: 'Gestor de Tráfego', prioridade: 'alta', status: 'aberta', prazo: '2026-08-09', created_at: '2026-08-02T10:00:00Z' },
+  { id: 'd3', cliente_id: 'c3', setor: 'trafego', privada: false, titulo: 'Otimizar campanha de aula experimental', descricao: '', responsavel: 'Gestor de Tráfego', prioridade: 'media', status: 'aberta', prazo: '2026-08-06', created_at: '2026-08-03T10:00:00Z' },
+  { id: 'd4', cliente_id: 'c2', setor: 'design', privada: false, titulo: 'Ajustar peças da coleção verão', descricao: '', responsavel: 'Designer', prioridade: 'media', status: 'aberta', prazo: '2026-08-10', created_at: '2026-08-02T10:00:00Z' },
+  { id: 'd5', cliente_id: null, setor: 'socios', privada: true, titulo: 'Fechar contratação do novo gestor', descricao: '', responsavel: 'Iuri', prioridade: 'alta', status: 'fazendo', prazo: '2026-08-15', created_at: '2026-08-01T10:00:00Z' },
+  { id: 'd6', cliente_id: null, setor: 'socios', privada: true, titulo: 'Revisar metas do trimestre', descricao: '', responsavel: 'Sócios', prioridade: 'media', status: 'aberta', prazo: '2026-08-25', created_at: '2026-08-01T10:00:00Z' },
+  { id: 'd7', cliente_id: null, setor: 'geral', privada: false, titulo: 'Atualizar site da agência', descricao: '', responsavel: 'Equipe', prioridade: 'baixa', status: 'aberta', prazo: '2026-08-20', created_at: '2026-08-01T10:00:00Z' },
 ];
 
 async function fetchDemandas(clienteId: string): Promise<DemandaView[]> {
@@ -46,7 +46,7 @@ export function useDemandas(clienteId: string) {
 // ---------- Criar / editar ----------
 export type DemandaFormData = Pick<
   Demanda,
-  'cliente_id' | 'setor' | 'privada' | 'titulo' | 'responsavel' | 'prioridade' | 'status' | 'prazo'
+  'cliente_id' | 'setor' | 'privada' | 'titulo' | 'descricao' | 'responsavel' | 'prioridade' | 'status' | 'prazo'
 >;
 
 async function saveDemanda(id: string | undefined, dados: DemandaFormData): Promise<string> {

@@ -17,6 +17,7 @@ import { TOCADORES, type Tocador } from '@/modules/demandas/api/cronometroApi';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
+import { Textarea } from '@/shared/ui/Textarea';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
 
@@ -24,6 +25,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   demanda?: DemandaView;
+  setorInicial?: DemandaSetor;
 }
 
 const PRIORIDADE_OPTIONS = (Object.keys(PRIORIDADE_LABEL) as DemandaPrioridade[]).map((p) => ({
@@ -45,7 +47,7 @@ function limparRascunho() {
   try { sessionStorage.removeItem(RASCUNHO_KEY); } catch { /* sem storage */ }
 }
 
-export function DemandaFormModal({ open, onClose, demanda }: Props) {
+export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
 
@@ -65,15 +67,19 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
   const [form, setForm] = useState(() => {
     const base = {
       cliente_id: demanda?.cliente_id ?? '',
-      setor: demanda?.setor ?? 'geral',
-      privada: demanda?.privada ?? false,
+      setor: demanda?.setor ?? setorInicial ?? 'geral',
+      privada: demanda?.privada ?? setorInicial === 'socios',
       titulo: demanda?.titulo ?? '',
+      descricao: demanda?.descricao ?? '',
       responsavel: demanda?.responsavel ?? '',
       prioridade: demanda?.prioridade ?? 'media',
       status: demanda?.status ?? 'aberta',
       prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
     };
-    return demanda ? base : { ...base, ...lerRascunho() };
+    if (demanda) return base;
+    const rascunho = lerRascunho();
+    const setorNovo = setorInicial ?? (rascunho.setor as DemandaSetor | undefined) ?? 'geral';
+    return { ...base, ...rascunho, setor: setorNovo, privada: setorNovo === 'socios' };
   });
 
   // Rascunho de demanda nova: sobrevive a recarregar a página ou trocar de aba.
@@ -141,13 +147,23 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
     >
       <div className="space-y-4">
         <Input id="titulo" label="Título" value={form.titulo} onChange={(e) => set('titulo', e.target.value)} />
+        <Textarea
+          id="descricao"
+          label="Descrição"
+          value={form.descricao}
+          onChange={(e) => set('descricao', e.target.value)}
+          placeholder="Detalhes, contexto ou orientações sobre a demanda (opcional)"
+        />
         <div className="grid grid-cols-2 gap-4">
           <Select
             id="setor"
             label="Setor"
             options={DEMANDA_SETORES.map((s) => ({ value: s.id, label: s.label }))}
             value={form.setor}
-            onChange={(e) => set('setor', e.target.value as DemandaSetor)}
+            onChange={(e) => {
+              const novoSetor = e.target.value as DemandaSetor;
+              setForm((f) => ({ ...f, setor: novoSetor, privada: novoSetor === 'socios' }));
+            }}
           />
           <label className="flex items-end gap-2 pb-2 text-sm text-slate-200">
             <input
