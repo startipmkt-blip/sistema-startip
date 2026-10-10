@@ -76,7 +76,10 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       status: demanda?.status ?? 'aberta',
       prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
     };
-    return demanda ? base : { ...base, ...lerRascunho() };
+    if (demanda) return base;
+    const rascunho = lerRascunho();
+    const setorNovo = setorInicial ?? (rascunho.setor as DemandaSetor | undefined) ?? 'geral';
+    return { ...base, ...rascunho, setor: setorNovo, privada: setorNovo === 'socios' };
   });
 
   // Rascunho de demanda nova: sobrevive a recarregar a página ou trocar de aba.
