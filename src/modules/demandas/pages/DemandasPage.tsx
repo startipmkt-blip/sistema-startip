@@ -81,7 +81,7 @@ export function DemandasPage() {
     if (responsavel) base = base.filter((d) => d.responsavel === responsavel);
     if (termo) {
       base = base.filter((d) =>
-        `${d.titulo} ${d.cliente_nome} ${d.responsavel}`.toLowerCase().includes(termo),
+        `${d.titulo} ${d.descricao} ${d.cliente_nome} ${d.responsavel}`.toLowerCase().includes(termo),
       );
     }
     return base;
@@ -146,6 +146,7 @@ export function DemandasPage() {
           setor,
           privada: setor === 'socios',
           titulo,
+          descricao: '',
           responsavel: '',
           prioridade: 'media',
           status: 'aberta',
@@ -178,6 +179,9 @@ export function DemandasPage() {
             </span>
             <Badge tone={PRIORIDADE_TONE[d.prioridade]}>{PRIORIDADE_LABEL[d.prioridade]}</Badge>
           </div>
+          {d.descricao && (
+            <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-xs text-slate-300">{d.descricao}</p>
+          )}
           <div className="text-xs text-slate-400">{d.cliente_nome}</div>
           {tocadores?.[d.id] && (
             <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
@@ -315,7 +319,12 @@ export function DemandasPage() {
           )}
 
           {formOpen && (
-            <DemandaFormModal open={formOpen} onClose={() => setFormOpen(false)} demanda={editando} />
+            <DemandaFormModal
+              open={formOpen}
+              onClose={() => setFormOpen(false)}
+              demanda={editando}
+              setorInicial={setor}
+            />
           )}
 
           {iniciando && (
