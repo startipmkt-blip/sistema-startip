@@ -8,6 +8,7 @@ export interface Demanda {
   setor: DemandaSetor;
   privada: boolean; // demanda privada dos sócios
   titulo: string;
+  descricao: string;
   responsavel: string;
   prioridade: DemandaPrioridade;
   status: DemandaStatus;
