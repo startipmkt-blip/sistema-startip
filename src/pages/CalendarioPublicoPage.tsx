@@ -4,9 +4,10 @@ import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import { useCalendarioPublico } from '@/modules/datas-comemorativas/api/datasApi';
 import {
-  agruparPorMes, anoDe, diasEntre, formatarData, gerarOcorrencias, hojeSaoPaulo, mesDe, periodoVigente,
+  agruparPorMes, anoDe, diasEntre, formatarData, gerarOcorrencias, hojeSaoPaulo, mapaAprovacoes, mesDe, periodoVigente,
 } from '@/modules/datas-comemorativas/lib/recorrencia';
 import { OcorrenciaCard } from '@/modules/datas-comemorativas/components/OcorrenciaCard';
+import { AprovacaoCliente, AprovacaoStatus } from '@/modules/datas-comemorativas/components/AprovacaoData';
 import { MESES } from '@/modules/datas-comemorativas/types';
 
 type Aba = 'proximas' | 'historico';
@@ -36,7 +37,7 @@ export function CalendarioPublicoPage() {
     const aPartirDe = periodo.de > hoje ? periodo.de : hoje;
     const proximas = todas.filter((o) => o.data >= aPartirDe && o.data <= periodo.ate);
     const historico = todas.filter((o) => o.data < hoje).reverse();
-    return { periodo, proximas, historico };
+    return { periodo, proximas, historico, aprovacoes: mapaAprovacoes(data.aprovacoes) };
   }, [data, hoje]);
 
   if (isLoading) return <div className="flex min-h-screen items-center justify-center bg-slate-950"><Spinner /></div>;
@@ -53,7 +54,8 @@ export function CalendarioPublicoPage() {
     );
   }
 
-  const { periodo, proximas, historico } = visao;
+  const { periodo, proximas, historico, aprovacoes } = visao;
+  const pendentes = proximas.filter((o) => !aprovacoes.has(o.key)).length;
   const proxima = proximas[0];
   const lista = aba === 'proximas' ? proximas : historico;
 
@@ -76,6 +78,8 @@ export function CalendarioPublicoPage() {
           Estas são as datas comemorativas escolhidas para a sua marca. <strong className="text-slate-300">Em planejamento</strong> indica
           que a data está próxima (ou já tem etapas de preparação em andamento) e a equipe Startip está trabalhando nela.
           Datas que já passaram ficam no <strong className="text-slate-300">Histórico</strong>.
+          Em cada data você pode <strong className="text-slate-300">aprovar</strong> ou <strong className="text-slate-300">reprovar</strong> —
+          ao reprovar, conte o motivo para a equipe ajustar o planejamento.
         </p>
 
         {proxima && (
@@ -86,6 +90,12 @@ export function CalendarioPublicoPage() {
               {formatarData(proxima.data, { weekday: 'long', day: '2-digit', month: 'long' })} · {faltam(diasEntre(hoje, proxima.data))}
             </div>
           </div>
+        )}
+
+        {pendentes > 0 && (
+          <p className="text-center text-xs text-amber-300">
+            ⏳ {pendentes === 1 ? '1 data aguardando' : `${pendentes} datas aguardando`} a sua aprovação
+          </p>
         )}
 
         <div className="flex justify-center gap-2">
@@ -118,7 +128,21 @@ export function CalendarioPublicoPage() {
                   <div className="h-px flex-1 bg-white/10" />
                 </div>
                 <div className="space-y-3">
-                  {g.itens.map((o) => <OcorrenciaCard key={o.key} ocorrencia={o} hoje={hoje} />)}
+                  {g.itens.map((o) => {
+                    const aprovacao = aprovacoes.get(o.key);
+                    return (
+                      <OcorrenciaCard
+                        key={o.key}
+                        ocorrencia={o}
+                        hoje={hoje}
+                        rodape={
+                          aba === 'proximas'
+                            ? <AprovacaoCliente slug={slug.toLowerCase()} ocorrencia={o} aprovacao={aprovacao} />
+                            : aprovacao && <AprovacaoStatus aprovacao={aprovacao} visao="cliente" />
+                        }
+                      />
+                    );
+                  })}
                 </div>
               </section>
             ))}
