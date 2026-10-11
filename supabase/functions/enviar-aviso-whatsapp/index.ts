@@ -9,6 +9,7 @@ import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 
 const SUPABASE_URL      = Deno.env.get('SUPABASE_URL') ?? '';
+const ANON_KEY          = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const SERVICE_ROLE      = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const ZAPI_INSTANCE_ID  = Deno.env.get('ZAPI_INSTANCE_ID') ?? '';
 const ZAPI_TOKEN        = Deno.env.get('ZAPI_TOKEN') ?? '';
@@ -26,6 +27,19 @@ function json(o: unknown, s = 200) {
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: CORS });
+
+  // Só a equipe logada pode disparar mensagens: a anon key é pública e,
+  // sozinha, passa pelo verify_jwt do gateway.
+  const auth = req.headers.get('Authorization');
+  if (!auth) return json({ error: 'Não autorizado' }, 401);
+  const sbUser = createClient(SUPABASE_URL, ANON_KEY, {
+    global: { headers: { Authorization: auth } },
+    auth: { persistSession: false },
+  });
+  const { data: user } = await sbUser.auth.getUser();
+  if (!user?.user) return json({ error: 'Não autorizado' }, 401);
+  const { data: eq } = await sbUser.rpc('is_equipe');
+  if (!eq) return json({ error: 'Apenas a equipe pode enviar mensagens' }, 403);
 
   const body = await req.json().catch(() => ({}));
   const { cliente_id, texto } = body as { cliente_id?: string; texto?: string };

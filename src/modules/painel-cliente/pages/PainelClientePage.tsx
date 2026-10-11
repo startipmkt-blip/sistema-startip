@@ -7,6 +7,7 @@ import {
   useAvisos, useSalvarAviso, useExcluirAviso,
   usePersona, useSalvarPersona,
 } from '@/modules/painel-cliente/api/painelClienteApi';
+import { supabase } from '@/shared/lib/supabaseClient';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
@@ -251,14 +252,13 @@ function SecaoAvisos({ clienteId }: { clienteId: string }) {
   async function enviarWhatsApp(a: { titulo: string; conteudo: string; id: string }) {
     setEnviandoWa(a.id);
     try {
-      const r = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/enviar-aviso-whatsapp`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ cliente_id: clienteId, texto: `*${a.titulo}*\n\n${a.conteudo}` }),
+      const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
+        body: { cliente_id: clienteId, texto: `*${a.titulo}*\n\n${a.conteudo}` },
       });
-      const b = await r.json().catch(() => ({}));
-      if (!r.ok) alert(b?.error ?? 'Falha ao enviar');
-      else alert('✅ Enviado pelo WhatsApp!');
+      if (error) {
+        const corpo = await (error as { context?: Response }).context?.json().catch(() => null);
+        alert(corpo?.error ?? 'Falha ao enviar');
+      } else alert('✅ Enviado pelo WhatsApp!');
     } catch (e) { alert((e as Error).message); }
     finally { setEnviandoWa(null); }
   }
