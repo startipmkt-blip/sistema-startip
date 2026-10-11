@@ -221,7 +221,16 @@ serve(async (req) => {
 
   // Antes de extrair, trata callbacks de "status" (entregue/lida/etc). A
   // Z-API manda com type "MessageStatusCallback" ou campo "status".
-  const isStatus = payload?.type === 'MessageStatusCallback' || typeof payload?.status === 'string';
+  // Mensagens recebidas (type "ReceivedCallback") também trazem
+  // status: "RECEIVED" — só o campo status não basta para classificar,
+  // senão toda mensagem nova é descartada como se fosse callback de status.
+  const temConteudo = !!(
+    payload?.text || payload?.image || payload?.audio || payload?.document ||
+    payload?.video || payload?.sticker || payload?.reaction || payload?.body
+  );
+  const isStatus =
+    payload?.type === 'MessageStatusCallback' ||
+    (typeof payload?.status === 'string' && payload?.type !== 'ReceivedCallback' && !temConteudo);
   if (isStatus) {
     const sbs = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
     const waId: string | null = txt(payload?.ids?.[0]) ?? txt(payload?.messageId) ?? txt(payload?.id);
@@ -288,6 +297,8 @@ serve(async (req) => {
   // Mensagens de conteúdo (texto ou mídia). Precisa de conteúdo mínimo.
   const nadaPraSalvar = dados.tipo === 'texto' && !dados.texto;
   if (nadaPraSalvar) {
+    // Sem conteúdo da conversa no log: só o formato do evento, para diagnóstico.
+    console.log('IGNORADO_SEM_TEXTO', { type: payload?.type, campos: Object.keys(payload ?? {}) });
     return new Response(JSON.stringify({ ignored: true, reason: 'sem texto' }), { status: 200 });
   }
 
