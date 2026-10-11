@@ -32,6 +32,7 @@ import { DesignerPage } from '@/modules/designer/pages/DesignerPage';
 import { Navigate } from 'react-router-dom';
 import { MarketplacePublicoPage } from '@/pages/MarketplacePublicoPage';
 import { CadastroPublicoPage } from '@/pages/CadastroPublicoPage';
+import { FormularioPublicoPage } from '@/modules/formularios/pages/FormularioPublicoPage';
 import { CentralClientePage } from '@/pages/CentralClientePage';
 import { AprovacaoPublicaPage } from '@/pages/AprovacaoPublicaPage';
 import { PortalAprovacao } from '@/portal/pages/PortalAprovacao';
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   // Rota pública de auto-cadastro do cliente (sem auth).
   { path: '/cadastro/:slug', element: <CadastroPublicoPage /> },
+  { path: '/formulario/:slug', element: <FormularioPublicoPage /> },
   { path: '/central/:slug', element: <CentralClientePage /> },
   { path: '/aprovar/:slug', element: <AprovacaoPublicaPage /> },
   { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
