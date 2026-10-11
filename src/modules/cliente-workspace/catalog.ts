@@ -34,6 +34,7 @@ export const DOC_ITENS: DocItem[] = [
   { chave: 'calendario', titulo: 'Calendário editorial', icon: '🗓️', grupo: 'fluxo' },
   { chave: 'instagram', titulo: 'Estrutura de Instagram', icon: '📸', grupo: 'fluxo' },
   { chave: 'gmn', titulo: 'Google Meu Negócio (GMN)', icon: '📍', grupo: 'fluxo' },
+  { chave: 'formularios', titulo: 'Formulários', icon: '📝', grupo: 'fluxo' },
 ];
 
 export function itensDoGrupo(grupo: DocGrupo): DocItem[] {

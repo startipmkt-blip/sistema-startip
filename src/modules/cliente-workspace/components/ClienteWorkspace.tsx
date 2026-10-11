@@ -10,6 +10,7 @@ import {
   type DocItem,
 } from '@/modules/cliente-workspace/catalog';
 import { ReunioesPanel } from '@/modules/reunioes/ReunioesPanel';
+import { FormulariosAba } from '@/modules/formularios/pages/FormulariosAba';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Textarea } from '@/shared/ui/Textarea';
@@ -119,6 +120,14 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
             {item.titulo}
           </h2>
           <ReunioesPanel clienteId={clienteId} />
+        </Card>
+      ) : item.chave === 'formularios' ? (
+        <Card className="p-6" id="formularios">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+            <span aria-hidden>{item.icon}</span>
+            {item.titulo}
+          </h2>
+          <FormulariosAba clienteId={clienteId} />
         </Card>
       ) : (
       <Card className="p-6">
