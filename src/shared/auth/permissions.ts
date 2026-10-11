@@ -25,6 +25,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'aprovacao-conteudo', label: 'Aprovação de conteúdo' },
   { key: 'datas-comemorativas', label: 'Datas comemorativas' },
   { key: 'painel-tv', label: 'Painel TV' },
+  { key: 'cs-clientes', label: 'CS Clientes' },
   { key: 'demandas', label: 'Demandas' },
   { key: 'ideias', label: 'Ideias' },
   { key: 'gestao-conteudo', label: 'Gestão de Conteúdo' },

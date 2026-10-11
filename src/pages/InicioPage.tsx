@@ -24,10 +24,11 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '11', label: 'Ideias',            emoji: '💡', to: '/ideias',            modulo: 'ideias' },
   { numero: '12', label: 'Gestão de Conteúdo', emoji: '🗂️', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
   { numero: '13', label: 'Anotações',          emoji: '📝', to: '/anotacoes',          modulo: 'anotacoes' },
+  { numero: '14', label: 'CS Clientes',        emoji: '💬', to: '/cs-clientes',        modulo: 'cs-clientes' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '14', label: 'Contratos',          emoji: '📄', to: '/contratos',          modulo: 'contratos' },
+  { numero: '15', label: 'Contratos',         emoji: '📄', to: '/contratos',          modulo: 'contratos' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {

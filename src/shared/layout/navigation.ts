@@ -14,6 +14,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: 'Início', to: '/inicio', icon: 'home', comingSoon: false },
   { label: 'Clientes', to: '/clientes', icon: 'clientes', comingSoon: false },
+  { label: 'CS Clientes', to: '/cs-clientes', icon: 'crm', comingSoon: false, equipeOnly: true },
   { label: 'Painel TV', to: '/painel-tv', icon: 'area-cliente', comingSoon: false, equipeOnly: true },
   { label: 'CRM', to: '/crm', icon: 'crm', comingSoon: false },
   { label: 'Financeiro', to: '/financeiro', icon: 'financeiro', comingSoon: false, equipeOnly: true },
