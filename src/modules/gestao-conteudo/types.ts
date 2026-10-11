@@ -167,16 +167,11 @@ export function driveInfo(url: string | null | undefined): DriveInfo {
 /** Texto do lembrete manual enviado ao cliente. */
 export function mensagemLembrete(p: { clienteNome: string; qtd: number; link: string }): string {
   return (
-    `Olá, ${p.clienteNome}! 👋
-
-` +
-    `Passando para lembrar que ${p.qtd === 1 ? 'há 1 conteúdo aguardando' : `há ${p.qtd} conteúdos aguardando`} ` +
-    `a sua aprovação.
-
-É rapidinho — veja a prévia e aprove por aqui:
-${p.link}
-
-Obrigado!`
+    `Olá pessoal, tudo bem?\n\n` +
+    `Passando pra lembrar que ${p.qtd === 1 ? 'há 1 conteúdo' : `há ${p.qtd} conteúdos`} ` +
+    `que vocês ainda não aprovaram.\n\n` +
+    `Segue o link do material para aprovação:\n${p.link}\n\n` +
+    `Obrigado!`
   );
 }
 

@@ -20,7 +20,7 @@ interface Dados {
 
 const FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/central-cliente`;
 
-type Aba = 'geral' | 'aprovacao' | 'entregas' | 'otimizacoes' | 'investimento' | 'avisos' | 'persona';
+type Aba = 'aprovacao' | 'entregas' | 'otimizacoes' | 'investimento' | 'avisos' | 'persona';
 
 function fmtDia(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
@@ -37,7 +37,7 @@ export function CentralClientePage() {
   const { slug = '' } = useParams<{ slug: string }>();
   const [dados, setDados] = useState<Dados | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [aba, setAba] = useState<Aba>('geral');
+  const [aba, setAba] = useState<Aba>('aprovacao');
 
   useEffect(() => {
     (async () => {
@@ -63,7 +63,6 @@ export function CentralClientePage() {
 
   const c = dados.cliente;
   const abas: { id: Aba; label: string; icone: string; badge?: number }[] = [
-    { id: 'geral',        label: 'Visão geral',       icone: '🏠' },
     { id: 'aprovacao',    label: 'Aprovar conteúdo',  icone: '✅', badge: dados.ideias_mes.filter((i) => i.status === 'pendente').length },
     { id: 'entregas',     label: 'Entregas da semana', icone: '📦', badge: dados.entregas_semana.length },
     { id: 'otimizacoes',  label: 'Otimizações',       icone: '⚡', badge: dados.otimizacoes.length },
@@ -113,7 +112,6 @@ export function CentralClientePage() {
       </nav>
 
       <main className="mx-auto mt-6 max-w-5xl space-y-6 px-4">
-        {aba === 'geral' && <VisaoGeral d={dados} />}
         {aba === 'aprovacao' && <AbaAprovacao slug={slug} ideias={dados.ideias_mes} mes={dados.mes_ref} />}
         {aba === 'entregas' && <AbaEntregas itens={dados.entregas_semana} semana={dados.semana_inicio} />}
         {aba === 'otimizacoes' && <AbaOtimizacoes itens={dados.otimizacoes} />}
@@ -126,85 +124,6 @@ export function CentralClientePage() {
         Startip · Cliente desde {new Date(c.data_entrada).toLocaleDateString('pt-BR')}
       </footer>
     </div>
-  );
-}
-
-function Barra({ label, valor }: { label: string; valor: number | null }) {
-  const cor = valor == null ? 'bg-slate-600' : valor >= 60 ? 'bg-emerald-500' : valor >= 40 ? 'bg-amber-500' : 'bg-red-500';
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between text-xs">
-        <span className="text-slate-300">{label}</span>
-        <span className="font-mono text-slate-400">{valor == null ? '—' : `${valor}%`}</span>
-      </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/5">
-        <div className={`h-full ${cor}`} style={{ width: `${valor ?? 0}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function VisaoGeral({ d }: { d: Dados }) {
-  const s = d.saude;
-  const classe = s?.score_saude == null ? 'Sem dados' : s.score_saude >= 80 ? 'Ótima' : s.score_saude >= 60 ? 'Boa' : s.score_saude >= 40 ? 'Atenção' : 'Crítica';
-  const tone: Parameters<typeof Badge>[0]['tone'] = s?.score_saude == null ? 'slate' : s.score_saude >= 60 ? 'green' : s.score_saude >= 40 ? 'amber' : 'red';
-  const invAtual = d.investimento[0];
-  return (
-    <>
-      <Card className="p-5">
-        <div className="mb-3 flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-slate-200">Score de saúde</h2>
-          <Badge tone={tone}>{classe}</Badge>
-          <span className="ml-auto text-3xl font-semibold text-slate-100">
-            {s?.score_saude ?? '—'}<span className="ml-1 text-sm text-slate-500">/100</span>
-          </span>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Barra label="Contrato"  valor={s?.score_contrato  ?? null} />
-          <Barra label="Aprovação" valor={s?.score_aprovacao ?? null} />
-          <Barra label="Suporte"   valor={s?.score_suporte   ?? null} />
-        </div>
-      </Card>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="p-4">
-          <div className="text-[10px] uppercase tracking-wider text-slate-500">Entregas na semana</div>
-          <div className="mt-1 text-2xl font-semibold text-slate-100">{d.entregas_semana.length}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-[10px] uppercase tracking-wider text-slate-500">Otimizações recentes</div>
-          <div className="mt-1 text-2xl font-semibold text-slate-100">{d.otimizacoes.length}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-[10px] uppercase tracking-wider text-slate-500">Investimento (semana atual)</div>
-          <div className="mt-1 text-xl font-semibold text-slate-100">
-            {invAtual ? fmtMoney(Number(invAtual.investimento_total)) : '—'}
-          </div>
-        </Card>
-      </div>
-
-      <Card className="p-5">
-        <h2 className="mb-3 text-sm font-semibold text-slate-200">Contratos</h2>
-        {d.contratos.length === 0 ? <p className="text-xs text-slate-500">Nenhum contrato ativo.</p> : (
-          <ul className="space-y-2">
-            {d.contratos.map((k) => (
-              <li key={k.id} className="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.02] px-3 py-2">
-                <div>
-                  <div className="text-sm text-slate-100">{k.titulo}</div>
-                  <div className="text-[11px] text-slate-400">
-                    {new Date(k.start_date).toLocaleDateString('pt-BR')} → {k.end_date ? new Date(k.end_date).toLocaleDateString('pt-BR') : '—'}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Badge tone={k.status === 'assinado' ? 'green' : k.status === 'aguardando' ? 'amber' : 'slate'}>{k.status}</Badge>
-                  <div className="mt-1 text-xs text-slate-300">{fmtMoney(Number(k.monthly_value ?? 0))}/mês</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
-    </>
   );
 }
 

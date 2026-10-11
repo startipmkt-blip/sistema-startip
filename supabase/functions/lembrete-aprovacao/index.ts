@@ -77,9 +77,10 @@ serve(async () => {
     const mes = lista.map((p: any) => p.mes_referencia).sort()[0];
     const n = lista.length;
     const texto =
-      `Olá, ${c.nome}! 👋\n\n` +
-      `Passando para lembrar que ${n === 1 ? 'há 1 conteúdo aguardando' : `há ${n} conteúdos aguardando`} ` +
-      `a sua aprovação.\n\nÉ rapidinho — veja a prévia e aprove por aqui:\n` +
+      `Olá pessoal, tudo bem?\n\n` +
+      `Passando pra lembrar que ${n === 1 ? 'há 1 conteúdo' : `há ${n} conteúdos`} ` +
+      `que vocês ainda não aprovaram.\n\n` +
+      `Segue o link do material para aprovação:\n` +
       `${SITE}/aprovar/${c.central_slug}?mes=${mes}\n\nObrigado!`;
 
     const ok = await enviarWhatsapp(c.whatsapp_chat_id, texto);
