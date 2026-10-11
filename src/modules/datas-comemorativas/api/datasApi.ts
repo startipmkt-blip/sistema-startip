@@ -3,7 +3,7 @@ import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
 import { demoClientes } from '@/shared/lib/demoData';
 import type {
-  CalendarioConfig, CalendarioPublico, DataBase, DataCliente, Prioridade,
+  Aprovacao, CalendarioConfig, CalendarioPublico, DataBase, DataCliente, Prioridade, StatusAprovacao,
 } from '@/modules/datas-comemorativas/types';
 
 // ---------- Stores demo (mutáveis) ----------
@@ -27,12 +27,14 @@ const demoItens: Required<DataCliente>[] = [
 const demoCalendarios: CalendarioConfig[] = [
   { cliente_id: 'c1', slug: 'padaria-do-bairro', inicio: '2026-09-25' },
 ];
+const demoAprovacoes: Aprovacao[] = [];
 
 const keys = {
   base: ['datas', 'base'] as const,
   itens: (clienteId: string) => ['datas', 'itens', clienteId] as const,
   calendario: (clienteId: string) => ['datas', 'calendario', clienteId] as const,
   publico: (slug: string) => ['datas', 'publico', slug] as const,
+  aprovacoes: (clienteId: string) => ['datas', 'aprovacoes', clienteId] as const,
 };
 
 export type DataBaseForm = Omit<DataBase, 'id' | 'chave'>;
@@ -146,11 +148,46 @@ async function fetchPublico(slug: string): Promise<CalendarioPublico | null> {
     if (!cal) return null;
     const itens = demoItens.filter((i) => i.cliente_id === cal.cliente_id && i.visivel_cliente);
     const cli = demoClientes.find((c) => c.id === cal.cliente_id);
-    return { cliente: { nome: cli?.nome ?? '', logo_url: cli?.logo_url ?? null }, inicio: cal.inicio, itens, base: demoBase };
+    const aprovacoes = demoAprovacoes.filter((a) => itens.some((i) => i.id === a.datas_cliente_id));
+    return { cliente: { nome: cli?.nome ?? '', logo_url: cli?.logo_url ?? null }, inicio: cal.inicio, itens, base: demoBase, aprovacoes };
   }
   const { data, error } = await supabase.rpc('calendario_publico' as never, { p_slug: slug } as never);
   if (error) throw error;
   return (data ?? null) as CalendarioPublico | null;
+}
+
+// ---------- Aprovação do cliente ----------
+export interface RespostaData {
+  itemId: string;
+  ano: number;
+  status: StatusAprovacao;
+  justificativa?: string;
+}
+
+async function responderData(slug: string, r: RespostaData): Promise<void> {
+  const justificativa = r.status === 'reprovada' ? (r.justificativa ?? '').trim() : '';
+  if (IS_DEMO) {
+    const i = demoAprovacoes.findIndex((a) => a.datas_cliente_id === r.itemId && a.ano === r.ano);
+    const nova: Aprovacao = { datas_cliente_id: r.itemId, ano: r.ano, status: r.status, justificativa, respondido_em: new Date().toISOString() };
+    if (i >= 0) demoAprovacoes[i] = nova; else demoAprovacoes.push(nova);
+    return;
+  }
+  const { error } = await supabase.rpc('calendario_responder' as never, {
+    p_slug: slug, p_item_id: r.itemId, p_ano: r.ano, p_status: r.status, p_justificativa: justificativa,
+  } as never);
+  if (error) throw error;
+}
+
+async function fetchAprovacoes(clienteId: string): Promise<Aprovacao[]> {
+  if (IS_DEMO) {
+    return demoAprovacoes.filter((a) => demoItens.some((i) => i.id === a.datas_cliente_id && i.cliente_id === clienteId));
+  }
+  const { data, error } = await supabase
+    .from('datas_aprovacao')
+    .select('datas_cliente_id, ano, status, justificativa, respondido_em, datas_cliente!inner(cliente_id)')
+    .eq('datas_cliente.cliente_id', clienteId);
+  if (error) throw error;
+  return (data ?? []) as unknown as Aprovacao[];
 }
 
 // ---------- Hooks ----------
@@ -168,6 +205,18 @@ export function useCalendarioConfig(clienteId: string) {
 
 export function useCalendarioPublico(slug: string) {
   return useQuery({ queryKey: keys.publico(slug), queryFn: () => fetchPublico(slug), enabled: !!slug, retry: 1 });
+}
+
+export function useAprovacoesCliente(clienteId: string) {
+  return useQuery({ queryKey: keys.aprovacoes(clienteId), queryFn: () => fetchAprovacoes(clienteId), enabled: !!clienteId });
+}
+
+export function useResponderData(slug: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (r: RespostaData) => responderData(slug, r),
+    onSuccess: () => qc.invalidateQueries({ queryKey: keys.publico(slug) }),
+  });
 }
 
 export function useSalvarDataBase() {

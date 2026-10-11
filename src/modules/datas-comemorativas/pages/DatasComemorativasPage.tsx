@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import {
-  useCalendarioConfig, useDatasBase, useDatasCliente, useRemoverDataCliente, useSalvarCalendario,
+  useAprovacoesCliente, useCalendarioConfig, useDatasBase, useDatasCliente, useRemoverDataCliente, useSalvarCalendario,
 } from '@/modules/datas-comemorativas/api/datasApi';
 import {
-  agruparPorMes, anoDe, formatarData, gerarOcorrencias, hojeSaoPaulo, periodoVigente, slugify,
+  agruparPorMes, anoDe, formatarData, gerarOcorrencias, hojeSaoPaulo, mapaAprovacoes, periodoVigente, slugify,
 } from '@/modules/datas-comemorativas/lib/recorrencia';
 import type { CalendarioConfig, DataCliente, Ocorrencia } from '@/modules/datas-comemorativas/types';
 import { OcorrenciaCard } from '@/modules/datas-comemorativas/components/OcorrenciaCard';
+import { AprovacaoStatus } from '@/modules/datas-comemorativas/components/AprovacaoData';
 import { BaseMaeModal } from '@/modules/datas-comemorativas/components/BaseMaeModal';
 import { AdicionarDatasModal } from '@/modules/datas-comemorativas/components/AdicionarDatasModal';
 import { EditarDataClienteModal } from '@/modules/datas-comemorativas/components/EditarDataClienteModal';
@@ -19,7 +20,7 @@ import { Input } from '@/shared/ui/Input';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 
-type Filtro = 'todas' | 'proximas' | 'historico';
+type Filtro = 'todas' | 'proximas' | 'historico' | 'reprovadas';
 
 export function DatasComemorativasPage() {
   const hoje = hojeSaoPaulo();
@@ -44,17 +45,23 @@ export function DatasComemorativasPage() {
   const baseQ = useDatasBase();
   const itensQ = useDatasCliente(clienteId);
   const calQ = useCalendarioConfig(clienteId);
+  const aprovacoesQ = useAprovacoesCliente(clienteId);
   const base = baseQ.data ?? [];
   const itens = itensQ.data ?? [];
   const cal = calQ.data ?? null;
 
   const ocorrencias = useMemo(() => gerarOcorrencias(itens, base, [ano], hoje), [itens, base, ano, hoje]);
-  const visiveis = ocorrencias.filter((o) =>
-    filtro === 'todas' ? true : filtro === 'proximas' ? o.status !== 'passada' : o.status === 'passada');
+  const aprovacoes = useMemo(() => mapaAprovacoes(aprovacoesQ.data), [aprovacoesQ.data]);
+  const visiveis = ocorrencias.filter((o) => {
+    if (filtro === 'reprovadas') return aprovacoes.get(o.key)?.status === 'reprovada';
+    return filtro === 'todas' ? true : filtro === 'proximas' ? o.status !== 'passada' : o.status === 'passada';
+  });
   const contagem = {
     proximas: ocorrencias.filter((o) => o.status !== 'passada').length,
     planejamento: ocorrencias.filter((o) => o.status === 'em_planejamento' || o.status === 'hoje').length,
     passadas: ocorrencias.filter((o) => o.status === 'passada').length,
+    aprovadas: ocorrencias.filter((o) => aprovacoes.get(o.key)?.status === 'aprovada').length,
+    reprovadas: ocorrencias.filter((o) => aprovacoes.get(o.key)?.status === 'reprovada').length,
   };
 
   function removerData(o: Ocorrencia) {
@@ -116,6 +123,7 @@ export function DatasComemorativasPage() {
                   ['todas', `Todas de ${ano} (${ocorrencias.length})`],
                   ['proximas', `Próximas (${contagem.proximas})`],
                   ['historico', `Histórico (${contagem.passadas})`],
+                  ['reprovadas', `❌ Reprovadas (${contagem.reprovadas})`],
                 ] as const).map(([id, label]) => (
                   <button
                     key={id}
@@ -129,6 +137,9 @@ export function DatasComemorativasPage() {
                 ))}
                 {contagem.planejamento > 0 && (
                   <span className="text-[11px] text-amber-300">⏳ {contagem.planejamento} em planejamento agora</span>
+                )}
+                {contagem.aprovadas > 0 && (
+                  <span className="text-[11px] text-emerald-300">✅ {contagem.aprovadas} aprovada(s) pelo cliente</span>
                 )}
               </div>
 
@@ -155,6 +166,7 @@ export function DatasComemorativasPage() {
                             key={o.key}
                             ocorrencia={o}
                             hoje={hoje}
+                            rodape={aprovacoes.get(o.key) && <AprovacaoStatus aprovacao={aprovacoes.get(o.key)!} visao="equipe" />}
                             etiquetas={
                               <>
                                 {o.item.visivel_cliente === false && <Badge tone="amber">🙈 Oculta do cliente</Badge>}

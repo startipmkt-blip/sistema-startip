@@ -10,9 +10,10 @@ interface Props {
   hoje: IsoDate;
   acoes?: ReactNode;
   etiquetas?: ReactNode;
+  rodape?: ReactNode;
 }
 
-export function OcorrenciaCard({ ocorrencia: o, hoje, acoes, etiquetas }: Props) {
+export function OcorrenciaCard({ ocorrencia: o, hoje, acoes, etiquetas, rodape }: Props) {
   const passada = o.status === 'passada';
   return (
     <article
@@ -84,6 +85,8 @@ export function OcorrenciaCard({ ocorrencia: o, hoje, acoes, etiquetas }: Props)
             </ol>
           </div>
         )}
+
+        {rodape}
 
         {acoes && <div className="flex flex-wrap items-center justify-end gap-3 pt-1">{acoes}</div>}
       </div>

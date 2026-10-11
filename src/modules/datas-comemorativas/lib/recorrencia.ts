@@ -1,6 +1,6 @@
 import {
   DIAS_SEMANA, MESES, PRIORIDADE_ORDEM,
-  type DataBase, type DataCliente, type IsoDate, type Ocorrencia, type StatusOcorrencia,
+  type Aprovacao, type DataBase, type DataCliente, type IsoDate, type Ocorrencia, type StatusOcorrencia,
 } from '@/modules/datas-comemorativas/types';
 
 // Toda a aritmética usa UTC sobre datas ISO puras para não sofrer com
@@ -136,6 +136,7 @@ export function gerarOcorrencias(
         .sort((x, y) => x.data.localeCompare(y.data));
       out.push({
         key: `${item.id}:${ano}`,
+        ano,
         item,
         base: b,
         data,
@@ -149,6 +150,11 @@ export function gerarOcorrencias(
   return out.sort((a, b) =>
     a.data.localeCompare(b.data) || PRIORIDADE_ORDEM[a.prioridade] - PRIORIDADE_ORDEM[b.prioridade],
   );
+}
+
+/** Indexa as respostas do cliente pela mesma chave de `Ocorrencia.key`. */
+export function mapaAprovacoes(aprovacoes: Aprovacao[] | undefined): Map<string, Aprovacao> {
+  return new Map((aprovacoes ?? []).map((a) => [`${a.datas_cliente_id}:${a.ano}`, a]));
 }
 
 /**

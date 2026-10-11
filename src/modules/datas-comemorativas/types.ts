@@ -1,6 +1,7 @@
 export type Prioridade = 'muito_alta' | 'alta' | 'media' | 'baixa' | 'operacional';
 export type RegraRecorrencia = 'fixa' | 'semana_do_mes' | 'pascoa' | 'relativa' | 'unica';
 export type StatusOcorrencia = 'passada' | 'hoje' | 'em_planejamento' | 'proxima';
+export type StatusAprovacao = 'aprovada' | 'reprovada';
 
 /** Data ISO sem horário: 'YYYY-MM-DD'. */
 export type IsoDate = string;
@@ -46,8 +47,19 @@ export interface CalendarioConfig {
   inicio: IsoDate;
 }
 
+/** Resposta do cliente para uma ocorrência (data do cliente + ano). */
+export interface Aprovacao {
+  datas_cliente_id: string;
+  ano: number;
+  status: StatusAprovacao;
+  justificativa: string;
+  respondido_em: string;
+}
+
 export interface Ocorrencia {
   key: string;
+  /** Ano da regra que gerou a ocorrência (o mesmo usado em `key` e na aprovação). */
+  ano: number;
   item: DataCliente;
   base: DataBase;
   data: IsoDate;
@@ -62,6 +74,7 @@ export interface CalendarioPublico {
   inicio: IsoDate;
   itens: DataCliente[];
   base: DataBase[];
+  aprovacoes?: Aprovacao[];
 }
 
 export const PRIORIDADE_LABEL: Record<Prioridade, string> = {
