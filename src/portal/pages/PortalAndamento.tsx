@@ -1,6 +1,6 @@
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { useOnboardingAndamentos } from '@/modules/onboarding/api/onboardingApi';
-import { RoteiroMapa } from '@/modules/onboarding/components/RoteiroMapa';
+import { EtapasTimeline } from '@/modules/onboarding/components/EtapasTimeline';
 import { useConteudos } from '@/modules/conteudo/api/conteudoApi';
 import { CONTEUDO_COLUNAS, TIPO_LABEL } from '@/modules/conteudo/types';
 import { Card } from '@/shared/ui/Card';
@@ -57,33 +57,9 @@ export function PortalAndamento() {
                 </div>
               );
             })()}
-          <ul className="space-y-2">
-            {meuOnboarding.etapas.map((e, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm">
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
-                    e.concluida ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/10 text-slate-400'
-                  }`}
-                >
-                  {e.concluida ? '✓' : ''}
-                </span>
-                <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>
-                  {e.etapa}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <EtapasTimeline etapas={meuOnboarding.etapas} comStatus />
           </>
         )}
-      </Card>
-
-      {/* Passo a passo do onboarding (com o tempo de cada etapa) */}
-      <Card className="p-5">
-        <h2 className="mb-1 text-sm font-semibold text-slate-200">Como funciona o seu onboarding</h2>
-        <p className="mb-4 text-xs text-slate-400">
-          O passo a passo completo e o tempo de cada etapa.
-        </p>
-        <RoteiroMapa />
       </Card>
 
       {/* Conteúdo em produção */}

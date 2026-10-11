@@ -43,6 +43,7 @@ import { CsClientesPage } from '@/modules/cs-clientes/pages/CsClientesPage';
 import { OtimizacoesListaPage } from '@/modules/otimizacoes/pages/OtimizacoesListaPage';
 import { OtimizacoesClientePage } from '@/modules/otimizacoes/pages/OtimizacoesClientePage';
 import { OtimizacoesPublicaPage } from '@/pages/OtimizacoesPublicaPage';
+import { OnboardingPublicoPage } from '@/pages/OnboardingPublicoPage';
 
 // Padrão para módulos futuros: envolva a page em <RequireModulo modulo="chave">
 // para respeitar a permissão do cargo.
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
   { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
   { path: '/tv/:slug', element: <PainelTvPage /> },
   { path: '/otim/:token', element: <OtimizacoesPublicaPage /> },
+  { path: '/onb/:token', element: <OnboardingPublicoPage /> },
   { path: '/marketplace', element: <MarketplacePublicoPage /> },
   {
     element: <ProtectedRoute />,
