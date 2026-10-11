@@ -46,7 +46,7 @@ export function CsClientesPage() {
           <strong className="text-white">{comGrupo}</strong> de {clientes.length} com grupo
         </span>
         {sugestoes.length > 0 && (
-          <Button onClick={() => setRevisando(true)}>✨ Revisar {sugestoes.length} sugestão(ões)</Button>
+          <Button onClick={() => setRevisando(true)}>Revisar sugestões</Button>
         )}
       </PageHeader>
 
