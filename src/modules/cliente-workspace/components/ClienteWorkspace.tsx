@@ -13,6 +13,8 @@ import { ReunioesPanel } from '@/modules/reunioes/ReunioesPanel';
 import { FormulariosAba } from '@/modules/formularios/pages/FormulariosAba';
 import { RegrasCliente } from '@/modules/cliente-perfil/components/RegrasCliente';
 import { useRegras } from '@/modules/cliente-perfil/api/regrasApi';
+import { IdentidadeVisual } from '@/modules/cliente-perfil/components/IdentidadeVisual';
+import { useArquivosIdentidade } from '@/modules/cliente-perfil/api/identidadeApi';
 import { PautasCliente } from '@/modules/gestao-conteudo/components/PautasCliente';
 import { usePautas } from '@/modules/gestao-conteudo/api/pautasApi';
 import { Card } from '@/shared/ui/Card';
@@ -59,9 +61,11 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
   const doc = docs?.[item.chave];
   const { data: regras } = useRegras(clienteId);
   const { data: pautas } = usePautas(clienteId);
+  const { data: arquivosIdentidade } = useArquivosIdentidade(clienteId);
   const preenchido = (chave: string) => {
     if (chave === 'regras') return (regras?.length ?? 0) > 0;
     if (chave === 'pautas') return (pautas?.length ?? 0) > 0;
+    if (chave === 'identidade') return (arquivosIdentidade?.length ?? 0) > 0 || Boolean(docs?.identidade?.conteudo?.trim());
     return Boolean(docs?.[chave]?.conteudo?.trim());
   };
 
@@ -124,7 +128,9 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
       </div>
 
       {/* Documento selecionado */}
-      {item.chave === 'regras' ? (
+      {item.chave === 'identidade' ? (
+        <IdentidadeVisual clienteId={clienteId} />
+      ) : item.chave === 'regras' ? (
         <RegrasCliente clienteId={clienteId} />
       ) : item.chave === 'pautas' ? (
         <PautasCliente clienteId={clienteId} clienteNome={clienteNome ?? 'cliente'} />
