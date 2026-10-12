@@ -12,11 +12,12 @@ interface Props {
   responsavelId?: string | null;
   q?: string;
   periodo?: { ini: string; fim: string } | null;
+  clienteIds?: string[] | null;
   onEditar: (d: DesignerDemanda) => void;
 }
 
-export function DemandasKanban({ clienteId, responsavelId, q, periodo, onEditar }: Props) {
-  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo });
+export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, onEditar }: Props) {
+  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds });
   const { data: tempos } = useTempoDesigner();
   const mover = useMoverStatus();
   const [arrastando, setArrastando] = useState<string | null>(null);

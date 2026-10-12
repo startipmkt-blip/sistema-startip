@@ -6,6 +6,9 @@ import { Select } from '@/shared/ui/Select';
 import { Textarea } from '@/shared/ui/Textarea';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
+import { AnexosDemanda } from './AnexosDemanda';
+import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
+import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   useSalvarDemanda, useExcluirDemanda,
   TIPO_LABEL, STATUS_COLUNAS,
@@ -31,6 +34,9 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
   const [status, setStatus] = useState<DesignerStatus>('a_fazer');
   const [responsavel, setResponsavel] = useState<string>('');
   const [prazo, setPrazo] = useState<string>('');
+  const [anexos, setAnexos] = useState<CriativoAnexo[]>([]);
+  // Enviados nesta abertura do formulário: se cancelar, somem do storage.
+  const [novos, setNovos] = useState<string[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,6 +48,8 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
     setStatus(demanda?.status ?? 'a_fazer');
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
+    setAnexos(demanda?.anexos ?? []);
+    setNovos([]);
     setErro(null);
   }, [open, demanda]);
 
@@ -62,7 +70,12 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
         tipo, status,
         responsavel_id: responsavel || null,
         prazo: prazo || null,
+        anexos,
       });
+      // Anexos que existiam e foram removidos agora saem do storage.
+      const mantidos = new Set(anexos.map((a) => a.path));
+      for (const a of demanda?.anexos ?? []) if (!mantidos.has(a.path)) void descartarAnexo(a.path);
+      setNovos([]);
       onClose();
       if (r?.cronometroErro) {
         alert(`A demanda foi salva, mas o cronômetro não acompanhou:
@@ -77,14 +90,24 @@ ${r.cronometroErro}`);
   async function handleExcluir() {
     if (!demanda?.id) return;
     if (!confirm(`Excluir "${demanda.titulo}"?`)) return;
-    try { await excluir.mutateAsync(demanda.id); onClose(); }
+    try {
+      await excluir.mutateAsync(demanda.id);
+      for (const a of demanda.anexos ?? []) void descartarAnexo(a.path);
+      onClose();
+    }
     catch (e) { setErro((e as Error).message); }
+  }
+
+  function fechar() {
+    for (const p of novos) void descartarAnexo(p);
+    setNovos([]);
+    onClose();
   }
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={fechar}
       title={demanda ? 'Editar demanda' : 'Nova demanda'}
       size="lg"
       footer={
@@ -94,7 +117,7 @@ ${r.cronometroErro}`);
               🗑 Excluir
             </Button>
           )}
-          <Button variant="secondary" onClick={onClose}>Cancelar</Button>
+          <Button variant="secondary" onClick={fechar}>Cancelar</Button>
           <Button onClick={submit} disabled={salvar.isPending}>
             {salvar.isPending ? 'Salvando…' : 'Salvar'}
           </Button>
@@ -146,6 +169,8 @@ ${r.cronometroErro}`);
           />
           <Input id="pz" type="date" label="Prazo" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
         </div>
+
+        <AnexosDemanda anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />
 
         {erro && <p role="alert" className="text-sm text-red-400">{erro}</p>}
       </form>

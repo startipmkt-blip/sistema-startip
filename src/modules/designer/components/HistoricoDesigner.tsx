@@ -12,6 +12,7 @@ interface Props {
   responsavelId?: string | null;
   q?: string;
   periodo?: { ini: string; fim: string } | null;
+  clienteIds?: string[] | null;
   onEditar: (d: DesignerDemanda) => void;
 }
 
@@ -32,8 +33,8 @@ function labelSemana(chave: string): string {
 }
 
 // O que o designer já entregou, por semana, com o tempo real do cronômetro.
-export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, onEditar }: Props) {
-  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo });
+export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, clienteIds, onEditar }: Props) {
+  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds });
   const { data: tempos } = useTempoDesigner();
 
   const semanas = useMemo(() => {

@@ -11,12 +11,20 @@ import { DemandasKanban } from '../components/DemandasKanban';
 import { HistoricoDesigner } from '../components/HistoricoDesigner';
 import { ResumoDesigner } from '../components/ResumoDesigner';
 import { PeriodoSeletor } from '../components/PeriodoSeletor';
-import { chaveMes, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
+import { hojeLocal, mesDaSemana, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
 import { DemandaFormModal } from '../components/DemandaFormModal';
 import { SocialMediaPage } from '@/modules/social-media/pages/SocialMediaPage';
 import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
 import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
 import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
+
+type GrupoCliente = 'todos' | 'organico' | 'trafego';
+
+const GRUPOS: Array<{ id: GrupoCliente; label: string; ajuda: string }> = [
+  { id: 'todos',    label: '👥 Todos os clientes',        ajuda: 'Todos os clientes' },
+  { id: 'organico', label: '📱 Com rede social (orgânico)', ajuda: 'Clientes com Social Mídia: posts, carrosséis, reels e stories' },
+  { id: 'trafego',  label: '🎯 Só tráfego pago (criativos)', ajuda: 'Clientes só com Tráfego Pago: edição de criativos, quando houver demanda' },
+];
 
 type Aba = 'demandas' | 'producao' | 'calendario' | 'aprovacao' | 'datas';
 
@@ -67,10 +75,11 @@ function AbaDemandas() {
   const [clienteId, setClienteId] = useState<string>('');
   const [responsavelId, setResponsavelId] = useState<string>('');
   const [busca, setBusca] = useState('');
-  const [mes, setMes] = useState(() => chaveMes(new Date()));
+  const [mes, setMes] = useState(() => mesDaSemana(hojeLocal()));
   const [semana, setSemana] = useState<number | null>(
-    () => semanaDe(chaveMes(new Date()), new Date().toLocaleDateString('sv-SE')).numero,
+    () => semanaDe(mesDaSemana(hojeLocal()), hojeLocal()).numero,
   );
+  const [grupo, setGrupo] = useState<GrupoCliente>('todos');
   const periodo = useMemo(() => {
     if (semana === null) return periodoDoMes(mes);
     const s = semanasDoMes(mes).find((x) => x.numero === semana);
@@ -83,6 +92,24 @@ function AbaDemandas() {
   const { data: clientes } = useClientes('');
   const { data: operadores } = useOperadores();
   const { data: demandas } = useDemandas();
+
+  const clientesDoGrupo = useMemo(() => {
+    const todos = clientes ?? [];
+    if (grupo === 'organico') return todos.filter((c) => c.servicos?.includes('social_midia'));
+    if (grupo === 'trafego') {
+      return todos.filter((c) => c.servicos?.includes('trafego_pago') && !c.servicos.includes('social_midia'));
+    }
+    return todos;
+  }, [clientes, grupo]);
+  const clienteIds = useMemo(
+    () => (grupo === 'todos' ? null : clientesDoGrupo.map((c) => c.id)),
+    [grupo, clientesDoGrupo],
+  );
+
+  function trocarGrupo(g: GrupoCliente) {
+    setGrupo(g);
+    setClienteId('');
+  }
 
   const stats = useMemo(() => {
     const t = demandas ?? [];
@@ -102,7 +129,7 @@ function AbaDemandas() {
         <Input id="q" placeholder="🔍 buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="w-52" />
         <Select
           id="c" value={clienteId} onChange={(e) => setClienteId(e.target.value)}
-          options={[{ value: '', label: 'todos os clientes' }, ...((clientes ?? []).map((c) => ({ value: c.id, label: c.nome })))]}
+          options={[{ value: '', label: 'todos os clientes' }, ...(clientesDoGrupo.map((c) => ({ value: c.id, label: c.nome })))]}
         />
         <Select
           id="r" value={responsavelId} onChange={(e) => setResponsavelId(e.target.value)}
@@ -117,6 +144,24 @@ function AbaDemandas() {
       </Card>
 
       <ResumoDesigner />
+
+      <div className="flex flex-wrap gap-1.5">
+        {GRUPOS.map((g) => (
+          <button
+            key={g.id}
+            type="button"
+            title={g.ajuda}
+            onClick={() => trocarGrupo(g.id)}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              grupo === g.id
+                ? 'border-brand-400 bg-brand-500/20 text-brand-100'
+                : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+            }`}
+          >
+            {g.label}{g.id !== 'todos' && grupo === g.id ? ` · ${clientesDoGrupo.length}` : ''}
+          </button>
+        ))}
+      </div>
 
       <PeriodoSeletor mes={mes} semana={semana} onMes={setMes} onSemana={setSemana} />
 
@@ -141,6 +186,7 @@ function AbaDemandas() {
           responsavelId={responsavelId || null}
           q={busca}
           periodo={periodo}
+          clienteIds={clienteIds}
           onEditar={abrir}
         />
       ) : (
@@ -149,6 +195,7 @@ function AbaDemandas() {
           responsavelId={responsavelId || null}
           q={busca}
           periodo={periodo}
+          clienteIds={clienteIds}
           onEditar={abrir}
         />
       )}

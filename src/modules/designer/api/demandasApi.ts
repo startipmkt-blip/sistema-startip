@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { useAuth } from '@/shared/auth/AuthProvider';
-import { dataRef } from '../lib/periodo';
+import { posicaoDaDemanda } from '../lib/periodo';
+import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   iniciarTimerDemanda, pararTimerDemanda, TOCADORES, type Tocador,
 } from '@/modules/demandas/api/cronometroApi';
@@ -76,9 +77,13 @@ export interface DesignerDemanda {
   prazo: string | null;
   origem: DesignerOrigem;
   ideia_id: string | null;
-  anexos: unknown[];
+  anexos: CriativoAnexo[];
   iniciado_em: string | null;
   concluido_em: string | null;
+  /** Calculados no cliente: vencida, levada de mês anterior, e data que define a semana. */
+  atrasada?: boolean;
+  carregada?: boolean;
+  ref_data?: string;
   criado_por: string | null;
   created_at: string;
   updated_at: string;
@@ -90,6 +95,8 @@ interface Filtros {
   tipo?: DesignerTipo | null;
   q?: string;
   periodo?: { ini: string; fim: string } | null;
+  /** Restringe a demandas desses clientes (grupo orgânico / só tráfego). */
+  clienteIds?: string[] | null;
 }
 
 async function fetchDemandas(): Promise<DesignerDemanda[]> {
@@ -118,11 +125,18 @@ async function fetchDemandas(): Promise<DesignerDemanda[]> {
 
   const mapaCli = new Map<string, string>((clientes.data ?? []).map((c: { id: string; nome: string }) => [c.id, c.nome]));
   const mapaProf = new Map<string, string>((profiles.data ?? []).map((p: { id: string; nome: string }) => [p.id, p.nome]));
-  return rows.map((r) => ({
+  return rows.map((r) => {
+    const pos = posicaoDaDemanda(r);
+    return {
     ...r,
+    anexos: Array.isArray(r.anexos) ? r.anexos : [],
+    atrasada: pos.atrasada,
+    carregada: pos.carregada,
+    ref_data: pos.ref,
     cliente_nome: r.cliente_id ? (mapaCli.get(r.cliente_id) ?? null) : null,
     responsavel_nome: r.responsavel_id ? (mapaProf.get(r.responsavel_id) ?? null) : null,
-  }));
+    };
+  });
 }
 
 export function useDemandas(filtros: Filtros = {}) {
@@ -134,8 +148,9 @@ export function useDemandas(filtros: Filtros = {}) {
         if (filtros.clienteId && r.cliente_id !== filtros.clienteId) return false;
         if (filtros.responsavelId && r.responsavel_id !== filtros.responsavelId) return false;
         if (filtros.tipo && r.tipo !== filtros.tipo) return false;
+        if (filtros.clienteIds && (!r.cliente_id || !filtros.clienteIds.includes(r.cliente_id))) return false;
         if (filtros.periodo) {
-          const ref = dataRef(r);
+          const ref = r.ref_data ?? '';
           if (ref < filtros.periodo.ini || ref > filtros.periodo.fim) return false;
         }
         if (filtros.q) {
@@ -159,6 +174,7 @@ interface UpsertInput {
   status?: DesignerStatus;
   responsavel_id?: string | null;
   prazo?: string | null;
+  anexos?: CriativoAnexo[];
   // Contexto pro cronômetro (não vai pro banco).
   de?: DesignerStatus;
   iniciado_em?: string | null;
