@@ -7,6 +7,7 @@ import { ClienteFormModal } from '@/modules/clientes/components/ClienteFormModal
 import { ClienteWorkspace } from '@/modules/cliente-workspace/components/ClienteWorkspace';
 import { ScoreSaudeCard } from '@/modules/clientes/components/ScoreSaudeCard';
 import { CentralLinkCard } from '@/modules/clientes/components/CentralLinkCard';
+import { RegrasCliente } from '@/modules/cliente-perfil/components/RegrasCliente';
 import { PautasCliente } from '@/modules/gestao-conteudo/components/PautasCliente';
 import { CriativosDoClienteCard } from '@/modules/ideias/criativos/components/CriativosDoClienteCard';
 import { Button } from '@/shared/ui/Button';
@@ -66,6 +67,9 @@ export function ClienteDetailPage() {
         <ScoreSaudeCard clienteId={cliente.id} />
         <CentralLinkCard clienteId={cliente.id} />
       </div>
+
+      {/* Briefing: o que o cliente gosta, não aprova, é obrigatório */}
+      <RegrasCliente clienteId={cliente.id} />
 
       {/* Painel do cliente (materiais + fluxo de trabalho) */}
       <ClienteWorkspace clienteId={cliente.id} />

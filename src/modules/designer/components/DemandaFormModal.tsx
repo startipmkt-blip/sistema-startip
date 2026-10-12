@@ -7,6 +7,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
 import { AnexosDemanda } from './AnexosDemanda';
+import { RegrasResumo } from '@/modules/cliente-perfil/components/RegrasResumo';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
@@ -145,6 +146,13 @@ ${r.cronometroErro}`);
             options={(Object.keys(TIPO_LABEL) as DesignerTipo[]).map((t) => ({ value: t, label: TIPO_LABEL[t] }))}
           />
         </div>
+
+        {clienteId && (
+          <RegrasResumo
+            clienteId={clienteId}
+            clienteNome={(clientes ?? []).find((c) => c.id === clienteId)?.nome}
+          />
+        )}
 
         <Input id="tit" label="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
 
