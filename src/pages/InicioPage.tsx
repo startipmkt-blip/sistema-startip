@@ -20,9 +20,8 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
   { numero: '08', label: 'Otimizações',        emoji: '📈', to: '/otimizacoes',        modulo: 'otimizacoes' },
   { numero: '10', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
-  { numero: '11', label: 'Ideias',            emoji: '💡', to: '/ideias',            modulo: 'ideias' },
+  { numero: '11', label: 'Ideias/Anotações',   emoji: '💡', to: '/ideias',            modulo: 'ideias' },
   { numero: '12', label: 'Gestão de Conteúdo', emoji: '🗂️', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
-  { numero: '13', label: 'Anotações',          emoji: '📝', to: '/anotacoes',          modulo: 'anotacoes' },
   { numero: '14', label: 'CS Clientes',        emoji: '💬', to: '/cs-clientes',        modulo: 'cs-clientes' },
 ];
 

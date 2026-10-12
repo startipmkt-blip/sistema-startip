@@ -18,6 +18,7 @@ import {
 } from '@/modules/ideias/types';
 import type { Ideia, IdeiaImportancia } from '@/modules/ideias/types';
 import { CriativosTab } from '@/modules/ideias/criativos/CriativosTab';
+import { AnotacoesPage } from '@/modules/anotacoes/pages/AnotacoesPage';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 type Ordem = 'recentes' | 'antigas' | 'mais_importantes' | 'menos_importantes';
@@ -266,20 +267,22 @@ function BancoDeIdeiasTab({ pills }: { pills: ReactNode }) {
   );
 }
 
-type AbaIdeias = 'banco' | 'criativos';
+type AbaIdeias = 'banco' | 'criativos' | 'anotacoes';
 
 const ABAS_IDEIAS: { id: AbaIdeias; label: string }[] = [
   { id: 'banco', label: 'Banco de Ideias' },
   { id: 'criativos', label: 'Ideias de Criativos' },
+  { id: 'anotacoes', label: 'Anotações' },
 ];
 
 export function IdeiasPage() {
   const [params, setParams] = useSearchParams();
-  const aba: AbaIdeias = params.get('aba') === 'criativos' ? 'criativos' : 'banco';
+  const abaParam = params.get('aba');
+  const aba: AbaIdeias = abaParam === 'criativos' || abaParam === 'anotacoes' ? abaParam : 'banco';
 
   function trocar(nova: AbaIdeias) {
     const p = new URLSearchParams();
-    if (nova === 'criativos') p.set('aba', 'criativos');
+    if (nova !== 'banco') p.set('aba', nova);
     setParams(p, { replace: true });
   }
 
@@ -303,5 +306,13 @@ export function IdeiasPage() {
     </div>
   );
 
+  if (aba === 'anotacoes') {
+    return (
+      <div className="space-y-6">
+        {pills}
+        <AnotacoesPage />
+      </div>
+    );
+  }
   return aba === 'criativos' ? <CriativosTab pills={pills} /> : <BancoDeIdeiasTab pills={pills} />;
 }

@@ -22,7 +22,6 @@ import { OnboardingPage } from '@/modules/onboarding/pages/OnboardingPage';
 import { DemandasPage } from '@/modules/demandas/pages/DemandasPage';
 import { IdeiasPage } from '@/modules/ideias/pages/IdeiasPage';
 import { GestaoConteudoPage } from '@/modules/gestao-conteudo/pages/GestaoConteudoPage';
-import { AnotacoesPage } from '@/modules/anotacoes/pages/AnotacoesPage';
 import { UsuariosPage } from '@/modules/usuarios/pages/UsuariosPage';
 import { ContratosPage } from '@/modules/contratos/pages/ContratosPage';
 import { MetaAdsGestorPage } from '@/modules/meta-ads/pages/MetaAdsGestorPage';
@@ -98,7 +97,7 @@ export const router = createBrowserRouter([
           { path: 'demandas', element: <RequireModulo modulo="demandas"><DemandasPage /></RequireModulo> },
           { path: 'ideias', element: <RequireModulo modulo="ideias"><IdeiasPage /></RequireModulo> },
           { path: 'gestao-conteudo', element: <RequireModulo modulo="gestao-conteudo"><GestaoConteudoPage /></RequireModulo> },
-          { path: 'anotacoes', element: <RequireModulo modulo="anotacoes"><AnotacoesPage /></RequireModulo> },
+          { path: 'anotacoes', element: <Navigate to="/ideias?aba=anotacoes" replace /> },
           { path: 'usuarios', element: <RequireModulo modulo="usuarios"><UsuariosPage /></RequireModulo> },
           { path: 'contratos', element: <RequireModulo modulo="contratos"><ContratosPage /></RequireModulo> },
           { path: 'meta-ads',   element: <RequireModulo modulo="diretoria"><MetaAdsGestorPage /></RequireModulo> },
