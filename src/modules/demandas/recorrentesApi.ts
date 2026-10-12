@@ -1,13 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/shared/lib/supabaseClient';
+import { IS_DEMO } from '@/shared/lib/env';
 
 export type RecorrenciaTipo = 'diaria' | 'semanal';
 
 export interface TarefaRecorrente {
   id: string;
   titulo: string;
-  responsavel: string;
+  descricao: string;
+  responsaveis: string[];
   tipo: RecorrenciaTipo;
-  dia_semana: number; // 0=Dom ... 6=Sáb (usado quando semanal)
+  dias_semana: number[]; // 0=Dom ... 6=Sáb (usado quando semanal; vários dias permitidos)
   horario: string; // opcional, ex.: '09:00-11:00'
   ultima_conclusao: string | null; // 'YYYY-MM-DD'
 }
@@ -20,13 +23,24 @@ export function hojeStr(): string {
 }
 
 export function ehParaHoje(t: TarefaRecorrente): boolean {
-  return t.tipo === 'diaria' || new Date().getDay() === t.dia_semana;
+  return t.tipo === 'diaria' || t.dias_semana.includes(new Date().getDay());
 }
 export function pendenteHoje(t: TarefaRecorrente): boolean {
   return ehParaHoje(t) && t.ultima_conclusao !== hojeStr();
 }
+function listaPt(itens: string[]): string {
+  if (itens.length <= 1) return itens.join('');
+  return `${itens.slice(0, -1).join(', ')} e ${itens[itens.length - 1]}`;
+}
 export function recorrenciaLabel(t: TarefaRecorrente): string {
-  const base = t.tipo === 'diaria' ? 'Todo dia' : `Toda ${DIAS[t.dia_semana].toLowerCase()}`;
+  const dias = [...t.dias_semana].sort((a, b) => a - b);
+  let base: string;
+  if (t.tipo === 'diaria' || dias.length === 7) base = 'Todo dia';
+  else if (dias.length === 0) base = 'Sem dia definido';
+  else {
+    const nomes = dias.map((d) => DIAS[d].toLowerCase());
+    base = `Toda ${listaPt(nomes)}`;
+  }
   return t.horario ? `${base} · ${t.horario}` : base;
 }
 
@@ -42,41 +56,80 @@ export function estaAtrasada(t: TarefaRecorrente): boolean {
   return agora > hRef;
 }
 
-// Store demo (em memória).
-let tarefas: TarefaRecorrente[] = [
-  { id: 't1', titulo: 'Análise de campanhas de todos os clientes', responsavel: 'Tráfego', tipo: 'semanal', dia_semana: 2, horario: '09:00-11:00', ultima_conclusao: null },
-  { id: 't2', titulo: 'Postar stories dos clientes', responsavel: 'Social', tipo: 'diaria', dia_semana: 1, horario: '', ultima_conclusao: null },
-  { id: 't3', titulo: 'Revisar metas da semana', responsavel: 'Sócios', tipo: 'semanal', dia_semana: 1, horario: '', ultima_conclusao: null },
+// Store demo (em memória) — só usado quando IS_DEMO.
+let demoTarefas: TarefaRecorrente[] = [
+  { id: 't1', titulo: 'Análise de campanhas de todos os clientes', descricao: '', responsaveis: ['Gestor de tráfego'], tipo: 'semanal', dias_semana: [2], horario: '09:00-11:00', ultima_conclusao: null },
+  { id: 't2', titulo: 'Postar stories dos clientes', descricao: '', responsaveis: ['Social media'], tipo: 'diaria', dias_semana: [], horario: '', ultima_conclusao: null },
+  { id: 't3', titulo: 'Revisar metas da semana', descricao: '', responsaveis: ['Iuri', 'Domini'], tipo: 'semanal', dias_semana: [1], horario: '', ultima_conclusao: null },
 ];
 
-export type RecorrenteForm = Pick<TarefaRecorrente, 'titulo' | 'responsavel' | 'tipo' | 'dia_semana' | 'horario'>;
+export type RecorrenteForm = Pick<TarefaRecorrente, 'titulo' | 'descricao' | 'responsaveis' | 'tipo' | 'dias_semana' | 'horario'>;
+
+const KEY = ['recorrentes'] as const;
+
+async function fetchRecorrentes(): Promise<TarefaRecorrente[]> {
+  if (IS_DEMO) return [...demoTarefas];
+  const { data, error } = await supabase
+    .from('tarefas_recorrentes')
+    .select('id, titulo, descricao, responsaveis, tipo, dias_semana, horario, ultima_conclusao')
+    .order('created_at');
+  if (error) throw error;
+  return (data ?? []) as unknown as TarefaRecorrente[];
+}
+
+async function saveRecorrente(id: string | undefined, dados: RecorrenteForm): Promise<void> {
+  if (IS_DEMO) {
+    if (id) demoTarefas = demoTarefas.map((t) => (t.id === id ? { ...t, ...dados } : t));
+    else demoTarefas = [...demoTarefas, { id: crypto.randomUUID(), ultima_conclusao: null, ...dados }];
+    return;
+  }
+  const payload = { ...dados, dias_semana: dados.tipo === 'diaria' ? [] : dados.dias_semana };
+  const { error } = id
+    ? await supabase.from('tarefas_recorrentes').update({ ...payload, updated_at: new Date().toISOString() } as never).eq('id', id)
+    : await supabase.from('tarefas_recorrentes').insert(payload as never);
+  if (error) throw error;
+}
+
+async function concluirRecorrente(id: string, concluir: boolean): Promise<void> {
+  const ultima_conclusao = concluir ? hojeStr() : null;
+  if (IS_DEMO) {
+    demoTarefas = demoTarefas.map((t) => (t.id === id ? { ...t, ultima_conclusao } : t));
+    return;
+  }
+  const { error } = await supabase.from('tarefas_recorrentes').update({ ultima_conclusao } as never).eq('id', id);
+  if (error) throw error;
+}
+
+async function excluirRecorrente(id: string): Promise<void> {
+  if (IS_DEMO) {
+    demoTarefas = demoTarefas.filter((t) => t.id !== id);
+    return;
+  }
+  const { error } = await supabase.from('tarefas_recorrentes').delete().eq('id', id);
+  if (error) throw error;
+}
 
 export function useRecorrentes() {
-  return useQuery({ queryKey: ['recorrentes'], queryFn: async () => [...tarefas] });
+  return useQuery({ queryKey: KEY, queryFn: fetchRecorrentes });
 }
 export function useSalvarRecorrente() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (p: { id?: string; dados: RecorrenteForm }) => {
-      if (p.id) tarefas = tarefas.map((t) => (t.id === p.id ? { ...t, ...p.dados } : t));
-      else tarefas = [...tarefas, { id: crypto.randomUUID(), ultima_conclusao: null, ...p.dados }];
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['recorrentes'] }),
+    mutationFn: (p: { id?: string; dados: RecorrenteForm }) => saveRecorrente(p.id, p.dados),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
 }
 export function useConcluirRecorrente() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (p: { id: string; concluir: boolean }) => {
-      tarefas = tarefas.map((t) => (t.id === p.id ? { ...t, ultima_conclusao: p.concluir ? hojeStr() : null } : t));
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['recorrentes'] }),
+    mutationFn: (p: { id: string; concluir: boolean }) => concluirRecorrente(p.id, p.concluir),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
 }
 export function useExcluirRecorrente() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => { tarefas = tarefas.filter((t) => t.id !== id); },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['recorrentes'] }),
+    mutationFn: (id: string) => excluirRecorrente(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
 }

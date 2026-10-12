@@ -39,7 +39,7 @@ export function TarefasRecorrentes() {
     return (
       <li key={t.id} className={`flex items-center justify-between gap-3 py-3 ${atrasada ? 'rounded-md bg-red-500/5 px-2' : ''}`}>
         <button
-          onClick={() => concluir.mutate({ id: t.id, concluir: !feitaHoje })}
+          onClick={() => concluir.mutate({ id: t.id, concluir: !feitaHoje }, { onError: (e) => alert(`Não foi possível atualizar: ${(e as Error).message}`) })}
           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${
             feitaHoje ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300' : 'border-white/20 text-transparent hover:border-brand-400'
           }`}
@@ -51,12 +51,17 @@ export function TarefasRecorrentes() {
         <div className="min-w-0 flex-1">
           <div className={`text-sm ${feitaHoje ? 'text-slate-500 line-through' : atrasada ? 'text-red-300' : 'text-slate-100'}`}>{t.titulo}</div>
           <div className={`text-xs ${atrasada ? 'text-red-400' : 'text-slate-400'}`}>
-            {recorrenciaLabel(t)}{t.responsavel ? ` · ${t.responsavel}` : ''}
+            {recorrenciaLabel(t)}{t.responsaveis.length > 0 ? ` · ${t.responsaveis.join(', ')}` : ''}
           </div>
+          {t.descricao && <div className="mt-0.5 whitespace-pre-line text-xs text-slate-500">{t.descricao}</div>}
         </div>
         {atrasada ? <Badge tone="red">⏰ atrasada</Badge> : pend && <Badge tone="amber">hoje</Badge>}
         <button className="text-xs font-medium text-brand-300 hover:underline" onClick={() => abrirEditar(t)}>Editar</button>
-        <button className="text-xs font-medium text-red-400 hover:underline" onClick={() => { if (confirm('Excluir?')) excluir.mutate(t.id); }}>Excluir</button>
+        <button className="text-xs font-medium text-red-400 hover:underline" onClick={() => {
+            if (confirm(`Excluir a tarefa recorrente "${t.titulo}"?`)) {
+              excluir.mutate(t.id, { onError: (e) => alert(`Não foi possível excluir: ${(e as Error).message}`) });
+            }
+          }}>Excluir</button>
       </li>
     );
   };
@@ -64,7 +69,7 @@ export function TarefasRecorrentes() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">Tarefas que se repetem (todo dia ou num dia fixo da semana) — para todos os setores.</p>
+        <p className="text-sm text-slate-400">Tarefas que se repetem (todo dia ou em dias fixos da semana) — para todos os setores.</p>
         <Button onClick={abrirNova}>+ Nova recorrente</Button>
       </div>
 
