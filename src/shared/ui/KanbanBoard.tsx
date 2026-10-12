@@ -12,6 +12,8 @@ interface KanbanBoardProps<T> {
   keyOf: (item: T) => string;
   renderCard: (item: T) => ReactNode;
   onMove?: (item: T, novaColuna: string) => void;
+  /** Cards e colunas menores, para quadros com muitos itens. */
+  compact?: boolean;
 }
 
 // Board com drag-and-drop nativo (HTML5). Ao arrastar um card e soltar
@@ -24,6 +26,7 @@ export function KanbanBoard<T>({
   keyOf,
   renderCard,
   onMove,
+  compact = false,
 }: KanbanBoardProps<T>) {
   const [dragKey, setDragKey] = useState<string | null>(null);
   const [dropCol, setDropCol] = useState<string | null>(null);
@@ -56,7 +59,7 @@ export function KanbanBoard<T>({
         const cards = items.filter((it) => columnOf(it) === col.id);
         const highlight = dropCol === col.id;
         return (
-          <div key={col.id} className="flex w-72 shrink-0 flex-col">
+          <div key={col.id} className={`flex shrink-0 flex-col ${compact ? 'w-64' : 'w-72'}`}>
             <div className="mb-2 flex items-center justify-between px-1">
               <span className="text-sm font-semibold text-slate-200">{col.label}</span>
               <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-slate-300">{cards.length}</span>
@@ -78,7 +81,7 @@ export function KanbanBoard<T>({
                     draggable={!!onMove}
                     onDragStart={(e) => onDragStart(e, it)}
                     onDragEnd={onDragEnd}
-                    className={`rounded-lg border border-white/10 bg-white/[0.06] p-3 text-slate-200 shadow-sm backdrop-blur-sm ${
+                    className={`rounded-lg border border-white/10 bg-white/[0.06] ${compact ? 'p-2' : 'p-3'} text-slate-200 shadow-sm backdrop-blur-sm ${
                       onMove ? 'cursor-grab active:cursor-grabbing' : ''
                     } ${isDrag ? 'opacity-40' : ''}`}
                   >

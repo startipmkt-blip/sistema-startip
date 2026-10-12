@@ -146,6 +146,12 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       }
     >
       <div className="space-y-4">
+        {demanda && (
+          <p className="text-xs text-slate-400">
+            Criada em {new Date(demanda.created_at).toLocaleDateString('pt-BR')} às{' '}
+            {new Date(demanda.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        )}
         <Input id="titulo" label="Título" value={form.titulo} onChange={(e) => set('titulo', e.target.value)} />
         <Textarea
           id="descricao"

@@ -6,6 +6,7 @@ import {
   PRIORIDADE_LABEL,
   PRIORIDADE_TONE,
   RESPONSAVEIS,
+  type DemandaPrioridade,
   type DemandaSetor,
   type DemandaStatus,
   type DemandaView,
@@ -37,9 +38,7 @@ function semanaChave(iso: string): string {
   d.setDate(d.getDate() + offset);
   return d.toISOString().slice(0, 10);
 }
-function quadroAtrasadas(lista: DemandaView[], hoje: string): number {
-  return lista.filter((d) => d.status !== 'concluida' && !!d.prazo && d.prazo < hoje).length;
-}
+type FiltroRapido = 'todas' | 'hoje' | 'atrasadas';
 function labelSemana(iso: string): string {
   const d = new Date(iso);
   const fim = new Date(d); fim.setDate(fim.getDate() + 6);
@@ -56,6 +55,8 @@ export function DemandasPage() {
   const hoje = new Date().toLocaleDateString('sv-SE');
   const [busca, setBusca] = useState('');
   const [responsavel, setResponsavel] = useState('');
+  const [rapido, setRapido] = useState<FiltroRapido>('todas');
+  const [prioridade, setPrioridade] = useState<DemandaPrioridade | ''>('');
   const [rapida, setRapida] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editando, setEditando] = useState<DemandaView | undefined>();
@@ -85,13 +86,20 @@ export function DemandasPage() {
         `${d.titulo} ${d.descricao} ${d.cliente_nome} ${d.responsavel}`.toLowerCase().includes(termo),
       );
     }
+    if (prioridade) base = base.filter((d) => d.prioridade === prioridade);
     return base;
-  }, [demandas, setor, isAdmin, busca, responsavel]);
+  }, [demandas, setor, isAdmin, busca, responsavel, prioridade]);
 
-  const atrasadasCount = quadroAtrasadas(doSetor, hoje);
+  const atrasadasCount = doSetor.filter((d) => d.status !== 'concluida' && !!d.prazo && d.prazo < hoje).length;
+  const hojeCount = doSetor.filter((d) => d.status !== 'concluida' && d.prazo === hoje).length;
+  const filtradas = useMemo(() => {
+    if (rapido === 'hoje') return doSetor.filter((d) => d.prazo === hoje);
+    if (rapido === 'atrasadas') return doSetor.filter((d) => d.status !== 'concluida' && !!d.prazo && d.prazo < hoje);
+    return doSetor;
+  }, [doSetor, rapido, hoje]);
 
-  const quadro   = doSetor.filter((d) => d.status !== 'concluida');
-  const concluidas = doSetor.filter((d) => d.status === 'concluida');
+  const quadro   = filtradas.filter((d) => d.status !== 'concluida');
+  const concluidas = filtradas.filter((d) => d.status === 'concluida');
 
   // Agrupamento de concluídas por semana.
   const concluidasPorSemana = useMemo(() => {
@@ -172,26 +180,29 @@ export function DemandasPage() {
         />
         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
           <div className="flex items-start justify-between gap-2">
-            <span className="font-medium text-slate-100">
+            <span className="text-[13px] font-medium leading-snug text-slate-100">
               {d.privada && <span title="Privada"><GlassIcon name="lock" /> </span>}
               {d.titulo}
             </span>
-            <Badge tone={PRIORIDADE_TONE[d.prioridade]}>{PRIORIDADE_LABEL[d.prioridade]}</Badge>
+            <Badge tone={PRIORIDADE_TONE[d.prioridade]} className="shrink-0 !px-2 !py-0 text-[10px]">{PRIORIDADE_LABEL[d.prioridade]}</Badge>
           </div>
           {d.descricao && (
-            <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-xs text-slate-300">{d.descricao}</p>
+            <p className="mt-0.5 line-clamp-2 whitespace-pre-wrap text-[11px] leading-snug text-slate-300">{d.descricao}</p>
           )}
-          <div className="text-xs text-slate-400">{d.cliente_nome}</div>
+          <div className="text-[11px] text-slate-400">{d.cliente_nome}</div>
           {tocadores?.[d.id] && (
             <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
               <GlassIcon name="timer" /> {tocadores[d.id]} está tocando
             </div>
           )}
-          <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
+          <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
             <span><GlassIcon name="user" /> {d.responsavel || '—'}</span>
             <span className={atrasada ? 'font-semibold text-red-400' : venceHoje ? 'font-semibold text-amber-300' : ''}>
               {glassify(atrasada ? '⚠ ' : '📅 ')}{formatDate(d.prazo)}
             </span>
+          </div>
+          <div className="mt-0.5 text-[10px] text-slate-500" title="Data em que a demanda foi criada">
+            Criada em {formatDate(d.created_at)}
           </div>
         </button>
       </div>
@@ -247,11 +258,43 @@ export function DemandasPage() {
               placeholder="＋ Criação rápida: digite e aperte Enter"
               className="min-w-[260px] flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
             />
-            {atrasadasCount > 0 && (
-              <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-semibold text-red-300">
-                <GlassIcon name="alert" /> {atrasadasCount} atrasada{atrasadasCount > 1 ? 's' : ''}
-              </span>
-            )}
+            <Select
+              options={[
+                { value: '', label: 'Toda importância' },
+                { value: 'alta', label: 'Importância alta' },
+                { value: 'media', label: 'Importância média' },
+                { value: 'baixa', label: 'Importância baixa' },
+              ]}
+              value={prioridade}
+              onChange={(e) => setPrioridade(e.target.value as DemandaPrioridade | '')}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            {([
+              { id: 'todas',     label: 'Todas',          n: null,           cor: '' },
+              { id: 'hoje',      label: 'Do dia',         n: hojeCount,      cor: 'amber' },
+              { id: 'atrasadas', label: 'Atrasadas',      n: atrasadasCount, cor: 'red' },
+            ] as const).map((f) => {
+              const ativo = rapido === f.id;
+              const tom = f.cor === 'red'
+                ? 'border-red-500/60 bg-red-500/20 text-red-200'
+                : f.cor === 'amber'
+                  ? 'border-amber-400/60 bg-amber-500/20 text-amber-200'
+                  : 'border-brand-400 bg-brand-500/20 text-brand-100';
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setRapido(f.id)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    ativo ? tom : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                  }`}
+                >
+                  {f.label}{f.n !== null ? ` · ${f.n}` : ''}
+                </button>
+              );
+            })}
           </div>
 
           {/* Abas por setor */}
@@ -280,6 +323,7 @@ export function DemandasPage() {
               keyOf={(d) => d.id}
               renderCard={CARD}
               onMove={aoMover}
+              compact
             />
           ) : concluidas.length === 0 ? (
             <Card><EmptyState message="Nenhuma tarefa concluída neste setor ainda." /></Card>
@@ -298,7 +342,7 @@ export function DemandasPage() {
                       <li key={d.id} className="flex items-center justify-between py-2 text-sm">
                         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
                           <div className="truncate text-slate-100 line-through opacity-70">{d.titulo}</div>
-                          <div className="text-xs text-slate-500">{d.cliente_nome} · <GlassIcon name="user" /> {d.responsavel || '—'}</div>
+                          <div className="text-xs text-slate-500">{d.cliente_nome} · <GlassIcon name="user" /> {d.responsavel || '—'} · criada em {formatDate(d.created_at)}</div>
                         </button>
                         <span className="text-xs text-slate-500"><GlassIcon name="calendar" /> {formatDate(d.prazo)}</span>
                         <button
