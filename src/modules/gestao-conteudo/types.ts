@@ -61,6 +61,60 @@ export const CONFIG_PADRAO: ConfigGestao = {
 
 export type Visao = 'carteira' | 'tabela' | 'semana';
 
+export type AbaGestao = 'conteudos' | 'ideias';
+
+// ---------- Ideias de conteúdo (aprovação antes da produção) ----------
+export type StatusIdeia = 'rascunho' | 'enviada' | 'aprovada' | 'reprovada';
+
+export interface Ideia {
+  id: string;
+  cliente_id: string;
+  mes_referencia: string;
+  semana: number;
+  titulo: string;
+  descricao: string;
+  formato: ConteudoTipo;
+  dia_postagem: string | null;
+  status: StatusIdeia;
+  justificativa: string;
+  enviado_em: string | null;
+  decidido_em: string | null;
+  lembrete_em: string | null;
+  lembretes_enviados: number;
+  created_at: string;
+}
+
+export type IdeiaForm = Pick<Ideia, 'titulo' | 'descricao' | 'formato' | 'semana' | 'dia_postagem'>;
+
+export const STATUS_IDEIA: Record<StatusIdeia, { label: string; emoji: string; tone: 'slate' | 'amber' | 'green' | 'red' }> = {
+  rascunho:  { label: 'Rascunho',            emoji: '📝', tone: 'slate' },
+  enviada:   { label: 'Aguardando cliente',  emoji: '📤', tone: 'amber' },
+  aprovada:  { label: 'Aprovada',            emoji: '✅', tone: 'green' },
+  reprovada: { label: 'Reprovada',           emoji: '↩️', tone: 'red'   },
+};
+
+export const STATUS_IDEIA_ORDEM: StatusIdeia[] = ['rascunho', 'enviada', 'reprovada', 'aprovada'];
+
+/** Texto enviado ao cliente com o link para aprovar as ideias do mês. */
+export function mensagemIdeias(p: { clienteNome: string; mes: string; qtd: number; link: string }): string {
+  return (
+    `Olá, ${p.clienteNome}! 👋\n\n` +
+    `Separamos ${p.qtd === 1 ? '1 ideia' : `${p.qtd} ideias`} de conteúdo para ${mesLabel(p.mes)} ` +
+    `e precisamos da sua aprovação antes de começar a produzir.\n\n` +
+    `Veja as ideias e aprove, ou conte o que quer mudar:\n${p.link}\n\n` +
+    `Se não gostar de alguma, é só explicar o motivo ou pedir outra ideia. Obrigado!`
+  );
+}
+
+export function mensagemLembreteIdeias(p: { qtd: number; link: string }): string {
+  return (
+    `Olá pessoal, tudo bem?\n\n` +
+    `Passando pra lembrar que ${p.qtd === 1 ? 'há 1 ideia' : `há ${p.qtd} ideias`} de conteúdo ` +
+    `que vocês ainda não aprovaram.\n\n` +
+    `Segue o link para aprovar:\n${p.link}\n\nObrigado!`
+  );
+}
+
 // ---------- datas ----------
 export const DIAS_SEMANA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 

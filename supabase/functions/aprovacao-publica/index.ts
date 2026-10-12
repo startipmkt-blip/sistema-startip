@@ -4,6 +4,10 @@
 // GET  /?slug=<central_slug>&mes=YYYY-MM  → cliente + ideias do mês
 // POST /  { slug, id, status, justificativa } → registra decisão
 // POST /  { slug, mes, acao: 'aprovar_todos' } → aprova todos os pendentes do mês
+// IDEIAS (tabela ideias_conteudo) — mesmos verbos com tipo 'ideias':
+// GET  /?slug&mes&tipo=ideias
+// POST /  { tipo:'ideias', slug, id, status:'aprovada'|'reprovada', justificativa }
+// POST /  { tipo:'ideias', slug, mes, acao:'aprovar_todos' }
 // Sem JWT. A validação é o slug do cliente + o vínculo id→cliente.
 // =============================================================
 
@@ -68,6 +72,30 @@ serve(async (req) => {
       .maybeSingle();
     if (!cli) return json({ error: 'link inválido' }, 404);
 
+    // Ideias de conteúdo (etapa anterior à produção) — página /aprovar-ideias/:slug
+    if (url.searchParams.get('tipo') === 'ideias') {
+      const { data: enviadas } = await sb
+        .from('ideias_conteudo')
+        .select('mes_referencia')
+        .eq('cliente_id', (cli as any).id)
+        .neq('status', 'rascunho');
+      const mesesIdeias = [...new Set((enviadas ?? []).map((m: any) => m.mes_referencia))]
+        .sort((a: string, b: string) => b.localeCompare(a));
+      const mesAlvo = url.searchParams.get('mes') ?? (mesesIdeias[0] as string | undefined) ?? mesAtual();
+
+      const { data: lista } = await sb
+        .from('ideias_conteudo')
+        .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia')
+        .eq('cliente_id', (cli as any).id)
+        .eq('mes_referencia', mesAlvo)
+        .neq('status', 'rascunho') // rascunhos internos nunca aparecem para o cliente
+        .order('semana', { ascending: true })
+        .order('dia_postagem', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: true });
+
+      return json({ cliente: cli, mes: mesAlvo, meses: mesesIdeias, ideias: lista ?? [] });
+    }
+
     const { data: ideias } = await sb
       .from('conteudo_aprovacao')
       .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia, link_drive, etapa')
@@ -91,10 +119,61 @@ serve(async (req) => {
 
   if (req.method === 'POST') {
     const body = await req.json().catch(() => ({}));
-    const { slug, id, status, justificativa, acao, mes } = body as {
+    const { slug, id, status, justificativa, acao, mes, tipo } = body as {
       slug?: string; id?: string; status?: string; justificativa?: string;
-      acao?: string; mes?: string;
+      acao?: string; mes?: string; tipo?: string;
     };
+
+    // ---- Ideias de conteúdo: aprovada | reprovada (reprovar exige justificativa) ----
+    if (tipo === 'ideias') {
+      if (!slug) return json({ error: 'parâmetros faltando' }, 400);
+      const { data: cliI } = await sb.from('clientes').select('id, nome').eq('central_slug', slug).maybeSingle();
+      if (!cliI) return json({ error: 'link inválido' }, 404);
+
+      if (acao === 'aprovar_todos') {
+        if (!mes) return json({ error: 'parâmetros faltando' }, 400);
+        const { data: atualizadas, error } = await sb
+          .from('ideias_conteudo')
+          .update({ status: 'aprovada', justificativa: '' } as any)
+          .eq('cliente_id', (cliI as any).id)
+          .eq('mes_referencia', mes)
+          .eq('status', 'enviada')
+          .select('id');
+        if (error) return json({ error: error.message }, 500);
+        return json({ ok: true, aprovadas: (atualizadas ?? []).length });
+      }
+
+      if (!id || !status) return json({ error: 'parâmetros faltando' }, 400);
+      if (status !== 'aprovada' && status !== 'reprovada') return json({ error: 'status inválido' }, 400);
+      const just = (justificativa ?? '').trim().slice(0, 2000);
+      if (status === 'reprovada' && !just) {
+        return json({ error: 'justificativa obrigatória para reprovar' }, 400);
+      }
+
+      const { data: ideiaI } = await sb
+        .from('ideias_conteudo')
+        .select('id, cliente_id, status, titulo, mes_referencia')
+        .eq('id', id)
+        .maybeSingle();
+      if (!ideiaI || (ideiaI as any).cliente_id !== (cliI as any).id || (ideiaI as any).status === 'rascunho') {
+        return json({ error: 'ideia não pertence a este cliente' }, 403);
+      }
+
+      const { error } = await sb
+        .from('ideias_conteudo')
+        .update({ status, justificativa: status === 'reprovada' ? just : '' } as any)
+        .eq('id', id);
+      if (error) return json({ error: error.message }, 500);
+
+      if (status === 'reprovada') {
+        await avisarEquipe(
+          sb,
+          `💡❌ ${(cliI as any).nome} não aprovou a ideia "${(ideiaI as any).titulo}" (${(ideiaI as any).mes_referencia}).\n\n` +
+          `O que ele pediu: ${just}`,
+        );
+      }
+      return json({ ok: true });
+    }
 
     // Aprovar todos os pendentes de um mês de uma vez
     if (acao === 'aprovar_todos') {

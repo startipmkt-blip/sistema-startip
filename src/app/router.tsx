@@ -35,6 +35,7 @@ import { CadastroPublicoPage } from '@/pages/CadastroPublicoPage';
 import { FormularioPublicoPage } from '@/modules/formularios/pages/FormularioPublicoPage';
 import { CentralClientePage } from '@/pages/CentralClientePage';
 import { AprovacaoPublicaPage } from '@/pages/AprovacaoPublicaPage';
+import { AprovacaoIdeiasPublicaPage } from '@/pages/AprovacaoIdeiasPublicaPage';
 import { PortalAprovacao } from '@/portal/pages/PortalAprovacao';
 import { CalendarioPublicoPage } from '@/pages/CalendarioPublicoPage';
 import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
   { path: '/formulario/:slug', element: <FormularioPublicoPage /> },
   { path: '/central/:slug', element: <CentralClientePage /> },
   { path: '/aprovar/:slug', element: <AprovacaoPublicaPage /> },
+  { path: '/aprovar-ideias/:slug', element: <AprovacaoIdeiasPublicaPage /> },
   { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
   { path: '/tv/:slug', element: <PainelTvPage /> },
   { path: '/otim/:token', element: <OtimizacoesPublicaPage /> },
