@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/shared/ui/PageHeader';
+import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Select } from '@/shared/ui/Select';
@@ -26,6 +27,7 @@ const VISOES: { id: Visao; label: string }[] = [
 const ABAS: { id: AbaGestao; label: string }[] = [
   { id: 'conteudos', label: '🎬 Conteúdos' },
   { id: 'ideias',    label: '💡 Aprovação de ideias' },
+  { id: 'datas',     label: '🎉 Datas comemorativas' },
 ];
 
 export function GestaoConteudoPage() {
@@ -36,7 +38,8 @@ export function GestaoConteudoPage() {
   const clienteId = params.get('cliente') ?? '';
   const visao = (params.get('visao') as Visao | null) ?? 'carteira';
   const etapaFiltro = (params.get('etapa') as Etapa | null) ?? '';
-  const aba: AbaGestao = params.get('aba') === 'ideias' ? 'ideias' : 'conteudos';
+  const abaParam = params.get('aba');
+  const aba: AbaGestao = abaParam === 'ideias' || abaParam === 'datas' ? abaParam : 'conteudos';
 
   function atualizar(mudancas: Record<string, string | null>) {
     const p = new URLSearchParams(params);
@@ -74,12 +77,16 @@ export function GestaoConteudoPage() {
         title="🗂️ Gestão de Conteúdo"
         subtitle="Acompanhe, por cliente e por mês, o que está em edição, em aprovação, aprovado e programado."
       >
-        <div className="flex items-center gap-1">
-          <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, -1) })}>←</Button>
-          <span className="min-w-[10rem] text-center text-sm font-medium capitalize text-slate-100">{mesLabel(mes)}</span>
-          <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, 1) })}>→</Button>
-        </div>
-        <Button variant="secondary" onClick={() => setConfigAberta(true)}><GlassIcon name="settings" /> Configurações</Button>
+        {aba !== 'datas' && (
+          <div className="flex items-center gap-1">
+            <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, -1) })}>←</Button>
+            <span className="min-w-[10rem] text-center text-sm font-medium capitalize text-slate-100">{mesLabel(mes)}</span>
+            <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, 1) })}>→</Button>
+          </div>
+        )}
+        {aba !== 'datas' && (
+          <Button variant="secondary" onClick={() => setConfigAberta(true)}><GlassIcon name="settings" /> Configurações</Button>
+        )}
       </PageHeader>
 
       {/* Sub-abas: produção (conteúdos prontos) | ideias a aprovar antes de produzir */}
@@ -97,6 +104,8 @@ export function GestaoConteudoPage() {
           </button>
         ))}
       </div>
+
+      {aba === 'datas' && <DatasComemorativasPage />}
 
       {aba === 'ideias' && (
         <IdeiasAprovacao

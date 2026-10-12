@@ -14,7 +14,6 @@ import { PeriodoSeletor } from '../components/PeriodoSeletor';
 import { hojeLocal, mesDaSemana, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
 import { DemandaFormModal } from '../components/DemandaFormModal';
 import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
-import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type GrupoCliente = 'todos' | 'organico' | 'trafego';
@@ -25,12 +24,11 @@ const GRUPOS: Array<{ id: GrupoCliente; label: string; ajuda: string }> = [
   { id: 'trafego',  label: '🎯 Só tráfego pago (criativos)', ajuda: 'Clientes só com Tráfego Pago: edição de criativos, quando houver demanda' },
 ];
 
-type Aba = 'demandas' | 'producao' | 'datas';
+type Aba = 'demandas' | 'producao';
 
 const ABAS: Array<{ id: Aba; label: string; icone: string }> = [
   { id: 'demandas',    label: 'Demandas',   icone: '📥' },
   { id: 'producao',    label: 'Produção',   icone: '🎨' },
-  { id: 'datas',       label: 'Datas comemorativas', icone: '🎉' },
 ];
 
 export function DesignerPage() {
@@ -41,7 +39,7 @@ export function DesignerPage() {
     <div className="space-y-4 p-4">
       <PageHeader
         title="🎨 Designer"
-        subtitle="Demandas do designer, produção e datas comemorativas."
+        subtitle="Demandas do designer e produção."
       />
 
       <nav className="flex gap-1 border-b border-white/10">
@@ -60,7 +58,6 @@ export function DesignerPage() {
 
       {aba === 'demandas'    && <AbaDemandas />}
       {aba === 'producao'    && <ConteudoPage />}
-      {aba === 'datas'       && <DatasComemorativasPage />}
     </div>
   );
 }

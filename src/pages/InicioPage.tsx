@@ -19,7 +19,6 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
   { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
   { numero: '08', label: 'Otimizações',        emoji: '📈', to: '/otimizacoes',        modulo: 'otimizacoes' },
-  { numero: '09', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },
   { numero: '10', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
   { numero: '11', label: 'Ideias',            emoji: '💡', to: '/ideias',            modulo: 'ideias' },
   { numero: '12', label: 'Gestão de Conteúdo', emoji: '🗂️', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
