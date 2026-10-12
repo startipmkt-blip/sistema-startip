@@ -40,8 +40,9 @@
   Header always set X-Content-Type-Options "nosniff"
   # Não vaza URL completa no Referer.
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  # Nega APIs sensíveis por padrão (webcam, mic, geolocalização, pagamentos).
-  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+  # Nega APIs sensíveis por padrão (webcam, geolocalização, pagamentos).
+  # Microfone liberado só para o próprio site: gravação de áudio no CRM e nas demandas.
+  Header always set Permissions-Policy "geolocation=(), microphone=(self), camera=(), payment=(), usb=()"
   # HTTPS obrigatório por 1 ano (só ativa depois que o SSL da Hostinger estiver estável).
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
