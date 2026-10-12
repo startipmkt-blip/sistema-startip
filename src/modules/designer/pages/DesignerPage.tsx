@@ -10,6 +10,7 @@ import { useDemandas, useDemandasRealtime, type DesignerDemanda } from '../api/d
 import { DemandasKanban } from '../components/DemandasKanban';
 import { HistoricoDesigner } from '../components/HistoricoDesigner';
 import { ResumoDesigner } from '../components/ResumoDesigner';
+import { FuncoesDesigner } from '../components/FuncoesDesigner';
 import { PeriodoSeletor } from '../components/PeriodoSeletor';
 import { hojeLocal, mesDaSemana, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
 import { DemandaFormModal } from '../components/DemandaFormModal';
@@ -24,11 +25,12 @@ const GRUPOS: Array<{ id: GrupoCliente; label: string; ajuda: string }> = [
   { id: 'trafego',  label: '🎯 Só tráfego pago (criativos)', ajuda: 'Clientes só com Tráfego Pago: edição de criativos, quando houver demanda' },
 ];
 
-type Aba = 'demandas' | 'producao';
+type Aba = 'demandas' | 'producao' | 'funcoes';
 
 const ABAS: Array<{ id: Aba; label: string; icone: string }> = [
   { id: 'demandas',    label: 'Demandas',   icone: '📥' },
   { id: 'producao',    label: 'Produção',   icone: '🎨' },
+  { id: 'funcoes',     label: 'Funções',    icone: '📋' },
 ];
 
 export function DesignerPage() {
@@ -39,7 +41,7 @@ export function DesignerPage() {
     <div className="space-y-4 p-4">
       <PageHeader
         title="🎨 Designer"
-        subtitle="Demandas do designer e produção."
+        subtitle="Demandas, produção e funções do designer."
       />
 
       <nav className="flex gap-1 border-b border-white/10">
@@ -58,6 +60,7 @@ export function DesignerPage() {
 
       {aba === 'demandas'    && <AbaDemandas />}
       {aba === 'producao'    && <ConteudoPage />}
+      {aba === 'funcoes'     && <FuncoesDesigner />}
     </div>
   );
 }
