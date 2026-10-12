@@ -70,7 +70,7 @@ export function TarefasRecorrentes() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">Tarefas que se repetem (todo dia ou em dias fixos da semana) — para todos os setores.</p>
+        <p className="text-sm text-slate-400">Tarefas que se repetem (todo dia, em dias fixos da semana ou em um dia do mês) — para todos os setores.</p>
         <Button onClick={abrirNova}>+ Nova recorrente</Button>
       </div>
 

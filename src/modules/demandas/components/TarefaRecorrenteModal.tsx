@@ -64,12 +64,14 @@ export function TarefaRecorrenteModal({ open, onClose, tarefa }: Props) {
     responsaveis: tarefa?.responsaveis ?? [],
     tipo: tarefa?.tipo ?? 'semanal',
     dias_semana: tarefa?.dias_semana ?? [1],
+    dia_mes: tarefa?.dia_mes ?? new Date().getDate(),
     horario: tarefa?.horario ?? '',
   });
   const set = <K extends keyof RecorrenteForm>(k: K, v: RecorrenteForm[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   const semDia = form.tipo === 'semanal' && form.dias_semana.length === 0;
-  const invalido = !form.titulo.trim() || semDia;
+  const semDiaMes = form.tipo === 'mensal' && !(form.dia_mes && form.dia_mes >= 1 && form.dia_mes <= 31);
+  const invalido = !form.titulo.trim() || semDia || semDiaMes;
 
   async function handleSalvar() {
     if (invalido) return;
@@ -116,6 +118,7 @@ export function TarefaRecorrenteModal({ open, onClose, tarefa }: Props) {
             options={[
               { value: 'diaria', label: 'Todo dia' },
               { value: 'semanal', label: 'Toda semana (dias fixos)' },
+              { value: 'mensal', label: 'Todo mês (um dia fixo)' },
             ]}
             value={form.tipo}
             onChange={(e) => set('tipo', e.target.value as RecorrenciaTipo)}
@@ -128,6 +131,20 @@ export function TarefaRecorrenteModal({ open, onClose, tarefa }: Props) {
             onChange={(e) => set('horario', e.target.value)}
           />
         </div>
+        {form.tipo === 'mensal' && (
+          <div className="space-y-1">
+            <Select
+              id="dia_mes"
+              label="Dia do mês"
+              options={Array.from({ length: 31 }, (_, i) => ({ value: String(i + 1), label: `Dia ${i + 1}` }))}
+              value={String(form.dia_mes ?? '')}
+              onChange={(e) => set('dia_mes', Number(e.target.value))}
+            />
+            {(form.dia_mes ?? 0) > 28 && (
+              <p className="text-xs text-slate-400">Em meses com menos dias, a tarefa cai no último dia do mês.</p>
+            )}
+          </div>
+        )}
         {form.tipo === 'semanal' && (
           <div className="space-y-1">
             <Chips
