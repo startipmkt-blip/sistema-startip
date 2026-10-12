@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/shared/ui/PageHeader';
+import { PautasCliente } from '@/modules/gestao-conteudo/components/PautasCliente';
 import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
@@ -104,6 +105,16 @@ export function GestaoConteudoPage() {
           </button>
         ))}
       </div>
+
+      {aba !== 'datas' && (
+        cliente ? (
+          <PautasCliente key={cliente.id} clienteId={cliente.id} clienteNome={cliente.nome} />
+        ) : (
+          <p className="rounded-lg border border-dashed border-white/10 px-3 py-2 text-xs text-slate-400">
+            <GlassIcon name="lightbulb" /> Selecione um cliente para ver e guardar as <strong>pautas de conteúdo</strong> dele.
+          </p>
+        )
+      )}
 
       {aba === 'datas' && <DatasComemorativasPage />}
 
