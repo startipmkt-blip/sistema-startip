@@ -17,7 +17,6 @@ const OPERACIONAL: ModuloCard[] = [
   { numero: '03', label: 'CRM · WhatsApp',     emoji: '💬', to: '/crm',                modulo: 'crm' },
   { numero: '04', label: 'Designer',           emoji: '🎨', to: '/designer',           modulo: 'conteudo' },
   { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
-  { numero: '06', label: 'Aprovação',          emoji: '✅', to: '/aprovacao-conteudo', modulo: 'aprovacao-conteudo' },
   { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
   { numero: '08', label: 'Otimizações',        emoji: '📈', to: '/otimizacoes',        modulo: 'otimizacoes' },
   { numero: '09', label: 'Datas comemorativas', emoji: '🎉', to: '/datas-comemorativas', modulo: 'datas-comemorativas' },

@@ -19,7 +19,6 @@ import { AreaClientePage } from '@/modules/area-cliente/pages/AreaClientePage';
 import { ProcessosPage } from '@/modules/processos/pages/ProcessosPage';
 import { IndicacaoPage } from '@/modules/indicacao/pages/IndicacaoPage';
 import { OnboardingPage } from '@/modules/onboarding/pages/OnboardingPage';
-import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
 import { DemandasPage } from '@/modules/demandas/pages/DemandasPage';
 import { IdeiasPage } from '@/modules/ideias/pages/IdeiasPage';
 import { GestaoConteudoPage } from '@/modules/gestao-conteudo/pages/GestaoConteudoPage';
@@ -93,7 +92,7 @@ export const router = createBrowserRouter([
           { path: 'onboarding', element: <RequireModulo modulo="onboarding"><OnboardingPage /></RequireModulo> },
           { path: 'designer', element: <RequireModulo modulo="conteudo"><DesignerPage /></RequireModulo> },
           { path: 'conteudo', element: <Navigate to="/designer" replace /> },
-          { path: 'aprovacao-conteudo', element: <RequireModulo modulo="aprovacao-conteudo"><AprovacaoConteudoPage /></RequireModulo> },
+          { path: 'aprovacao-conteudo', element: <Navigate to="/gestao-conteudo" replace /> },
           { path: 'cs-clientes', element: <RequireModulo modulo="cs-clientes"><CsClientesPage /></RequireModulo> },
           { path: 'painel-tv', element: <RequireModulo modulo="painel-tv"><PainelTvAdminPage /></RequireModulo> },
           { path: 'datas-comemorativas', element: <RequireModulo modulo="datas-comemorativas"><DatasComemorativasPage /></RequireModulo> },

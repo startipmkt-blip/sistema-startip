@@ -48,7 +48,7 @@ export function ConteudoPage() {
       </PageHeader>
 
       <div className="rounded-md border border-dashed border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
-        <GlassIcon name="lightbulb" /> Ideias começam em <Link to="/aprovacao-conteudo" className="text-brand-300 hover:underline">Aprovação de conteúdo</Link>.
+        <GlassIcon name="lightbulb" /> Ideias começam em <Link to="/gestao-conteudo" className="text-brand-300 hover:underline">Gestão de Conteúdo</Link>.
         Só entram aqui depois que o cliente aprova no portal.
       </div>
 
