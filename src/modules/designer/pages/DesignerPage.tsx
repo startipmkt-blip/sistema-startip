@@ -13,8 +13,6 @@ import { ResumoDesigner } from '../components/ResumoDesigner';
 import { PeriodoSeletor } from '../components/PeriodoSeletor';
 import { hojeLocal, mesDaSemana, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
 import { DemandaFormModal } from '../components/DemandaFormModal';
-import { SocialMediaPage } from '@/modules/social-media/pages/SocialMediaPage';
-import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
 import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
 import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
@@ -27,13 +25,11 @@ const GRUPOS: Array<{ id: GrupoCliente; label: string; ajuda: string }> = [
   { id: 'trafego',  label: '🎯 Só tráfego pago (criativos)', ajuda: 'Clientes só com Tráfego Pago: edição de criativos, quando houver demanda' },
 ];
 
-type Aba = 'demandas' | 'producao' | 'calendario' | 'aprovacao' | 'datas';
+type Aba = 'demandas' | 'producao' | 'datas';
 
 const ABAS: Array<{ id: Aba; label: string; icone: string }> = [
   { id: 'demandas',    label: 'Demandas',   icone: '📥' },
   { id: 'producao',    label: 'Produção',   icone: '🎨' },
-  { id: 'calendario',  label: 'Calendário', icone: '🗓' },
-  { id: 'aprovacao',   label: 'Aprovação',  icone: '✅' },
   { id: 'datas',       label: 'Datas comemorativas', icone: '🎉' },
 ];
 
@@ -45,7 +41,7 @@ export function DesignerPage() {
     <div className="space-y-4 p-4">
       <PageHeader
         title="🎨 Designer"
-        subtitle="Kanban unificado de demandas + calendário editorial + aprovação de conteúdo."
+        subtitle="Demandas do designer, produção e datas comemorativas."
       />
 
       <nav className="flex gap-1 border-b border-white/10">
@@ -64,8 +60,6 @@ export function DesignerPage() {
 
       {aba === 'demandas'    && <AbaDemandas />}
       {aba === 'producao'    && <ConteudoPage />}
-      {aba === 'calendario'  && <SocialMediaPage />}
-      {aba === 'aprovacao'   && <AprovacaoConteudoPage />}
       {aba === 'datas'       && <DatasComemorativasPage />}
     </div>
   );
