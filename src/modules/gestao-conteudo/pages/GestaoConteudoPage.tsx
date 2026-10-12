@@ -8,18 +8,24 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { usePostsDoMes } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
-  ETAPAS, deslocarMes, mesAtualRef, mesLabel, type Etapa, type Visao,
+  ETAPAS, deslocarMes, mesAtualRef, mesLabel, type AbaGestao, type Etapa, type Visao,
 } from '@/modules/gestao-conteudo/types';
+import { IdeiasAprovacao } from '@/modules/gestao-conteudo/components/IdeiasAprovacao';
 import { contar, type ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { DetalheCliente } from '@/modules/gestao-conteudo/components/DetalheCliente';
 import { ConfigModal } from '@/modules/gestao-conteudo/components/ConfigModal';
 import { AgendaSemana, VisaoCarteira, VisaoTabela } from '@/modules/gestao-conteudo/components/VisoesCarteira';
-
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+
 const VISOES: { id: Visao; label: string }[] = [
   { id: 'carteira', label: '🗂️ Carteira' },
   { id: 'tabela',   label: '📊 Tabela' },
   { id: 'semana',   label: '📅 Agenda da semana' },
+];
+
+const ABAS: { id: AbaGestao; label: string }[] = [
+  { id: 'conteudos', label: '🎬 Conteúdos' },
+  { id: 'ideias',    label: '💡 Aprovação de ideias' },
 ];
 
 export function GestaoConteudoPage() {
@@ -30,6 +36,7 @@ export function GestaoConteudoPage() {
   const clienteId = params.get('cliente') ?? '';
   const visao = (params.get('visao') as Visao | null) ?? 'carteira';
   const etapaFiltro = (params.get('etapa') as Etapa | null) ?? '';
+  const aba: AbaGestao = params.get('aba') === 'ideias' ? 'ideias' : 'conteudos';
 
   function atualizar(mudancas: Record<string, string | null>) {
     const p = new URLSearchParams(params);
@@ -75,6 +82,33 @@ export function GestaoConteudoPage() {
         <Button variant="secondary" onClick={() => setConfigAberta(true)}><GlassIcon name="settings" /> Configurações</Button>
       </PageHeader>
 
+      {/* Sub-abas: produção (conteúdos prontos) | ideias a aprovar antes de produzir */}
+      <div className="flex gap-1 border-b border-white/10">
+        {ABAS.map((a) => (
+          <button
+            key={a.id}
+            onClick={() => atualizar({ aba: a.id === 'conteudos' ? null : a.id, etapa: null, visao: null })}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+              aba === a.id
+                ? 'border-brand-400 text-white'
+                : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+          >
+            {glassify(a.label)}
+          </button>
+        ))}
+      </div>
+
+      {aba === 'ideias' && (
+        <IdeiasAprovacao
+          clientes={clientes}
+          clienteId={clienteId}
+          mes={mes}
+          onCliente={(id) => atualizar({ cliente: id })}
+        />
+      )}
+
+      {aba === 'conteudos' && (
+      <>
       {/* Barra de controle: quem ver + como ver */}
       <Card className="flex flex-wrap items-end gap-3 p-3">
         <div className="min-w-[14rem] flex-1 sm:flex-none">
@@ -177,6 +211,8 @@ export function GestaoConteudoPage() {
             />
           )}
         </>
+      )}
+      </>
       )}
 
       <ConfigModal open={configAberta} onClose={() => setConfigAberta(false)} />
