@@ -47,7 +47,7 @@ export function TarefasRecorrentes() {
           title={ehParaHoje(t) ? (feitaHoje ? 'Desfazer' : 'Concluir') : 'Só no dia da recorrência'}
           disabled={!ehParaHoje(t)}
         >
-          <GlassIcon name="check" />
+          {feitaHoje && <GlassIcon name="check" />}
         </button>
         <div className="min-w-0 flex-1">
           <div className={`text-sm ${feitaHoje ? 'text-slate-500 line-through' : atrasada ? 'text-red-300' : 'text-slate-100'}`}>{t.titulo}</div>

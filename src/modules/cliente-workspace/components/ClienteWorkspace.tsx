@@ -100,7 +100,7 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
                         }`}
                         title={ok ? 'Preenchido' : 'Em branco'}
                       >
-                        <GlassIcon name="check" />
+                        {ok && <GlassIcon name="check" />}
                       </span>
                       <span aria-hidden><GlassIcon emoji={it.icon} /></span>
                       <span className="flex-1">{it.titulo}</span>
