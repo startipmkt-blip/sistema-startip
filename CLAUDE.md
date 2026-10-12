@@ -158,8 +158,13 @@ AUTENTIQUE_API_TOKEN
 5. **SEMPRE** commitar via git antes de rodar uma nova rodada grande.
 6. **SEMPRE** testar mobile em módulos com rota pública (M12 Turbo Cenas quando existir, área do cliente).
 7. **NUNCA** apagar/regravar migrations aplicadas. Novo campo = nova migration numerada.
-8. **Deploy manual do frontend**: `npm run build` local → upload dos 3 arquivos em `dist/assets/` para `public_html/assets/` no Hostinger → editar `index.html` (colar o novo do dist) → salvar. Já detectada dificuldade com o click do botão save do Filegator — usar Ctrl+S no editor Ace.
-9. **Deploy de Edge Function**: `SUPABASE_ACCESS_TOKEN=... npx supabase functions deploy <nome> --project-ref oxenrjsagtfmdgcrkvzs`.
+8. **Deploy SEMPRE pelo GitHub — NUNCA subir arquivo na Hostinger (File Manager/Filegator/FTP) nem rodar `supabase functions deploy` à mão.**
+   - Fluxo único: `git commit` → `git push origin main` (repo `startipmkt-blip/sistema-startip`). A Action `.github/workflows/deploy.yml` faz o build **com os secrets** `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`, envia o `dist/` por FTP para a Hostinger e publica todas as Edge Functions.
+   - **Por quê:** build local não tem `.env.local` → o bundle sai em *Modo demonstração* (dados de exemplo) e, subido à mão, derruba a produção. Aconteceu em 12/10/2026. Os dados no banco nunca são afetados, mas o site parece "vazio".
+   - Para publicar sem mudança de código: Actions → Deploy → *Run workflow* (`workflow_dispatch`).
+   - `npm run build` local serve só para checar erro de compilação; **nunca** copie o `dist/` local para o servidor.
+   - Se o site aparecer com o banner "Modo demonstração" em produção, o build foi feito sem as variáveis: refaça o deploy pelo GitHub.
+9. **Migrations não vão pelo pipeline.** A Action publica frontend e Edge Functions, mas **não** aplica `supabase/migrations/*`. Aplique a migration no Supabase (SQL Editor ou MCP `apply_migration`) **antes** do push que depende dela e mantenha o arquivo versionado no repo.
 
 ## Estado atual dos módulos
 
@@ -197,4 +202,4 @@ Mapeamento com os 16 módulos do Turbo (referência: `docs/turbo-kit/DOSSIE.md`)
 - Antes de criar componente novo, verificar `src/shared/ui/` — o design system já cobre a maioria.
 - Se precisar de dados fake pra testar, usar `IS_DEMO` do `shared/lib/env.ts` (fixtures em `shared/lib/demoData.ts` e per-module).
 - Nunca dados de clientes reais em desenvolvimento.
-- **Sempre reportar antes de deploy**: mostrar diff da mudança, aguardar OK antes de subir pro Hostinger.
+- **Sempre reportar antes de deploy**: mostrar o diff da mudança e aguardar OK antes do `git push origin main` (o push **é** o deploy — ver regra 8).
