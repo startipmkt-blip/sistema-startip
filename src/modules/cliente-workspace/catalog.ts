@@ -26,11 +26,14 @@ export const DOC_ITENS: DocItem[] = [
   { chave: 'referencias', titulo: 'Referências', icon: '🔗', grupo: 'materiais' },
   { chave: 'dores', titulo: 'Dores / mecanismo único / diferenciais', icon: '⚡', grupo: 'materiais' },
   { chave: 'reunioes', titulo: 'Reuniões (PDFs e resumos)', icon: '📁', grupo: 'materiais' },
+  // Itens com tela própria (listas estruturadas, não texto livre)
+  { chave: 'regras', titulo: 'Regras do cliente (briefing)', icon: '📋', grupo: 'materiais' },
   // Fluxo de trabalho
   { chave: 'funil', titulo: 'Funil de Marketing', icon: '🔽', grupo: 'fluxo' },
   { chave: 'mineracao', titulo: 'Lista de mineração', icon: '⛏️', grupo: 'fluxo' },
   { chave: 'ideias', titulo: 'Ideias de conteúdo', icon: '💭', grupo: 'fluxo' },
   { chave: 'pilares', titulo: 'Pilares de conteúdo', icon: '🏛️', grupo: 'fluxo' },
+  { chave: 'pautas', titulo: 'Pautas de conteúdo', icon: '📌', grupo: 'fluxo' },
   { chave: 'calendario', titulo: 'Calendário editorial', icon: '🗓️', grupo: 'fluxo' },
   { chave: 'instagram', titulo: 'Estrutura de Instagram', icon: '📸', grupo: 'fluxo' },
   { chave: 'gmn', titulo: 'Google Meu Negócio (GMN)', icon: '📍', grupo: 'fluxo' },

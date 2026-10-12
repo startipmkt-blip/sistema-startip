@@ -11,6 +11,10 @@ import {
 } from '@/modules/cliente-workspace/catalog';
 import { ReunioesPanel } from '@/modules/reunioes/ReunioesPanel';
 import { FormulariosAba } from '@/modules/formularios/pages/FormulariosAba';
+import { RegrasCliente } from '@/modules/cliente-perfil/components/RegrasCliente';
+import { useRegras } from '@/modules/cliente-perfil/api/regrasApi';
+import { PautasCliente } from '@/modules/gestao-conteudo/components/PautasCliente';
+import { usePautas } from '@/modules/gestao-conteudo/api/pautasApi';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Textarea } from '@/shared/ui/Textarea';
@@ -20,7 +24,7 @@ import { uploadArquivo } from '@/shared/lib/storage';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
-export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
+export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string; clienteNome?: string }) {
   const { data: docs, isLoading } = useClienteDocs(clienteId);
   const salvar = useSalvarClienteDoc(clienteId);
 
@@ -53,7 +57,13 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
     [selecionada],
   );
   const doc = docs?.[item.chave];
-  const preenchido = (chave: string) => Boolean(docs?.[chave]?.conteudo?.trim());
+  const { data: regras } = useRegras(clienteId);
+  const { data: pautas } = usePautas(clienteId);
+  const preenchido = (chave: string) => {
+    if (chave === 'regras') return (regras?.length ?? 0) > 0;
+    if (chave === 'pautas') return (pautas?.length ?? 0) > 0;
+    return Boolean(docs?.[chave]?.conteudo?.trim());
+  };
 
   function abrir(chave: string) {
     setSelecionada(chave);
@@ -114,7 +124,11 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
       </div>
 
       {/* Documento selecionado */}
-      {item.chave === 'reunioes' ? (
+      {item.chave === 'regras' ? (
+        <RegrasCliente clienteId={clienteId} />
+      ) : item.chave === 'pautas' ? (
+        <PautasCliente clienteId={clienteId} clienteNome={clienteNome ?? 'cliente'} />
+      ) : item.chave === 'reunioes' ? (
         <Card className="p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
             <span aria-hidden><GlassIcon emoji={item.icon} /></span>
