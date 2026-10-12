@@ -1,8 +1,13 @@
+import { useEffect, useState } from 'react';
 import { Badge } from '@/shared/ui/Badge';
-import { TIPO_LABEL, type DesignerDemanda } from '../api/demandasApi';
+import {
+  TIPO_LABEL, formatarDuracao, segundosAberto,
+  type DesignerDemanda, type TempoDemanda,
+} from '../api/demandasApi';
 
 interface Props {
   d: DesignerDemanda;
+  tempo?: TempoDemanda;
   onEditar: (d: DesignerDemanda) => void;
   onDragStart: (id: string) => void;
 }
@@ -20,8 +25,23 @@ function diasAte(iso: string | null): { texto: string; tone: 'green' | 'amber' |
   return { texto: `${dias}d`, tone: 'green' };
 }
 
-export function DemandaCard({ d, onEditar, onDragStart }: Props) {
+// Soma fechados + o registro aberto, atualizando a cada segundo só enquanto roda.
+export function useTempoTotal(tempo?: TempoDemanda): number {
+  const [, tick] = useState(0);
+  const rodando = !!tempo?.aberto && !tempo.aberto.pausado;
+  useEffect(() => {
+    if (!rodando) return;
+    const t = setInterval(() => tick((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, [rodando]);
+  if (!tempo) return 0;
+  return tempo.segundosFechados + (tempo.aberto ? segundosAberto(tempo.aberto) : 0);
+}
+
+export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const prazoInfo = diasAte(d.prazo);
+  const total = useTempoTotal(tempo);
+  const aberto = tempo?.aberto;
   return (
     <div
       draggable
@@ -40,6 +60,14 @@ export function DemandaCard({ d, onEditar, onDragStart }: Props) {
       )}
       {d.descricao && (
         <p className="mt-1 line-clamp-2 text-[11px] text-slate-500">{d.descricao}</p>
+      )}
+      {aberto && (
+        <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+          ⏱ {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
+        </div>
+      )}
+      {!aberto && total > 0 && (
+        <p className="mt-2 text-[11px] text-slate-400">⏱ {formatarDuracao(total)} gastos</p>
       )}
       <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
         <span>{d.responsavel_nome ? `👤 ${d.responsavel_nome}` : 'sem responsável'}</span>

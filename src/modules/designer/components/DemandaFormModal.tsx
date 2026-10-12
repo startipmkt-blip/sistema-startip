@@ -50,8 +50,12 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
     setErro(null);
     if (!titulo.trim()) { setErro('Título é obrigatório.'); return; }
     try {
-      await salvar.mutateAsync({
+      const respNome = (operadores ?? []).find((op) => op.id === responsavel)?.nome ?? null;
+      const r = await salvar.mutateAsync({
         id: demanda?.id,
+        de: demanda?.status,
+        iniciado_em: demanda?.iniciado_em ?? null,
+        responsavel_nome: respNome,
         cliente_id: clienteId || null,
         titulo: titulo.trim(),
         descricao: descricao.trim() || null,
@@ -60,6 +64,11 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
         prazo: prazo || null,
       });
       onClose();
+      if (r?.cronometroErro) {
+        alert(`A demanda foi salva, mas o cronômetro não acompanhou:
+
+${r.cronometroErro}`);
+      }
     } catch (e) {
       setErro((e as Error).message);
     }

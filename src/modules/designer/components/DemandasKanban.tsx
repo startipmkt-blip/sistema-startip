@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import {
-  useDemandas, useMoverStatus, STATUS_COLUNAS,
+  useDemandas, useMoverStatus, useTempoDesigner, STATUS_COLUNAS,
   type DesignerDemanda, type DesignerStatus,
 } from '../api/demandasApi';
 import { DemandaCard } from './DemandaCard';
@@ -11,11 +11,13 @@ interface Props {
   clienteId?: string | null;
   responsavelId?: string | null;
   q?: string;
+  periodo?: { ini: string; fim: string } | null;
   onEditar: (d: DesignerDemanda) => void;
 }
 
-export function DemandasKanban({ clienteId, responsavelId, q, onEditar }: Props) {
-  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q });
+export function DemandasKanban({ clienteId, responsavelId, q, periodo, onEditar }: Props) {
+  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo });
+  const { data: tempos } = useTempoDesigner();
   const mover = useMoverStatus();
   const [arrastando, setArrastando] = useState<string | null>(null);
   const [dropAlvo, setDropAlvo] = useState<DesignerStatus | null>(null);
@@ -29,9 +31,23 @@ export function DemandasKanban({ clienteId, responsavelId, q, onEditar }: Props)
   if (isLoading) return <Card className="flex justify-center p-10"><Spinner /></Card>;
 
   function handleDrop(status: DesignerStatus) {
-    if (arrastando) mover.mutate({ id: arrastando, status });
+    const d = (data ?? []).find((x) => x.id === arrastando);
     setArrastando(null);
     setDropAlvo(null);
+    if (!d || d.status === status) return;
+    mover.mutate(
+      {
+        id: d.id, status, titulo: d.titulo, de: d.status,
+        iniciado_em: d.iniciado_em, responsavel_nome: d.responsavel_nome ?? null,
+      },
+      {
+        onSuccess: (r) => {
+          if (r?.cronometroErro) {
+            alert(`A demanda foi movida, mas o cronômetro não acompanhou:\n\n${r.cronometroErro}`);
+          }
+        },
+      },
+    );
   }
 
   return (
@@ -62,7 +78,7 @@ export function DemandasKanban({ clienteId, responsavelId, q, onEditar }: Props)
                 </p>
               ) : (
                 itens.map((d) => (
-                  <DemandaCard key={d.id} d={d} onEditar={onEditar} onDragStart={setArrastando} />
+                  <DemandaCard key={d.id} d={d} tempo={tempos?.[d.id]} onEditar={onEditar} onDragStart={setArrastando} />
                 ))
               )}
             </div>

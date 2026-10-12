@@ -19,7 +19,6 @@ export interface Demanda {
 export const DEMANDA_SETORES: { id: DemandaSetor; label: string; adminOnly?: boolean }[] = [
   { id: 'socios', label: 'Sócios', adminOnly: true },
   { id: 'trafego', label: 'Tráfego pago' },
-  { id: 'design', label: 'Design' },
   { id: 'geral', label: 'Geral' },
 ];
 

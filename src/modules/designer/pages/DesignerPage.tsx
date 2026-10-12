@@ -8,6 +8,10 @@ import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
 import { useDemandas, useDemandasRealtime, type DesignerDemanda } from '../api/demandasApi';
 import { DemandasKanban } from '../components/DemandasKanban';
+import { HistoricoDesigner } from '../components/HistoricoDesigner';
+import { ResumoDesigner } from '../components/ResumoDesigner';
+import { PeriodoSeletor } from '../components/PeriodoSeletor';
+import { chaveMes, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
 import { DemandaFormModal } from '../components/DemandaFormModal';
 import { SocialMediaPage } from '@/modules/social-media/pages/SocialMediaPage';
 import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
@@ -63,6 +67,16 @@ function AbaDemandas() {
   const [clienteId, setClienteId] = useState<string>('');
   const [responsavelId, setResponsavelId] = useState<string>('');
   const [busca, setBusca] = useState('');
+  const [mes, setMes] = useState(() => chaveMes(new Date()));
+  const [semana, setSemana] = useState<number | null>(
+    () => semanaDe(chaveMes(new Date()), new Date().toLocaleDateString('sv-SE')).numero,
+  );
+  const periodo = useMemo(() => {
+    if (semana === null) return periodoDoMes(mes);
+    const s = semanasDoMes(mes).find((x) => x.numero === semana);
+    return s ? { ini: s.ini, fim: s.fim } : periodoDoMes(mes);
+  }, [mes, semana]);
+  const [visao, setVisao] = useState<'quadro' | 'historico'>('quadro');
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState<DesignerDemanda | null>(null);
 
@@ -102,12 +116,42 @@ function AbaDemandas() {
         </div>
       </Card>
 
-      <DemandasKanban
-        clienteId={clienteId || null}
-        responsavelId={responsavelId || null}
-        q={busca}
-        onEditar={abrir}
-      />
+      <ResumoDesigner />
+
+      <PeriodoSeletor mes={mes} semana={semana} onMes={setMes} onSemana={setSemana} />
+
+      <div className="flex gap-1 border-b border-white/10">
+        {([
+          { id: 'quadro', label: '📋 Quadro' },
+          { id: 'historico', label: '✅ Histórico (o que foi feito)' },
+        ] as const).map((v) => (
+          <button
+            key={v.id}
+            onClick={() => setVisao(v.id)}
+            className={`border-b-2 px-3 py-1.5 text-xs font-medium transition-colors ${
+              visao === v.id ? 'border-brand-500 text-brand-300' : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >{v.label}</button>
+        ))}
+      </div>
+
+      {visao === 'quadro' ? (
+        <DemandasKanban
+          clienteId={clienteId || null}
+          responsavelId={responsavelId || null}
+          q={busca}
+          periodo={periodo}
+          onEditar={abrir}
+        />
+      ) : (
+        <HistoricoDesigner
+          clienteId={clienteId || null}
+          responsavelId={responsavelId || null}
+          q={busca}
+          periodo={periodo}
+          onEditar={abrir}
+        />
+      )}
 
       <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} />
     </div>

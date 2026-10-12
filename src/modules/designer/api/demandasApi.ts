@@ -2,6 +2,46 @@ import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { useAuth } from '@/shared/auth/AuthProvider';
+import { dataRef } from '../lib/periodo';
+import {
+  iniciarTimerDemanda, pararTimerDemanda, TOCADORES, type Tocador,
+} from '@/modules/demandas/api/cronometroApi';
+
+// Quem toca quando o responsável da demanda não é um usuário do cronômetro.
+const DESIGNER_PADRAO: Tocador = 'Gabriel';
+
+// O timer segue o status: abre ao entrar em "Em andamento" e fecha ao sair
+// (aprovação, concluído ou de volta pra fila). Falha no cronômetro não desfaz a demanda.
+export interface ResultadoCronometro { cronometroErro?: string }
+
+async function sincronizarCronometro(opts: {
+  id: string; titulo: string; de?: DesignerStatus; para: DesignerStatus; responsavelNome?: string | null;
+}): Promise<ResultadoCronometro> {
+  try {
+    if (opts.para === 'em_andamento' && opts.de !== 'em_andamento') {
+      const tocador = (TOCADORES as readonly string[]).includes(opts.responsavelNome ?? '')
+        ? (opts.responsavelNome as Tocador)
+        : DESIGNER_PADRAO;
+      await iniciarTimerDemanda({ id: opts.id, titulo: opts.titulo }, tocador, 'designer_demanda_id');
+    } else if (opts.para !== 'em_andamento' && (opts.de === 'em_andamento' || opts.de === undefined)) {
+      await pararTimerDemanda(opts.id, 'designer_demanda_id');
+    }
+    return {};
+  } catch (e) {
+    console.error('Falha ao sincronizar com o cronômetro:', e);
+    return { cronometroErro: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// Marca início (1ª vez em andamento) e conclusão; reabrir limpa a conclusão.
+function carimbos(de: DesignerStatus | undefined, para: DesignerStatus, jaIniciado: string | null | undefined) {
+  const agora = new Date().toISOString();
+  const patch: { iniciado_em?: string; concluido_em?: string | null } = {};
+  if (para === 'em_andamento' && !jaIniciado) patch.iniciado_em = agora;
+  if (para === 'concluido' && de !== 'concluido') patch.concluido_em = agora;
+  if (para !== 'concluido' && de === 'concluido') patch.concluido_em = null;
+  return patch;
+}
 
 export type DesignerStatus = 'a_fazer' | 'em_andamento' | 'aprovacao' | 'concluido';
 export type DesignerOrigem = 'manual' | 'ideia_aprovada' | 'calendario';
@@ -37,6 +77,8 @@ export interface DesignerDemanda {
   origem: DesignerOrigem;
   ideia_id: string | null;
   anexos: unknown[];
+  iniciado_em: string | null;
+  concluido_em: string | null;
   criado_por: string | null;
   created_at: string;
   updated_at: string;
@@ -47,6 +89,7 @@ interface Filtros {
   responsavelId?: string | null;
   tipo?: DesignerTipo | null;
   q?: string;
+  periodo?: { ini: string; fim: string } | null;
 }
 
 async function fetchDemandas(): Promise<DesignerDemanda[]> {
@@ -91,6 +134,10 @@ export function useDemandas(filtros: Filtros = {}) {
         if (filtros.clienteId && r.cliente_id !== filtros.clienteId) return false;
         if (filtros.responsavelId && r.responsavel_id !== filtros.responsavelId) return false;
         if (filtros.tipo && r.tipo !== filtros.tipo) return false;
+        if (filtros.periodo) {
+          const ref = dataRef(r);
+          if (ref < filtros.periodo.ini || ref > filtros.periodo.fim) return false;
+        }
         if (filtros.q) {
           const q = filtros.q.toLowerCase();
           const hay = `${r.titulo} ${r.descricao ?? ''} ${r.cliente_nome ?? ''}`.toLowerCase();
@@ -112,40 +159,67 @@ interface UpsertInput {
   status?: DesignerStatus;
   responsavel_id?: string | null;
   prazo?: string | null;
+  // Contexto pro cronômetro (não vai pro banco).
+  de?: DesignerStatus;
+  iniciado_em?: string | null;
+  responsavel_nome?: string | null;
 }
 
 export function useSalvarDemanda() {
   const qc = useQueryClient();
   const { profile } = useAuth();
   return useMutation({
-    mutationFn: async (input: UpsertInput) => {
-      const payload = { ...input, criado_por: input.id ? undefined : profile?.id ?? null };
+    mutationFn: async (input: UpsertInput): Promise<ResultadoCronometro> => {
+      const { de, iniciado_em, responsavel_nome, ...dados } = input;
+      const para = dados.status ?? 'a_fazer';
+      const payload = {
+        ...dados,
+        ...carimbos(input.id ? de : undefined, para, iniciado_em),
+        criado_por: input.id ? undefined : profile?.id ?? null,
+      };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const tbl = (supabase.from as any)('designer_demandas');
-      if (input.id) {
-        const { id, ...patch } = payload;
+      let id = input.id;
+      if (id) {
+        const { id: _omit, ...patch } = payload;
         const { error } = await tbl.update(patch).eq('id', id);
         if (error) throw error;
       } else {
-        const { error } = await tbl.insert(payload);
+        const { data, error } = await tbl.insert(payload).select('id').single();
         if (error) throw error;
+        id = (data as { id: string }).id;
       }
+      return sincronizarCronometro({
+        id: id!, titulo: input.titulo, de: input.id ? de : undefined, para, responsavelNome: responsavel_nome,
+      });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['designer'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['designer'] });
+      qc.invalidateQueries({ queryKey: ['cronometro'] });
+    },
   });
 }
 
 export function useMoverStatus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (v: { id: string; status: DesignerStatus }) => {
+    mutationFn: async (v: {
+      id: string; status: DesignerStatus; titulo: string; de: DesignerStatus;
+      iniciado_em: string | null; responsavel_nome: string | null;
+    }): Promise<ResultadoCronometro> => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from as any)('designer_demandas')
-        .update({ status: v.status, updated_at: new Date().toISOString() })
+        .update({ status: v.status, updated_at: new Date().toISOString(), ...carimbos(v.de, v.status, v.iniciado_em) })
         .eq('id', v.id);
       if (error) throw error;
+      return sincronizarCronometro({
+        id: v.id, titulo: v.titulo, de: v.de, para: v.status, responsavelNome: v.responsavel_nome,
+      });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['designer'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['designer'] });
+      qc.invalidateQueries({ queryKey: ['cronometro'] });
+    },
   });
 }
 
@@ -153,11 +227,16 @@ export function useExcluirDemanda() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      // Não deixa timer órfão rodando.
+      await pararTimerDemanda(id, 'designer_demanda_id').catch((e) => console.error('Falha ao parar o cronômetro:', e));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from as any)('designer_demandas').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['designer'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['designer'] });
+      qc.invalidateQueries({ queryKey: ['cronometro'] });
+    },
   });
 }
 
@@ -176,4 +255,50 @@ export function useDemandasRealtime() {
       (supabase as any).removeChannel(canal);
     };
   }, [qc]);
+}
+
+// ---------- Tempo (cronômetro) por demanda ----------
+export interface TempoDemanda {
+  segundosFechados: number;
+  aberto: { inicio: string; quem: string; pausado: boolean; pausadoSeg: number; inicioPausa: string | null } | null;
+}
+
+export function useTempoDesigner() {
+  return useQuery({
+    queryKey: ['cronometro', 'designer'],
+    queryFn: async (): Promise<Record<string, TempoDemanda>> => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.from as any)('registros_tempo')
+        .select('designer_demanda_id, inicio, fim, duracao_segundos, pausado, inicio_pausa, tempo_pausado_total, usuarios(nome)')
+        .not('designer_demanda_id', 'is', null);
+      if (error) throw error;
+      const mapa: Record<string, TempoDemanda> = {};
+      for (const r of data ?? []) {
+        const t = (mapa[r.designer_demanda_id] ??= { segundosFechados: 0, aberto: null });
+        if (r.fim) t.segundosFechados += r.duracao_segundos ?? 0;
+        else t.aberto = {
+          inicio: r.inicio, quem: r.usuarios?.nome ?? '', pausado: !!r.pausado,
+          pausadoSeg: r.tempo_pausado_total ?? 0, inicioPausa: r.inicio_pausa ?? null,
+        };
+      }
+      return mapa;
+    },
+    refetchInterval: 30_000,
+    retry: false,
+  });
+}
+
+// Segundos efetivos do registro aberto (mesma conta do Timer do cronômetro).
+export function segundosAberto(a: NonNullable<TempoDemanda['aberto']>, agora = Date.now()): number {
+  let pausado = a.pausadoSeg;
+  if (a.pausado && a.inicioPausa) pausado += Math.floor((agora - new Date(a.inicioPausa).getTime()) / 1000);
+  return Math.max(Math.floor((agora - new Date(a.inicio).getTime()) / 1000) - pausado, 0);
+}
+
+export function formatarDuracao(seg: number): string {
+  const h = Math.floor(seg / 3600);
+  const m = Math.floor((seg % 3600) / 60);
+  if (h > 0) return `${h}h${String(m).padStart(2, '0')}`;
+  if (m > 0) return `${m}min`;
+  return `${seg}s`;
 }

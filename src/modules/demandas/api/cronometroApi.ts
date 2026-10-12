@@ -10,7 +10,8 @@ export type Tocador = (typeof TOCADORES)[number];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
-type FiltroRegistro = { demanda_id: string } | { usuario_id: string };
+// `demanda_id` = demandas gerais; `designer_demanda_id` = kanban do Designer.
+type FiltroRegistro = { demanda_id: string } | { designer_demanda_id: string } | { usuario_id: string };
 
 // Mesma conta do Timer do cronômetro: tempo total menos o tempo pausado.
 async function fecharRegistrosAbertos(filtro: FiltroRegistro): Promise<void> {
@@ -18,7 +19,8 @@ async function fecharRegistrosAbertos(filtro: FiltroRegistro): Promise<void> {
     .from('registros_tempo')
     .select('id, inicio, pausado, inicio_pausa, tempo_pausado_total')
     .is('fim', null);
-  q = 'demanda_id' in filtro ? q.eq('demanda_id', filtro.demanda_id) : q.eq('usuario_id', filtro.usuario_id);
+  const [coluna, valor] = Object.entries(filtro)[0];
+  q = q.eq(coluna, valor);
   const { data, error } = await q;
   if (error) throw error;
 
@@ -43,9 +45,12 @@ async function fecharRegistrosAbertos(filtro: FiltroRegistro): Promise<void> {
   }
 }
 
+export type OrigemDemanda = 'demanda_id' | 'designer_demanda_id';
+
 export async function iniciarTimerDemanda(
   demanda: { id: string; titulo: string },
   tocador: Tocador,
+  origem: OrigemDemanda = 'demanda_id',
 ): Promise<void> {
   if (IS_DEMO) return;
 
@@ -59,7 +64,7 @@ export async function iniciarTimerDemanda(
 
   // O cronômetro só mostra um timer aberto por pessoa: encerra o que estiver rodando.
   await fecharRegistrosAbertos({ usuario_id: usuario.id });
-  await fecharRegistrosAbertos({ demanda_id: demanda.id });
+  await fecharRegistrosAbertos({ [origem]: demanda.id } as FiltroRegistro);
 
   // Tipo de tarefa = título da demanda (cria se ainda não existir).
   const titulo = demanda.titulo.trim();
@@ -75,14 +80,17 @@ export async function iniciarTimerDemanda(
     tipo_tarefa_id: tipo.id,
     descricao: titulo,
     inicio: new Date().toISOString(),
-    demanda_id: demanda.id,
+    [origem]: demanda.id,
   });
   if (error) throw error;
 }
 
-export async function pararTimerDemanda(demandaId: string): Promise<void> {
+export async function pararTimerDemanda(
+  demandaId: string,
+  origem: OrigemDemanda = 'demanda_id',
+): Promise<void> {
   if (IS_DEMO) return;
-  await fecharRegistrosAbertos({ demanda_id: demandaId });
+  await fecharRegistrosAbertos({ [origem]: demandaId } as FiltroRegistro);
 }
 
 // Mapa demanda_id -> nome de quem está com o timer rodando.
