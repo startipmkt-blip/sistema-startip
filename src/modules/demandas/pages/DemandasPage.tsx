@@ -117,10 +117,6 @@ export function DemandasPage() {
     );
   }
 
-  function concluir(d: DemandaView) {
-    mover(d, 'concluida');
-  }
-
   // Ir para "Em andamento" exige escolher quem toca; as outras colunas movem direto.
   function aoMover(d: DemandaView, novaCol: string) {
     if (novaCol === 'fazendo') setIniciando(d);
@@ -163,15 +159,6 @@ export function DemandasPage() {
     const venceHoje = d.prazo === hoje;
     return (
       <div className="flex items-start gap-2">
-        <button
-          type="button"
-          onClick={() => concluir(d)}
-          title="Marcar como concluída"
-          aria-label={`Concluir ${d.titulo}`}
-          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-500 text-[11px] text-transparent transition-colors hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300"
-        >
-          <GlassIcon name="check" />
-        </button>
         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
           <div className="flex items-start justify-between gap-2">
             <span className="font-medium text-slate-100">
@@ -224,7 +211,7 @@ export function DemandasPage() {
         <TarefasRecorrentes />
       ) : (
         <>
-          <PageHeader title="Demandas da equipe" subtitle="Arraste os cards entre as colunas ou clique no ✓ para concluir.">
+          <PageHeader title="Demandas da equipe" subtitle="Arraste os cards entre as colunas. Para concluir, abra a demanda e mude o status.">
             <Select options={clienteOptions} value={clienteId} onChange={(e) => setClienteId(e.target.value)} />
             <Button onClick={() => { setEditando(undefined); setFormOpen(true); }}>+ Nova demanda</Button>
           </PageHeader>
