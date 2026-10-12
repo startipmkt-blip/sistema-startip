@@ -7,6 +7,7 @@ import { MetaAdsGestorPage } from '@/modules/meta-ads/pages/MetaAdsGestorPage';
 import { AbaChecklist } from '../components/AbaChecklist';
 import { AbaOtimizacoes } from '../components/AbaOtimizacoes';
 import { AbaSaldo } from '../components/AbaSaldo';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 type Aba = 'meta' | 'checklist' | 'otimizacoes' | 'saldo';
 
@@ -57,7 +58,7 @@ function NavAbas({ aba, setAba }: { aba: Aba; setAba: (a: Aba) => void }) {
               ? 'bg-white/5 text-white border-b-2 border-brand-400'
               : 'text-slate-400 hover:text-slate-200'
           }`}
-        >{a.icone} {a.label}</button>
+        ><GlassIcon emoji={a.icone} /> {a.label}</button>
       ))}
     </nav>
   );

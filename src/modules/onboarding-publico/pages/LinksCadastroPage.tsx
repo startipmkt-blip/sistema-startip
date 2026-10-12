@@ -9,6 +9,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 function linkPublico(slug: string): string {
   return `${window.location.origin}/cadastro/${slug}`;
@@ -141,7 +142,7 @@ export function LinksCadastroPage() {
                               className="rounded-md px-1.5 py-0.5 text-xs text-slate-300 hover:bg-white/10"
                               title="Copiar link"
                             >
-                              {copiadoId === l.id ? '✓' : '📋'}
+                              {glassify(copiadoId === l.id ? '✓' : '📋')}
                             </button>
                           </div>
                           {razao && <div className="mt-1 text-xs text-slate-400">Preenchido por: <span className="text-slate-200">{razao}</span></div>}
@@ -153,9 +154,9 @@ export function LinksCadastroPage() {
                           <div className="flex justify-end gap-1">
                             {l.status === 'preenchido' && (
                               <>
-                                <Button onClick={() => setRevisando(l)}>👤 Virar cliente</Button>
+                                <Button onClick={() => setRevisando(l)}><GlassIcon name="user" /> Virar cliente</Button>
                                 <Button variant="secondary" onClick={() => mudarStatus.mutate({ id: l.id, status: 'revisado' })}>
-                                  ✓ Marcar revisado
+                                  <GlassIcon name="check" /> Marcar revisado
                                 </Button>
                               </>
                             )}
@@ -163,7 +164,7 @@ export function LinksCadastroPage() {
                               onClick={() => mudarStatus.mutate({ id: l.id, status: 'arquivado' })}
                               className="rounded-md px-2 text-xs text-slate-400 hover:bg-white/10"
                             >
-                              📦
+                              <GlassIcon name="archive" />
                             </button>
                           </div>
                         </td>
@@ -231,7 +232,7 @@ export function LinksCadastroPage() {
             <>
               <Button variant="secondary" onClick={() => setRevisando(null)}>Cancelar</Button>
               <Button onClick={() => virarCliente(revisando)} disabled={criando}>
-                {criando ? 'Criando…' : '👤 Criar cliente'}
+                {glassify(criando ? 'Criando…' : '👤 Criar cliente')}
               </Button>
             </>
           }

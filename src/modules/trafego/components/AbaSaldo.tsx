@@ -13,6 +13,7 @@ import {
   useSaldoSnapshotHoje, useDispararSaldo,
   type SaldoConfig,
 } from '../api/trafegoApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function AbaSaldo() {
   const cfgQ = useSaldoConfig();
@@ -45,13 +46,13 @@ export function AbaSaldo() {
       <Card className="lg:col-span-2 overflow-hidden p-0">
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-100">💰 Saldo hoje</h3>
+            <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="dollar" /> Saldo hoje</h3>
             <p className="text-[11px] text-slate-500">
-              {total} conta(s) · {precisam > 0 ? <span className="text-amber-300">⚠ {precisam} precisam atenção</span> : '✅ tudo ok'}
+              {total} conta(s) · {glassify(precisam > 0 ? <span className="text-amber-300"><GlassIcon name="alert" /> {precisam} precisam atenção</span> : '✅ tudo ok')}
             </p>
           </div>
           <Button variant="secondary" onClick={rodar} disabled={disparar.isPending}>
-            {disparar.isPending ? 'Rodando…' : '🔄 Rodar agora'}
+            {glassify(disparar.isPending ? 'Rodando…' : '🔄 Rodar agora')}
           </Button>
         </div>
         {resposta && <p className="border-b border-white/10 bg-white/5 px-4 py-2 text-xs text-brand-100">{resposta}</p>}
@@ -78,7 +79,7 @@ export function AbaSaldo() {
               </tr>
             ))}
             {(snap.data ?? []).length === 0 && (
-              <tr><td colSpan={5} className="px-3 py-8 text-center text-slate-500">Sem snapshot hoje. Clique "🔄 Rodar agora".</td></tr>
+              <tr><td colSpan={5} className="px-3 py-8 text-center text-slate-500">Sem snapshot hoje. Clique "<GlassIcon name="refresh" /> Rodar agora".</td></tr>
             )}
           </tbody>
         </table>
@@ -87,7 +88,7 @@ export function AbaSaldo() {
       {/* Coluna direita: config + contatos */}
       <div className="space-y-3">
         <Card className="p-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-100">⚙️ Envio diário</h3>
+          <h3 className="mb-2 text-sm font-semibold text-slate-100"><GlassIcon name="settings" /> Envio diário</h3>
           <div className="space-y-2 text-xs">
             <label className="flex items-center justify-between gap-2 text-slate-300">
               <span>Ativo</span>
@@ -111,7 +112,7 @@ export function AbaSaldo() {
         </Card>
 
         <Card className="p-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-100">📱 Contatos do aviso</h3>
+          <h3 className="mb-2 text-sm font-semibold text-slate-100"><GlassIcon name="smartphone" /> Contatos do aviso</h3>
           <ContatosLista contatos={contatosQ.data ?? []} />
         </Card>
       </div>
@@ -151,7 +152,7 @@ function ContatosLista({ contatos }: { contatos: NonNullable<ReturnType<typeof u
               </p>
             </div>
             <button onClick={() => { if (confirm(`Excluir ${c.nome_grupo}?`)) excluir.mutate(c.id); }}
-              className="text-slate-400 hover:text-red-400" title="Excluir">🗑</button>
+              className="text-slate-400 hover:text-red-400" title="Excluir"><GlassIcon name="trash" /></button>
           </li>
         ))}
       </ul>

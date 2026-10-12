@@ -34,6 +34,7 @@ import { useRespostasRapidas, filtrarPorAtalho } from '@/modules/crm/api/respost
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
@@ -177,7 +178,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               conversa.is_grupo ? 'bg-amber-500/15 text-amber-300' : 'bg-brand-500/15 text-brand-200'
             }`}
           >
-            {conversa.is_grupo ? '👥' : conversa.nome.slice(0, 2).toUpperCase()}
+            {glassify(conversa.is_grupo ? '👥' : conversa.nome.slice(0, 2).toUpperCase())}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -185,7 +186,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               {conversa.is_grupo && <Badge tone="amber">Grupo</Badge>}
             </div>
             <div className="text-xs text-slate-400">
-              📞 {conversa.telefone} {conversa.origem ? `· ${conversa.origem}` : ''}
+              <GlassIcon name="phone" /> {conversa.telefone} {conversa.origem ? `· ${conversa.origem}` : ''}
             </div>
           </div>
         </div>
@@ -218,7 +219,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/20"
               disabled={assumir.isPending}
             >
-              🙋 Assumir
+              <GlassIcon name="hand" /> Assumir
             </button>
           )}
           {conversa.atendente_id && conversa.atendente_id === profile?.id && (
@@ -228,7 +229,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               disabled={liberar.isPending}
               title="Devolver pra fila"
             >
-              🔓 Liberar
+              <GlassIcon name="unlock" /> Liberar
             </button>
           )}
           <button
@@ -236,13 +237,13 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
             className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
             title={conversa.fixado ? 'Desafixar' : 'Fixar no topo'}
           >
-            {conversa.fixado ? '📌 Fixada' : '📌 Fixar'}
+            {glassify(conversa.fixado ? '📌 Fixada' : '📌 Fixar')}
           </button>
           <button
             onClick={() => arquivar.mutate({ leadId: conversa.id, arquivado: !conversa.arquivado })}
             className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
           >
-            {conversa.arquivado ? '📤 Desarquivar' : '📦 Arquivar'}
+            {glassify(conversa.arquivado ? '📤 Desarquivar' : '📦 Arquivar')}
           </button>
           {conversa.is_grupo && (
             <button
@@ -250,7 +251,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
               title="Ver participantes do grupo"
             >
-              👥 Membros
+              <GlassIcon name="users" /> Membros
             </button>
           )}
           {conversa.is_grupo && (
@@ -268,7 +269,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               }`}
               title="Agente Turbo cria solicitação para mensagens sem resposta"
             >
-              🤖 {conversa.monitorado ? 'Monitorado' : 'Ativar Agente'}
+              <GlassIcon name="bot" /> {conversa.monitorado ? 'Monitorado' : 'Ativar Agente'}
             </button>
           )}
           <button
@@ -276,7 +277,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
             className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
             title="Gerenciar respostas rápidas"
           >
-            ⚡ Templates
+            <GlassIcon name="zap" /> Templates
           </button>
           <button
             onClick={() => {
@@ -286,7 +287,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
             className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-200 hover:bg-amber-500/20"
             title="Nota interna visível só para a equipe"
           >
-            📝 Nota
+            <GlassIcon name="note" /> Nota
           </button>
           <NotifBar />
           <Button variant="secondary" onClick={onIrParaFunil}>Ver no funil</Button>
@@ -296,7 +297,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
       {/* Banners multi-atendente */}
       {bloqueadoPorAtendente && (
         <div className="flex items-center justify-between gap-3 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-200">
-          <span>⚠️ Esta conversa está com <strong>{conversa.atendente_nome ?? 'outro atendente'}</strong>. Você está em modo leitura.</span>
+          <span><GlassIcon name="alert" /> Esta conversa está com <strong>{conversa.atendente_nome ?? 'outro atendente'}</strong>. Você está em modo leitura.</span>
           <button
             onClick={() => assumir.mutate(conversa.id)}
             className="rounded-md border border-amber-400/50 bg-amber-500/20 px-2 py-1 font-semibold hover:bg-amber-500/30"
@@ -306,7 +307,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
       )}
       {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length > 0 && (
         <div className="border-b border-white/10 bg-white/5 px-4 py-1.5 text-[11px] text-slate-400">
-          👀 {(presencas ?? []).filter((p) => p.user_id !== profile?.id).map((p) => p.user_nome ?? 'alguém').join(', ')} {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length === 1 ? 'está vendo essa conversa' : 'estão vendo essa conversa'}
+          <GlassIcon name="eye" /> {(presencas ?? []).filter((p) => p.user_id !== profile?.id).map((p) => p.user_nome ?? 'alguém').join(', ')} {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length === 1 ? 'está vendo essa conversa' : 'estão vendo essa conversa'}
         </div>
       )}
 
@@ -324,7 +325,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                 <div key={`n-${n.id}`} className="my-2 flex justify-center">
                   <div className="max-w-[85%] rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
                     <div className="mb-0.5 flex items-center gap-2 text-[10px] uppercase tracking-wide text-amber-300/80">
-                      <span>📝 nota interna</span>
+                      <span><GlassIcon name="note" /> nota interna</span>
                       <span>·</span>
                       <span>{n.autor_nome ?? 'anônimo'}</span>
                       <span>·</span>
@@ -383,7 +384,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                         }}
                         className="flex w-full items-center gap-2 px-3 py-1.5 text-slate-200 hover:bg-white/5"
                       >
-                        📋 Copiar
+                        <GlassIcon name="clipboard" /> Copiar
                       </button>
                       <button
                         onClick={() => { setEncaminharAlvo(m); setMenuMsgId(null); }}
@@ -395,7 +396,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                         onClick={() => { setReacaoAlvoId(m.id); setMenuMsgId(null); }}
                         className="flex w-full items-center gap-2 px-3 py-1.5 text-slate-200 hover:bg-white/5"
                       >
-                        😊 Reagir
+                        <GlassIcon name="smile" /> Reagir
                       </button>
                       <button
                         onClick={() => {
@@ -405,14 +406,14 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                         }}
                         className="flex w-full items-center gap-2 px-3 py-1.5 text-slate-200 hover:bg-white/5"
                       >
-                        {m.favorita_ids?.includes(profile?.id ?? '') ? '⭐ Desfavoritar' : '⭐ Favoritar'}
+                        {glassify(m.favorita_ids?.includes(profile?.id ?? '') ? '⭐ Desfavoritar' : '⭐ Favoritar')}
                       </button>
                       {enviada && (m.tipo === 'texto' || !m.tipo) && (
                         <button
                           onClick={() => { setEditandoMsg({ msg: m, texto: m.texto }); setMenuMsgId(null); }}
                           className="flex w-full items-center gap-2 px-3 py-1.5 text-slate-200 hover:bg-white/5"
                         >
-                          ✏️ Editar
+                          <GlassIcon name="pencil" /> Editar
                         </button>
                       )}
                       <div className="my-0.5 h-px bg-white/5" />
@@ -420,7 +421,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                         onClick={() => { setApagarMsg(m); setMenuMsgId(null); }}
                         className="flex w-full items-center gap-2 px-3 py-1.5 text-red-300 hover:bg-red-500/10"
                       >
-                        🗑️ Apagar
+                        <GlassIcon name="trash" /> Apagar
                       </button>
                     </div>
                   )}
@@ -450,7 +451,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
 
                     {/* Conteúdo — mídia, texto ou "apagada" */}
                     {m.apagada_em ? (
-                      <div className="italic text-slate-400">🚫 Esta mensagem foi apagada</div>
+                      <div className="italic text-slate-400"><GlassIcon name="ban" /> Esta mensagem foi apagada</div>
                     ) : m.tipo && m.tipo !== 'texto' ? (
                       <MidiaBubble msg={m} />
                     ) : (
@@ -465,14 +466,14 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                     {/* Hora + editada + favorita */}
                     <div className={`mt-0.5 flex items-center gap-1 text-[10px] ${enviada ? 'text-brand-100/70' : 'text-slate-500'}`}>
                       {m.favorita_ids && m.favorita_ids.length > 0 && (
-                        <span title="Favoritada">⭐</span>
+                        <span title="Favoritada"><GlassIcon name="star" /></span>
                       )}
                       <span>{new Date(m.hora).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                       {m.editada_em && <span className="italic">· editada</span>}
-                      {enviada && m.status === 'enviada' && <span title="Enviada" className="text-slate-300">✓</span>}
-                      {enviada && m.status === 'entregue' && <span title="Entregue" className="text-slate-300">✓✓</span>}
-                      {enviada && m.status === 'lida' && <span title="Lida" className="text-blue-300">✓✓</span>}
-                      {enviada && m.status === 'falhou' && <span title="Falhou">⚠️</span>}
+                      {enviada && m.status === 'enviada' && <span title="Enviada" className="text-slate-300"><GlassIcon name="check" /></span>}
+                      {enviada && m.status === 'entregue' && <span title="Entregue" className="text-slate-300"><GlassIcon name="check-check" /></span>}
+                      {enviada && m.status === 'lida' && <span title="Lida" className="text-blue-300"><GlassIcon name="check-check" /></span>}
+                      {enviada && m.status === 'falhou' && <span title="Falhou"><GlassIcon name="alert" /></span>}
                     </div>
                   </div>
 
@@ -485,7 +486,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                           className="rounded-full border border-white/10 bg-slate-800 px-1.5 py-0.5 text-xs"
                           title={quem.join(', ')}
                         >
-                          {emoji} {quem.length > 1 ? quem.length : ''}
+                          <GlassIcon emoji={emoji} /> {quem.length > 1 ? quem.length : ''}
                         </span>
                       ))}
                     </div>
@@ -528,7 +529,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
             </div>
             <div className="truncate text-slate-300">{respondendo.texto || `[${respondendo.tipo}]`}</div>
           </div>
-          <button onClick={() => setRespondendo(null)} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setRespondendo(null)} className="text-slate-400 hover:text-white"><GlassIcon name="x" /></button>
         </div>
       )}
 
@@ -548,7 +549,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
         )}
         {micErro && !gravandoAudio && (
           <div className="flex items-center gap-2 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-            ⚠️ {micErro}
+            <GlassIcon name="alert" /> {micErro}
             <button onClick={() => setMicErro(null)} className="ml-auto rounded px-2 py-1 hover:bg-white/10">Fechar</button>
           </div>
         )}
@@ -564,49 +565,49 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
         {anexoMenuOpen && (
           <div className="absolute bottom-full left-12 z-30 mb-2 rounded-md border border-white/10 bg-slate-900 py-1 text-sm shadow-2xl">
             <button onClick={() => abrirAnexo('imagem')} className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5">
-              🖼️ Galeria (foto/vídeo)
+              <GlassIcon name="image" /> Galeria (foto/vídeo)
             </button>
             <button onClick={() => abrirAnexo('camera')} className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5">
-              📷 Câmera (tirar foto)
+              <GlassIcon name="camera" /> Câmera (tirar foto)
             </button>
             <button onClick={() => abrirAnexo('documento')} className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5">
-              📎 Documento
+              <GlassIcon name="paperclip" /> Documento
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setContatoOpen(true); }}
               className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
             >
-              👤 Contato
+              <GlassIcon name="user" /> Contato
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setEnqueteOpen(true); }}
               className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
             >
-              📊 Enquete
+              <GlassIcon name="bar-chart" /> Enquete
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setEventoOpen(true); }}
               className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
             >
-              📅 Evento
+              <GlassIcon name="calendar" /> Evento
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setLocalOpen(true); }}
               className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
             >
-              📍 Localização
+              <GlassIcon name="map-pin" /> Localização
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setBotoesOpen(true); }}
               className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
             >
-              🔘 Botões (até 3)
+              <GlassIcon name="orb-gray" /> Botões (até 3)
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setListaOpen(true); }}
               className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
             >
-              📋 Lista interativa
+              <GlassIcon name="clipboard" /> Lista interativa
             </button>
           </div>
         )}
@@ -638,7 +639,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/5 text-xl text-slate-200 hover:bg-white/10"
           title="Emojis"
         >
-          😊
+          <GlassIcon name="smile" />
         </button>
 
         {!gravandoAudio && texto.startsWith('/') && (() => {
@@ -732,7 +733,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/5 text-xl text-slate-200 hover:bg-white/10"
                 title="Gravar áudio"
               >
-                🎤
+                <GlassIcon name="mic" />
               </button>
             )}
           </>
@@ -771,7 +772,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           <div className="w-full max-w-sm rounded-lg border border-white/10 bg-slate-900 p-4 text-sm" onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
               <div className="text-slate-100 font-medium">Dados da mensagem</div>
-              <button onClick={() => setDadosMsg(null)} className="text-slate-400 hover:text-white">✕</button>
+              <button onClick={() => setDadosMsg(null)} className="text-slate-400 hover:text-white"><GlassIcon name="x" /></button>
             </div>
             <dl className="space-y-2 text-xs text-slate-300">
               <div><dt className="text-slate-500">Enviada em</dt><dd>{new Date(dadosMsg.hora).toLocaleString('pt-BR')}</dd></div>
@@ -838,7 +839,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                   }}
                   disabled={apagar.isPending}
                 >
-                  {apagar.isPending ? 'Apagando…' : '🗑️ Apagar para todos'}
+                  {glassify(apagar.isPending ? 'Apagando…' : '🗑️ Apagar para todos')}
                 </Button>
               )}
               <Button

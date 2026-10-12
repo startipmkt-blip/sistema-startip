@@ -5,6 +5,7 @@ import { AudioPlayer } from './AudioPlayer';
 // Sem isso, o Chrome grava WebM e o áudio chega "indisponível" no celular.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import Recorder from 'opus-recorder';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   leadId: string;
@@ -143,7 +144,7 @@ export function AudioRecorder({ leadId, stream: streamProp, respondendoWaId, res
   if (estado === 'erro') {
     return (
       <div className="flex items-center gap-3 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-        <span>⚠️ {erro}</span>
+        <span><GlassIcon name="alert" /> {erro}</span>
         <button onClick={iniciarGravacao} className="ml-auto rounded px-2 py-1 hover:bg-white/10">Tentar de novo</button>
         <button onClick={descartar} className="rounded px-2 py-1 hover:bg-white/10">Fechar</button>
       </div>
@@ -160,13 +161,13 @@ export function AudioRecorder({ leadId, stream: streamProp, respondendoWaId, res
         </span>
         <span className="font-mono">{formatoTempo(tempo)}</span>
         <span className="text-xs text-slate-400">{pausado ? 'Pausado' : 'Gravando…'}</span>
-        <button onClick={descartar} className="ml-auto rounded-full px-2 py-1 text-slate-300 hover:bg-white/10" title="Descartar">🗑️</button>
+        <button onClick={descartar} className="ml-auto rounded-full px-2 py-1 text-slate-300 hover:bg-white/10" title="Descartar"><GlassIcon name="trash" /></button>
         {pausado ? (
-          <button onClick={retomar} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white hover:bg-white/20">▶ Retomar</button>
+          <button onClick={retomar} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white hover:bg-white/20"><GlassIcon name="play" /> Retomar</button>
         ) : (
-          <button onClick={pausar} disabled={estado === 'preparando'} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white hover:bg-white/20 disabled:opacity-50">⏸ Pausar</button>
+          <button onClick={pausar} disabled={estado === 'preparando'} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white hover:bg-white/20 disabled:opacity-50"><GlassIcon name="pause" /> Pausar</button>
         )}
-        <button onClick={pararEIrParaPreview} disabled={estado === 'preparando'} className="rounded-full bg-brand-500 px-3 py-1 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50">⏹ Parar</button>
+        <button onClick={pararEIrParaPreview} disabled={estado === 'preparando'} className="rounded-full bg-brand-500 px-3 py-1 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50"><GlassIcon name="stop" /> Parar</button>
       </div>
     );
   }
@@ -175,10 +176,10 @@ export function AudioRecorder({ leadId, stream: streamProp, respondendoWaId, res
     <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100">
       {previewUrl && <AudioPlayer src={previewUrl} duracaoInicial={tempo} />}
       <span className="text-xs text-slate-400">{formatoTempo(tempo)}</span>
-      <button onClick={descartar} className="ml-auto rounded-full px-2 py-1 text-slate-300 hover:bg-white/10" title="Descartar">🗑️</button>
-      <button onClick={iniciarGravacao} className="rounded-full bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20" title="Regravar">🔄</button>
+      <button onClick={descartar} className="ml-auto rounded-full px-2 py-1 text-slate-300 hover:bg-white/10" title="Descartar"><GlassIcon name="trash" /></button>
+      <button onClick={iniciarGravacao} className="rounded-full bg-white/10 px-2 py-1 text-xs text-white hover:bg-white/20" title="Regravar"><GlassIcon name="refresh" /></button>
       <button onClick={enviarAudio} disabled={estado === 'enviando'} className="rounded-full bg-brand-500 px-3 py-1 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50">
-        {estado === 'enviando' ? 'Enviando…' : '➤ Enviar'}
+        {glassify(estado === 'enviando' ? 'Enviando…' : '➤ Enviar')}
       </button>
     </div>
   );

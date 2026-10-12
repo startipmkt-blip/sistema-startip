@@ -14,6 +14,7 @@ import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 const LIMITE_TV = 6;
 
@@ -51,12 +52,12 @@ export function PainelTvAdminPage() {
         {link && (
           <>
             <Button variant="secondary" onClick={() => { void navigator.clipboard.writeText(link); setCopiado(true); setTimeout(() => setCopiado(false), 1500); }}>
-              {copiado ? 'Copiado ✓' : '🔗 Copiar link da TV'}
+              {glassify(copiado ? 'Copiado ✓' : '🔗 Copiar link da TV')}
             </Button>
             <a href={link} target="_blank" rel="noreferrer"><Button>Abrir painel ↗</Button></a>
           </>
         )}
-        {isAdmin && <Button variant="secondary" onClick={() => setPinAberto(true)}>🔒 Trocar senha</Button>}
+        {isAdmin && <Button variant="secondary" onClick={() => setPinAberto(true)}><GlassIcon name="lock" /> Trocar senha</Button>}
       </PageHeader>
 
       <div className="grid gap-4 xl:grid-cols-[3fr_2fr]">
@@ -64,7 +65,7 @@ export function PainelTvAdminPage() {
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-white">Saúde dos clientes ativos ({linhas.length})</h2>
             <span className={`text-xs ${urgentes > LIMITE_TV ? 'text-amber-300' : 'text-slate-400'}`}>
-              🔴 {urgentes} urgente(s){urgentes > LIMITE_TV && ` — a TV destaca os ${LIMITE_TV} primeiros`}
+              <GlassIcon name="orb-red" /> {urgentes} urgente(s){urgentes > LIMITE_TV && ` — a TV destaca os ${LIMITE_TV} primeiros`}
             </span>
           </div>
           {clientesQ.isLoading || saudeQ.isLoading ? (
@@ -108,7 +109,7 @@ function LinhaCliente({ nome, saude, totalUrgentes }: { nome: string; saude: Sau
             title={STATUS_INFO[s].label}
             className={`rounded-md border px-2 py-1 text-xs ${saude.status === s ? BOTAO_STATUS[s] : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
           >
-            {STATUS_INFO[s].emoji} {STATUS_INFO[s].label}
+            <GlassIcon emoji={STATUS_INFO[s].emoji} /> {STATUS_INFO[s].label}
           </button>
         ))}
       </div>
@@ -164,7 +165,7 @@ function DemandasCard({ clientes }: { clientes: Array<{ id: string; nome: string
 
   return (
     <Card className="space-y-3 p-4">
-      <h2 className="text-sm font-semibold text-white">⚡ Demandas urgentes da semana ({demandas?.length ?? 0})</h2>
+      <h2 className="text-sm font-semibold text-white"><GlassIcon name="zap" /> Demandas urgentes da semana ({demandas?.length ?? 0})</h2>
       <form onSubmit={(e) => void enviar(e)} className="space-y-2 rounded-lg border border-white/10 bg-white/[0.02] p-3">
         <Input id="du-titulo" placeholder="O que precisa ser feito?" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} maxLength={100} />
         <Select
@@ -196,7 +197,7 @@ function DemandasCard({ clientes }: { clientes: Array<{ id: string; nome: string
                   {[nomeCliente(d.cliente_id), d.responsavel, d.prazo && `prazo ${formatarData(d.prazo, { day: '2-digit', month: '2-digit' })}`].filter(Boolean).join(' · ') || '—'}
                 </div>
               </div>
-              <button onClick={() => concluir.mutate(d.id)} className="rounded-md bg-emerald-500/20 px-2 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/30">✓ Feita</button>
+              <button onClick={() => concluir.mutate(d.id)} className="rounded-md bg-emerald-500/20 px-2 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/30"><GlassIcon name="check" /> Feita</button>
               <button onClick={() => editar(d)} className="px-1 text-[11px] text-brand-300 hover:underline">Editar</button>
               <button onClick={() => { if (confirm(`Excluir "${d.titulo}"?`)) excluir.mutate(d.id); }} className="px-1 text-[11px] text-slate-500 hover:text-red-300">Excluir</button>
             </li>

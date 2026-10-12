@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { podeAcessarModulo } from '@/shared/auth/permissions';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface ModuloCard {
   numero: string;
@@ -47,9 +48,7 @@ function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCa
             to={m.to}
             className="group flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-400/40 hover:bg-brand-500/5"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800/80 text-lg group-hover:bg-brand-500/20">
-              {m.emoji}
-            </span>
+            <GlassIcon emoji={m.emoji} plate className="h-11 w-11 text-xl transition-transform group-hover:scale-105" />
             <div className="min-w-0 flex-1">
               <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">
                 {m.numero} · ÁREA
@@ -76,7 +75,7 @@ export function InicioPage() {
       <aside className="flex flex-col justify-between gap-6">
         <div>
           <div className="mb-6 flex h-32 w-32 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
-            <span className="text-4xl">🚀</span>
+            <span className="text-4xl"><GlassIcon name="rocket" /></span>
           </div>
           <span className="inline-flex rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
             Central de Ferramentas

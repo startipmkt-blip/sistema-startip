@@ -1,5 +1,5 @@
-interface EtapaTimeline {
-  etapa: string;
+
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';interface EtapaTimeline {  etapa: string;
   tempo: string;
   itens: string[];
   concluida?: boolean;
@@ -24,7 +24,7 @@ export function EtapasTimeline({ etapas, comStatus = false }: { etapas: EtapaTim
                   feita ? 'bg-emerald-600' : comStatus && !ehAtual ? 'bg-slate-700' : 'bg-brand-600'
                 }`}
               >
-                {feita ? '✓' : i + 1}
+                {glassify(feita ? '✓' : i + 1)}
               </span>
               <div
                 className={`rounded-lg border p-4 shadow-sm ${
@@ -36,7 +36,7 @@ export function EtapasTimeline({ etapas, comStatus = false }: { etapas: EtapaTim
                   <div className="flex flex-wrap items-center gap-2">
                     {e.tempo && (
                       <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-300">
-                        ⏱ {e.tempo}
+                        <GlassIcon name="timer" /> {e.tempo}
                       </span>
                     )}
                     {feita && (

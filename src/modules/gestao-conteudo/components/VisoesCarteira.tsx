@@ -12,6 +12,7 @@ import {
 } from '@/modules/gestao-conteudo/utils';
 import { PostCard } from './PostCard';
 import { PreviaDrive } from './PreviaDrive';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface BaseProps {
   clientes: ClienteGestao[];
@@ -24,7 +25,7 @@ interface BaseProps {
 function Logo({ c, tam = 'h-9 w-9' }: { c: ClienteGestao; tam?: string }) {
   return c.logo_url
     ? <img src={c.logo_url} alt="" className={`${tam} shrink-0 rounded-full object-cover`} />
-    : <span className={`${tam} grid shrink-0 place-items-center rounded-full bg-white/5`}>🏢</span>;
+    : <span className={`${tam} grid shrink-0 place-items-center rounded-full bg-white/5`}><GlassIcon name="building" /></span>;
 }
 
 // ------------------------------------------------ Carteira (cards)
@@ -74,17 +75,17 @@ export function VisaoCarteira({ clientes, posts, mes, mesAtual, onAbrir }: BaseP
 
             <div className="mt-2 flex flex-wrap gap-1.5">
               {ETAPAS.filter((e) => n[e.id] > 0).map((e) => (
-                <Badge key={e.id} tone={e.tone}>{e.emoji} {n[e.id]} {e.label.toLowerCase()}</Badge>
+                <Badge key={e.id} tone={e.tone}><GlassIcon emoji={e.emoji} /> {n[e.id]} {e.label.toLowerCase()}</Badge>
               ))}
               {meus.length === 0 && <span className="text-[11px] text-slate-500">Nenhum conteúdo planejado.</span>}
             </div>
 
-            {tempo && <p className="mt-2 text-[11px] text-slate-400">⏱ Responde em média em {tempo}</p>}
+            {tempo && <p className="mt-2 text-[11px] text-slate-400"><GlassIcon name="timer" /> Responde em média em {tempo}</p>}
 
             {alertas.length > 0 && (
               <ul className="mt-2 space-y-0.5 text-[11px]">
                 {alertas.map((a) => (
-                  <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}>⚠ {a.texto}</li>
+                  <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
                 ))}
               </ul>
             )}
@@ -112,7 +113,7 @@ export function VisaoTabela({ clientes, posts, mesAtual, onAbrir }: BaseProps) {
           <tr>
             <th className="px-3 py-2 text-left">Cliente</th>
             <th className="px-2 py-2 text-center">Posts / meta</th>
-            {ETAPAS.map((e) => <th key={e.id} className="px-2 py-2 text-center" title={e.label}>{e.emoji}</th>)}
+            {ETAPAS.map((e) => <th key={e.id} className="px-2 py-2 text-center" title={e.label}><GlassIcon emoji={e.emoji} /></th>)}
             <th className="px-2 py-2 text-center">Resposta</th>
             <th className="px-3 py-2 text-left">Alertas</th>
           </tr>
@@ -139,7 +140,7 @@ export function VisaoTabela({ clientes, posts, mesAtual, onAbrir }: BaseProps) {
                 <td className="px-2 py-2 text-center text-slate-300">{textoTempoMedio(meus) ?? '—'}</td>
                 <td className="px-3 py-2 text-[11px]">
                   {alertas.length === 0
-                    ? <span className="text-emerald-400">✓</span>
+                    ? <span className="text-emerald-400"><GlassIcon name="check" /></span>
                     : <span className={alertas.some((a) => a.gravidade === 'alta') ? 'text-red-300' : 'text-amber-300'}>
                       {alertas.map((a) => a.texto).join(' · ')}
                     </span>}

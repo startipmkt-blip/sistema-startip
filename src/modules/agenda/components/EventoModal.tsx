@@ -5,6 +5,7 @@ import { Input } from '@/shared/ui/Input';
 import { useSalvarEvento, useApagarEvento, useAgendaTemplates, type AgendaEvent, type AgendaStatus, type Recorrencia } from '@/modules/agenda/api/agendaApi';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { PILLAR_KEYS, pillarInfo, type PillarKey } from '@/shared/lib/pillars';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -99,7 +100,7 @@ export function EventoModal({ open, onClose, evento, dataDefault }: Props) {
         <>
           {evento?.id && (
             <button onClick={handleApagar} className="mr-auto rounded-md px-3 py-1 text-xs text-red-300 hover:bg-red-500/10">
-              🗑️ Apagar
+              <GlassIcon name="trash" /> Apagar
             </button>
           )}
           <Button variant="secondary" onClick={onClose}>Cancelar</Button>
@@ -179,7 +180,7 @@ export function EventoModal({ open, onClose, evento, dataDefault }: Props) {
                   onClick={() => setPilares((cur) => toggle(cur, k))}
                   className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${on ? 'bg-brand-500 text-white' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}
                 >
-                  <span aria-hidden>{info.icone}</span>{info.label}
+                  <span aria-hidden><GlassIcon emoji={info.icone} /></span>{info.label}
                 </button>
               );
             })}

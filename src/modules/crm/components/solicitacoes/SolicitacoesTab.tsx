@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const STATUS_TABS: { id: SolicitacaoStatus | 'todas'; label: string }[] = [
   { id: 'pendente',     label: 'Pendentes' },
@@ -104,7 +105,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                     onClick={() => { onAbrirConversa(e.lead_id); setSp({ tab: 'atendimento', leadId: e.lead_id }); }}
                     className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200 hover:bg-white/10"
                   >
-                    <span aria-hidden>{p.icone}</span>
+                    <span aria-hidden><GlassIcon emoji={p.icone} /></span>
                     <span className="max-w-40 truncate font-medium">{e.nome}</span>
                     <span className="rounded-full bg-red-500/20 px-1.5 text-red-200">{e.n}</span>
                     <span className="text-[10px] text-slate-500">pendente {tempoAtras(e.maisAntiga)}</span>
@@ -142,7 +143,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                         onClick={() => onAbrirConversa(s.lead_id)}
                         className="flex items-center gap-1 text-left text-brand-300 hover:underline"
                       >
-                        <span aria-hidden>{p.icone}</span>
+                        <span aria-hidden><GlassIcon emoji={p.icone} /></span>
                         <span className="truncate font-medium">{s.lead_nome ?? '—'}</span>
                       </button>
                       {s.pilar && <div className="text-[10px] text-slate-500">{p.label}</div>}
@@ -165,7 +166,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                             variant="secondary"
                             onClick={() => mudarStatus.mutate({ id: s.id, status: 'concluida' })}
                           >
-                            ✓ Concluir
+                            <GlassIcon name="check" /> Concluir
                           </Button>
                         )}
                         {s.status === 'pendente' && (
@@ -173,7 +174,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                             variant="secondary"
                             onClick={() => mudarStatus.mutate({ id: s.id, status: 'em_andamento' })}
                           >
-                            ⏳ Em andamento
+                            <GlassIcon name="hourglass" /> Em andamento
                           </Button>
                         )}
                         <button
@@ -181,7 +182,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                           className="rounded-md px-2 text-xs text-red-300 hover:bg-red-500/10"
                           title="Remover"
                         >
-                          🗑️
+                          <GlassIcon name="trash" />
                         </button>
                       </div>
                     </td>

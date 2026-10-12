@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Dados {
   cliente: { id: string; nome: string; logo_url: string | null; status: string; servicos: string[]; data_entrada: string; tipo_negocio: string };
@@ -53,7 +54,7 @@ export function CentralClientePage() {
   if (erro) return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <Card className="w-full max-w-md p-6 text-center">
-        <div className="mb-3 text-3xl">⚠️</div>
+        <div className="mb-3 text-3xl"><GlassIcon name="alert" /></div>
         <div className="text-slate-100">{erro}</div>
         <p className="mt-2 text-xs text-slate-400">O link pode estar expirado ou incorreto.</p>
       </Card>
@@ -79,7 +80,7 @@ export function CentralClientePage() {
           {c.logo_url ? (
             <img src={c.logo_url} alt="" className="h-14 w-14 rounded-full border border-white/10 object-cover" />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-2xl">🏢</div>
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-2xl"><GlassIcon name="building" /></div>
           )}
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-semibold text-white">{c.nome}</h1>
@@ -99,7 +100,7 @@ export function CentralClientePage() {
                 aba === a.id ? 'bg-brand-500 text-white' : 'text-slate-300 hover:bg-white/5'
               }`}
             >
-              <span>{a.icone}</span>
+              <span><GlassIcon emoji={a.icone} /></span>
               <span>{a.label}</span>
               {a.badge && a.badge > 0 && (
                 <span className={`rounded-full px-1.5 text-[10px] font-semibold ${
@@ -131,7 +132,7 @@ function AbaAprovacao({ slug, ideias, mes }: { slug: string; ideias: Dados['idei
   const pendentes = ideias.filter((i) => i.status === 'pendente').length;
   return (
     <Card className="p-6 text-center">
-      <div className="mb-3 text-4xl">✅</div>
+      <div className="mb-3 text-4xl"><GlassIcon name="check-circle" /></div>
       <h2 className="text-lg font-semibold text-slate-100">Aprovação de conteúdo</h2>
       <p className="mt-2 text-sm text-slate-400">
         {pendentes > 0
@@ -154,7 +155,7 @@ function AbaEntregas({ itens, semana }: { itens: Dados['entregas_semana']; seman
     <>
       <Card className="p-4">
         <h2 className="text-sm font-semibold text-slate-200">
-          📦 Conteúdos entregues · <span className="font-normal text-slate-400">{fmtSemana(semana)}</span>
+          <GlassIcon name="archive" /> Conteúdos entregues · <span className="font-normal text-slate-400">{fmtSemana(semana)}</span>
         </h2>
       </Card>
       {itens.length === 0 ? <Card className="p-6 text-center text-sm text-slate-500">Nenhuma entrega registrada nesta semana.</Card> : (
@@ -167,7 +168,7 @@ function AbaEntregas({ itens, semana }: { itens: Dados['entregas_semana']; seman
               </div>
               <div className="text-sm font-medium text-slate-100">{e.titulo}</div>
               {e.descricao && <p className="mt-1 text-xs text-slate-400">{e.descricao}</p>}
-              {e.url && <a href={e.url} target="_blank" rel="noopener" className="mt-2 inline-block text-xs font-medium text-brand-300 hover:underline">🔗 Ver publicação</a>}
+              {e.url && <a href={e.url} target="_blank" rel="noopener" className="mt-2 inline-block text-xs font-medium text-brand-300 hover:underline"><GlassIcon name="link" /> Ver publicação</a>}
             </Card>
           ))}
         </div>
@@ -185,7 +186,7 @@ function AbaOtimizacoes({ itens }: { itens: Dados['otimizacoes'] }) {
           <li key={o.id}>
             <Card className="p-4">
               <div className="mb-1 flex items-center gap-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-amber-300">⚡ {o.plataforma}</span>
+                <span className="text-xs font-medium uppercase tracking-wider text-amber-300"><GlassIcon name="zap" /> {o.plataforma}</span>
                 <span className="text-[11px] text-slate-500">{new Date(o.criada_em).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
               </div>
               <div className="text-sm font-medium text-slate-100">{o.titulo}</div>
@@ -230,7 +231,7 @@ function AbaAvisos({ itens }: { itens: Dados['avisos'] }) {
           <li key={a.id}>
             <Card className="p-4">
               <div className="mb-1 flex items-center gap-2">
-                <span className="text-xs font-semibold text-amber-300">📌 AVISO</span>
+                <span className="text-xs font-semibold text-amber-300"><GlassIcon name="pin" /> AVISO</span>
                 <span className="text-[11px] text-slate-500">{new Date(a.criado_em).toLocaleDateString('pt-BR')}</span>
               </div>
               <div className="text-sm font-semibold text-slate-100">{a.titulo}</div>
@@ -246,10 +247,10 @@ function AbaPersona({ p }: { p: Dados['persona'] }) {
   if (!p) return <Card className="p-6 text-center text-sm text-slate-500">Persona ainda não foi mapeada.</Card>;
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {p.persona && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300">🎯 Persona</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.persona}</p></Card>}
-      {p.planejamento_estrategico && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300">📋 Planejamento estratégico</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.planejamento_estrategico}</p></Card>}
-      {p.tom_de_voz && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300">🎙️ Tom de voz</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.tom_de_voz}</p></Card>}
-      {p.produtos_servicos && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300">🛍️ Produtos / serviços</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.produtos_servicos}</p></Card>}
+      {p.persona && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="target" /> Persona</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.persona}</p></Card>}
+      {p.planejamento_estrategico && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="clipboard" /> Planejamento estratégico</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.planejamento_estrategico}</p></Card>}
+      {p.tom_de_voz && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="mic" /> Tom de voz</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.tom_de_voz}</p></Card>}
+      {p.produtos_servicos && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="shopping-bag" /> Produtos / serviços</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.produtos_servicos}</p></Card>}
     </div>
   );
 }

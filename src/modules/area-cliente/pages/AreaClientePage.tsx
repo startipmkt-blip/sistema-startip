@@ -13,6 +13,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatMoney, formatMonth } from '@/shared/lib/format';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
 import { PainelClientePage } from '@/modules/painel-cliente/pages/PainelClientePage';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 type SubAba = 'relatorios' | 'painel';
 
@@ -31,7 +32,7 @@ export function AreaClientePage() {
             className={`border-b-2 px-4 py-2 text-sm font-medium ${
               aba === t.id ? 'border-brand-500 text-brand-300' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
-          >{t.label}</button>
+          >{glassify(t.label)}</button>
         ))}
       </div>
       {aba === 'relatorios' ? <RelatoriosView /> : <PainelClientePage />}

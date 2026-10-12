@@ -1,6 +1,7 @@
 import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { TOCADORES, type Tocador } from '@/modules/demandas/api/cronometroApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   titulo: string;
@@ -31,7 +32,7 @@ export function TocadorModal({ titulo, onEscolher, onCancelar }: Props) {
             onClick={() => onEscolher(nome)}
             className="rounded-xl border border-white/10 bg-white/5 px-3 py-4 text-sm font-semibold text-slate-100 transition-colors hover:border-brand-400/60 hover:bg-brand-500/10"
           >
-            ⏱ {nome}
+            <GlassIcon name="timer" /> {nome}
           </button>
         ))}
       </div>

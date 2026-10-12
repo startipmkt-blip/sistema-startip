@@ -4,6 +4,7 @@ import { EtapasTimeline } from '@/modules/onboarding/components/EtapasTimeline';
 import { BrandMark } from '@/shared/ui/BrandMark';
 import { Spinner } from '@/shared/ui/Spinner';
 import { formatDate } from '@/shared/lib/format';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 // Página pública (/onb/:token) que o cliente abre para ver todo o processo
 // de onboarding e em que ponto ele está.
@@ -39,7 +40,7 @@ export function OnboardingPublicoPage() {
           <>
             <section className="pt-4">
               <h1 className="font-display text-2xl font-semibold text-white">
-                {finalizado ? 'Onboarding concluído 🎉' : `Bem-vindo(a), ${data.cliente_nome}!`}
+                {glassify(finalizado ? 'Onboarding concluído 🎉' : `Bem-vindo(a), ${data.cliente_nome}!`)}
               </h1>
               <p className="mt-2 text-sm text-slate-300">
                 {finalizado

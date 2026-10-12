@@ -4,6 +4,7 @@ import { useAuth } from '@/shared/auth/AuthProvider';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   area: string;        // ex: 'diretoria', 'empresas'
@@ -65,7 +66,7 @@ export function PinGate({ area, icone = '🔒', titulo, onOk }: Props) {
     <div className="flex min-h-full items-center justify-center p-6">
       <Card className="w-full max-w-sm p-6">
         <div className="mb-4 text-center">
-          <div className="mb-2 text-3xl">{icone}</div>
+          <div className="mb-2 text-3xl"><GlassIcon emoji={icone} /></div>
           <h1 className="text-lg font-semibold text-slate-100">{titulo}</h1>
           <p className="mt-1 text-xs text-slate-400">Área restrita. Informe o PIN.</p>
         </div>

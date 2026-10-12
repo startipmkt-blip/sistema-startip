@@ -7,6 +7,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   clienteId: string;
@@ -53,7 +54,7 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-slate-100">{r.titulo}</div>
-                    <div className="text-xs text-slate-400">📅 {formatDate(r.data)}</div>
+                    <div className="text-xs text-slate-400"><GlassIcon name="calendar" /> {formatDate(r.data)}</div>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     {r.pdf_url && (
@@ -72,7 +73,7 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                     {!somenteLeitura && (
                       <>
                         {drive[r.id]?.estado === 'enviando' ? (
-                          <span className="text-xs text-slate-400">⏳ Enviando ao Drive…</span>
+                          <span className="text-xs text-slate-400"><GlassIcon name="hourglass" /> Enviando ao Drive…</span>
                         ) : drive[r.id]?.estado === 'ok' ? (
                           <span className="flex items-center gap-2 text-xs">
                             <a
@@ -81,7 +82,7 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                               rel="noreferrer"
                               className="font-medium text-emerald-300 hover:underline"
                             >
-                              ✅ Salvo no Drive · abrir pasta
+                              <GlassIcon name="check-circle" /> Salvo no Drive · abrir pasta
                             </a>
                             <button className="text-slate-400 hover:underline" onClick={() => enviarParaDrive(r.id)}>reenviar</button>
                           </span>
@@ -92,10 +93,10 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                               title="Salva o resumo e o PDF na pasta de backup do Drive"
                               onClick={() => enviarParaDrive(r.id)}
                             >
-                              ☁ Enviar p/ Drive
+                              <GlassIcon name="cloud" /> Enviar p/ Drive
                             </button>
                             {drive[r.id]?.estado === 'erro' && (
-                              <span className="max-w-[260px] text-red-400" title={drive[r.id]?.msg}>⚠ {drive[r.id]?.msg}</span>
+                              <span className="max-w-[260px] text-red-400" title={drive[r.id]?.msg}><GlassIcon name="alert" /> {drive[r.id]?.msg}</span>
                             )}
                           </span>
                         )}

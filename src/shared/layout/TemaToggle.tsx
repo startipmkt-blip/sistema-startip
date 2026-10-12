@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 type Tema = 'dark' | 'light';
 const CHAVE = 'startip-os:tema';
@@ -32,7 +33,7 @@ export function TemaToggle() {
       title={tema === 'dark' ? 'Mudar para claro' : 'Mudar para escuro'}
       aria-label="Alternar tema"
     >
-      <span className="text-lg">{tema === 'dark' ? '☀️' : '🌙'}</span>
+      <span className="text-lg">{glassify(tema === 'dark' ? '☀️' : '🌙')}</span>
     </button>
   );
 }

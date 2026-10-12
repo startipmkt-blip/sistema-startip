@@ -22,6 +22,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Aba = 'andamento' | 'concluidos' | 'templates';
 
@@ -121,7 +122,7 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <div className="font-semibold text-slate-100">{a.cliente_nome}</div>
-            {concluido && <Badge tone="green">✅ Concluído</Badge>}
+            {concluido && <Badge tone="green"><GlassIcon name="check-circle" /> Concluído</Badge>}
           </div>
           <div className="text-xs text-slate-400">
             {[a.template_nome, a.created_at && `iniciado em ${formatDate(a.created_at)}`].filter(Boolean).join(' · ')}
@@ -145,10 +146,10 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
                   e.concluida ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/10 text-slate-400'
                 }`}
-              >{e.concluida ? '✓' : ''}</span>
+              >{glassify(e.concluida ? '✓' : '')}</span>
               <span className="min-w-0 flex-1">
                 <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>{e.etapa}</span>
-                {e.tempo && <span className="ml-2 text-xs text-amber-300/80">⏱ {e.tempo}</span>}
+                {e.tempo && <span className="ml-2 text-xs text-amber-300/80"><GlassIcon name="timer" /> {e.tempo}</span>}
               </span>
             </button>
             {detalhes && e.itens.length > 0 && (
@@ -208,7 +209,7 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                 }
               }}
             >
-              ✅ Concluir
+              <GlassIcon name="check-circle" /> Concluir
             </Button>
           )}
         </div>

@@ -12,6 +12,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Select } from '@/shared/ui/Select';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Aba = 'pendentes' | 'feitas';
 
@@ -109,7 +110,7 @@ export function AnotacoesPage() {
         <input
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          placeholder="🔎 Buscar no texto…"
+          placeholder="Buscar no texto…"
           className="min-w-[200px] flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500"
         />
         <Select
@@ -120,7 +121,7 @@ export function AnotacoesPage() {
         />
         <Select
           id="f-prio"
-          options={[{ value: '', label: 'Toda prioridade' }, { value: 'urgente', label: '🔴 Urgente' }, { value: 'importante', label: '🟠 Importante' }, { value: 'normal', label: '⚪ Normal' }]}
+          options={[{ value: '', label: 'Toda prioridade' }, { value: 'urgente', label: 'Urgente' }, { value: 'importante', label: 'Importante' }, { value: 'normal', label: 'Normal' }]}
           value={prioFiltro}
           onChange={(e) => setPrioFiltro(e.target.value)}
         />
@@ -188,7 +189,7 @@ function CardAnotacao({ a, onEditar, onToggle }: CardProps) {
           }`}
           title={feita ? 'Reabrir' : 'Marcar como feita'}
         >
-          {feita ? '✓' : ''}
+          {glassify(feita ? '✓' : '')}
         </button>
         <div className="min-w-0 flex-1">
           <p className={`whitespace-pre-wrap break-words text-sm leading-relaxed ${feita ? 'text-slate-400 line-through' : 'text-slate-100'} ${!expandido && textoLongo ? 'line-clamp-3' : ''}`}>
@@ -201,22 +202,22 @@ function CardAnotacao({ a, onEditar, onToggle }: CardProps) {
           )}
 
           <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]">
-            <Badge tone="slate">🏢 {a.cliente_nome ?? 'Geral'}</Badge>
-            {a.autor_nome && <Badge tone="slate">👤 {a.autor_nome}</Badge>}
+            <Badge tone="slate"><GlassIcon name="building" /> {a.cliente_nome ?? 'Geral'}</Badge>
+            {a.autor_nome && <Badge tone="slate"><GlassIcon name="user" /> {a.autor_nome}</Badge>}
             {a.prioridade !== 'normal' && <Badge tone={PRIORIDADE_TONE[a.prioridade]}>{PRIORIDADE_LABEL[a.prioridade]}</Badge>}
             {a.prazo && (
               <Badge tone={vencida ? 'red' : 'amber'}>
-                📅 {new Date(a.prazo).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                <GlassIcon name="calendar" /> {new Date(a.prazo).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                 {vencida && ' · vencida'}
               </Badge>
             )}
-            {(a.anexos?.length ?? 0) > 0 && <Badge tone="slate">📎 {a.anexos.length}</Badge>}
+            {(a.anexos?.length ?? 0) > 0 && <Badge tone="slate"><GlassIcon name="paperclip" /> {a.anexos.length}</Badge>}
             {a.demanda_id && <Badge tone="green">↗ virou demanda</Badge>}
           </div>
 
           <div className="mt-2 flex justify-end">
             <button onClick={onEditar} className="text-[11px] font-medium text-brand-300 hover:underline">
-              ✎ Editar
+              <GlassIcon name="pencil" /> Editar
             </button>
           </div>
         </div>

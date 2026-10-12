@@ -16,6 +16,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { Select } from '@/shared/ui/Select';
 import { Badge } from '@/shared/ui/Badge';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Aba = 'entregas' | 'otimizacoes' | 'investimento' | 'avisos' | 'persona';
 
@@ -55,7 +56,7 @@ export function PainelClientePage() {
         <>
           {linkPublico && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-white/15 bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
-              🔗 <span className="text-slate-300">Central do cliente:</span>
+              <GlassIcon name="link" /> <span className="text-slate-300">Central do cliente:</span>
               <code className="flex-1 truncate rounded bg-slate-800 px-2 py-0.5 text-slate-200">{linkPublico}</code>
               <button
                 onClick={() => { void navigator.clipboard.writeText(linkPublico); }}
@@ -78,7 +79,7 @@ export function PainelClientePage() {
                 className={`border-b-2 px-4 py-2 text-sm font-medium ${
                   aba === t.id ? 'border-brand-500 text-brand-300' : 'border-transparent text-slate-400 hover:text-slate-200'
                 }`}
-              >{t.label}</button>
+              >{glassify(t.label)}</button>
             ))}
           </div>
 
@@ -136,7 +137,7 @@ function SecaoEntregas({ clienteId }: { clienteId: string }) {
                   </div>
                   <div className="mt-1 text-sm font-medium text-slate-100">{e.titulo}</div>
                   {e.descricao && <p className="text-xs text-slate-400">{e.descricao}</p>}
-                  {e.url && <a href={e.url} target="_blank" rel="noopener" className="text-xs text-brand-300 hover:underline">🔗 {e.url}</a>}
+                  {e.url && <a href={e.url} target="_blank" rel="noopener" className="text-xs text-brand-300 hover:underline"><GlassIcon name="link" /> {e.url}</a>}
                 </div>
                 <button onClick={() => { if (confirm('Excluir?')) excluir.mutate(e.id); }} className="text-xs text-red-400 hover:underline">Excluir</button>
               </Card>
@@ -181,7 +182,7 @@ function SecaoOtimizacoes({ clienteId }: { clienteId: string }) {
               <Card className="flex items-start justify-between gap-3 p-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="font-semibold uppercase text-amber-300">⚡ {o.plataforma}</span>
+                    <span className="font-semibold uppercase text-amber-300"><GlassIcon name="zap" /> {o.plataforma}</span>
                     <span className="text-slate-500">{new Date(o.criada_em).toLocaleString('pt-BR')}</span>
                   </div>
                   <div className="mt-1 text-sm font-medium text-slate-100">{o.titulo}</div>
@@ -284,7 +285,7 @@ function SecaoAvisos({ clienteId }: { clienteId: string }) {
             <li key={a.id}>
               <Card className="flex items-start justify-between gap-3 p-3">
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider text-amber-300">📌 {new Date(a.criado_em).toLocaleDateString('pt-BR')}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-amber-300"><GlassIcon name="pin" /> {new Date(a.criado_em).toLocaleDateString('pt-BR')}</div>
                   <div className="text-sm font-semibold text-slate-100">{a.titulo}</div>
                   <p className="whitespace-pre-line text-xs text-slate-300">{a.conteudo}</p>
                 </div>
@@ -293,7 +294,7 @@ function SecaoAvisos({ clienteId }: { clienteId: string }) {
                     onClick={() => void enviarWhatsApp(a)}
                     disabled={enviandoWa === a.id}
                     className="rounded-md bg-emerald-500/20 px-2 py-1 text-emerald-200 hover:bg-emerald-500/30 disabled:opacity-50"
-                  >{enviandoWa === a.id ? '⏳' : '📢 WhatsApp'}</button>
+                  >{glassify(enviandoWa === a.id ? '⏳' : '📢 WhatsApp')}</button>
                   <button onClick={() => { if (confirm('Excluir?')) excluir.mutate(a.id); }} className="rounded-md px-2 py-1 text-red-400 hover:bg-red-500/10">Excluir</button>
                 </div>
               </Card>

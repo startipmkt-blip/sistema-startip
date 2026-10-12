@@ -10,6 +10,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatMoney, formatMonth } from '@/shared/lib/format';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const num = (v: number) => v.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
 
@@ -34,7 +35,7 @@ export function PortalRelatorios() {
       {/* Saudação + resumo */}
       <Card className="bg-brand-500/10 p-5">
         <h1 className="text-xl font-semibold text-white">
-          Olá{nomeCliente ? `, ${nomeCliente}` : ''} 👋
+          Olá{nomeCliente ? `, ${nomeCliente}` : ''} <GlassIcon name="hand" />
         </h1>
         <p className="mt-1 text-sm text-slate-300">Acompanhe seus resultados e o andamento do seu projeto por aqui.</p>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/shared/auth/AuthProvider';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 // Protege uma rota por módulo: bloqueia quem não tem permissão no cargo.
 export function RequireModulo({ modulo, children }: { modulo: string; children: ReactNode }) {
@@ -9,7 +10,7 @@ export function RequireModulo({ modulo, children }: { modulo: string; children: 
 
   return (
     <div className="mx-auto max-w-lg py-16 text-center">
-      <div className="text-3xl">🔒</div>
+      <div className="text-3xl"><GlassIcon name="lock" /></div>
       <h1 className="mt-3 text-lg font-semibold text-slate-800">Sem permissão</h1>
       <p className="mt-1 text-sm text-slate-500">
         Seu cargo não tem acesso a este módulo. Fale com um administrador da

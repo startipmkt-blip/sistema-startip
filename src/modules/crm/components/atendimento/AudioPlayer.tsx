@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   src: string;
@@ -61,9 +62,9 @@ export function AudioPlayer({ src, duracaoInicial }: Props) {
   if (erro) {
     return (
       <div className="flex min-w-[220px] items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-[11px] text-red-300">
-        <span>🎵 áudio incompatível</span>
+        <span><GlassIcon name="music" /> áudio incompatível</span>
         <a href={src} download className="rounded-full bg-white/10 px-2 py-0.5 text-white hover:bg-white/20" target="_blank" rel="noopener">
-          ⬇ baixar
+          <GlassIcon name="download" /> baixar
         </a>
       </div>
     );
@@ -76,7 +77,7 @@ export function AudioPlayer({ src, duracaoInicial }: Props) {
         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs text-white hover:bg-white/25"
         title={tocando ? 'Pausar' : 'Tocar'}
       >
-        {tocando ? '⏸' : '▶'}
+        {glassify(tocando ? '⏸' : '▶')}
       </button>
       <input
         type="range"

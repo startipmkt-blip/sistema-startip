@@ -1,5 +1,6 @@
 import type { CrmLead, Etiqueta } from '@/modules/crm/types';
 import { Badge } from '@/shared/ui/Badge';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   lead: CrmLead;
@@ -58,15 +59,15 @@ export function KanbanCard({ lead, onEtiquetaInfo, onAbrirConversa, onEditar, on
       {/* Metadados */}
       <div className="space-y-0.5 text-[11px] text-slate-400">
         {lead.created_at && (
-          <div>🕒 Entrou em {formatEntradaCurto(lead.created_at)}</div>
+          <div><GlassIcon name="clock" /> Entrou em {formatEntradaCurto(lead.created_at)}</div>
         )}
         {(() => {
           const tel = formatTelefone(lead.telefone);
-          return tel ? <div>📞 {tel}</div> : null;
+          return tel ? <div><GlassIcon name="phone" /> {tel}</div> : null;
         })()}
         {veioWhatsApp && (
           <div className="inline-flex items-center gap-1 rounded bg-emerald-500/15 px-1.5 py-0.5 text-emerald-300">
-            <span aria-hidden>🟢</span> WhatsApp
+            <span aria-hidden><GlassIcon name="orb-green" /></span> WhatsApp
           </div>
         )}
       </div>
@@ -88,14 +89,14 @@ export function KanbanCard({ lead, onEtiquetaInfo, onAbrirConversa, onEditar, on
           className="rounded-md bg-brand-500/15 px-2 py-1 text-[11px] font-medium text-brand-200 hover:bg-brand-500/25"
           title="Abrir conversa na aba Atendimento"
         >
-          💬 Conversa
+          <GlassIcon name="message" /> Conversa
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onConverterCliente(); }}
           className="rounded-md bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-200 hover:bg-white/10"
           title="Cadastrar este contato como cliente da agência"
         >
-          ➕ Virar cliente
+          <GlassIcon name="plus" /> Virar cliente
         </button>
         <span className="ml-auto text-xs font-medium text-emerald-400">
           {lead.valor > 0 ? `R$ ${lead.valor.toLocaleString('pt-BR')}` : ''}

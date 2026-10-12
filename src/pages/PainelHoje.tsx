@@ -6,6 +6,7 @@ import { pillarInfo, type PillarKey } from '@/shared/lib/pillars';
 import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 function hojeIso(): string { return new Date().toISOString().slice(0, 10); }
 
@@ -90,7 +91,7 @@ export function PainelHoje() {
       {/* Agenda de hoje */}
       <Card className="p-4">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-200">📅 Agenda de hoje</h3>
+          <h3 className="text-sm font-semibold text-slate-200"><GlassIcon name="calendar" /> Agenda de hoje</h3>
           <Link to="/agenda" className="text-[11px] text-brand-300 hover:underline">Abrir agenda</Link>
         </div>
         {!agenda ? <div className="h-10" /> : agenda.length === 0 ? (
@@ -103,7 +104,7 @@ export function PainelHoje() {
                   <span className="font-mono text-slate-400">{e.hora.slice(0, 5)}</span>
                   <span className="min-w-0 flex-1 truncate font-medium text-slate-100">{e.titulo}</span>
                   <div className="flex shrink-0 gap-0.5">
-                    {e.pilares.map((p) => <span key={p} title={pillarInfo(p).label}>{pillarInfo(p).icone}</span>)}
+                    {e.pilares.map((p) => <span key={p} title={pillarInfo(p).label}><GlassIcon emoji={pillarInfo(p).icone} /></span>)}
                   </div>
                 </div>
                 {e.status !== 'agendado' && <Badge tone={e.status === 'concluido' ? 'green' : 'slate'}>{e.status}</Badge>}
@@ -116,7 +117,7 @@ export function PainelHoje() {
       {/* Solicitações do Agente Turbo */}
       <Card className="p-4">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-200">🤖 Solicitações pendentes</h3>
+          <h3 className="text-sm font-semibold text-slate-200"><GlassIcon name="bot" /> Solicitações pendentes</h3>
           <Link to="/crm?tab=solicitacoes" className="text-[11px] text-brand-300 hover:underline">Ver todas</Link>
         </div>
         {!solicitacoes ? <div className="h-10" /> : solicitacoes.length === 0 ? (
@@ -139,7 +140,7 @@ export function PainelHoje() {
       {/* Contratos expirando */}
       <Card className="p-4">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-200">📋 Contratos expirando (30d)</h3>
+          <h3 className="text-sm font-semibold text-slate-200"><GlassIcon name="clipboard" /> Contratos expirando (30d)</h3>
           <Link to="/contratos" className="text-[11px] text-brand-300 hover:underline">Ver contratos</Link>
         </div>
         {!contratos ? <div className="h-10" /> : contratos.length === 0 ? (

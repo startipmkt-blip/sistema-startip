@@ -15,6 +15,7 @@ import { DetalheCliente } from '@/modules/gestao-conteudo/components/DetalheClie
 import { ConfigModal } from '@/modules/gestao-conteudo/components/ConfigModal';
 import { AgendaSemana, VisaoCarteira, VisaoTabela } from '@/modules/gestao-conteudo/components/VisoesCarteira';
 
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 const VISOES: { id: Visao; label: string }[] = [
   { id: 'carteira', label: '🗂️ Carteira' },
   { id: 'tabela',   label: '📊 Tabela' },
@@ -71,7 +72,7 @@ export function GestaoConteudoPage() {
           <span className="min-w-[10rem] text-center text-sm font-medium capitalize text-slate-100">{mesLabel(mes)}</span>
           <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, 1) })}>→</Button>
         </div>
-        <Button variant="secondary" onClick={() => setConfigAberta(true)}>⚙ Configurações</Button>
+        <Button variant="secondary" onClick={() => setConfigAberta(true)}><GlassIcon name="settings" /> Configurações</Button>
       </PageHeader>
 
       {/* Barra de controle: quem ver + como ver */}
@@ -96,7 +97,7 @@ export function GestaoConteudoPage() {
                 onClick={() => atualizar({ visao: v.id === 'carteira' ? null : v.id })}
                 className={`rounded-md px-3 py-1.5 ${visao === v.id ? 'bg-brand-500/20 text-white' : 'text-slate-400 hover:text-slate-200'}`}
               >
-                {v.label}
+                {glassify(v.label)}
               </button>
             ))}
           </div>
@@ -107,7 +108,7 @@ export function GestaoConteudoPage() {
         )}
 
         {etapaFiltro && (
-          <Button variant="secondary" onClick={() => atualizar({ etapa: null })}>✕ Limpar filtro de etapa</Button>
+          <Button variant="secondary" onClick={() => atualizar({ etapa: null })}><GlassIcon name="x" /> Limpar filtro de etapa</Button>
         )}
       </Card>
 
@@ -122,7 +123,7 @@ export function GestaoConteudoPage() {
               className={`rounded-xl border p-3 text-left transition-colors ${
                 ativo ? 'border-brand-400/70 bg-brand-500/15' : 'border-white/10 bg-white/[0.03] hover:border-white/25'}`}
             >
-              <div className="text-[11px] text-slate-400">{e.emoji} {e.label}</div>
+              <div className="text-[11px] text-slate-400"><GlassIcon emoji={e.emoji} /> {e.label}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{totais[e.id]}</div>
             </button>
           );

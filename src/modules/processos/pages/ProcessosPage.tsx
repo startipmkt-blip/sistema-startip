@@ -19,6 +19,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { urlDoArquivo } from '@/shared/lib/storage';
 import type { ProcessoAnexo } from '@/modules/processos/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 function AnexosList({ anexos }: { anexos: ProcessoAnexo[] }) {
   async function abrir(a: ProcessoAnexo) {
@@ -37,7 +38,7 @@ function AnexosList({ anexos }: { anexos: ProcessoAnexo[] }) {
           : /word|\.docx?$/.test(a.type + a.name) ? '📝' : '📎';
         return (
           <li key={a.path} className="flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.02] px-2 py-1.5 text-xs">
-            <span>{icone}</span>
+            <span><GlassIcon emoji={icone} /></span>
             <button onClick={() => void abrir(a)} className="min-w-0 flex-1 truncate text-left text-brand-300 hover:underline" type="button">
               {a.name}
             </button>
@@ -154,7 +155,7 @@ export function ProcessosPage() {
                 {(selecionado.anexos?.length ?? 0) > 0 && (
                   <div className="mt-6 border-t border-white/10 pt-4">
                     <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                      📎 Anexos ({selecionado.anexos!.length})
+                      <GlassIcon name="paperclip" /> Anexos ({selecionado.anexos!.length})
                     </h3>
                     <AnexosList anexos={selecionado.anexos!} />
                   </div>

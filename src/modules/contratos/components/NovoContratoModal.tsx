@@ -6,6 +6,7 @@ import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useContractTemplates, useSalvarContrato } from '@/modules/contratos/api/contratosApi';
 import type { Contract, ContractorType } from '@/modules/contratos/types';
 import { preencherTemplate } from '@/modules/contratos/lib/preencherTemplate';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -88,7 +89,7 @@ export function NovoContratoModal({ open, onClose, contrato }: Props) {
         <>
           <Button variant="secondary" onClick={onClose}>Cancelar</Button>
           <Button variant="secondary" onClick={() => setModoPreview((v) => !v)}>
-            {modoPreview ? '✎ Editar' : '👁 Preview'}
+            {glassify(modoPreview ? '✎ Editar' : '👁 Preview')}
           </Button>
           <Button onClick={handleSalvar} disabled={salvar.isPending || !titulo.trim()}>
             {salvar.isPending ? 'Salvando…' : 'Salvar rascunho'}

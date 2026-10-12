@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSalvarAnotacao } from '@/modules/anotacoes/api/anotacoesApi';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useAuth } from '@/shared/auth/AuthProvider';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   clienteInicial?: string | null;
@@ -39,7 +40,7 @@ export function CriacaoRapida({ clienteInicial = null }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-2">
-      <span className="pl-2 text-slate-500">✍️</span>
+      <span className="pl-2 text-slate-500"><GlassIcon name="pencil" /></span>
       <input
         value={texto}
         onChange={(e) => setTexto(e.target.value)}

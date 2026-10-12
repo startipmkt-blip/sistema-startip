@@ -14,6 +14,7 @@ import { alertasDoCliente, contar, textoTempoMedio, type ClienteGestao } from '@
 import { PostCard } from './PostCard';
 import { PostFormModal } from './PostFormModal';
 import { PreviaDrive } from './PreviaDrive';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Agrupar = 'semanas' | 'etapas';
 
@@ -121,13 +122,13 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-lg font-semibold text-white">{cliente.nome}</h2>
         {alertas.length === 0 && posts.length > 0 && <Badge tone="green">Em dia</Badge>}
-        {tempo && <span className="text-xs text-slate-400">⏱ responde em média em {tempo}</span>}
+        {tempo && <span className="text-xs text-slate-400"><GlassIcon name="timer" /> responde em média em {tempo}</span>}
         <div className="ml-auto flex flex-wrap gap-2">
           <Button variant="secondary" onClick={copiarMesAnterior} disabled={copiar.isPending}>
-            {copiar.isPending ? 'Copiando…' : '📋 Copiar mês anterior'}
+            {glassify(copiar.isPending ? 'Copiando…' : '📋 Copiar mês anterior')}
           </Button>
           <Button variant="secondary" onClick={() => { if (link) { void navigator.clipboard.writeText(link); ok('Link de aprovação copiado.'); } }} disabled={!link}>
-            🔗 Copiar link
+            <GlassIcon name="link" /> Copiar link
           </Button>
           <Button
             variant="secondary"
@@ -135,14 +136,14 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             disabled={aguardando.length === 0 || lembrar.isPending || !cliente.whatsapp_chat_id}
             title={aguardando.length === 0 ? 'Nada aguardando o cliente' : undefined}
           >
-            {lembrar.isPending ? 'Enviando…' : `⏰ Lembrar cliente (${aguardando.length})`}
+            {glassify(lembrar.isPending ? 'Enviando…' : `⏰ Lembrar cliente (${aguardando.length})`)}
           </Button>
           <Button
             onClick={enviarSelecionados}
             disabled={selecionados.length === 0 || enviar.isPending || !cliente.whatsapp_chat_id}
             title={!cliente.whatsapp_chat_id ? 'Cliente sem WhatsApp cadastrado' : undefined}
           >
-            {enviar.isPending ? 'Enviando…' : `📤 Enviar para aprovação (${selecionados.length})`}
+            {glassify(enviar.isPending ? 'Enviando…' : `📤 Enviar para aprovação (${selecionados.length})`)}
           </Button>
           <Button onClick={() => abrirNovo(1)}>+ Novo conteúdo</Button>
         </div>
@@ -159,13 +160,13 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       )}
       {!cliente.whatsapp_chat_id && (
         <p className="text-xs text-amber-300">
-          ⚠ Este cliente não tem WhatsApp cadastrado — envio e lembrete ficam desativados. Cadastre o número/grupo no cliente.
+          <GlassIcon name="alert" /> Este cliente não tem WhatsApp cadastrado — envio e lembrete ficam desativados. Cadastre o número/grupo no cliente.
         </p>
       )}
       {alertas.length > 0 && (
         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
           {alertas.map((a) => (
-            <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}>⚠ {a.texto}</li>
+            <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
           ))}
         </ul>
       )}
@@ -194,7 +195,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       </Card>
 
       <div className="flex flex-wrap items-center gap-1.5">
-        {ETAPAS.map((e) => <Badge key={e.id} tone={e.tone}>{e.emoji} {n[e.id]} {e.label}</Badge>)}
+        {ETAPAS.map((e) => <Badge key={e.id} tone={e.tone}><GlassIcon emoji={e.emoji} /> {n[e.id]} {e.label}</Badge>)}
         {posts.some((p) => p.etapa === 'editado') && (
           <button
             className="text-xs text-brand-300 hover:underline"
@@ -250,7 +251,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             return (
               <section key={e.id} className="w-64 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] p-2">
                 <div className="mb-2 flex items-center justify-between px-1 text-sm font-semibold text-slate-100">
-                  <span>{e.emoji} {e.label}</span>
+                  <span><GlassIcon emoji={e.emoji} /> {e.label}</span>
                   <span className="text-[11px] text-slate-400">{coluna.length}</span>
                 </div>
                 <div className="space-y-2">

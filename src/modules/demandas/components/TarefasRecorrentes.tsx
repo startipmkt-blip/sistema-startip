@@ -16,6 +16,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function TarefasRecorrentes() {
   const { data: tarefas, isLoading } = useRecorrentes();
@@ -46,7 +47,7 @@ export function TarefasRecorrentes() {
           title={ehParaHoje(t) ? (feitaHoje ? 'Desfazer' : 'Concluir') : 'Só no dia da recorrência'}
           disabled={!ehParaHoje(t)}
         >
-          ✓
+          <GlassIcon name="check" />
         </button>
         <div className="min-w-0 flex-1">
           <div className={`text-sm ${feitaHoje ? 'text-slate-500 line-through' : atrasada ? 'text-red-300' : 'text-slate-100'}`}>{t.titulo}</div>
@@ -55,7 +56,7 @@ export function TarefasRecorrentes() {
           </div>
           {t.descricao && <div className="mt-0.5 whitespace-pre-line text-xs text-slate-500">{t.descricao}</div>}
         </div>
-        {atrasada ? <Badge tone="red">⏰ atrasada</Badge> : pend && <Badge tone="amber">hoje</Badge>}
+        {atrasada ? <Badge tone="red"><GlassIcon name="alarm" /> atrasada</Badge> : pend && <Badge tone="amber">hoje</Badge>}
         <button className="text-xs font-medium text-brand-300 hover:underline" onClick={() => abrirEditar(t)}>Editar</button>
         <button className="text-xs font-medium text-red-400 hover:underline" onClick={() => {
             if (confirm(`Excluir a tarefa recorrente "${t.titulo}"?`)) {
@@ -74,7 +75,7 @@ export function TarefasRecorrentes() {
       </div>
 
       <Card className="p-5">
-        <h2 className="mb-1 text-sm font-semibold text-slate-100">✅ Para hoje</h2>
+        <h2 className="mb-1 text-sm font-semibold text-slate-100"><GlassIcon name="check-circle" /> Para hoje</h2>
         {paraHoje.length === 0 ? (
           <EmptyState message="Nada pendente para hoje. Bom trabalho!" />
         ) : (

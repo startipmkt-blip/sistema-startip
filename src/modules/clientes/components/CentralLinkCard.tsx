@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props { clienteId: string; }
 
@@ -73,7 +74,7 @@ export function CentralLinkCard({ clienteId }: Props) {
               className="rounded-md px-2 text-xs text-slate-300 hover:bg-white/10"
               title="Copiar"
             >
-              {copiado ? '✓' : '📋'}
+              {glassify(copiado ? '✓' : '📋')}
             </button>
           </div>
           <div className="flex justify-between gap-2">
@@ -95,7 +96,7 @@ export function CentralLinkCard({ clienteId }: Props) {
         </div>
       ) : (
         <Button onClick={() => gerar.mutate()} disabled={gerar.isPending}>
-          {gerar.isPending ? 'Gerando…' : '🔗 Gerar link exclusivo'}
+          {glassify(gerar.isPending ? 'Gerando…' : '🔗 Gerar link exclusivo')}
         </Button>
       )}
     </Card>

@@ -13,6 +13,7 @@ import {
   useSalvarContaMeta, useExcluirContaMeta, useSincronizarMeta,
   type ContaMetaComCliente,
 } from '../api/metaAdsApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function MetaAdsPage() {
   const contas = useContasMeta();
@@ -52,7 +53,7 @@ export function MetaAdsPage() {
         subtitle="Configure e sincronize as contas de anúncio Meta dos clientes com tráfego pago."
       >
         <Button onClick={sincronizarTudo} variant="secondary" disabled={sync.isPending}>
-          {sync.isPending ? 'Sincronizando…' : '🔄 Sincronizar tudo'}
+          {glassify(sync.isPending ? 'Sincronizando…' : '🔄 Sincronizar tudo')}
         </Button>
         <Button onClick={abrirNovo}>+ Conectar conta</Button>
       </PageHeader>
@@ -67,7 +68,7 @@ export function MetaAdsPage() {
         <Card className="flex justify-center p-10"><Spinner /></Card>
       ) : !contas.data?.length ? (
         <Card className="p-8 text-center">
-          <div className="mb-2 text-4xl">📊</div>
+          <div className="mb-2 text-4xl"><GlassIcon name="bar-chart" /></div>
           <h2 className="text-lg font-semibold text-slate-100">Nenhuma conta Meta conectada</h2>
           <p className="mt-1 text-sm text-slate-400">Conecte uma conta pra começar a puxar métricas automaticamente.</p>
           <div className="mt-4 flex justify-center">
@@ -90,12 +91,12 @@ export function MetaAdsPage() {
 
               <dl className="mt-3 grid grid-cols-2 gap-y-1 text-[11px] text-slate-400">
                 <dt>Moeda</dt><dd className="text-right text-slate-300">{c.moeda ?? 'BRL'}</dd>
-                <dt>Token</dt><dd className="text-right text-slate-300">{c.tem_token ? '••• salvo' : '⚠ ausente'}</dd>
+                <dt>Token</dt><dd className="text-right text-slate-300">{glassify(c.tem_token ? '••• salvo' : '⚠ ausente')}</dd>
                 <dt>Última sync</dt><dd className="text-right text-slate-300">{c.ultima_sync_at ? formatDate(c.ultima_sync_at) : '—'}</dd>
               </dl>
 
               {c.ultimo_erro_sync && (
-                <p className="mt-2 rounded bg-red-500/10 p-2 text-[11px] text-red-300">⚠ {c.ultimo_erro_sync}</p>
+                <p className="mt-2 rounded bg-red-500/10 p-2 text-[11px] text-red-300"><GlassIcon name="alert" /> {c.ultimo_erro_sync}</p>
               )}
 
               <div className="mt-3 flex gap-2">
@@ -104,14 +105,14 @@ export function MetaAdsPage() {
                   variant="secondary"
                   onClick={() => sync.mutate({ cliente_id: c.cliente_id })}
                   disabled={sync.isPending || !c.tem_token || !c.sincronizacao_ativa}
-                >🔄</Button>
+                ><GlassIcon name="refresh" /></Button>
                 <Button
                   variant="secondary"
                   className="text-red-300 hover:bg-red-500/10"
                   onClick={() => {
                     if (confirm(`Excluir integração de ${c.cliente_nome}?`)) excluir.mutate(c.id);
                   }}
-                >🗑</Button>
+                ><GlassIcon name="trash" /></Button>
               </div>
             </Card>
           ))}

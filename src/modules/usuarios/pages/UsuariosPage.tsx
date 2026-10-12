@@ -13,6 +13,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { Table, type Column } from '@/shared/ui/Table';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const MODULO_LABEL = Object.fromEntries(MODULOS.map((m) => [m.key, m.label]));
 
@@ -119,7 +120,7 @@ export function UsuariosPage() {
       </PageHeader>
 
       <div className="rounded-md border border-dashed border-white/15 bg-white/5 px-4 py-2 text-xs text-slate-400">
-        🔐 Sistema privado. Funcionários entram por login (Google ou e-mail/senha).
+        <GlassIcon name="lock" /> Sistema privado. Funcionários entram por login (Google ou e-mail/senha).
         Ao se cadastrar, a conta fica <strong>pendente</strong> até um administrador
         aprovar e definir os módulos liberados.
       </div>

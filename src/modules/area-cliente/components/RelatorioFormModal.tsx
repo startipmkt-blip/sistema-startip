@@ -15,6 +15,7 @@ import { Select } from '@/shared/ui/Select';
 import { Textarea } from '@/shared/ui/Textarea';
 import { Button } from '@/shared/ui/Button';
 import { uploadArquivo } from '@/shared/lib/storage';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -151,11 +152,11 @@ export function RelatorioFormModal({ open, onClose, relatorio }: Props) {
         {/* Importar */}
         <div className="flex flex-wrap gap-4 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs">
           <label className="cursor-pointer font-medium text-brand-300 hover:underline">
-            ⬆️ Importar CSV do Meta
+            <GlassIcon name="upload" /> Importar CSV do Meta
             <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => e.target.files?.[0] && importarCsv(e.target.files[0])} />
           </label>
           <label className="cursor-pointer font-medium text-brand-300 hover:underline">
-            {enviandoPdf ? '⏳ Enviando…' : '📄 Anexar PDF do resumo'}
+            {glassify(enviandoPdf ? '⏳ Enviando…' : '📄 Anexar PDF do resumo')}
             <input
               type="file"
               accept="application/pdf"

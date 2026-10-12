@@ -10,6 +10,7 @@ import {
   enviarFormularioPublico,
   type FormularioPublico,
 } from '@/modules/formularios/api/formulariosApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function FormularioPublicoPage() {
   const { slug = '' } = useParams<{ slug: string }>();
@@ -74,7 +75,7 @@ export function FormularioPublicoPage() {
     return (
       <Shell>
         <Card className="w-full max-w-md p-6 text-center">
-          <div className="mb-3 text-3xl">⚠️</div>
+          <div className="mb-3 text-3xl"><GlassIcon name="alert" /></div>
           <div className="text-slate-100">{erro || 'Erro ao carregar formulário.'}</div>
         </Card>
       </Shell>
@@ -145,7 +146,7 @@ export function FormularioPublicoPage() {
 
           <div className="pt-2">
             <Button type="submit" disabled={enviando} className="w-full py-3 text-base">
-              {enviando ? 'Enviando…' : '✓ Enviar respostas'}
+              {glassify(enviando ? 'Enviando…' : '✓ Enviar respostas')}
             </Button>
           </div>
         </form>
@@ -169,12 +170,12 @@ function TelaObrigado({ titulo }: { titulo?: string }) {
     <Card className="w-full max-w-xl p-8 text-center">
       <div className="mb-4 flex justify-center">
         <div className="flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-emerald-500/15 text-5xl">
-          ✓
+          <GlassIcon name="check" />
         </div>
       </div>
       <div className="mb-2 text-xl font-bold text-emerald-300">Agência Startip</div>
       <h1 className="mb-3 text-2xl font-semibold text-white">
-        {titulo ?? 'Obrigado por preencher as informações! 🎉'}
+        {glassify(titulo ?? 'Obrigado por preencher as informações! 🎉')}
       </h1>
       <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-300">
         Agora vamos seguir para os próximos passos, que é montar o seu diagnóstico personalizado

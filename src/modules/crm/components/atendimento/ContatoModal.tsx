@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { useConversas } from '@/modules/crm/api/atendimentoApi';
 import { useEnviarContato } from '@/modules/crm/api/crmApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -72,7 +73,7 @@ export function ContatoModal({ open, onClose, leadId }: Props) {
                     disabled={enviar.isPending}
                     className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-slate-200 hover:bg-white/5 disabled:opacity-50"
                   >
-                    <span aria-hidden>👤</span>
+                    <span aria-hidden><GlassIcon name="user" /></span>
                     <span className="min-w-0 flex-1 truncate">{c.nome}</span>
                     <span className="text-xs text-slate-500">{c.telefone}</span>
                   </button>

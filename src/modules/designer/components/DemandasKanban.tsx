@@ -6,6 +6,7 @@ import {
   type DesignerDemanda, type DesignerStatus,
 } from '../api/demandasApi';
 import { DemandaCard } from './DemandaCard';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   clienteId?: string | null;
@@ -68,7 +69,7 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
           >
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-100">
-                <span className="mr-1">{col.emoji}</span>{col.label}
+                <span className="mr-1"><GlassIcon emoji={col.emoji} /></span>{col.label}
               </h3>
               <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-slate-300">{itens.length}</span>
             </div>

@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { Spinner } from '@/shared/ui/Spinner';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 // Protege as rotas internas: exige sessão + profile válido.
 // Usuário autenticado mas SEM profile é tratado como "sem acesso".
@@ -34,7 +35,7 @@ export function ProtectedRoute() {
   if (profile.status === 'pendente') {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-3 px-6 text-center">
-        <div className="text-3xl">⏳</div>
+        <div className="text-3xl"><GlassIcon name="hourglass" /></div>
         <h1 className="text-lg font-semibold text-slate-800">Aguardando aprovação</h1>
         <p className="max-w-md text-sm text-slate-500">
           Sua conta foi criada e está pendente. Um administrador da agência

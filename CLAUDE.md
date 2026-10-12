@@ -16,7 +16,7 @@ SaaS de gestão de agência de marketing: CRM WhatsApp integrado, gestão de cli
 | Estado servidor | **@tanstack/react-query v5** |
 | UI | **Design system próprio** em `src/shared/ui/` (Button, Input, Modal, Card, Badge, Spinner, EmptyState). Adotar shadcn/ui apenas se surgir necessidade específica. |
 | Styling | **Tailwind CSS 3.4**, tema dark permanente |
-| Ícones | Emojis inline (sem lib de ícones — mais leve, WhatsApp-like) |
+| Ícones | `GlassIcon` (`src/shared/ui/GlassIcon.tsx`): SVGs próprios com efeito vidro, sem lib externa. Nunca emoji na UI — ver convenção abaixo |
 | Emojis | **@emoji-mart/react** com `set="native"` |
 | Datas | `Intl.DateTimeFormat('pt-BR')` (sem date-fns por enquanto) |
 | Forms | `useState` local + validação manual (sem react-hook-form) |
@@ -93,6 +93,16 @@ Enum `papel_operacional` (a criar/estender em `profiles`):
 - `diretor` — visão executiva (acesso a Diretoria)
 
 **Autorização real** é RLS no Postgres. Roles são para permissões de UI e atribuição de tarefas.
+
+### Ícones de interface (GlassIcon)
+
+- Use `<GlassIcon name="paperclip" />` (ou `emoji={item.icone}` quando o emoji vem de um dado). O tamanho acompanha o texto (`1.15em`); passe `className="h-5 w-5"` para fixar e `plate` para destacar numa placa de vidro.
+- Strings com emoji que vão para a tela passam por `glassify(texto)`. `PageHeader`, `Modal` e `AnexoLink` já fazem isso com `title`/`subtitle`/`prefixo`.
+- Atributos que não aceitam JSX (`placeholder`, `title`, `<option>`) ficam **sem** emoji.
+- Novo ícone: adicione o glifo (SVG 24x24) em `G` e, se houver emoji equivalente, em `EMOJI_TO_ICON` no `GlassIcon.tsx`.
+- **Continuam emoji** de propósito: reações do WhatsApp (conteúdo do usuário), textos enviados por WhatsApp/notificação do navegador, `🌐` do nome dos grupos (é dado, ver abaixo) e o seletor de emojis do chat.
+- `<GlassSprite />` (montado em `main.tsx`) define os degradês dos ícones — precisa estar no DOM.
+- Logo: `BrandMark` usa `public/logo-startip-wordmark.png` (texto branco) e `-dark.png` (tema claro).
 
 ### Convenção grupos WhatsApp
 

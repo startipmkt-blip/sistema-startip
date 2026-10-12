@@ -13,6 +13,7 @@ import {
   useDiretoriaCarteira, useDiretoriaTrafego30d, useDiretoriaTrafegoDiario,
   useSincronizarMeta,
 } from '@/modules/meta-ads/api/metaAdsApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 const AREA = 'diretoria';
 const CHAVE_SESSAO = 'startip-os:diretoria-pin-ok';
@@ -85,7 +86,7 @@ function PinGate({ isAdmin, onOk }: { isAdmin: boolean; onOk: () => void }) {
     <div className="flex min-h-full items-center justify-center p-6">
       <Card className="w-full max-w-sm p-6">
         <div className="mb-4 text-center">
-          <div className="mb-2 text-3xl">👑</div>
+          <div className="mb-2 text-3xl"><GlassIcon name="crown" /></div>
           <h1 className="text-lg font-semibold text-slate-100">Diretoria</h1>
           <p className="mt-1 text-xs text-slate-400">Área restrita. Informe o PIN.</p>
         </div>
@@ -126,13 +127,13 @@ function DashboardExecutivo({ onSair }: { onSair: () => void }) {
   return (
     <div className="space-y-4 p-4">
       <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold text-white">👑 Diretoria</h1>
+        <h1 className="text-xl font-semibold text-white"><GlassIcon name="crown" /> Diretoria</h1>
         <span className="text-xs text-slate-400">Visão executiva consolidada</span>
         <div className="ml-auto flex gap-2">
           <Button variant="secondary" onClick={() => sync.mutate({})} disabled={sync.isPending}>
-            {sync.isPending ? 'Sincronizando…' : '🔄 Sincronizar Meta'}
+            {glassify(sync.isPending ? 'Sincronizando…' : '🔄 Sincronizar Meta')}
           </Button>
-          <Button variant="secondary" onClick={onSair}>🔒 Sair</Button>
+          <Button variant="secondary" onClick={onSair}><GlassIcon name="lock" /> Sair</Button>
         </div>
       </header>
 
@@ -150,7 +151,7 @@ function DashboardExecutivo({ onSair }: { onSair: () => void }) {
                 ? 'bg-white/5 text-white border-b-2 border-brand-400'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
-          >{label}</button>
+          >{glassify(label)}</button>
         ))}
       </nav>
 

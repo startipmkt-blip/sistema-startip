@@ -3,6 +3,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { useEnviarEnquete } from '@/modules/crm/api/crmApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -76,7 +77,7 @@ export function EnqueteModal({ open, onClose, leadId }: Props) {
                   className="rounded-md px-2 text-sm text-slate-400 hover:bg-white/5"
                   title="Remover opção"
                 >
-                  ✕
+                  <GlassIcon name="x" />
                 </button>
               )}
             </div>

@@ -17,6 +17,7 @@ import { SocialMediaPage } from '@/modules/social-media/pages/SocialMediaPage';
 import { AprovacaoConteudoPage } from '@/modules/aprovacao-conteudo/pages/AprovacaoConteudoPage';
 import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
 import { DatasComemorativasPage } from '@/modules/datas-comemorativas/pages/DatasComemorativasPage';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type GrupoCliente = 'todos' | 'organico' | 'trafego';
 
@@ -57,7 +58,7 @@ export function DesignerPage() {
                 ? 'bg-white/5 text-white border-b-2 border-brand-400'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
-          >{a.icone} {a.label}</button>
+          ><GlassIcon emoji={a.icone} /> {a.label}</button>
         ))}
       </nav>
 
@@ -126,7 +127,7 @@ function AbaDemandas() {
   return (
     <div className="space-y-3">
       <Card className="flex flex-wrap items-center gap-3 p-3">
-        <Input id="q" placeholder="🔍 buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="w-52" />
+        <Input id="q" placeholder="buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="w-52" />
         <Select
           id="c" value={clienteId} onChange={(e) => setClienteId(e.target.value)}
           options={[{ value: '', label: 'todos os clientes' }, ...(clientesDoGrupo.map((c) => ({ value: c.id, label: c.nome })))]}
@@ -137,8 +138,8 @@ function AbaDemandas() {
         />
         <div className="ml-auto flex items-center gap-3 text-xs text-slate-400">
           <span>{stats.total} demanda(s)</span>
-          {stats.hoje > 0 && <span className="rounded bg-amber-500/20 px-2 py-0.5 text-amber-300">📅 {stats.hoje} hoje</span>}
-          {stats.atrasadas > 0 && <span className="rounded bg-red-500/20 px-2 py-0.5 text-red-300">⚠ {stats.atrasadas} atrasada(s)</span>}
+          {stats.hoje > 0 && <span className="rounded bg-amber-500/20 px-2 py-0.5 text-amber-300"><GlassIcon name="calendar" /> {stats.hoje} hoje</span>}
+          {stats.atrasadas > 0 && <span className="rounded bg-red-500/20 px-2 py-0.5 text-red-300"><GlassIcon name="alert" /> {stats.atrasadas} atrasada(s)</span>}
           <Button onClick={() => abrir(null)}>+ Nova demanda</Button>
         </div>
       </Card>
@@ -158,7 +159,7 @@ function AbaDemandas() {
                 : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
           >
-            {g.label}{g.id !== 'todos' && grupo === g.id ? ` · ${clientesDoGrupo.length}` : ''}
+            {glassify(g.label)}{g.id !== 'todos' && grupo === g.id ? ` · ${clientesDoGrupo.length}` : ''}
           </button>
         ))}
       </div>
@@ -176,7 +177,7 @@ function AbaDemandas() {
             className={`border-b-2 px-3 py-1.5 text-xs font-medium transition-colors ${
               visao === v.id ? 'border-brand-500 text-brand-300' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
-          >{v.label}</button>
+          >{glassify(v.label)}</button>
         ))}
       </div>
 

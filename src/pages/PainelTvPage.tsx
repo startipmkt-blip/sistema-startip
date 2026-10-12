@@ -4,6 +4,7 @@ import { BrandMark } from '@/shared/ui/BrandMark';
 import { STATUS_ORDEM, usePainelTv } from '@/modules/painel-tv/api/painelTvApi';
 import type { PainelTvDados, SaudeStatus } from '@/modules/painel-tv/types';
 import { diasEntre, hojeSaoPaulo } from '@/modules/datas-comemorativas/lib/recorrencia';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 const LIMITE_URGENTES = 6;
 const LIMITE_DEMANDAS = 6;
@@ -155,7 +156,7 @@ function Painel({ dados, offline }: { dados: PainelTvDados; offline: boolean }) 
           <section className="flex min-h-0 flex-col rounded-[1.6rem] border border-white/10 bg-white/[0.03] p-[1.2rem]">
             <TituloSecao icone="🚨" texto="Clientes que exigem atenção agora" extra={contagem.urgente > LIMITE_URGENTES ? `+${contagem.urgente - LIMITE_URGENTES} na faixa abaixo` : undefined} />
             {urgentes.length === 0 ? (
-              <div className="flex flex-1 items-center justify-center text-[2rem] text-emerald-300">🎉 Nenhum cliente em estado urgente</div>
+              <div className="flex flex-1 items-center justify-center text-[2rem] text-emerald-300"><GlassIcon name="party" /> Nenhum cliente em estado urgente</div>
             ) : (
               <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-2 gap-[1rem]">
                 {urgentes.map((c, i) => <CardUrgente key={c.id} posicao={i + 1} nome={c.nome} motivo={c.motivo} logo={c.logo_url} />)}
@@ -166,7 +167,7 @@ function Painel({ dados, offline }: { dados: PainelTvDados; offline: boolean }) 
           <section className="flex min-h-0 flex-col rounded-[1.6rem] border border-white/10 bg-white/[0.03] p-[1.2rem]">
             <TituloSecao icone="⚡" texto="Urgentes da semana" />
             {demandas.length === 0 ? (
-              <div className="flex flex-1 items-center justify-center text-center text-[1.6rem] text-slate-400">Nenhuma demanda urgente 🙌</div>
+              <div className="flex flex-1 items-center justify-center text-center text-[1.6rem] text-slate-400">Nenhuma demanda urgente <GlassIcon name="sparkles" /></div>
             ) : (
               <ol className="grid min-h-0 flex-1 grid-rows-6 gap-[0.7rem]">
                 {demandas.map((d) => <LinhaDemanda key={d.id} demanda={d} hoje={hoje} />)}
@@ -179,7 +180,7 @@ function Painel({ dados, offline }: { dados: PainelTvDados; offline: boolean }) 
           <div className="mb-[0.6rem] flex items-center justify-between text-[0.95rem] uppercase tracking-[0.2em] text-slate-400">
             <span>Todos os clientes</span>
             <span className={`normal-case tracking-normal ${offline ? 'text-amber-300' : 'text-slate-500'}`}>
-              {offline ? `⚠ Sem conexão — dados de ${atualizado}` : `Atualizado às ${atualizado}`}
+              {glassify(offline ? `⚠ Sem conexão — dados de ${atualizado}` : `Atualizado às ${atualizado}`)}
             </span>
           </div>
           <div className="flex flex-wrap gap-[0.5rem]">
@@ -212,7 +213,7 @@ function Contador({ valor, rotulo, classe, ponto }: { valor: number; rotulo: str
 function TituloSecao({ icone, texto, extra }: { icone: string; texto: string; extra?: string }) {
   return (
     <div className="mb-[1rem] flex items-center gap-[0.7rem]">
-      <span className="text-[1.6rem]">{icone}</span>
+      <span className="text-[1.6rem]"><GlassIcon emoji={icone} /></span>
       <h2 className="text-[1.5rem] font-bold uppercase tracking-wide">{texto}</h2>
       {extra && <span className="ml-auto text-[1rem] text-red-300">{extra}</span>}
     </div>
@@ -285,7 +286,7 @@ function BotaoTelaCheia() {
       onClick={() => void document.documentElement.requestFullscreen?.()}
       className="absolute bottom-[0.6rem] right-[0.8rem] rounded-full bg-white/5 px-[0.8rem] py-[0.3rem] text-[0.8rem] text-slate-500 opacity-40 hover:opacity-100"
     >
-      ⛶ Tela cheia
+      <GlassIcon name="maximize" /> Tela cheia
     </button>
   );
 }

@@ -8,6 +8,7 @@ import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
 import { uploadArquivo } from '@/shared/lib/storage';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -159,7 +160,7 @@ export function ClienteFormModal({ open, onClose, cliente, preencher }: Props) {
           />
           <div className="flex flex-wrap items-center gap-3 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs">
             <label className="cursor-pointer font-medium text-brand-300 hover:underline">
-              {enviandoLogo ? '⏳ Enviando…' : '🖼️ Enviar arquivo do logo'}
+              {glassify(enviandoLogo ? '⏳ Enviando…' : '🖼️ Enviar arquivo do logo')}
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/svg+xml"

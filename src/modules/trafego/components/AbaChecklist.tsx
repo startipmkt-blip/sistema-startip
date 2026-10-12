@@ -3,6 +3,7 @@ import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Textarea } from '@/shared/ui/Textarea';
 import { CHECKLIST_ITENS, useChecklistHoje, useSalvarChecklist, type ChecklistDia } from '../api/trafegoApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props { clienteId: string | undefined; clienteNome: string | undefined; }
 
@@ -38,7 +39,7 @@ export function AbaChecklist({ clienteId, clienteNome }: Props) {
     <Card className="p-5">
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">📋 Checklist diário — {clienteNome}</h3>
+          <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="clipboard" /> Checklist diário — {clienteNome}</h3>
           <p className="text-[11px] text-slate-500">Ciclo desde {new Date(local.data + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })} · zera seg/qua/sex · {marcados}/6 itens</p>
         </div>
         <div className="h-2 w-40 rounded-full bg-white/5">

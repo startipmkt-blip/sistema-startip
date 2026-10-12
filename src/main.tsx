@@ -2,9 +2,11 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
 import '@/index.css';
+import { GlassSprite } from '@/shared/ui/GlassIcon';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <GlassSprite />
     <App />
   </StrictMode>,
 );

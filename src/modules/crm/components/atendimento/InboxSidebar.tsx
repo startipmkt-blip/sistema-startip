@@ -1,6 +1,7 @@
 import type { FiltroInbox } from '@/modules/crm/types';
 import type { Operador } from '@/modules/crm/api/atendimentoApi';
 import { usePushDesktop } from '@/modules/crm/hooks/useInboxBadge';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   filtro: FiltroInbox;
@@ -45,7 +46,7 @@ export function InboxSidebar({
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <span aria-hidden>{f.icone}</span>
+                    <span aria-hidden><GlassIcon emoji={f.icone} /></span>
                     <span>{f.label}</span>
                   </span>
                   {n > 0 && (
@@ -125,7 +126,7 @@ export function InboxSidebar({
             onClick={() => push.ligar()}
             className="flex w-full items-center gap-2 rounded-md border border-brand-500/30 bg-brand-500/10 px-2 py-1.5 text-xs text-brand-200 hover:bg-brand-500/20"
           >
-            🔔 Ativar alertas do desktop
+            <GlassIcon name="bell" /> Ativar alertas do desktop
           </button>
         )}
         {push.estado === 'ligado' && (
@@ -133,7 +134,7 @@ export function InboxSidebar({
             onClick={() => push.desligar()}
             className="flex w-full items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-slate-300 hover:bg-white/10"
           >
-            🔕 Desligar alertas do desktop
+            <GlassIcon name="bell-off" /> Desligar alertas do desktop
           </button>
         )}
       </div>

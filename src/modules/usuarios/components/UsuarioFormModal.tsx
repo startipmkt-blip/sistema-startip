@@ -7,6 +7,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -109,7 +110,7 @@ export function UsuarioFormModal({ open, onClose, usuario }: Props) {
         {!usuario && (
           <div className="rounded-md border border-brand-500/30 bg-brand-500/5 p-3">
             <div className="mb-2 text-xs font-semibold text-brand-200">
-              📧 Credenciais de acesso
+              <GlassIcon name="mail" /> Credenciais de acesso
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input id="email" type="email" label="Email de login *" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="pessoa@startipmkt.com" />
@@ -173,7 +174,7 @@ export function UsuarioFormModal({ open, onClose, usuario }: Props) {
           )}
         </div>
 
-        {erro && <div className="rounded-md border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-300">⚠️ {erro}</div>}
+        {erro && <div className="rounded-md border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-300"><GlassIcon name="alert" /> {erro}</div>}
       </div>
     </Modal>
   );

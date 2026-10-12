@@ -12,6 +12,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 const MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -79,7 +80,7 @@ export function AprovacaoConteudoPage() {
           ))}
         </select>
         <Button variant="secondary" onClick={() => setLoteOpen(true)} disabled={!clienteId}>
-          📅 Ideias do mês
+          <GlassIcon name="calendar" /> Ideias do mês
         </Button>
         <Button
           variant="secondary"
@@ -93,7 +94,7 @@ export function AprovacaoConteudoPage() {
           disabled={!clienteId || publicarMes.isPending}
           className="bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30"
         >
-          🚀 Publicar tudo do mês
+          <GlassIcon name="rocket" /> Publicar tudo do mês
         </Button>
         <Button onClick={() => { setEditando(undefined); setFormOpen(true); }} disabled={!clienteId}>
           + Nova ideia
@@ -118,7 +119,7 @@ export function AprovacaoConteudoPage() {
                 >
                   {c.logo_url
                     ? <img src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]">🏢</span>}
+                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
                   <span className="truncate">{c.nome}</span>
                 </button>
               </li>
@@ -161,7 +162,7 @@ export function AprovacaoConteudoPage() {
           {/* Link público */}
           {linkPublico && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-white/15 bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
-              🔗 <span className="text-slate-300">Link do cliente:</span>
+              <GlassIcon name="link" /> <span className="text-slate-300">Link do cliente:</span>
               <code className="flex-1 truncate rounded bg-slate-800 px-2 py-0.5 text-slate-200">{linkPublico}</code>
               <button
                 onClick={() => { void navigator.clipboard.writeText(linkPublico); }}
@@ -212,15 +213,15 @@ export function AprovacaoConteudoPage() {
                           <div className="mb-2 flex flex-wrap items-center gap-1.5">
                             <Badge tone="slate">{TIPO_LABEL[i.formato]}</Badge>
                             <Badge tone={APROVACAO_TONE[i.status]}>{APROVACAO_LABEL[i.status]}</Badge>
-                            {rascunho && <Badge tone="amber">✏️ Rascunho interno</Badge>}
+                            {rascunho && <Badge tone="amber"><GlassIcon name="pencil" /> Rascunho interno</Badge>}
                             {i.dia_postagem && (
                               <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
-                                📅 {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                                <GlassIcon name="calendar" /> {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                               </span>
                             )}
                             {(i.anexos?.length ?? 0) > 0 && (
                               <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
-                                📎 {i.anexos!.length}
+                                <GlassIcon name="paperclip" /> {i.anexos!.length}
                               </span>
                             )}
                           </div>
@@ -241,13 +242,13 @@ export function AprovacaoConteudoPage() {
                               }`}
                               title={rascunho ? 'Publicar para o cliente ver' : 'Ocultar do cliente (voltar a rascunho)'}
                             >
-                              {rascunho ? '🚀 Publicar pro cliente' : '👁️ Publicado'}
+                              {glassify(rascunho ? '🚀 Publicar pro cliente' : '👁️ Publicado')}
                             </button>
                             <button
                               onClick={() => { setEditando(i); setFormOpen(true); }}
                               className="text-xs font-medium text-brand-300 hover:underline"
                             >
-                              ✎ Editar
+                              <GlassIcon name="pencil" /> Editar
                             </button>
                           </div>
                         </div>
@@ -300,7 +301,7 @@ export function AprovacaoConteudoPage() {
           </div>
           {idsDoMes.length > 0 && (
             <div className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-[11px] text-amber-300">
-              ⚠️ Este mês já tem {idsDoMes.length} ideia(s). Os novos cards serão adicionados aos existentes.
+              <GlassIcon name="alert" /> Este mês já tem {idsDoMes.length} ideia(s). Os novos cards serão adicionados aos existentes.
             </div>
           )}
         </div>

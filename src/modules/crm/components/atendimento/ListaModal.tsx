@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Textarea } from '@/shared/ui/Textarea';
 import { useEnviarLista } from '@/modules/crm/api/crmApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -87,7 +88,7 @@ export function ListaModal({ open, onClose, leadId }: Props) {
                   className="flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
                 />
                 {opcoes.length > 1 && (
-                  <button onClick={() => remover(i)} className="rounded-md px-2 text-sm text-slate-400 hover:bg-white/5" title="Remover">✕</button>
+                  <button onClick={() => remover(i)} className="rounded-md px-2 text-sm text-slate-400 hover:bg-white/5" title="Remover"><GlassIcon name="x" /></button>
                 )}
               </div>
               <input

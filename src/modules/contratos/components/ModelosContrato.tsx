@@ -9,6 +9,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { uploadArquivo, urlDoArquivo, removerArquivo } from '@/shared/lib/storage';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function ModelosContrato() {
   const { data: templates, isLoading } = useContractTemplates();
@@ -47,7 +48,7 @@ export function ModelosContrato() {
                 <div>
                   <div className="text-sm font-semibold text-slate-100">{t.nome}</div>
                   <div className="text-[11px] text-slate-500">
-                    {t.arquivo_nome ? `📎 ${t.arquivo_nome}` : t.body_text ? `📝 corpo em texto (${t.body_text.length} chars)` : 'vazio'}
+                    {glassify(t.arquivo_nome ? `📎 ${t.arquivo_nome}` : t.body_text ? `📝 corpo em texto (${t.body_text.length} chars)` : 'vazio')}
                   </div>
                 </div>
               </div>
@@ -63,7 +64,7 @@ export function ModelosContrato() {
                     apagar.mutate(t.id);
                   }}
                   className="rounded-md px-2 text-xs text-red-300 hover:bg-red-500/10"
-                >🗑️</button>
+                ><GlassIcon name="trash" /></button>
               </div>
             </Card>
           ))}
@@ -139,17 +140,17 @@ function TemplateForm({ template, onClose, onSalvar }: FormProps) {
           <label className="mb-1 block text-xs text-slate-300">Arquivo do modelo (PDF ou DOCX — opcional)</label>
           {arquivoPath ? (
             <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.02] px-2 py-1.5 text-xs">
-              <span>📎</span>
+              <span><GlassIcon name="paperclip" /></span>
               <span className="min-w-0 flex-1 truncate text-slate-200">{arquivoNome}</span>
               <button
                 onClick={async () => { try { await removerArquivo('anexos-internos', arquivoPath); } catch {} setArquivoPath(null); setArquivoNome(null); setArquivoTipo(null); }}
                 className="rounded px-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-300"
                 type="button"
-              >✕</button>
+              ><GlassIcon name="x" /></button>
             </div>
           ) : (
             <label className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-white/15 bg-white/[0.02] px-3 py-2 text-xs text-slate-300 hover:border-brand-400/50">
-              <span>{enviando ? '⏳ Enviando…' : '📎 Selecionar arquivo (PDF, DOC, DOCX)'}</span>
+              <span>{glassify(enviando ? '⏳ Enviando…' : '📎 Selecionar arquivo (PDF, DOC, DOCX)')}</span>
               <input
                 type="file"
                 accept="application/pdf,.doc,.docx"

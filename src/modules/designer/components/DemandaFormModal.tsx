@@ -14,6 +14,7 @@ import {
   TIPO_LABEL, STATUS_COLUNAS,
   type DesignerDemanda, type DesignerTipo, type DesignerStatus,
 } from '../api/demandasApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -114,7 +115,7 @@ ${r.cronometroErro}`);
         <>
           {demanda && (
             <Button variant="secondary" className="mr-auto text-red-300 hover:bg-red-500/10" onClick={handleExcluir}>
-              🗑 Excluir
+              <GlassIcon name="trash" /> Excluir
             </Button>
           )}
           <Button variant="secondary" onClick={fechar}>Cancelar</Button>
@@ -155,7 +156,7 @@ ${r.cronometroErro}`);
             label="Status"
             value={status}
             onChange={(e) => setStatus(e.target.value as DesignerStatus)}
-            options={STATUS_COLUNAS.map((c) => ({ value: c.id, label: `${c.emoji} ${c.label}` }))}
+            options={STATUS_COLUNAS.map((c) => ({ value: c.id, label: c.label }))}
           />
           <Select
             id="resp"

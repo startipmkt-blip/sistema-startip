@@ -7,6 +7,7 @@ import {
 import {
   descartarAnexo, enviarAnexo, urlParaBaixar, useUrlAnexo, validarArquivo,
 } from '@/modules/ideias/criativos/criativosApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 /** Miniatura (imagem) ou icone (documento) de um anexo ja enviado. */
 export function MiniaturaAnexo({ anexo, className = 'h-16 w-16' }: { anexo: CriativoAnexo; className?: string }) {
@@ -17,7 +18,7 @@ export function MiniaturaAnexo({ anexo, className = 'h-16 w-16' }: { anexo: Cria
   }
   return (
     <div className={`${className} grid shrink-0 place-items-center rounded-lg bg-white/5 text-2xl`}>
-      {iconeAnexo(anexo)}
+      <GlassIcon emoji={iconeAnexo(anexo)} />
     </div>
   );
 }
@@ -86,7 +87,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
           arrastando ? 'border-brand-400 bg-brand-500/10 text-slate-100' : 'border-white/15 bg-white/[0.02] text-slate-300 hover:border-brand-400/50'
         }`}
       >
-        <span className="text-xl">📎</span>
+        <span className="text-xl"><GlassIcon name="paperclip" /></span>
         <span>{enviando ? 'Enviando…' : 'Arraste arquivos aqui ou toque para anexar'}</span>
         <span className="rounded-lg bg-brand-500/20 px-3 py-1 text-xs font-medium text-brand-100">Anexar arquivo</span>
         <span className="text-[11px] text-slate-500">
@@ -128,7 +129,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
                 className="rounded-lg px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
                 title="Ver em nova aba"
               >
-                👁 Ver
+                <GlassIcon name="eye" /> Ver
               </button>
               <button
                 type="button"
@@ -136,7 +137,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
                 className="rounded-lg px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
                 title="Baixar"
               >
-                ⬇ Baixar
+                <GlassIcon name="download" /> Baixar
               </button>
               <button
                 type="button"
@@ -144,7 +145,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
                 className="rounded-lg px-2 py-1 text-slate-400 hover:bg-red-500/10 hover:text-red-300"
                 title="Remover"
               >
-                ✕
+                <GlassIcon name="x" />
               </button>
             </li>
           ))}

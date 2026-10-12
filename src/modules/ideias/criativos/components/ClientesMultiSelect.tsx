@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   value: string[];
@@ -72,7 +73,7 @@ export function ClientesMultiSelect({ value, geral, onChange, onGeralChange }: P
                     className="rounded-full px-1 text-brand-200 hover:bg-white/10"
                     aria-label="Remover cliente"
                   >
-                    ✕
+                    <GlassIcon name="x" />
                   </button>
                 </span>
               ))}
@@ -105,7 +106,7 @@ export function ClientesMultiSelect({ value, geral, onChange, onGeralChange }: P
                           className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/5"
                         >
                           <span className={`grid h-4 w-4 place-items-center rounded border text-[10px] ${marcado ? 'border-brand-400 bg-brand-500 text-white' : 'border-white/20'}`}>
-                            {marcado ? '✓' : ''}
+                            {glassify(marcado ? '✓' : '')}
                           </span>
                           {c.nome}
                         </button>

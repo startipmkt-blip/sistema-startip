@@ -6,6 +6,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { Button } from '@/shared/ui/Button';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -75,7 +76,7 @@ export function ReuniaoFormModal({ open, onClose, clienteId, reuniao }: Props) {
         <Textarea id="resumo" label="Resumo (texto)" className="min-h-[140px]" value={form.resumo} onChange={(e) => set('resumo', e.target.value)} />
         <div className="flex flex-wrap items-center gap-3 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs">
           <label className="cursor-pointer font-medium text-brand-300 hover:underline">
-            {enviandoPdf ? '⏳ Enviando…' : '📎 Anexar PDF da reunião'}
+            {glassify(enviandoPdf ? '⏳ Enviando…' : '📎 Anexar PDF da reunião')}
             <input
               type="file"
               accept="application/pdf"

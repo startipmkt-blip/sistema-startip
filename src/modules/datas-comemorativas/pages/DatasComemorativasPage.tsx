@@ -19,6 +19,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Input } from '@/shared/ui/Input';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Filtro = 'todas' | 'proximas' | 'historico' | 'reprovadas';
 
@@ -79,7 +80,7 @@ export function DatasComemorativasPage() {
         >
           {[anoDe(hoje) - 1, anoDe(hoje), anoDe(hoje) + 1].map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
-        <Button variant="secondary" onClick={() => setBaseAberta(true)}>📚 Base Mãe</Button>
+        <Button variant="secondary" onClick={() => setBaseAberta(true)}><GlassIcon name="book" /> Base Mãe</Button>
         <Button onClick={() => setAdicionarAberto(true)} disabled={!clienteId || baseQ.isLoading}>+ Adicionar datas</Button>
       </PageHeader>
 
@@ -100,7 +101,7 @@ export function DatasComemorativasPage() {
                 >
                   {c.logo_url
                     ? <img src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]">🏢</span>}
+                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
                   <span className="truncate">{c.nome}</span>
                 </button>
               </li>
@@ -132,14 +133,14 @@ export function DatasComemorativasPage() {
                       filtro === id ? 'border-brand-400 bg-brand-500/20 text-white' : 'border-white/10 text-slate-300 hover:bg-white/5'
                     }`}
                   >
-                    {label}
+                    {glassify(label)}
                   </button>
                 ))}
                 {contagem.planejamento > 0 && (
-                  <span className="text-[11px] text-amber-300">⏳ {contagem.planejamento} em planejamento agora</span>
+                  <span className="text-[11px] text-amber-300"><GlassIcon name="hourglass" /> {contagem.planejamento} em planejamento agora</span>
                 )}
                 {contagem.aprovadas > 0 && (
-                  <span className="text-[11px] text-emerald-300">✅ {contagem.aprovadas} aprovada(s) pelo cliente</span>
+                  <span className="text-[11px] text-emerald-300"><GlassIcon name="check-circle" /> {contagem.aprovadas} aprovada(s) pelo cliente</span>
                 )}
               </div>
 
@@ -169,13 +170,13 @@ export function DatasComemorativasPage() {
                             rodape={aprovacoes.get(o.key) && <AprovacaoStatus aprovacao={aprovacoes.get(o.key)!} visao="equipe" />}
                             etiquetas={
                               <>
-                                {o.item.visivel_cliente === false && <Badge tone="amber">🙈 Oculta do cliente</Badge>}
+                                {o.item.visivel_cliente === false && <Badge tone="amber"><GlassIcon name="eye-off" /> Oculta do cliente</Badge>}
                                 {cal && o.data < cal.inicio && <Badge tone="slate">Antes do início do calendário</Badge>}
                               </>
                             }
                             acoes={
                               <>
-                                <button onClick={() => setEditando(o.item)} className="text-xs font-medium text-brand-300 hover:underline">✎ Ajustar</button>
+                                <button onClick={() => setEditando(o.item)} className="text-xs font-medium text-brand-300 hover:underline"><GlassIcon name="pencil" /> Ajustar</button>
                                 <button onClick={() => removerData(o)} className="text-xs text-slate-500 hover:text-red-300">Remover</button>
                               </>
                             }
@@ -252,7 +253,7 @@ function LinkCalendario({ clienteId, clienteNome, cal, carregando, hoje }: LinkP
     return (
       <div className="space-y-2 rounded-lg border border-dashed border-white/15 bg-white/[0.02] p-3">
         <div className="text-xs text-slate-300">
-          {cal ? 'Ajustar link do calendário' : `🔗 ${clienteNome} ainda não tem link do calendário.`}
+          {glassify(cal ? 'Ajustar link do calendário' : `🔗 ${clienteNome} ainda não tem link do calendário.`)}
         </div>
         <div className="grid gap-2 sm:grid-cols-[1fr_180px_auto] sm:items-end">
           <Input id="cal-slug" label={`${window.location.origin}/calendario/…`} value={slug} onChange={(e) => setSlug(e.target.value)} />
@@ -272,13 +273,13 @@ function LinkCalendario({ clienteId, clienteNome, cal, carregando, hoje }: LinkP
   return (
     <div className="space-y-1 rounded-lg border border-dashed border-white/15 bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
       <div className="flex flex-wrap items-center gap-2">
-        🔗 <span className="text-slate-300">Link do cliente:</span>
+        <GlassIcon name="link" /> <span className="text-slate-300">Link do cliente:</span>
         <code className="min-w-0 flex-1 truncate rounded bg-slate-800 px-2 py-0.5 text-slate-200">{url}</code>
         <button
           onClick={() => { void navigator.clipboard.writeText(url); setCopiado(true); setTimeout(() => setCopiado(false), 1500); }}
           className="rounded-md border border-white/10 px-2 py-0.5 text-slate-200 hover:bg-white/5"
         >
-          {copiado ? 'Copiado ✓' : 'Copiar'}
+          {glassify(copiado ? 'Copiado ✓' : 'Copiar')}
         </button>
         <a href={url} target="_blank" rel="noreferrer" className="rounded-md border border-white/10 px-2 py-0.5 text-slate-200 hover:bg-white/5">Abrir</a>
         <button onClick={() => setEditando(true)} className="text-brand-300 hover:underline">Ajustar</button>

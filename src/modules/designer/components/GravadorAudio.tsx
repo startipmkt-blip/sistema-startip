@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { enviarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   onGravado: (anexo: CriativoAnexo) => void;
@@ -111,7 +112,7 @@ export function GravadorAudio({ onGravado }: Props) {
           onClick={() => void iniciar()}
           className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-100 hover:border-brand-400/60 hover:bg-brand-500/10"
         >
-          🎙 Gravar áudio explicando a demanda
+          <GlassIcon name="mic" /> Gravar áudio explicando a demanda
         </button>
       )}
       {estado === 'gravando' && (
@@ -123,7 +124,7 @@ export function GravadorAudio({ onGravado }: Props) {
             onClick={parar}
             className="ml-auto rounded-md bg-red-500/30 px-3 py-1 font-semibold text-red-100 hover:bg-red-500/40"
           >
-            ⏹ Parar e salvar
+            <GlassIcon name="stop" /> Parar e salvar
           </button>
         </div>
       )}

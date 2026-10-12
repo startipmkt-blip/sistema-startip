@@ -16,6 +16,7 @@ import {
   DIAS_SEMANA, MESES, PRIORIDADE_LABEL, PRIORIDADE_TONE, REGRA_LABEL,
   type DataBase, type Marco, type RegraRecorrencia,
 } from '@/modules/datas-comemorativas/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -93,7 +94,7 @@ export function BaseMaeModal({ open, onClose }: Props) {
                     </div>
                   </div>
                   <Badge tone={PRIORIDADE_TONE[b.prioridade]}>{PRIORIDADE_LABEL[b.prioridade]}</Badge>
-                  <button onClick={() => setEditando(b)} className="text-xs font-medium text-brand-300 hover:underline">✎ Editar</button>
+                  <button onClick={() => setEditando(b)} className="text-xs font-medium text-brand-300 hover:underline"><GlassIcon name="pencil" /> Editar</button>
                   <button onClick={() => void remover(b)} className="text-xs text-slate-500 hover:text-red-300">Excluir</button>
                 </li>
               ))}

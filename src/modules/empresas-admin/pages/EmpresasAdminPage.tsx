@@ -9,6 +9,7 @@ import { StatCard } from '@/shared/ui/StatCard';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import type { Cliente, ClienteStatus } from '@/shared/types/database';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const CHAVE_SESSAO = 'startip-os:empresas-pin-ok';
 
@@ -91,11 +92,11 @@ function PainelEmpresas({ onSair }: { onSair: () => void }) {
   return (
     <div className="space-y-4 p-4">
       <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold text-white">🏢 Empresas</h1>
+        <h1 className="text-xl font-semibold text-white"><GlassIcon name="building" /> Empresas</h1>
         <span className="text-xs text-slate-400">Cadastro consolidado</span>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <Button variant="secondary" onClick={exportarCsv}>⬇️ CSV</Button>
-          <Button variant="secondary" onClick={onSair}>🔒 Sair da área</Button>
+          <Button variant="secondary" onClick={exportarCsv}><GlassIcon name="download" /> CSV</Button>
+          <Button variant="secondary" onClick={onSair}><GlassIcon name="lock" /> Sair da área</Button>
         </div>
       </header>
 

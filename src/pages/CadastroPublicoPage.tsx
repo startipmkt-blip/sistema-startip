@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface FormData {
   razao_social: string;
@@ -69,7 +70,7 @@ export function CadastroPublicoPage() {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <Card className="w-full max-w-md p-6 text-center">
-          <div className="mb-3 text-3xl">⚠️</div>
+          <div className="mb-3 text-3xl"><GlassIcon name="alert" /></div>
           <div className="text-slate-100">{erro || 'Erro ao carregar formulário.'}</div>
         </Card>
       </div>
@@ -79,7 +80,7 @@ export function CadastroPublicoPage() {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <Card className="w-full max-w-md p-6 text-center">
-          <div className="mb-3 text-4xl">✅</div>
+          <div className="mb-3 text-4xl"><GlassIcon name="check-circle" /></div>
           <h1 className="mb-2 text-lg font-semibold text-slate-100">Cadastro recebido!</h1>
           <p className="text-sm text-slate-400">Obrigado. Nossa equipe entrará em contato em breve.</p>
         </Card>
@@ -91,7 +92,7 @@ export function CadastroPublicoPage() {
     <div className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto max-w-2xl">
         <div className="mb-6 text-center">
-          <div className="mb-2 text-3xl">🚀</div>
+          <div className="mb-2 text-3xl"><GlassIcon name="rocket" /></div>
           <h1 className="text-2xl font-semibold text-white">Bem-vindo à Startip</h1>
           <p className="mt-1 text-sm text-slate-400">
             Preencha seus dados abaixo pra começarmos a trabalhar juntos.

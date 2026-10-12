@@ -3,6 +3,7 @@ import { ETAPAS_ATIVAS } from '@/modules/crm/types';
 import { pillarInfo } from '@/shared/lib/pillars';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { Spinner } from '@/shared/ui/Spinner';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 const TRES_DIAS_MS = 3 * 24 * 60 * 60 * 1000;
 
@@ -59,7 +60,7 @@ export function InboxLista({
             onChange={(e) => onBuscar(e.target.value)}
             className="w-full rounded-md border border-white/10 bg-white/5 px-8 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
           />
-          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"><GlassIcon name="search" /></span>
         </div>
       </div>
 
@@ -99,13 +100,13 @@ export function InboxLista({
                             : 'bg-brand-500/15 text-brand-200'
                         }`}
                       >
-                        {c.is_grupo ? '👥' : inicial(c.nome)}
+                        {glassify(c.is_grupo ? '👥' : inicial(c.nome))}
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-1.5">
-                          {c.fixado && <span className="text-[10px] text-amber-300" title="Fixada">📌</span>}
+                          {c.fixado && <span className="text-[10px] text-amber-300" title="Fixada"><GlassIcon name="pin" /></span>}
                           <span className="truncate text-sm font-medium text-slate-100">{c.nome}</span>
                         </div>
                         <span className="shrink-0 text-[11px] text-slate-500">{tempoRelativo(c.ultima_em)}</span>
@@ -122,13 +123,13 @@ export function InboxLista({
                         )}
                       </div>
                       {c.atendente_nome && (
-                        <div className="mt-0.5 truncate text-[10px] text-slate-500">👤 {c.atendente_nome}</div>
+                        <div className="mt-0.5 truncate text-[10px] text-slate-500"><GlassIcon name="user" /> {c.atendente_nome}</div>
                       )}
                       {c.pilar && (() => {
                         const p = pillarInfo(c.pilar);
                         return (
                           <div className="mt-0.5 inline-flex items-center gap-1 text-[10px] text-slate-500">
-                            <span aria-hidden>{p.icone}</span>
+                            <span aria-hidden><GlassIcon emoji={p.icone} /></span>
                             <span>{p.label}</span>
                           </div>
                         );
@@ -138,7 +139,7 @@ export function InboxLista({
                         if (!dias) return null;
                         return (
                           <div className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-300">
-                            ⏰ Follow-up {dias}d
+                            <GlassIcon name="alarm" /> Follow-up {dias}d
                           </div>
                         );
                       })()}

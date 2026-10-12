@@ -11,6 +11,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { StatCard } from '@/shared/ui/StatCard';
 import { formatMoney } from '@/shared/lib/format';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const TABS: { id: ContractStatus | 'todos'; label: string; tone: Parameters<typeof Badge>[0]['tone'] }[] = [
   { id: 'todos',      label: 'Todos',      tone: 'slate' },
@@ -145,13 +146,13 @@ export function ContratosPage() {
                   </td>
                   <td className="p-3">
                     <div className="flex justify-end gap-1">
-                      <Button variant="secondary" onClick={() => baixarPdf(c)}>📄 PDF</Button>
+                      <Button variant="secondary" onClick={() => baixarPdf(c)}><GlassIcon name="file" /> PDF</Button>
                       <Button variant="secondary" onClick={() => { setEditando(c); setNovoOpen(true); }}>Editar</Button>
                       <button
                         onClick={() => { if (confirm('Apagar contrato?')) apagar.mutate(c.id); }}
                         className="rounded-md px-2 text-xs text-red-300 hover:bg-red-500/10"
                       >
-                        🗑️
+                        <GlassIcon name="trash" />
                       </button>
                     </div>
                   </td>

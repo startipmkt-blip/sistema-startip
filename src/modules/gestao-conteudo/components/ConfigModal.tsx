@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { useConfigGestao, useSalvarConfigGestao } from '@/modules/gestao-conteudo/api/gestaoApi';
 import { CONFIG_PADRAO, type ConfigGestao } from '@/modules/gestao-conteudo/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function ConfigModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { data } = useConfigGestao();
@@ -40,7 +41,7 @@ export function ConfigModal({ open, onClose }: { open: boolean; onClose: () => v
         {erro && <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{erro}</p>}
 
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-slate-100">⏰ Lembrete automático ao cliente</h3>
+          <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="alarm" /> Lembrete automático ao cliente</h3>
           <p className="text-xs text-slate-400">
             Quando um conteúdo fica sem resposta, o sistema reenvia o link no WhatsApp do cliente
             (de seg a sex, das 9h às 18h).
@@ -58,7 +59,7 @@ export function ConfigModal({ open, onClose }: { open: boolean; onClose: () => v
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-slate-100">🔔 Aviso interno da equipe</h3>
+          <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="bell" /> Aviso interno da equipe</h3>
           <p className="text-xs text-slate-400">
             Quando o cliente clicar em "Não aprovado", este WhatsApp recebe o conteúdo e a alteração pedida.
           </p>

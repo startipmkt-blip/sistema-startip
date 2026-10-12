@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { formatMoney } from '@/shared/lib/format';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -39,7 +40,7 @@ export function LeadConversasModal({ open, onClose, lead, onEditar }: Props) {
       <div className="space-y-3">
         {/* Dados do lead */}
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-          <span>📞 {lead.telefone || '—'}</span>
+          <span><GlassIcon name="phone" /> {lead.telefone || '—'}</span>
           <span>· {lead.origem || 'origem —'}</span>
           <span>· {formatMoney(lead.valor)}</span>
           {lead.etiquetas.map((e) => {

@@ -6,6 +6,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { Modal } from '@/shared/ui/Modal';
 import { Textarea } from '@/shared/ui/Textarea';
 import { useOtimizacoesSemana, useSalvarOtimizacao, type OtimizacaoLog } from '../api/trafegoApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function AbaOtimizacoes() {
   const [offset, setOffset] = useState(0);
@@ -40,25 +41,25 @@ export function AbaOtimizacoes() {
 
       <div className="grid gap-3 md:grid-cols-2">
         <Card className="p-3">
-          <h3 className="mb-2 text-sm font-semibold text-red-300">⚠ Sem otimização</h3>
+          <h3 className="mb-2 text-sm font-semibold text-red-300"><GlassIcon name="alert" /> Sem otimização</h3>
           <ul className="space-y-1.5">
             {visiveis.filter((l) => !l.tem_otimizacao).map((l) => (
               <li key={l.cliente_id} className="flex items-center gap-2 rounded border border-white/10 bg-white/5 p-2 text-xs">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-slate-100">{l.cliente_nome}</p>
-                  {l.justificativa && <p className="mt-0.5 truncate text-[10px] text-slate-400">📝 {l.justificativa}</p>}
+                  {l.justificativa && <p className="mt-0.5 truncate text-[10px] text-slate-400"><GlassIcon name="note" /> {l.justificativa}</p>}
                 </div>
                 <Button variant="secondary" onClick={() => setEditando(l)}>Editar</Button>
               </li>
             ))}
             {visiveis.filter((l) => !l.tem_otimizacao).length === 0 && (
-              <li className="text-xs text-slate-500">Todos justificados/otimizados ✨</li>
+              <li className="text-xs text-slate-500">Todos justificados/otimizados <GlassIcon name="sparkles" /></li>
             )}
           </ul>
         </Card>
 
         <Card className="p-3">
-          <h3 className="mb-2 text-sm font-semibold text-emerald-300">✅ Com otimização</h3>
+          <h3 className="mb-2 text-sm font-semibold text-emerald-300"><GlassIcon name="check-circle" /> Com otimização</h3>
           <ul className="space-y-1.5">
             {visiveis.filter((l) => l.tem_otimizacao).map((l) => (
               <li key={l.cliente_id} className="flex items-center gap-2 rounded border border-white/10 bg-white/5 p-2 text-xs">

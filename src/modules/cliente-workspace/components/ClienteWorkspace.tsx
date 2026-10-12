@@ -18,6 +18,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { formatDate } from '@/shared/lib/format';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
   const { data: docs, isLoading } = useClienteDocs(clienteId);
@@ -99,9 +100,9 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
                         }`}
                         title={ok ? 'Preenchido' : 'Em branco'}
                       >
-                        ✓
+                        <GlassIcon name="check" />
                       </span>
-                      <span aria-hidden>{it.icon}</span>
+                      <span aria-hidden><GlassIcon emoji={it.icon} /></span>
                       <span className="flex-1">{it.titulo}</span>
                     </button>
                   </li>
@@ -116,7 +117,7 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
       {item.chave === 'reunioes' ? (
         <Card className="p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
-            <span aria-hidden>{item.icon}</span>
+            <span aria-hidden><GlassIcon emoji={item.icon} /></span>
             {item.titulo}
           </h2>
           <ReunioesPanel clienteId={clienteId} />
@@ -124,7 +125,7 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
       ) : item.chave === 'formularios' ? (
         <Card className="p-6" id="formularios">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
-            <span aria-hidden>{item.icon}</span>
+            <span aria-hidden><GlassIcon emoji={item.icon} /></span>
             {item.titulo}
           </h2>
           <FormulariosAba clienteId={clienteId} />
@@ -134,7 +135,7 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="flex items-center gap-2 text-lg font-semibold text-white">
-              <span aria-hidden>{item.icon}</span>
+              <span aria-hidden><GlassIcon emoji={item.icon} /></span>
               {item.titulo}
             </h2>
             {doc?.updated_at && !editando && (
@@ -162,7 +163,7 @@ export function ClienteWorkspace({ clienteId }: { clienteId: string }) {
               {/* Anexar PDF / documento */}
               <div className="flex flex-wrap items-center gap-3 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs">
                 <label className="cursor-pointer font-medium text-brand-300 hover:underline">
-                  {enviandoAnexo ? '⏳ Enviando…' : '📎 Anexar PDF / documento'}
+                  {glassify(enviandoAnexo ? '⏳ Enviando…' : '📎 Anexar PDF / documento')}
                   <input
                     type="file"
                     accept="application/pdf,.doc,.docx"

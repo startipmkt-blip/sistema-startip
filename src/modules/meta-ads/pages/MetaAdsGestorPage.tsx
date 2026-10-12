@@ -14,6 +14,7 @@ import {
   type Periodo, type PeriodoPreset, type Campanha,
 } from '../api/gestorApi';
 import { MetaAdsPage as MetaAdsConfigPage } from './MetaAdsPage';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Aba = 'painel' | 'campanhas' | 'anuncios' | 'config';
 
@@ -58,10 +59,10 @@ export function MetaAdsGestorPage() {
       >
         {aba !== 'config' && contaSelecionada && (
           <Button variant="secondary" onClick={() => sync.mutate({ cliente_id: contaSelecionada.cliente_id })} disabled={sync.isPending}>
-            {sync.isPending ? 'Sincronizando…' : '💾 Salvar cache'}
+            {glassify(sync.isPending ? 'Sincronizando…' : '💾 Salvar cache')}
           </Button>
         )}
-        <Button variant="secondary" onClick={() => setAba('config')}>⚙️ Contas</Button>
+        <Button variant="secondary" onClick={() => setAba('config')}><GlassIcon name="settings" /> Contas</Button>
       </PageHeader>
 
       {/* Barra de seleção cliente */}
@@ -90,7 +91,7 @@ export function MetaAdsGestorPage() {
             <button key={id} onClick={() => setAba(id)}
               className={`rounded-t-md px-4 py-2 text-sm font-medium transition-colors ${
                 aba === id ? 'bg-white/5 text-white border-b-2 border-brand-400' : 'text-slate-400 hover:text-slate-200'
-              }`}>{label}</button>
+              }`}>{glassify(label)}</button>
           ))}
         </nav>
       )}
@@ -104,11 +105,11 @@ export function MetaAdsGestorPage() {
 
       {aba !== 'config' && !contaSelecionada && !contas.isLoading && contasProntas.length === 0 && (
         <Card className="p-8 text-center">
-          <div className="mb-2 text-4xl">🔌</div>
+          <div className="mb-2 text-4xl"><GlassIcon name="plug" /></div>
           <h2 className="text-lg font-semibold text-slate-100">Nenhuma conta conectada ainda</h2>
           <p className="mt-1 text-sm text-slate-400">Conecte a primeira conta Meta pra começar a gerenciar as campanhas.</p>
           <div className="mt-4 flex justify-center">
-            <Button onClick={() => setAba('config')}>⚙️ Ir para Contas</Button>
+            <Button onClick={() => setAba('config')}><GlassIcon name="settings" /> Ir para Contas</Button>
           </div>
         </Card>
       )}
@@ -207,7 +208,7 @@ function AbaPainel({ contaId, periodo, moeda }: { contaId: string; periodo: Peri
   const diario = useDiario(contaId, periodo);
 
   if (kpis.isLoading || diario.isLoading) return <Card className="flex justify-center p-10"><Spinner /></Card>;
-  if (kpis.isError) return <Card className="p-6 text-sm text-red-300">❌ {(kpis.error as Error).message}</Card>;
+  if (kpis.isError) return <Card className="p-6 text-sm text-red-300"><GlassIcon name="x-circle" /> {(kpis.error as Error).message}</Card>;
   const k = kpis.data!;
   const dias = diario.data ?? [];
   const spendMax = Math.max(1, ...dias.map((d) => d.spend));
@@ -231,7 +232,7 @@ function AbaPainel({ contaId, periodo, moeda }: { contaId: string; periodo: Peri
           <div key={t.label} className={`relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${t.tone} p-4`}>
             <div className="mb-1 flex items-center justify-between">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-white/80">{t.label}</span>
-              <span className="text-lg">{t.icone}</span>
+              <span className="text-lg"><GlassIcon emoji={t.icone} /></span>
             </div>
             <div className="text-2xl font-bold text-white">{t.valor}</div>
             {t.hint && <div className="mt-1 text-[10px] text-white/60">{t.hint}</div>}
@@ -295,7 +296,7 @@ function AbaCampanhas({ contaId, periodo }: { contaId: string; periodo: Periodo 
   const [ordem, setOrdem] = useState<'spend' | 'roas' | 'conversions' | 'nome'>('spend');
 
   if (query.isLoading) return <Card className="flex justify-center p-10"><Spinner /></Card>;
-  if (query.isError) return <Card className="p-6 text-sm text-red-300">❌ {(query.error as Error).message}</Card>;
+  if (query.isError) return <Card className="p-6 text-sm text-red-300"><GlassIcon name="x-circle" /> {(query.error as Error).message}</Card>;
 
   let linhas = query.data?.campanhas ?? [];
   if (filtro === 'ativas')  linhas = linhas.filter((c) => c.status === 'ACTIVE');
@@ -313,7 +314,7 @@ function AbaCampanhas({ contaId, periodo }: { contaId: string; periodo: Periodo 
         {(['todas','ativas','pausadas'] as const).map((f) => (
           <button key={f} onClick={() => setFiltro(f)}
             className={`rounded-md px-3 py-1 text-xs font-medium ${filtro === f ? 'bg-brand-500/20 text-brand-200' : 'text-slate-400 hover:bg-white/5'}`}>
-            {f === 'todas' ? 'Todas' : f === 'ativas' ? '🟢 Ativas' : '⏸ Pausadas'}
+            {glassify(f === 'todas' ? 'Todas' : f === 'ativas' ? '🟢 Ativas' : '⏸ Pausadas')}
           </button>
         ))}
         <span className="ml-auto text-xs text-slate-400">
@@ -374,14 +375,14 @@ function CardCampanha({ c, onPausar, onEditarOrcamento, alternando }: {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={onEditarOrcamento}>💰 Orçamento</Button>
+          <Button variant="secondary" onClick={onEditarOrcamento}><GlassIcon name="dollar" /> Orçamento</Button>
           <Button
             variant="secondary"
             className={ativa ? 'text-amber-300 hover:bg-amber-500/10' : 'text-emerald-300 hover:bg-emerald-500/10'}
             onClick={onPausar}
             disabled={alternando}
           >
-            {ativa ? '⏸ Pausar' : '▶ Ativar'}
+            {glassify(ativa ? '⏸ Pausar' : '▶ Ativar')}
           </Button>
         </div>
       </div>
@@ -470,7 +471,7 @@ function AbaAnuncios({ contaId, periodo }: { contaId: string; periodo: Periodo }
   const [ordem, setOrdem] = useState<'spend' | 'roas' | 'clicks'>('spend');
 
   if (query.isLoading) return <Card className="flex justify-center p-10"><Spinner /></Card>;
-  if (query.isError) return <Card className="p-6 text-sm text-red-300">❌ {(query.error as Error).message}</Card>;
+  if (query.isError) return <Card className="p-6 text-sm text-red-300"><GlassIcon name="x-circle" /> {(query.error as Error).message}</Card>;
 
   const linhas = [...(query.data ?? [])].sort((a, b) => (b as any)[ordem] - (a as any)[ordem]);
 
@@ -493,7 +494,7 @@ function AbaAnuncios({ contaId, periodo }: { contaId: string; periodo: Periodo }
               {a.thumbnail ? (
                 <img src={a.thumbnail} alt="" className="h-40 w-full object-cover" />
               ) : (
-                <div className="grid h-40 w-full place-items-center bg-slate-800 text-4xl text-slate-600">🖼</div>
+                <div className="grid h-40 w-full place-items-center bg-slate-800 text-4xl text-slate-600"><GlassIcon name="image" /></div>
               )}
               <div className="p-3">
                 <div className="mb-1 flex items-center gap-2">
@@ -518,7 +519,7 @@ function AbaAnuncios({ contaId, periodo }: { contaId: string; periodo: Periodo }
                     className={`flex-1 text-xs ${ativa ? 'text-amber-300 hover:bg-amber-500/10' : 'text-emerald-300 hover:bg-emerald-500/10'}`}
                     onClick={() => pausar.mutate({ objeto_id: a.id, status: ativa ? 'PAUSED' : 'ACTIVE' })}
                     disabled={pausar.isPending}
-                  >{ativa ? '⏸ Pausar' : '▶ Ativar'}</Button>
+                  >{glassify(ativa ? '⏸ Pausar' : '▶ Ativar')}</Button>
                 </div>
               </div>
             </Card>

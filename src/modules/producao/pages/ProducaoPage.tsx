@@ -7,6 +7,7 @@ import { StatCard } from '@/shared/ui/StatCard';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props { tipo: ProducaoTipo; }
 
@@ -92,7 +93,7 @@ export function ProducaoPage({ tipo }: Props) {
   return (
     <div className="space-y-4 p-4">
       <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold text-white">{emoji} {nomeModulo}</h1>
+        <h1 className="text-xl font-semibold text-white"><GlassIcon emoji={emoji} /> {nomeModulo}</h1>
         <select
           value={clienteFiltro}
           onChange={(e) => setClienteFiltro(e.target.value)}
@@ -167,7 +168,7 @@ export function ProducaoPage({ tipo }: Props) {
                         className="ml-auto rounded-md px-1 text-[10px] text-red-300 hover:bg-red-500/10"
                         title="Apagar"
                       >
-                        🗑️
+                        <GlassIcon name="trash" />
                       </button>
                     </div>
                   </li>

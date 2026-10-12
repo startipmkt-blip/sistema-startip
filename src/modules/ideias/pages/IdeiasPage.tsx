@@ -18,6 +18,7 @@ import {
 } from '@/modules/ideias/types';
 import type { Ideia, IdeiaImportancia } from '@/modules/ideias/types';
 import { CriativosTab } from '@/modules/ideias/criativos/CriativosTab';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 type Ordem = 'recentes' | 'antigas' | 'mais_importantes' | 'menos_importantes';
 
@@ -197,7 +198,7 @@ function BancoDeIdeiasTab({ pills }: { pills: ReactNode }) {
       {/* Estado vazio */}
       {vazio && (
         <Card className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <span className="text-5xl">💡</span>
+          <span className="text-5xl"><GlassIcon name="lightbulb" /></span>
           <h2 className="mt-4 text-lg font-semibold text-slate-100">
             Sua próxima grande ideia pode aparecer a qualquer momento.
           </h2>

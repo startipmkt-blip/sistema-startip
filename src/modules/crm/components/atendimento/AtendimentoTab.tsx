@@ -9,6 +9,7 @@ import { InboxLista } from './InboxLista';
 import { InboxConversa } from './InboxConversa';
 import { useInboxBadge } from '@/modules/crm/hooks/useInboxBadge';
 import { useNotificacoesCrm } from '@/modules/crm/api/notificacoesApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   onIrParaFunil: (leadId: string) => void;
@@ -118,7 +119,7 @@ export function AtendimentoTab({ onIrParaFunil }: Props) {
           ) : (
             <div className="flex flex-1 items-center justify-center text-center text-sm text-slate-500">
               <div>
-                <div className="mb-2 text-3xl">💬</div>
+                <div className="mb-2 text-3xl"><GlassIcon name="message" /></div>
                 Selecione uma conversa à esquerda
                 <div className="mt-1 text-xs text-slate-600">
                   Mensagens novas do WhatsApp aparecem aqui em tempo real

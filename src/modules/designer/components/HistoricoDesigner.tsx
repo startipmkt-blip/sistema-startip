@@ -6,6 +6,7 @@ import {
   useDemandas, useTempoDesigner, formatarDuracao, TIPO_LABEL,
   type DesignerDemanda,
 } from '../api/demandasApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   clienteId?: string | null;
@@ -60,10 +61,10 @@ export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, client
           <Card key={chave} className="p-4">
             <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-emerald-500/20 px-3 py-1 font-semibold text-emerald-200">
-                ✅ {itens.length}
+                <GlassIcon name="check-circle" /> {itens.length}
               </span>
               {seg > 0 && (
-                <span className="rounded-full bg-white/10 px-3 py-1 text-slate-200">⏱ {formatarDuracao(seg)}</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-slate-200"><GlassIcon name="timer" /> {formatarDuracao(seg)}</span>
               )}
               <span className="text-slate-300">{labelSemana(chave)}</span>
             </div>
@@ -80,14 +81,14 @@ export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, client
                         <span className="block truncate text-slate-100">{d.titulo}</span>
                         <span className="text-xs text-slate-500">
                           {TIPO_LABEL[d.tipo]}{d.cliente_nome ? ` · ${d.cliente_nome}` : ''}
-                          {d.responsavel_nome ? ` · 👤 ${d.responsavel_nome}` : ''}
+                          {glassify(d.responsavel_nome ? ` · 👤 ${d.responsavel_nome}` : '')}
                         </span>
                       </span>
                       <span className="shrink-0 text-right text-xs text-slate-400">
                         <span className="block">
                           {d.concluido_em ? new Date(d.concluido_em).toLocaleDateString('pt-BR') : '—'}
                         </span>
-                        {t > 0 && <span className="block text-slate-300">⏱ {formatarDuracao(t)}</span>}
+                        {t > 0 && <span className="block text-slate-300"><GlassIcon name="timer" /> {formatarDuracao(t)}</span>}
                       </span>
                     </button>
                   </li>

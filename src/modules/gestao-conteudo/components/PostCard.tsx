@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Badge } from '@/shared/ui/Badge';
 import { ETAPAS, ETAPA_INFO, driveInfo, type Etapa, type Post } from '@/modules/gestao-conteudo/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   post: Post;
@@ -59,19 +60,19 @@ export function PostCard({
           aria-label="Etapa"
           className="glass-field min-w-0 flex-1 px-1.5 py-1 text-[11px] [&>option]:bg-slate-900 [&>option]:text-slate-100"
         >
-          {ETAPAS.map((e) => <option key={e.id} value={e.id}>{e.emoji} {e.label}</option>)}
+          {ETAPAS.map((e) => <option key={e.id} value={e.id}>{e.label}</option>)}
         </select>
         {post.link_drive && (
-          <button onClick={onPrevia} className="rounded px-1.5 py-1 text-slate-300 hover:bg-white/10" title="Prévia">👁</button>
+          <button onClick={onPrevia} className="rounded px-1.5 py-1 text-slate-300 hover:bg-white/10" title="Prévia"><GlassIcon name="eye" /></button>
         )}
         {onEditar && (
-          <button onClick={onEditar} className="rounded px-1.5 py-1 text-slate-300 hover:bg-white/10" title="Editar">✏️</button>
+          <button onClick={onEditar} className="rounded px-1.5 py-1 text-slate-300 hover:bg-white/10" title="Editar"><GlassIcon name="pencil" /></button>
         )}
         {onExcluir && (
-          <button onClick={onExcluir} className="rounded px-1.5 py-1 text-slate-400 hover:bg-red-500/10 hover:text-red-300" title="Excluir">🗑</button>
+          <button onClick={onExcluir} className="rounded px-1.5 py-1 text-slate-400 hover:bg-red-500/10 hover:text-red-300" title="Excluir"><GlassIcon name="trash" /></button>
         )}
       </div>
-      <div className="mt-1"><Badge tone={etapa.tone}>{etapa.emoji} {etapa.label}</Badge></div>
+      <div className="mt-1"><Badge tone={etapa.tone}><GlassIcon emoji={etapa.emoji} /> {etapa.label}</Badge></div>
     </div>
   );
 }

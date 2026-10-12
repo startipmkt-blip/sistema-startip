@@ -5,6 +5,7 @@ import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useCrmLeads } from '@/modules/crm/api/crmApi';
 import { navItems, moduloKey } from '@/shared/layout/navigation';
 import { podeAcessarModulo } from '@/shared/auth/permissions';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Acao {
   id: string;
@@ -147,7 +148,7 @@ export function CommandPalette() {
         className="w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-slate-900 shadow-2xl"
       >
         <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
-          <span className="text-slate-500">🔎</span>
+          <span className="text-slate-500"><GlassIcon name="search" /></span>
           <input
             ref={inputRef}
             value={busca}
@@ -179,7 +180,7 @@ export function CommandPalette() {
                     i === cursor ? 'bg-brand-500/20 text-white' : 'text-slate-200 hover:bg-white/5'
                   }`}
                 >
-                  <span className="w-5 text-center">{a.icon}</span>
+                  <span className="w-5 text-center"><GlassIcon emoji={a.icon} /></span>
                   <span className="flex-1 truncate">{a.label}</span>
                   {a.hint && <span className="truncate text-xs text-slate-500">{a.hint}</span>}
                 </button>

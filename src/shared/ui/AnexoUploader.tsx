@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { uploadArquivo, urlDoArquivo, removerArquivo, type BucketId } from '@/shared/lib/storage';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export interface Anexo {
   path: string;
@@ -79,7 +80,7 @@ export function AnexoUploader({
   return (
     <div className="space-y-2">
       <label className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-white/15 bg-white/[0.02] px-3 py-2 text-xs text-slate-300 hover:border-brand-400/50 hover:text-slate-100">
-        <span>{enviando ? '⏳ Enviando…' : '📎 Anexar arquivo (PDF, DOC, imagem)'}</span>
+        <span>{glassify(enviando ? '⏳ Enviando…' : '📎 Anexar arquivo (PDF, DOC, imagem)')}</span>
         <input
           type="file"
           multiple
@@ -99,7 +100,7 @@ export function AnexoUploader({
               key={a.path}
               className="flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.02] px-2 py-1.5 text-xs"
             >
-              <span>{iconeArquivo(a)}</span>
+              <span><GlassIcon emoji={iconeArquivo(a)} /></span>
               <button
                 onClick={() => void abrir(a)}
                 className="min-w-0 flex-1 truncate text-left text-brand-300 hover:underline"
@@ -113,7 +114,7 @@ export function AnexoUploader({
                 type="button"
                 title="Remover"
               >
-                ✕
+                <GlassIcon name="x" />
               </button>
             </li>
           ))}

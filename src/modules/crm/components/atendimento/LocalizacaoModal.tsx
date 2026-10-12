@@ -3,6 +3,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { useEnviarLocalizacao } from '@/modules/crm/api/crmApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -70,14 +71,14 @@ export function LocalizacaoModal({ open, onClose, leadId }: Props) {
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={pegarMinha} disabled={pegando}
             className="rounded border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-200 hover:bg-white/10">
-            {pegando ? '⏳ pegando…' : '📱 usar minha localização'}
+            {glassify(pegando ? '⏳ pegando…' : '📱 usar minha localização')}
           </button>
           {lat && lng && (
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat + ',' + lng)}`}
               target="_blank" rel="noopener noreferrer"
               className="rounded border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-200 hover:bg-white/10"
-            >🗺 abrir no Google Maps</a>
+            ><GlassIcon name="map" /> abrir no Google Maps</a>
           )}
         </div>
 

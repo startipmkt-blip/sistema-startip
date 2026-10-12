@@ -1,4 +1,5 @@
 import { labelMes, mesAnteriorProximo, semanasDoMes } from '../lib/periodo';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   mes: string; // YYYY-MM
@@ -24,7 +25,7 @@ export function PeriodoSeletor({ mes, semana, onMes, onSemana }: Props) {
           onClick={() => { onMes(mesAnteriorProximo(mes, -1)); onSemana(null); }}
           className="rounded-md border border-white/10 px-2 py-1 text-sm text-slate-300 hover:bg-white/10"
         >‹</button>
-        <span className="min-w-[9rem] text-center text-sm font-semibold text-slate-100">📅 {labelMes(mes)}</span>
+        <span className="min-w-[9rem] text-center text-sm font-semibold text-slate-100"><GlassIcon name="calendar" /> {labelMes(mes)}</span>
         <button
           type="button" aria-label="Próximo mês"
           onClick={() => { onMes(mesAnteriorProximo(mes, 1)); onSemana(null); }}

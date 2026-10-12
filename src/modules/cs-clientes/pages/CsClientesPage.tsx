@@ -12,6 +12,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
 import { Textarea } from '@/shared/ui/Textarea';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const OUTRO = '__outro__';
 
@@ -147,7 +148,7 @@ function LinhaCliente({ cliente, grupos, sugestao, compartilhadoCom, onMensagem 
       <div className="flex w-52 items-center gap-2">
         {cliente.logo_url
           ? <img src={cliente.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-          : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]">🏢</span>}
+          : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
         <span className="truncate text-sm text-slate-100">{cliente.nome}</span>
       </div>
 
@@ -185,7 +186,7 @@ function LinhaCliente({ cliente, grupos, sugestao, compartilhadoCom, onMensagem 
               className="rounded-full border border-brand-400/40 bg-brand-500/10 px-2.5 py-0.5 text-xs text-brand-200 hover:bg-brand-500/20"
               title="Usar este grupo"
             >
-              ✨ Usar "{sugestao.nome}"
+              <GlassIcon name="sparkles" /> Usar "{sugestao.nome}"
             </button>
           )
           : <Badge tone="amber">Sem grupo</Badge>}
@@ -227,7 +228,7 @@ function MensagemModal({ cliente, grupoNome, onClose }: { cliente: Cliente; grup
     <Modal open onClose={onClose} title={`Mensagem para ${cliente.nome}`}>
       {enviado ? (
         <div className="space-y-3 text-center">
-          <div className="text-3xl">✅</div>
+          <div className="text-3xl"><GlassIcon name="check-circle" /></div>
           <p className="text-sm text-slate-200">Mensagem enviada para <strong>{grupoNome}</strong>.</p>
           <Button onClick={onClose}>Fechar</Button>
         </div>

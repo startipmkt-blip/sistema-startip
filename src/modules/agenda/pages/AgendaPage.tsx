@@ -7,6 +7,7 @@ import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 function inicioSemana(d: Date): Date {
   const x = new Date(d);
@@ -88,7 +89,7 @@ export function AgendaPage() {
                   </div>
                   <div className="flex gap-1">
                     <button onClick={() => copiarDia(d)} title="Copiar agenda pro WhatsApp"
-                            className="rounded-md px-1.5 py-0.5 text-xs text-slate-400 hover:bg-white/10">💬</button>
+                            className="rounded-md px-1.5 py-0.5 text-xs text-slate-400 hover:bg-white/10"><GlassIcon name="message" /></button>
                     <button onClick={() => setNovoOpen({ open: true, data: key })}
                             className="rounded-md px-1.5 py-0.5 text-xs text-slate-400 hover:bg-white/10">+</button>
                   </div>
@@ -114,7 +115,7 @@ export function AgendaPage() {
                           )}
                           {e.pilares.length > 0 && (
                             <div className="mt-0.5 flex gap-1">
-                              {e.pilares.map((p) => <span key={p} title={pillarInfo(p).label}>{pillarInfo(p).icone}</span>)}
+                              {e.pilares.map((p) => <span key={p} title={pillarInfo(p).label}><GlassIcon emoji={pillarInfo(p).icone} /></span>)}
                             </div>
                           )}
                         </button>

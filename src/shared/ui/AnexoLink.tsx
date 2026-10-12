@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { urlDoArquivo, type BucketId } from '@/shared/lib/storage';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   bucket: BucketId;
@@ -37,13 +38,13 @@ export function AnexoLink({ bucket, path, prefixo = '📎', className }: Props) 
   if (erro) {
     return (
       <span className={className} title={erro}>
-        {prefixo} {nomeVisivel} <span className="text-red-400">(erro)</span>
+        {glassify(prefixo)} {nomeVisivel} <span className="text-red-400">(erro)</span>
       </span>
     );
   }
 
   if (!href) {
-    return <span className={className}>{prefixo} {nomeVisivel}</span>;
+    return <span className={className}>{glassify(prefixo)} {nomeVisivel}</span>;
   }
 
   return (
@@ -53,7 +54,7 @@ export function AnexoLink({ bucket, path, prefixo = '📎', className }: Props) 
       rel="noopener noreferrer"
       className={className}
     >
-      {prefixo} {nomeVisivel}
+      {glassify(prefixo)} {nomeVisivel}
     </a>
   );
 }

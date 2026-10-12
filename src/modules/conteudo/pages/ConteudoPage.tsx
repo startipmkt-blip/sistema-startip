@@ -11,6 +11,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { KanbanBoard } from '@/shared/ui/KanbanBoard';
 import { Link } from 'react-router-dom';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function ConteudoPage() {
   const [clienteId, setClienteId] = useState('');
@@ -47,7 +48,7 @@ export function ConteudoPage() {
       </PageHeader>
 
       <div className="rounded-md border border-dashed border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
-        💡 Ideias começam em <Link to="/aprovacao-conteudo" className="text-brand-300 hover:underline">Aprovação de conteúdo</Link>.
+        <GlassIcon name="lightbulb" /> Ideias começam em <Link to="/aprovacao-conteudo" className="text-brand-300 hover:underline">Aprovação de conteúdo</Link>.
         Só entram aqui depois que o cliente aprova no portal.
       </div>
 
@@ -69,7 +70,7 @@ export function ConteudoPage() {
                 <Badge tone="slate">{TIPO_LABEL[i.formato]}</Badge>
                 {i.dia_postagem && (
                   <span className="text-[10px] text-slate-400">
-                    📅 {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                    <GlassIcon name="calendar" /> {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                   </span>
                 )}
               </div>

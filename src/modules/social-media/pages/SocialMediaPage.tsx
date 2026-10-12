@@ -9,6 +9,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { StatCard } from '@/shared/ui/StatCard';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface AtribMensal {
   cliente_id: string;
@@ -60,7 +61,7 @@ export function SocialMediaPage() {
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 p-4">
       <header className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold text-white">📱 Social Media</h1>
+        <h1 className="text-xl font-semibold text-white"><GlassIcon name="smartphone" /> Social Media</h1>
         <div className="ml-auto flex items-center gap-2">
           <select value={mes} onChange={(e) => setMes(Number(e.target.value))}
                   className="rounded-md border border-white/10 bg-slate-800 px-2 py-1 text-xs text-slate-100 [color-scheme:dark]">
@@ -106,10 +107,10 @@ export function SocialMediaPage() {
                   <div className="mb-1 text-sm font-medium text-slate-100">{p.nome}</div>
                   <div className="flex flex-wrap gap-1 text-[10px]">
                     <Badge tone={p.posts_entregues >= p.meta_post ? 'green' : 'amber'}>
-                      🎨 {p.posts_entregues}/{p.meta_post}
+                      <GlassIcon name="palette" /> {p.posts_entregues}/{p.meta_post}
                     </Badge>
                     <Badge tone={p.videos_entregues >= p.meta_video ? 'green' : 'amber'}>
-                      🎬 {p.videos_entregues}/{p.meta_video}
+                      <GlassIcon name="clapperboard" /> {p.videos_entregues}/{p.meta_video}
                     </Badge>
                   </div>
                 </button>
@@ -167,7 +168,7 @@ function DetalheEmpresa(props: {
           {new Date(props.ano, props.mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
         </span>
         <Button variant="secondary" className="ml-auto" onClick={() => setEditando((v) => !v)}>
-          {editando ? 'Fechar' : '✎ Editar metas'}
+          {glassify(editando ? 'Fechar' : '✎ Editar metas')}
         </Button>
       </div>
 
@@ -214,7 +215,7 @@ function DetalheEmpresa(props: {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Card className="p-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-200">🎨 Posts</h3>
+          <h3 className="mb-2 text-sm font-semibold text-slate-200"><GlassIcon name="palette" /> Posts</h3>
           <div className="text-3xl font-semibold text-slate-100">
             {progresso.posts_entregues}<span className="text-sm text-slate-500"> / {progresso.meta_post}</span>
           </div>
@@ -226,7 +227,7 @@ function DetalheEmpresa(props: {
           </div>
         </Card>
         <Card className="p-4">
-          <h3 className="mb-2 text-sm font-semibold text-slate-200">🎬 Vídeos</h3>
+          <h3 className="mb-2 text-sm font-semibold text-slate-200"><GlassIcon name="clapperboard" /> Vídeos</h3>
           <div className="text-3xl font-semibold text-slate-100">
             {progresso.videos_entregues}<span className="text-sm text-slate-500"> / {progresso.meta_video}</span>
           </div>
@@ -240,8 +241,8 @@ function DetalheEmpresa(props: {
       </div>
 
       <p className="mt-3 text-[11px] text-slate-500">
-        As tarefas em si são gerenciadas em <a href="/webdesigner" className="text-brand-300 hover:underline">🎨 Webdesigner</a>
-        {' '}e <a href="/video-maker" className="text-brand-300 hover:underline">🎬 Video Maker</a>. Aqui é o painel consolidado por empresa.
+        As tarefas em si são gerenciadas em <a href="/webdesigner" className="text-brand-300 hover:underline"><GlassIcon name="palette" /> Webdesigner</a>
+        {' '}e <a href="/video-maker" className="text-brand-300 hover:underline"><GlassIcon name="clapperboard" /> Video Maker</a>. Aqui é o painel consolidado por empresa.
       </p>
     </Card>
   );

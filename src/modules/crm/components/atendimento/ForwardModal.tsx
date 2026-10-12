@@ -3,6 +3,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { useConversas } from '@/modules/crm/api/atendimentoApi';
 import { useEncaminharMensagem } from '@/modules/crm/api/crmApi';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -80,7 +81,7 @@ export function ForwardModal({ open, onClose, leadIdOrigem, waMessageId }: Props
                   checked={selecionados.has(c.id)}
                   onChange={() => toggle(c.id)}
                 />
-                <span aria-hidden>{c.is_grupo ? '👥' : '👤'}</span>
+                <span aria-hidden>{glassify(c.is_grupo ? '👥' : '👤')}</span>
                 <span className="min-w-0 flex-1 truncate">{c.nome}</span>
                 <span className="text-xs text-slate-500">{c.telefone}</span>
               </label>

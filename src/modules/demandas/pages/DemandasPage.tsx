@@ -25,6 +25,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { KanbanBoard } from '@/shared/ui/KanbanBoard';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type Aba = 'quadro' | 'concluidas' | 'recorrentes';
 
@@ -169,12 +170,12 @@ export function DemandasPage() {
           aria-label={`Concluir ${d.titulo}`}
           className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-500 text-[11px] text-transparent transition-colors hover:border-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300"
         >
-          ✓
+          <GlassIcon name="check" />
         </button>
         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
           <div className="flex items-start justify-between gap-2">
             <span className="font-medium text-slate-100">
-              {d.privada && <span title="Privada">🔒 </span>}
+              {d.privada && <span title="Privada"><GlassIcon name="lock" /> </span>}
               {d.titulo}
             </span>
             <Badge tone={PRIORIDADE_TONE[d.prioridade]}>{PRIORIDADE_LABEL[d.prioridade]}</Badge>
@@ -185,13 +186,13 @@ export function DemandasPage() {
           <div className="text-xs text-slate-400">{d.cliente_nome}</div>
           {tocadores?.[d.id] && (
             <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
-              ⏱ {tocadores[d.id]} está tocando
+              <GlassIcon name="timer" /> {tocadores[d.id]} está tocando
             </div>
           )}
           <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
-            <span>👤 {d.responsavel || '—'}</span>
+            <span><GlassIcon name="user" /> {d.responsavel || '—'}</span>
             <span className={atrasada ? 'font-semibold text-red-400' : venceHoje ? 'font-semibold text-amber-300' : ''}>
-              {atrasada ? '⚠ ' : '📅 '}{formatDate(d.prazo)}
+              {glassify(atrasada ? '⚠ ' : '📅 ')}{formatDate(d.prazo)}
             </span>
           </div>
         </button>
@@ -232,7 +233,7 @@ export function DemandasPage() {
             <input
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="🔍 Buscar por título, cliente ou responsável"
+              placeholder="Buscar por título, cliente ou responsável"
               className="w-72 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
             />
             <Select
@@ -250,7 +251,7 @@ export function DemandasPage() {
             />
             {atrasadasCount > 0 && (
               <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-semibold text-red-300">
-                ⚠ {atrasadasCount} atrasada{atrasadasCount > 1 ? 's' : ''}
+                <GlassIcon name="alert" /> {atrasadasCount} atrasada{atrasadasCount > 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -266,7 +267,7 @@ export function DemandasPage() {
                 }`}
               >
                 {s.label}
-                {s.adminOnly && <span className="ml-1" title="Privado dos sócios">🔒</span>}
+                {s.adminOnly && <span className="ml-1" title="Privado dos sócios"><GlassIcon name="lock" /></span>}
               </button>
             ))}
           </div>
@@ -290,7 +291,7 @@ export function DemandasPage() {
                 <Card key={sem} className="p-4">
                   <div className="mb-3 flex items-center gap-2 text-xs">
                     <span className="rounded-full bg-emerald-500/20 px-3 py-1 font-semibold text-emerald-200">
-                      ✅ {itens.length}
+                      <GlassIcon name="check-circle" /> {itens.length}
                     </span>
                     <span className="text-slate-300">{labelSemana(sem)}</span>
                   </div>
@@ -299,9 +300,9 @@ export function DemandasPage() {
                       <li key={d.id} className="flex items-center justify-between py-2 text-sm">
                         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
                           <div className="truncate text-slate-100 line-through opacity-70">{d.titulo}</div>
-                          <div className="text-xs text-slate-500">{d.cliente_nome} · 👤 {d.responsavel || '—'}</div>
+                          <div className="text-xs text-slate-500">{d.cliente_nome} · <GlassIcon name="user" /> {d.responsavel || '—'}</div>
                         </button>
-                        <span className="text-xs text-slate-500">📅 {formatDate(d.prazo)}</span>
+                        <span className="text-xs text-slate-500"><GlassIcon name="calendar" /> {formatDate(d.prazo)}</span>
                         <button
                           type="button"
                           onClick={() => mover(d, 'aberta')}

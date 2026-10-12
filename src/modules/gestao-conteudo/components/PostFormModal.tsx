@@ -9,6 +9,7 @@ import {
   FORMATO_OPCOES, driveInfo, type Post, type PostForm,
 } from '@/modules/gestao-conteudo/types';
 import type { ConteudoTipo } from '@/modules/conteudo/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -94,7 +95,7 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
           <Input label="Link do arquivo no Drive" type="url" inputMode="url"
             placeholder="https://drive.google.com/file/d/…"
             value={form.link_drive ?? ''} onChange={(e) => set('link_drive', e.target.value)} />
-          {info.tipo === 'arquivo' && <p className="text-[11px] text-emerald-400">✓ Arquivo reconhecido — a prévia aparece para você e para o cliente.</p>}
+          {info.tipo === 'arquivo' && <p className="text-[11px] text-emerald-400"><GlassIcon name="check" /> Arquivo reconhecido — a prévia aparece para você e para o cliente.</p>}
           {info.tipo === 'pasta' && <p className="text-[11px] text-amber-300">Isso é uma pasta. Cole o link do arquivo (vídeo ou imagem) para ter a prévia.</p>}
           <p className="text-[11px] text-slate-500">
             No Drive: Compartilhar → "Qualquer pessoa com o link" → Copiar link.

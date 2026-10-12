@@ -8,6 +8,7 @@ import { TIPO_LABEL } from '@/modules/formularios/types';
 import { EnviarWhatsappBtn } from './EnviarWhatsappBtn';
 import { ExportarDiagnosticoBtn } from './ExportarDiagnosticoBtn';
 import { RespostasView } from './RespostasView';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   formularios: Formulario[];
@@ -52,11 +53,11 @@ export function ListaFormularios({ formularios, nomeCliente, whatsappChatId }: P
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-white">{TIPO_LABEL[f.tipo]}</span>
                     {f.status === 'preenchido' ? (
-                      <Badge tone="green">✅ Preenchido {f.preenchido_em ? `em ${formatDate(f.preenchido_em)}` : ''}</Badge>
+                      <Badge tone="green"><GlassIcon name="check-circle" /> Preenchido {f.preenchido_em ? `em ${formatDate(f.preenchido_em)}` : ''}</Badge>
                     ) : f.status === 'arquivado' ? (
                       <Badge tone="slate">Arquivado</Badge>
                     ) : (
-                      <Badge tone="amber">⏳ Pendente</Badge>
+                      <Badge tone="amber"><GlassIcon name="hourglass" /> Pendente</Badge>
                     )}
                   </div>
                   <div className="mt-1 text-xs text-slate-400">
@@ -70,7 +71,7 @@ export function ListaFormularios({ formularios, nomeCliente, whatsappChatId }: P
                   {link}
                 </code>
                 <Button variant="ghost" onClick={() => copiarLink(f.slug)}>
-                  {copiado === f.slug ? '✅ Copiado' : '📋 Copiar link'}
+                  {glassify(copiado === f.slug ? '✅ Copiado' : '📋 Copiar link')}
                 </Button>
                 {f.status === 'pendente' && (
                   <EnviarWhatsappBtn
@@ -82,7 +83,7 @@ export function ListaFormularios({ formularios, nomeCliente, whatsappChatId }: P
                 {f.status === 'preenchido' && (
                   <>
                     <Button variant="secondary" onClick={() => setVerRespostas(f)}>
-                      👁 Ver respostas
+                      <GlassIcon name="eye" /> Ver respostas
                     </Button>
                     <ExportarDiagnosticoBtn formulario={f} nomeCliente={nomeCliente} />
                   </>

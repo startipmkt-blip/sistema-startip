@@ -17,6 +17,7 @@ import {
   FORMATO_LABEL, STATUS_LABEL, STATUS_TONE, ehImagem, formatarData,
   type Criativo, type CriativoStatus,
 } from './types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 function opts<T extends string>(labels: Record<T, string>, todos: string) {
   return [{ value: '', label: todos }, ...(Object.keys(labels) as T[]).map((k) => ({ value: k, label: labels[k] }))];
@@ -95,7 +96,7 @@ export function CriativosTab({ pills }: { pills: ReactNode }) {
 
       {!isLoading && !error && vazio && (
         <Card className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <span className="text-5xl">🎬</span>
+          <span className="text-5xl"><GlassIcon name="clapperboard" /></span>
           <h2 className="mt-4 text-lg font-semibold text-slate-100">
             Teve uma ideia de criativo? Registre aqui antes que ela se perca.
           </h2>

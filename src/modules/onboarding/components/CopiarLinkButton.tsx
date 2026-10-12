@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 export function CopiarLinkButton({ link }: { link: string }) {
   const [copiado, setCopiado] = useState(false);
@@ -17,7 +18,7 @@ export function CopiarLinkButton({ link }: { link: string }) {
 
   return (
     <Button variant="secondary" onClick={copiar}>
-      {copiado ? '✓ Link copiado' : '🔗 Copiar link do cliente'}
+      {glassify(copiado ? '✓ Link copiado' : '🔗 Copiar link do cliente')}
     </Button>
   );
 }

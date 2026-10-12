@@ -9,6 +9,7 @@ import {
 import { OcorrenciaCard } from '@/modules/datas-comemorativas/components/OcorrenciaCard';
 import { AprovacaoCliente, AprovacaoStatus } from '@/modules/datas-comemorativas/components/AprovacaoData';
 import { MESES } from '@/modules/datas-comemorativas/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 type Aba = 'proximas' | 'historico';
 
@@ -46,7 +47,7 @@ export function CalendarioPublicoPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
         <Card className="w-full max-w-md p-6 text-center">
-          <div className="mb-3 text-3xl">⚠️</div>
+          <div className="mb-3 text-3xl"><GlassIcon name="alert" /></div>
           <div className="text-slate-100">{error ? 'Não foi possível carregar o calendário.' : 'Link inválido.'}</div>
           <p className="mt-2 text-xs text-slate-400">Confira o endereço ou fale com a equipe Startip.</p>
         </Card>
@@ -94,7 +95,7 @@ export function CalendarioPublicoPage() {
 
         {pendentes > 0 && (
           <p className="text-center text-xs text-amber-300">
-            ⏳ {pendentes === 1 ? '1 data aguardando' : `${pendentes} datas aguardando`} a sua aprovação
+            <GlassIcon name="hourglass" /> {pendentes === 1 ? '1 data aguardando' : `${pendentes} datas aguardando`} a sua aprovação
           </p>
         )}
 

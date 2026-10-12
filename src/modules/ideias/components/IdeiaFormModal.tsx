@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/Button';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useSalvarIdeia, useExcluirIdeia, hoje } from '@/modules/ideias/api/ideiasApi';
 import type { Ideia, IdeiaT, IdeiaImportancia, IdeiaAutor } from '@/modules/ideias/types';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -160,7 +161,7 @@ export function IdeiaFormModal({ open, onClose, ideia }: Props) {
                     : 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/20 hover:text-slate-300'
                 }`}
               >
-                <span>{t.emoji}</span>
+                <span><GlassIcon emoji={t.emoji} /></span>
                 {t.label}
               </button>
             ))}

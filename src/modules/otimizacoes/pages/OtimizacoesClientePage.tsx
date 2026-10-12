@@ -23,6 +23,7 @@ import {
   type Anexo,
 } from '../api/otimizacoesApi';
 import { MESES_PT, isoHoje, ultimosMeses, fmtDia } from '../utils';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const rascunhoKey = (slug: string, data: string) => `otim_rascunho_${slug}_${data}`;
 
@@ -100,9 +101,9 @@ export function OtimizacoesClientePage() {
         title={`📈 ${cliente.nome}`}
         subtitle="Histórico diário de otimizações. Clique em um dia pra editar, ou em “Nova otimização” pra registrar hoje."
       >
-        <Button variant="secondary" onClick={copiarComoTexto}>📋 Copiar como texto</Button>
-        <Button variant="secondary" onClick={exportarPdf}>📄 Exportar PDF</Button>
-        <Button variant="secondary" onClick={() => setMostraLink(true)}>🔗 Link do cliente</Button>
+        <Button variant="secondary" onClick={copiarComoTexto}><GlassIcon name="clipboard" /> Copiar como texto</Button>
+        <Button variant="secondary" onClick={exportarPdf}><GlassIcon name="file" /> Exportar PDF</Button>
+        <Button variant="secondary" onClick={() => setMostraLink(true)}><GlassIcon name="link" /> Link do cliente</Button>
         <Button onClick={abrirNova}>+ Nova otimização</Button>
       </PageHeader>
 
@@ -225,7 +226,7 @@ function BlocoDia({ clienteNome, otim, onEditar }: { clienteNome: string; otim: 
             atualizada {new Date(otim.updated_at).toLocaleString('pt-BR')}
           </span>
           <div className="ml-auto flex items-center gap-3">
-            <button onClick={copiarDia} className="text-xs text-slate-400 hover:text-brand-400" title="Copiar só este dia">📋 copiar</button>
+            <button onClick={copiarDia} className="text-xs text-slate-400 hover:text-brand-400" title="Copiar só este dia"><GlassIcon name="clipboard" /> copiar</button>
             <button onClick={onEditar} className="text-xs text-slate-400 hover:text-brand-400">editar</button>
           </div>
         </div>
@@ -335,7 +336,7 @@ function ModalEditar({
       <div className="space-y-3 text-sm">
         {rascunhoNotif && (
           <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-200">
-            <span>📝 Encontramos um rascunho salvo desse dia que ainda não foi enviado.</span>
+            <span><GlassIcon name="note" /> Encontramos um rascunho salvo desse dia que ainda não foi enviado.</span>
             <div className="flex gap-2">
               <button
                 onClick={() => { setC(rascunhoNotif); setRascunhoNotif(null); }}
@@ -371,7 +372,7 @@ function ModalEditar({
           onChange={(e) => setC(e.target.value)}
           placeholder="ex: pausei 3 anúncios do conjunto Interesses (CPL alto), escalei o carrossel Black em +30%, criei nova campanha de remarketing com o público 180d..."
         />
-        <p className="text-[10px] text-slate-500">💾 Rascunho salvo automaticamente enquanto você digita.</p>
+        <p className="text-[10px] text-slate-500"><GlassIcon name="save" /> Rascunho salvo automaticamente enquanto você digita.</p>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-300">Prints das campanhas</label>

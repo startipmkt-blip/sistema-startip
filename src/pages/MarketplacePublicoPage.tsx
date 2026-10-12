@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Produto {
   id: string;
@@ -66,7 +67,7 @@ export function MarketplacePublicoPage() {
     <div className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="text-center">
-          <div className="mb-2 text-4xl">🛍️</div>
+          <div className="mb-2 text-4xl"><GlassIcon name="shopping-bag" /></div>
           <h1 className="text-3xl font-semibold text-white">Turbo Marketplace</h1>
           <p className="mt-1 text-sm text-slate-400">Descontos e ofertas exclusivas entre os clientes da Startip.</p>
         </header>
@@ -79,7 +80,7 @@ export function MarketplacePublicoPage() {
                 onClick={() => setAba(t.id)}
                 className={`rounded px-3 py-1 text-xs ${aba === t.id ? 'bg-brand-500 text-white' : 'text-slate-300'}`}
               >
-                {t.label}
+                {glassify(t.label)}
               </button>
             ))}
           </div>
@@ -104,7 +105,7 @@ export function MarketplacePublicoPage() {
                   {e.logo_url ? (
                     <img src={e.logo_url} alt="" className="h-12 w-12 rounded-lg border border-white/10 object-cover" />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-500/15 text-lg text-brand-300">🏢</div>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-500/15 text-lg text-brand-300"><GlassIcon name="building" /></div>
                   )}
                   <div className="min-w-0">
                     <h3 className="truncate text-sm font-semibold text-slate-100">{e.nome}</h3>
@@ -138,7 +139,7 @@ export function MarketplacePublicoPage() {
                       rel="noopener noreferrer"
                       className="flex-1 rounded-md bg-emerald-500 px-3 py-2 text-center text-xs font-medium text-white hover:bg-emerald-600"
                     >
-                      💬 Falar com vendedor
+                      <GlassIcon name="message" /> Falar com vendedor
                     </a>
                   )}
                   {e.instagram && (

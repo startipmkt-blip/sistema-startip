@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import type { Formulario } from '@/modules/formularios/types';
 import { TIPO_LABEL } from '@/modules/formularios/types';
+import { glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   formulario: Formulario;
@@ -49,7 +50,7 @@ export function ExportarDiagnosticoBtn({ formulario, nomeCliente }: Props) {
 
   return (
     <Button variant="secondary" onClick={copiar}>
-      {estado === 'copiado' ? '✅ Copiado!' : '📋 Exportar p/ Diagnóstico'}
+      {glassify(estado === 'copiado' ? '✅ Copiado!' : '📋 Exportar p/ Diagnóstico')}
     </Button>
   );
 }

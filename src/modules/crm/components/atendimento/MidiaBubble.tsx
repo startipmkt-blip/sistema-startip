@@ -3,6 +3,7 @@ import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
 import type { CrmMensagem } from '@/modules/crm/types';
 import { AudioPlayer } from './AudioPlayer';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   msg: CrmMensagem;
@@ -57,11 +58,11 @@ export function MidiaBubble({ msg }: Props) {
               title="Baixar imagem"
               onClick={(e) => e.stopPropagation()}
             >
-              ⬇
+              <GlassIcon name="download" />
             </a>
           </div>
         ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500">📷 …</div>
+          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500"><GlassIcon name="camera" /> …</div>
         )}
         {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm">{msg.texto}</div>}
       </div>
@@ -80,11 +81,11 @@ export function MidiaBubble({ msg }: Props) {
               className="rounded-full px-1 text-slate-300 hover:bg-white/10"
               title="Baixar áudio"
             >
-              ⬇
+              <GlassIcon name="download" />
             </a>
           </>
         ) : (
-          <span className="text-xs text-slate-400">🎵 carregando…</span>
+          <span className="text-xs text-slate-400"><GlassIcon name="music" /> carregando…</span>
         )}
       </div>
     );
@@ -93,7 +94,7 @@ export function MidiaBubble({ msg }: Props) {
   if (msg.tipo === 'documento') {
     return (
       <div className="flex items-center gap-2 rounded-md bg-white/5 p-2">
-        <span className="text-xl" aria-hidden>📎</span>
+        <span className="text-xl" aria-hidden><GlassIcon name="paperclip" /></span>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-medium">{msg.midia_nome ?? 'Documento'}</div>
           {url && (
@@ -124,11 +125,11 @@ export function MidiaBubble({ msg }: Props) {
               title="Baixar vídeo"
               onClick={(e) => e.stopPropagation()}
             >
-              ⬇
+              <GlassIcon name="download" />
             </a>
           </div>
         ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500">🎬 …</div>
+          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500"><GlassIcon name="clapperboard" /> …</div>
         )}
         {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm">{msg.texto}</div>}
       </div>
@@ -138,7 +139,7 @@ export function MidiaBubble({ msg }: Props) {
   if (msg.tipo === 'sticker') {
     return url
       ? <img src={url} alt="figurinha" className="h-32 w-32 rounded" />
-      : <div className="h-32 w-32 rounded bg-slate-800 text-center text-4xl leading-32">🌟</div>;
+      : <div className="h-32 w-32 rounded bg-slate-800 text-center text-4xl leading-32"><GlassIcon name="star" /></div>;
   }
 
   // Fallback: texto puro

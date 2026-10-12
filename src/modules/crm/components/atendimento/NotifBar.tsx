@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNotifConfig, pedirPermissao, tocarBip } from '@/modules/crm/api/notificacoesApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 // Toggle discreto usado no cabeçalho da inbox. O hook global de realtime
 // (useNotificacoesCrm) é chamado em AtendimentoTab, não aqui.
@@ -30,7 +31,7 @@ export function NotifBar() {
         className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-200 hover:bg-white/10"
         title="Notificações"
       >
-        {precisaLiberar ? '🔔 Ativar' : config.som ? '🔔' : '🔕'}
+        {glassify(precisaLiberar ? '🔔 Ativar' : config.som ? '🔔' : '🔕')}
       </button>
 
       {aberto && (
@@ -51,17 +52,17 @@ export function NotifBar() {
           )}
 
           <label className="mt-1 flex items-center justify-between gap-2 py-1.5 text-slate-200">
-            <span>🔊 Tocar som</span>
+            <span><GlassIcon name="volume" /> Tocar som</span>
             <input type="checkbox" checked={config.som}
               onChange={(e) => salvar.mutate({ som: e.target.checked })} />
           </label>
           <label className="flex items-center justify-between gap-2 py-1.5 text-slate-200">
-            <span>💬 Avisar no navegador</span>
+            <span><GlassIcon name="message" /> Avisar no navegador</span>
             <input type="checkbox" checked={config.notificacao}
               onChange={(e) => salvar.mutate({ notificacao: e.target.checked })} />
           </label>
           <label className="flex items-center justify-between gap-2 py-1.5 text-slate-200">
-            <span>🔴 Badge no título da aba</span>
+            <span><GlassIcon name="orb-red" /> Badge no título da aba</span>
             <input type="checkbox" checked={config.titulo_badge}
               onChange={(e) => salvar.mutate({ titulo_badge: e.target.checked })} />
           </label>
@@ -81,7 +82,7 @@ export function NotifBar() {
           <button
             onClick={tocarBip}
             className="mt-2 w-full rounded border border-white/10 bg-white/5 py-1.5 text-slate-300 hover:bg-white/10"
-          >🎧 Testar som</button>
+          ><GlassIcon name="headphones" /> Testar som</button>
         </div>
       )}
     </div>

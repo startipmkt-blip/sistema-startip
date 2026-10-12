@@ -22,6 +22,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { StatCard } from '@/shared/ui/StatCard';
 import { KanbanBoard } from '@/shared/ui/KanbanBoard';
 import { formatMoney } from '@/shared/lib/format';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 type Sub = 'atendimento' | 'solicitacoes' | 'leads' | 'funil' | 'contatos';
 
@@ -108,7 +109,7 @@ export function CrmPage() {
                   : 'text-slate-300 hover:bg-white/5'
               }`}
             >
-              <span aria-hidden>{t.icone}</span>
+              <span aria-hidden><GlassIcon emoji={t.icone} /></span>
               {t.label}
             </button>
           ))}
@@ -118,10 +119,10 @@ export function CrmPage() {
           {sub === 'leads' && (
             <>
               <Button variant="secondary" onClick={() => exportarLeadsCsv(todos)}>
-                ⬇️ Excel
+                <GlassIcon name="download" /> Excel
               </Button>
               <Button variant="secondary" onClick={exportarPdf}>
-                📄 PDF
+                <GlassIcon name="file" /> PDF
               </Button>
               <Button variant="secondary" onClick={() => setEtapasOpen(true)}>
                 Etapas

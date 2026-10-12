@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface ModalProps {
   open: boolean;
@@ -35,13 +36,13 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-          <h2 className="text-base font-semibold text-white">{title}</h2>
+          <h2 className="text-base font-semibold text-white">{glassify(title)}</h2>
           <button
             onClick={onClose}
             className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-slate-200"
             aria-label="Fechar"
           >
-            ✕
+            <GlassIcon name="x" />
           </button>
         </div>
         <div className="max-h-[80vh] overflow-y-auto px-5 py-4">{children}</div>

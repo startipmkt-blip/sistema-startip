@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Textarea } from '@/shared/ui/Textarea';
 import { useResponderData } from '@/modules/datas-comemorativas/api/datasApi';
 import type { Aprovacao, Ocorrencia } from '@/modules/datas-comemorativas/types';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 function quando(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
@@ -27,7 +28,7 @@ export function AprovacaoStatus({ aprovacao: a, visao }: StatusProps) {
       }`}
     >
       <div className="font-semibold">
-        {aprovada ? '✅' : '❌'} {titulo} <span className="font-normal opacity-70">· {quando(a.respondido_em)}</span>
+        {glassify(aprovada ? '✅' : '❌')} {titulo} <span className="font-normal opacity-70">· {quando(a.respondido_em)}</span>
       </div>
       {!aprovada && a.justificativa && (
         <p className="mt-1 whitespace-pre-wrap leading-relaxed text-slate-200">
@@ -94,14 +95,14 @@ export function AprovacaoCliente({ slug, ocorrencia: o, aprovacao }: ClienteProp
             disabled={responder.isPending}
             className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/25 disabled:opacity-50"
           >
-            ✓ Aprovar
+            <GlassIcon name="check" /> Aprovar
           </button>
           <button
             onClick={() => { setReprovando(true); setErro(null); }}
             disabled={responder.isPending}
             className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/20 disabled:opacity-50"
           >
-            ✕ Reprovar
+            <GlassIcon name="x" /> Reprovar
           </button>
           {aprovacao && (
             <button onClick={() => setAlterando(false)} className="px-2 text-xs text-slate-400 hover:text-slate-200">

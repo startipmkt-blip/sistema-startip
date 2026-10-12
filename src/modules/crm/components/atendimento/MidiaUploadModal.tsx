@@ -3,6 +3,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { useEnviarMidia } from '@/modules/crm/api/crmApi';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   open: boolean;
@@ -66,7 +67,7 @@ export function MidiaUploadModal({ open, onClose, leadId, tipo, arquivo }: Props
           )}
           {tipo === 'documento' && (
             <div className="text-center">
-              <div className="text-4xl">📎</div>
+              <div className="text-4xl"><GlassIcon name="paperclip" /></div>
               <div className="mt-2 text-sm font-medium text-slate-100">{arquivo.name}</div>
               <div className="text-xs text-slate-400">{tamanho(arquivo.size)}</div>
             </div>

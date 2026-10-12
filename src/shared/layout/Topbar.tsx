@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Icon } from '@/shared/ui/Icon';
 import { TemaToggle } from '@/shared/layout/TemaToggle';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu: () => void; ocultarHamburguer?: boolean }) {
   const { profile, session, isAdmin, isCliente, signOut } = useAuth();
@@ -45,7 +46,7 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
           className="hidden items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-300 hover:bg-white/10 sm:flex"
           title="Busca universal (Ctrl+K)"
         >
-          <span>🔎</span>
+          <span><GlassIcon name="search" /></span>
           <span className="hidden md:inline">Buscar…</span>
           <kbd className="rounded border border-white/10 bg-white/5 px-1 text-[10px] text-slate-400">Ctrl K</kbd>
         </button>

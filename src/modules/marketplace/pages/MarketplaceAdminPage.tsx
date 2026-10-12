@@ -7,6 +7,7 @@ import { Input } from '@/shared/ui/Input';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function MarketplaceAdminPage() {
   const { data: perfis, isLoading } = useMpPerfis();
@@ -28,7 +29,7 @@ export function MarketplaceAdminPage() {
     <div className="space-y-4 p-4">
       <header className="flex flex-wrap items-center gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-white">🛍️ Marketplace</h1>
+          <h1 className="text-xl font-semibold text-white"><GlassIcon name="shopping-bag" /> Marketplace</h1>
           <p className="text-xs text-slate-400">Gerencie o perfil e os produtos dos clientes no clube de descontos.</p>
         </div>
         <a
@@ -119,8 +120,8 @@ function PerfilForm({ cid, inicial }: { cid: string; inicial: ReturnType<typeof 
           Categoria
           <select value={categoria} onChange={(e) => setCategoria(e.target.value as MpCategoria)}
                   className="mt-1 w-full rounded-md border border-white/10 bg-slate-800 px-3 py-2 text-sm text-slate-100 [color-scheme:dark]">
-            <option value="base">🏢 Base Turbo</option>
-            <option value="beneficios">⭐ Clube de Benefícios</option>
+            <option value="base">Base Turbo</option>
+            <option value="beneficios">Clube de Benefícios</option>
           </select>
         </label>
         <Input id="segm" label="Segmento" value={segmento} onChange={(e) => setSegmento(e.target.value)} placeholder="Ex: Tráfego pago, Moda, Advocacia…" />
@@ -207,7 +208,7 @@ function ProdutosSection({ clienteId }: { clienteId: string }) {
                 onClick={() => { if (confirm('Apagar produto?')) apagar.mutate({ id: p.id, cliente_id: clienteId }); }}
                 className="rounded-md px-2 text-xs text-red-300 hover:bg-red-500/10"
               >
-                🗑️
+                <GlassIcon name="trash" />
               </button>
             </li>
           ))}

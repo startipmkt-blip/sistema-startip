@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 // Chrome/Edge/Android disparam 'beforeinstallprompt' quando o app é
 // instalável. iOS Safari não dispara nada — nesse caso mostramos uma
@@ -51,7 +52,7 @@ export function PwaInstallHint() {
   return (
     <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md rounded-2xl border border-white/10 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="flex items-start gap-3">
-        <span className="text-2xl">📲</span>
+        <span className="text-2xl"><GlassIcon name="smartphone" /></span>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold text-slate-100">Instalar Startip OS</div>
           {prompt ? (

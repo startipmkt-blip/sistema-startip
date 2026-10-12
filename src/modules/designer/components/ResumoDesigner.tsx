@@ -4,6 +4,7 @@ import {
   useDemandas, useTempoDesigner, formatarDuracao, segundosAberto, TIPO_LABEL,
 } from '../api/demandasApi';
 import { useTempoTotal } from './DemandaCard';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 function inicioDaSemana(): Date {
   const d = new Date();
@@ -24,7 +25,7 @@ function LinhaFazendo({ titulo, cliente, quem, tempo }: {
         {cliente && <span className="text-slate-400"> · {cliente}</span>}
       </span>
       <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 font-semibold text-emerald-300">
-        ⏱ {quem || '—'} · {formatarDuracao(total)}
+        <GlassIcon name="timer" /> {quem || '—'} · {formatarDuracao(total)}
       </span>
     </li>
   );
@@ -60,20 +61,20 @@ export function ResumoDesigner() {
       <div className="grid gap-2 text-center sm:grid-cols-4">
         <div className="rounded-lg bg-blue-500/10 p-2">
           <div className="text-lg font-bold text-blue-300">{r.fazendo.length}</div>
-          <div className="text-[11px] text-slate-400">🎨 fazendo agora</div>
+          <div className="text-[11px] text-slate-400"><GlassIcon name="palette" /> fazendo agora</div>
         </div>
         <div className="rounded-lg bg-white/5 p-2">
           <div className="text-lg font-bold text-slate-100">{r.fila.length}</div>
-          <div className="text-[11px] text-slate-400">📥 na fila</div>
+          <div className="text-[11px] text-slate-400"><GlassIcon name="inbox" /> na fila</div>
         </div>
         <div className="rounded-lg bg-amber-500/10 p-2">
           <div className="text-lg font-bold text-amber-300">{r.aprovacao}</div>
-          <div className="text-[11px] text-slate-400">👀 aguardando aprovação</div>
+          <div className="text-[11px] text-slate-400"><GlassIcon name="eye" /> aguardando aprovação</div>
         </div>
         <div className="rounded-lg bg-emerald-500/10 p-2">
           <div className="text-lg font-bold text-emerald-300">{r.feitasSemana}</div>
           <div className="text-[11px] text-slate-400">
-            ✅ feitas na semana{r.segSemana > 0 && ` · ${formatarDuracao(r.segSemana)}`}
+            <GlassIcon name="check-circle" /> feitas na semana{r.segSemana > 0 && ` · ${formatarDuracao(r.segSemana)}`}
           </div>
         </div>
       </div>

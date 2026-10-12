@@ -5,6 +5,7 @@ import {
   TIPO_LABEL, formatarDuracao, segundosAberto,
   type DesignerDemanda, type TempoDemanda,
 } from '../api/demandasApi';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   d: DesignerDemanda;
@@ -59,7 +60,7 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
     >
       {d.atrasada && (
         <div className="mb-2 rounded-md bg-red-500/20 px-2 py-1 text-[11px] font-semibold text-red-200">
-          ⚠ ATRASADA há {atraso} dia{atraso === 1 ? '' : 's'}
+          <GlassIcon name="alert" /> ATRASADA há {atraso} dia{atraso === 1 ? '' : 's'}
           {d.carregada && d.prazo && (
             <span className="block font-normal text-red-300/80">
               ↪ veio de {labelMes(mesDaSemana(d.prazo.slice(0, 10)))}
@@ -74,27 +75,27 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
       </div>
       <p className="font-semibold text-slate-100 line-clamp-2">{d.titulo}</p>
       {d.cliente_nome && (
-        <p className="mt-1 truncate text-[11px] text-slate-400">🏢 {d.cliente_nome}</p>
+        <p className="mt-1 truncate text-[11px] text-slate-400"><GlassIcon name="building" /> {d.cliente_nome}</p>
       )}
       {d.descricao && (
         <p className="mt-1 line-clamp-2 text-[11px] text-slate-500">{d.descricao}</p>
       )}
       {(audios > 0 || arquivos > 0) && (
         <p className="mt-1 flex gap-3 text-[11px] text-slate-400">
-          {audios > 0 && <span>🎙 {audios} áudio{audios > 1 ? 's' : ''}</span>}
-          {arquivos > 0 && <span>📎 {arquivos} anexo{arquivos > 1 ? 's' : ''}</span>}
+          {audios > 0 && <span><GlassIcon name="mic" /> {audios} áudio{audios > 1 ? 's' : ''}</span>}
+          {arquivos > 0 && <span><GlassIcon name="paperclip" /> {arquivos} anexo{arquivos > 1 ? 's' : ''}</span>}
         </p>
       )}
       {aberto && (
         <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
-          ⏱ {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
+          <GlassIcon name="timer" /> {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
         </div>
       )}
       {!aberto && total > 0 && (
-        <p className="mt-2 text-[11px] text-slate-400">⏱ {formatarDuracao(total)} gastos</p>
+        <p className="mt-2 text-[11px] text-slate-400"><GlassIcon name="timer" /> {formatarDuracao(total)} gastos</p>
       )}
       <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
-        <span>{d.responsavel_nome ? `👤 ${d.responsavel_nome}` : 'sem responsável'}</span>
+        <span>{glassify(d.responsavel_nome ? `👤 ${d.responsavel_nome}` : 'sem responsável')}</span>
         <Badge tone={prazoInfo.tone}>{prazoInfo.texto}</Badge>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { Button } from '@/shared/ui/Button';
 import { Modal } from '@/shared/ui/Modal';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Ideia {
   id: string;
@@ -114,7 +115,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
   if (erro) return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <Card className="w-full max-w-md p-6 text-center">
-        <div className="mb-3 text-3xl">⚠️</div>
+        <div className="mb-3 text-3xl"><GlassIcon name="alert" /></div>
         <div className="text-slate-100">{erro}</div>
       </Card>
     </div>
@@ -149,15 +150,15 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
         </div>
 
         <div className="text-center text-xs text-slate-400">
-          {dados.ideias.length === 0 ? 'Nenhum conteúdo publicado neste mês ainda.' :
+          {glassify(dados.ideias.length === 0 ? 'Nenhum conteúdo publicado neste mês ainda.' :
             pendentes === 0 ? '✅ Todos os conteúdos deste mês já foram decididos.' :
-              `${pendentes} conteúdo(s) aguardando sua decisão.`}
+              `${pendentes} conteúdo(s) aguardando sua decisão.`)}
         </div>
 
         {pendentes >= 2 && (
           <div className="flex justify-center">
             <Button onClick={() => void aprovarTodos()} disabled={salvando}>
-              ✅ Aprovar todos os {pendentes} pendentes
+              <GlassIcon name="check-circle" /> Aprovar todos os {pendentes} pendentes
             </Button>
           </div>
         )}
@@ -187,7 +188,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                         </Badge>
                         {i.dia_postagem && (
                           <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
-                            📅 postar em {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                            <GlassIcon name="calendar" /> postar em {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
                           </span>
                         )}
                       </div>
@@ -204,7 +205,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                             className="h-48 w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
                           />
                           <span className="absolute inset-0 grid place-items-center">
-                            <span className="rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white">▶ Ver prévia</span>
+                            <span className="rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white"><GlassIcon name="play" /> Ver prévia</span>
                           </span>
                         </button>
                       ) : driveInfo(i.link_drive).abrirUrl ? (
@@ -226,7 +227,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                       {i.status === 'pendente' && (
                         <div className="mt-4 flex gap-2">
                           <Button onClick={() => void decidir(i.id, 'aprovado')} disabled={salvando} className="flex-1">
-                            ✅ Aprovado
+                            <GlassIcon name="check-circle" /> Aprovado
                           </Button>
                           <Button
                             variant="secondary"
@@ -234,7 +235,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                             disabled={salvando}
                             className="flex-1"
                           >
-                            ❌ Não aprovado
+                            <GlassIcon name="x-circle" /> Não aprovado
                           </Button>
                         </div>
                       )}
@@ -298,11 +299,11 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
               <div className="flex gap-2">
                 <Button className="flex-1" disabled={salvando}
                   onClick={() => { const i = previa; setPrevia(null); void decidir(i.id, 'aprovado'); }}>
-                  ✅ Aprovado
+                  <GlassIcon name="check-circle" /> Aprovado
                 </Button>
                 <Button variant="secondary" className="flex-1" disabled={salvando}
                   onClick={() => { const i = previa; setPrevia(null); setReprovar(i); setJustificativa(''); }}>
-                  ❌ Não aprovado
+                  <GlassIcon name="x-circle" /> Não aprovado
                 </Button>
               </div>
             )}

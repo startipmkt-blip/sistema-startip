@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { CrmLead } from '@/modules/crm/types';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
   leads: CrmLead[];
@@ -57,7 +58,7 @@ export function ContatosTab({
             onChange={(e) => setBusca(e.target.value)}
             className="w-full rounded-md border border-white/10 bg-white/5 px-8 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
           />
-          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"><GlassIcon name="search" /></span>
         </div>
 
         <div className="flex gap-1 rounded-md border border-white/10 bg-white/5 p-0.5 text-xs">
@@ -129,7 +130,7 @@ export function ContatosTab({
                           : 'bg-white/10 text-slate-300'
                       }`}
                     >
-                      {(l.origem ?? '').toLowerCase().includes('whatsapp') && '🟢'} {l.origem || 'Manual'}
+                      {glassify((l.origem ?? '').toLowerCase().includes('whatsapp') && '🟢')} {l.origem || 'Manual'}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-xs text-slate-400">{l.etapa}</td>
@@ -142,14 +143,14 @@ export function ContatosTab({
                         onClick={() => onAbrirConversa(l.id)}
                         className="rounded-md bg-brand-500/15 px-2 py-1 text-[11px] font-medium text-brand-200 hover:bg-brand-500/25"
                       >
-                        💬 Conversa
+                        <GlassIcon name="message" /> Conversa
                       </button>
                       <button
                         onClick={() => onConverterCliente(l)}
                         className="rounded-md bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-200 hover:bg-white/10"
                         title="Cadastrar este contato como cliente da agência"
                       >
-                        ➕ Virar cliente
+                        <GlassIcon name="plus" /> Virar cliente
                       </button>
                     </div>
                   </td>

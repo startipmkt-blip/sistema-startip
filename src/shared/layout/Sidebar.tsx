@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { navItems, moduloKey } from '@/shared/layout/navigation';
 import { useAuth } from '@/shared/auth/AuthProvider';
-import { Icon } from '@/shared/ui/Icon';
 import { BrandMark } from '@/shared/ui/BrandMark';
 import { Badge } from '@/shared/ui/Badge';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   aberto: boolean;
@@ -27,7 +27,7 @@ export function Sidebar({ aberto, onFechar }: Props) {
               title="Em breve"
             >
               <span className="flex items-center gap-3">
-                <Icon name={item.icon} />
+                <GlassIcon name={item.icon} tone="slate" className="h-5 w-5" />
                 {item.label}
               </span>
               <Badge tone="slate">em breve</Badge>
@@ -48,8 +48,12 @@ export function Sidebar({ aberto, onFechar }: Props) {
               }`
             }
           >
-            <Icon name={item.icon} className="h-5 w-5 shrink-0" />
-            <span className="truncate">{item.label}</span>
+            {({ isActive }) => (
+              <>
+                <GlassIcon name={item.icon} tone={isActive ? 'white' : undefined} className="h-5 w-5" />
+                <span className="truncate">{item.label}</span>
+              </>
+            )}
           </NavLink>
         );
       })}
@@ -78,7 +82,7 @@ export function Sidebar({ aberto, onFechar }: Props) {
                 className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white"
                 aria-label="Fechar menu"
               >
-                ✕
+                <GlassIcon name="x" />
               </button>
             </div>
             {nav}

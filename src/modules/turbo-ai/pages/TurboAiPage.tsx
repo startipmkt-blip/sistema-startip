@@ -142,7 +142,7 @@ function TemplatesPanel({ moduleKey }: { moduleKey: AiModuleKey }) {
       <Card className="p-4">
         <h2 className="mb-2 text-sm font-semibold text-slate-100">+ Novo modelo</h2>
         <div className="space-y-2">
-          <Input id="tm-nome" label="Nome" value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Ex: Resposta 5⭐ padrão" />
+          <Input id="tm-nome" label="Nome" value={novoNome} onChange={(e) => setNovoNome(e.target.value)} placeholder="Ex: Resposta 5padrão" />
           <label className="block text-xs text-slate-300">
             Texto
             <textarea

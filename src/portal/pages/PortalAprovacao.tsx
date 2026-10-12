@@ -15,6 +15,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatMonth } from '@/shared/lib/format';
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function PortalAprovacao() {
   const { profile } = useAuth();
@@ -79,12 +80,12 @@ export function PortalAprovacao() {
                 onClick={() => setMesAberto(mes)}
                 className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-5 text-left shadow-sm transition-colors hover:border-brand-400/50 hover:bg-brand-500/10"
               >
-                <span className="text-3xl">📁</span>
+                <span className="text-3xl"><GlassIcon name="folder" /></span>
                 <div>
                   <div className="text-base font-semibold capitalize text-slate-100">{formatMonth(mes)}</div>
                   <div className="text-xs text-slate-400">
                     {itens.length} conteúdo(s) ·{' '}
-                    {pendentes === 0 ? 'tudo revisado ✓' : `${pendentes} aguardando você`}
+                    {glassify(pendentes === 0 ? 'tudo revisado ✓' : `${pendentes} aguardando você`)}
                   </div>
                 </div>
               </button>
@@ -120,9 +121,9 @@ export function PortalAprovacao() {
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <Button onClick={() => aprovar(i.id)} disabled={decidir.isPending}>✓ Aprovar</Button>
+                  <Button onClick={() => aprovar(i.id)} disabled={decidir.isPending}><GlassIcon name="check" /> Aprovar</Button>
                   <Button variant="secondary" onClick={() => { setReprovandoId(i.id); setJustificativa(i.justificativa); }}>
-                    ✕ Não aprovar
+                    <GlassIcon name="x" /> Não aprovar
                   </Button>
                 </div>
               )
@@ -133,10 +134,10 @@ export function PortalAprovacao() {
           {todasDecididas && mesSeguinte && (
             <div className="rounded-lg border border-brand-500/30 bg-brand-500/10 p-4">
               <h3 className="text-sm font-semibold text-slate-100">
-                🎉 Tudo revisado! Sugestões para <span className="capitalize">{formatMonth(mesSeguinte)}</span>?
+                <GlassIcon name="party" /> Tudo revisado! Sugestões para <span className="capitalize">{formatMonth(mesSeguinte)}</span>?
               </h3>
               {jaSugeriu ? (
-                <p className="mt-2 text-sm font-medium text-emerald-300">✓ Recebemos suas sugestões. Obrigado!</p>
+                <p className="mt-2 text-sm font-medium text-emerald-300"><GlassIcon name="check" /> Recebemos suas sugestões. Obrigado!</p>
               ) : (
                 <div className="mt-2 space-y-2">
                   <Textarea
