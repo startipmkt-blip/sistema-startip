@@ -7,6 +7,7 @@ import { ClienteFormModal } from '@/modules/clientes/components/ClienteFormModal
 import { ClienteWorkspace } from '@/modules/cliente-workspace/components/ClienteWorkspace';
 import { ScoreSaudeCard } from '@/modules/clientes/components/ScoreSaudeCard';
 import { CentralLinkCard } from '@/modules/clientes/components/CentralLinkCard';
+import { PautasCliente } from '@/modules/gestao-conteudo/components/PautasCliente';
 import { CriativosDoClienteCard } from '@/modules/ideias/criativos/components/CriativosDoClienteCard';
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
@@ -68,6 +69,9 @@ export function ClienteDetailPage() {
 
       {/* Painel do cliente (materiais + fluxo de trabalho) */}
       <ClienteWorkspace clienteId={cliente.id} />
+
+      {/* Pautas de conteúdo: mesma tabela da Gestão de Conteúdo (editar em um aparece no outro) */}
+      <PautasCliente clienteId={cliente.id} clienteNome={cliente.nome} />
 
       {/* Ideias de criativos marcadas para este cliente (somente leitura) */}
       <CriativosDoClienteCard clienteId={cliente.id} />
