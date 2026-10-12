@@ -1,5 +1,5 @@
 import { AnexosCriativo } from '@/modules/ideias/criativos/components/AnexosCriativo';
-import { descartarAnexo, useUrlAnexo } from '@/modules/ideias/criativos/criativosApi';
+import { descartarAnexo, urlParaBaixar, useUrlAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import { GravadorAudio } from './GravadorAudio';
 
@@ -22,6 +22,14 @@ function AudioItem({ anexo, onRemover }: { anexo: CriativoAnexo; onRemover: () =
         <p className="truncate text-[11px] text-slate-400">{anexo.name}</p>
         {url ? <audio controls src={url} className="h-8 w-full" /> : <p className="text-[11px] text-slate-500">carregando…</p>}
       </div>
+      <button
+        type="button"
+        onClick={() => void urlParaBaixar(anexo).then((u) => window.open(u, '_blank', 'noopener'))}
+        className="rounded-lg px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
+        title="Baixar áudio"
+      >
+        ⬇ Baixar
+      </button>
       <button
         type="button"
         onClick={onRemover}

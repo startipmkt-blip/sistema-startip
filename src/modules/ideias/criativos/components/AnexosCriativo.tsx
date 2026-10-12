@@ -110,11 +110,34 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
         <ul className="grid gap-2 sm:grid-cols-2">
           {anexos.map((a) => (
             <li key={a.path} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-2">
-              <MiniaturaAnexo anexo={a} className="h-12 w-12" />
+              <button
+                type="button"
+                onClick={() => void abrirAnexo(a).catch((e) => setErros([(e as Error).message || 'Não foi possível abrir.']))}
+                className="shrink-0 rounded-lg hover:ring-2 hover:ring-brand-400/60"
+                title="Ver"
+              >
+                <MiniaturaAnexo anexo={a} className="h-12 w-12" />
+              </button>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium text-slate-100">{a.name}</p>
                 <p className="text-[11px] text-slate-500">{formatarTamanho(a.size)}</p>
               </div>
+              <button
+                type="button"
+                onClick={() => void abrirAnexo(a).catch((e) => setErros([(e as Error).message || 'Não foi possível abrir.']))}
+                className="rounded-lg px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
+                title="Ver em nova aba"
+              >
+                👁 Ver
+              </button>
+              <button
+                type="button"
+                onClick={() => void abrirAnexo(a, true).catch((e) => setErros([(e as Error).message || 'Não foi possível baixar.']))}
+                className="rounded-lg px-2 py-1 text-xs text-slate-300 hover:bg-white/10"
+                title="Baixar"
+              >
+                ⬇ Baixar
+              </button>
               <button
                 type="button"
                 onClick={() => void remover(a)}
