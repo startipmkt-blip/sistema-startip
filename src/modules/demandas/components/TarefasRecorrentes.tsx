@@ -17,6 +17,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 export function TarefasRecorrentes() {
   const { data: tarefas, isLoading } = useRecorrentes();
@@ -54,7 +55,7 @@ export function TarefasRecorrentes() {
           <div className={`text-xs ${atrasada ? 'text-red-400' : 'text-slate-400'}`}>
             {recorrenciaLabel(t)}{t.responsaveis.length > 0 ? ` · ${t.responsaveis.join(', ')}` : ''}
           </div>
-          {t.descricao && <div className="mt-0.5 whitespace-pre-line text-xs text-slate-500">{t.descricao}</div>}
+          {t.descricao && <div className="mt-0.5 whitespace-pre-line text-xs text-slate-500"><Linkify texto={t.descricao} /></div>}
         </div>
         {atrasada ? <Badge tone="red"><GlassIcon name="alarm" /> atrasada</Badge> : pend && <Badge tone="amber">hoje</Badge>}
         <button className="text-xs font-medium text-brand-300 hover:underline" onClick={() => abrirEditar(t)}>Editar</button>

@@ -17,6 +17,7 @@ import { Select } from '@/shared/ui/Select';
 import { Badge } from '@/shared/ui/Badge';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 type Aba = 'entregas' | 'otimizacoes' | 'investimento' | 'avisos' | 'persona';
 
@@ -186,7 +187,7 @@ function SecaoOtimizacoes({ clienteId }: { clienteId: string }) {
                     <span className="text-slate-500">{new Date(o.criada_em).toLocaleString('pt-BR')}</span>
                   </div>
                   <div className="mt-1 text-sm font-medium text-slate-100">{o.titulo}</div>
-                  {o.descricao && <p className="whitespace-pre-line text-xs text-slate-400">{o.descricao}</p>}
+                  {o.descricao && <p className="whitespace-pre-line text-xs text-slate-400"><Linkify texto={o.descricao} /></p>}
                 </div>
                 <button onClick={() => { if (confirm('Excluir?')) excluir.mutate(o.id); }} className="text-xs text-red-400 hover:underline">Excluir</button>
               </Card>
@@ -287,7 +288,7 @@ function SecaoAvisos({ clienteId }: { clienteId: string }) {
                 <div className="min-w-0">
                   <div className="text-[10px] uppercase tracking-wider text-amber-300"><GlassIcon name="pin" /> {new Date(a.criado_em).toLocaleDateString('pt-BR')}</div>
                   <div className="text-sm font-semibold text-slate-100">{a.titulo}</div>
-                  <p className="whitespace-pre-line text-xs text-slate-300">{a.conteudo}</p>
+                  <p className="whitespace-pre-line text-xs text-slate-300"><Linkify texto={a.conteudo} /></p>
                 </div>
                 <div className="flex shrink-0 flex-col gap-1 text-xs">
                   <button

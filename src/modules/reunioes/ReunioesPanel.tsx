@@ -8,6 +8,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 interface Props {
   clienteId: string;
@@ -107,7 +108,7 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                   </div>
                 </div>
                 {expandida && r.resumo && (
-                  <p className="mt-3 whitespace-pre-wrap border-t border-white/10 pt-3 text-sm text-slate-200">{r.resumo}</p>
+                  <p className="mt-3 whitespace-pre-wrap border-t border-white/10 pt-3 text-sm text-slate-200"><Linkify texto={r.resumo} /></p>
                 )}
               </Card>
             );

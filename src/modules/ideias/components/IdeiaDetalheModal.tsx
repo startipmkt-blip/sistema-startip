@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { useExcluirIdeia } from '@/modules/ideias/api/ideiasApi';
 import { TIPO_LABEL, TIPO_TONE, IMPORTANCIA_LABEL, IMPORTANCIA_TONE, AUTOR_LABEL } from '@/modules/ideias/types';
 import type { Ideia } from '@/modules/ideias/types';
+import { Linkify } from '@/shared/ui/Linkify';
 
 interface Props {
   open: boolean;
@@ -48,7 +49,7 @@ export function IdeiaDetalheModal({ open, onClose, ideia, onEditar }: Props) {
         {ideia.descricao && (
           <div>
             <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Descrição</h3>
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">{ideia.descricao}</p>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200"><Linkify texto={ideia.descricao} /></p>
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import type { Formulario } from '@/modules/formularios/types';
+import { Linkify } from '@/shared/ui/Linkify';
 
 export function RespostasView({ formulario }: { formulario: Formulario }) {
   const respostas = formulario.respostas ?? {};
@@ -10,7 +11,7 @@ export function RespostasView({ formulario }: { formulario: Formulario }) {
             {p.label}
           </div>
           <div className="mt-1 whitespace-pre-wrap text-sm text-slate-100">
-            {String(respostas[p.id] ?? '').trim() || <span className="text-slate-500">— não respondido —</span>}
+            {String(respostas[p.id] ?? '').trim() ? <Linkify texto={String(respostas[p.id]).trim()} /> : <span className="text-slate-500">— não respondido —</span>}
           </div>
         </div>
       ))}

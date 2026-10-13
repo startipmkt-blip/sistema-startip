@@ -10,6 +10,7 @@ import { Input } from '@/shared/ui/Input';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { Linkify } from '@/shared/ui/Linkify';
 
 export function TurboAiPage() {
   const { data: modulos, isLoading } = useAiModulos();
@@ -197,7 +198,7 @@ function TemplatesPanel({ moduleKey }: { moduleKey: AiModuleKey }) {
                       <div className="flex items-start gap-3">
                         <div className="min-w-0 flex-1">
                           <div className="text-sm font-medium text-slate-100">{t.nome}</div>
-                          <div className="mt-1 whitespace-pre-wrap break-words text-xs text-slate-300">{t.body_text}</div>
+                          <div className="mt-1 whitespace-pre-wrap break-words text-xs text-slate-300"><Linkify texto={t.body_text} /></div>
                         </div>
                         <div className="flex gap-1">
                           <button onClick={() => { setEditandoId(t.id); setEditNome(t.nome); setEditBody(t.body_text); }} className="rounded px-2 text-xs text-slate-400 hover:bg-white/5">editar</button>

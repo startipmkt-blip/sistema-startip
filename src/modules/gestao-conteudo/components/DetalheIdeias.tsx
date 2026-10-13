@@ -12,6 +12,7 @@ import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import type { ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { IdeiaFormModal } from './IdeiaFormModal';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 interface Props {
   cliente: ClienteGestao;
@@ -178,7 +179,7 @@ export function DetalheIdeias({ cliente, mes, ideias }: Props) {
                             {i.dia_postagem && ` · postar ${new Date(`${i.dia_postagem}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`}
                           </p>
                           {i.descricao && (
-                            <p className="mt-1 line-clamp-3 whitespace-pre-line text-[11px] text-slate-300">{i.descricao}</p>
+                            <p className="mt-1 line-clamp-3 whitespace-pre-line text-[11px] text-slate-300"><Linkify texto={i.descricao} /></p>
                           )}
                         </div>
                       </div>

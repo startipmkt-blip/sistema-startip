@@ -24,6 +24,7 @@ import {
 } from '../api/otimizacoesApi';
 import { MESES_PT, isoHoje, ultimosMeses, fmtDia } from '../utils';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 const rascunhoKey = (slug: string, data: string) => `otim_rascunho_${slug}_${data}`;
 
@@ -231,7 +232,7 @@ function BlocoDia({ clienteNome, otim, onEditar }: { clienteNome: string; otim: 
           </div>
         </div>
         <pre className="whitespace-pre-wrap break-words font-sans text-sm text-slate-200">
-          {conteudoMostrado}{mostraCorte && '...'}
+          <Linkify texto={conteudoMostrado} />{mostraCorte && '...'}
         </pre>
         {longo && (
           <button onClick={() => setExpandido((v) => !v)} className="mt-2 text-xs text-brand-400 hover:underline">

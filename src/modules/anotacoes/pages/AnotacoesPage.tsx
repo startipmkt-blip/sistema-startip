@@ -13,6 +13,7 @@ import { Select } from '@/shared/ui/Select';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 type Aba = 'pendentes' | 'feitas';
 
@@ -193,7 +194,7 @@ function CardAnotacao({ a, onEditar, onToggle }: CardProps) {
         </button>
         <div className="min-w-0 flex-1">
           <p className={`whitespace-pre-wrap break-words text-sm leading-relaxed ${feita ? 'text-slate-400 line-through' : 'text-slate-100'} ${!expandido && textoLongo ? 'line-clamp-3' : ''}`}>
-            {a.texto}
+            <Linkify texto={a.texto} />
           </p>
           {textoLongo && (
             <button onClick={() => setExpandido((v) => !v)} className="mt-0.5 text-[11px] text-brand-300 hover:underline">

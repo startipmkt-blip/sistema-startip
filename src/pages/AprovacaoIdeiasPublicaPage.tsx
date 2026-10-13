@@ -7,6 +7,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { Button } from '@/shared/ui/Button';
 import { Modal } from '@/shared/ui/Modal';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 type Status = 'enviada' | 'aprovada' | 'reprovada';
 
@@ -172,7 +173,7 @@ export function AprovacaoIdeiasPublicaPage() {
                         )}
                       </div>
                       <h3 className="mb-1.5 text-base font-semibold text-slate-100">{i.titulo}</h3>
-                      <p className="whitespace-pre-line text-sm leading-relaxed text-slate-300">{i.descricao}</p>
+                      <p className="whitespace-pre-line text-sm leading-relaxed text-slate-300"><Linkify texto={i.descricao} /></p>
                       {i.status === 'reprovada' && i.justificativa && (
                         <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-300">
                           <strong>Você pediu:</strong> {i.justificativa}

@@ -4,6 +4,7 @@ import { IS_DEMO } from '@/shared/lib/env';
 import type { CrmMensagem } from '@/modules/crm/types';
 import { AudioPlayer } from './AudioPlayer';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 interface Props {
   msg: CrmMensagem;
@@ -64,7 +65,7 @@ export function MidiaBubble({ msg }: Props) {
         ) : (
           <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500"><GlassIcon name="camera" /> …</div>
         )}
-        {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm">{msg.texto}</div>}
+        {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm"><Linkify texto={msg.texto} /></div>}
       </div>
     );
   }
@@ -131,7 +132,7 @@ export function MidiaBubble({ msg }: Props) {
         ) : (
           <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500"><GlassIcon name="clapperboard" /> …</div>
         )}
-        {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm">{msg.texto}</div>}
+        {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm"><Linkify texto={msg.texto} /></div>}
       </div>
     );
   }
@@ -143,5 +144,5 @@ export function MidiaBubble({ msg }: Props) {
   }
 
   // Fallback: texto puro
-  return <div className="whitespace-pre-wrap break-words">{msg.texto}</div>;
+  return <div className="whitespace-pre-wrap break-words"><Linkify texto={msg.texto} /></div>;
 }

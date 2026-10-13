@@ -8,6 +8,7 @@ import { GlassIcon } from '@/shared/ui/GlassIcon';
 import {
   useExcluirPauta, usePautas, useSalvarPauta, type Pauta, type PautaForm,
 } from '../api/pautasApi';
+import { Linkify } from '@/shared/ui/Linkify';
 
 interface Props {
   clienteId: string;
@@ -111,7 +112,7 @@ export function PautasCliente({ clienteId, clienteNome }: Props) {
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-slate-100">{p.titulo}</p>
                         {p.descricao && (
-                          <p className="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-slate-300">{p.descricao}</p>
+                          <p className="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-slate-300"><Linkify texto={p.descricao} /></p>
                         )}
                       </div>
                       <div className="flex shrink-0 gap-3 text-xs">

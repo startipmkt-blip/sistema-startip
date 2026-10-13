@@ -5,6 +5,7 @@ import { clientePorSlug } from '@/modules/otimizacoes/clientes';
 import { MESES_PT, fmtDia } from '@/modules/otimizacoes/utils';
 import { BrandMark } from '@/shared/ui/BrandMark';
 import { Spinner } from '@/shared/ui/Spinner';
+import { Linkify } from '@/shared/ui/Linkify';
 
 export function OtimizacoesPublicaPage() {
   const { token } = useParams();
@@ -101,7 +102,7 @@ function BlocoPublico({ data, conteudo, anexos }: {
       </div>
       <div className="min-w-0 flex-1">
         <pre className="whitespace-pre-wrap break-words font-sans text-sm text-slate-200">
-          {conteudoMostrado}{mostraCorte && '...'}
+          <Linkify texto={conteudoMostrado} />{mostraCorte && '...'}
         </pre>
         {longo && (
           <button

@@ -7,6 +7,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 const STATUS_TABS: { id: SolicitacaoStatus | 'todas'; label: string }[] = [
   { id: 'pendente',     label: 'Pendentes' },
@@ -149,7 +150,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                       {s.pilar && <div className="text-[10px] text-slate-500">{p.label}</div>}
                     </td>
                     <td className="p-2 align-top text-slate-200">
-                      <div className="whitespace-pre-wrap break-words">{s.texto}</div>
+                      <div className="whitespace-pre-wrap break-words"><Linkify texto={s.texto} /></div>
                       {s.status !== 'pendente' && (
                         <Badge tone={s.status === 'concluida' ? 'green' : s.status === 'descartada' ? 'slate' : 'amber'}>
                           {s.status}

@@ -35,6 +35,7 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 const EmojiPicker = lazy(() => import('./EmojiPicker'));
 
@@ -331,7 +332,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                       <span>·</span>
                       <span>{new Date(n.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <div className="whitespace-pre-wrap">{n.texto}</div>
+                    <div className="whitespace-pre-wrap"><Linkify texto={n.texto} /></div>
                   </div>
                 </div>
               );
@@ -459,7 +460,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                         {m.texto && /https?:\/\//i.test(m.texto) && (
                           <LinkPreviewCard texto={m.texto} mensagemId={m.id} linkPreviewCache={m.link_preview ?? null} />
                         )}
-                        <div className="whitespace-pre-wrap break-words">{m.texto}</div>
+                        <div className="whitespace-pre-wrap break-words"><Linkify texto={m.texto} /></div>
                       </>
                     )}
 

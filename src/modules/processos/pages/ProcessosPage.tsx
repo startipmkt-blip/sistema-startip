@@ -20,6 +20,7 @@ import { formatDate } from '@/shared/lib/format';
 import { urlDoArquivo } from '@/shared/lib/storage';
 import type { ProcessoAnexo } from '@/modules/processos/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 function AnexosList({ anexos }: { anexos: ProcessoAnexo[] }) {
   async function abrir(a: ProcessoAnexo) {
@@ -150,7 +151,7 @@ export function ProcessosPage() {
                   </div>
                 </div>
                 <div className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-                  {selecionado.conteudo}
+                  <Linkify texto={selecionado.conteudo} />
                 </div>
                 {(selecionado.anexos?.length ?? 0) > 0 && (
                   <div className="mt-6 border-t border-white/10 pt-4">

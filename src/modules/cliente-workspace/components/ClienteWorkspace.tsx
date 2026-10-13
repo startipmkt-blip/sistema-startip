@@ -25,6 +25,7 @@ import { formatDate } from '@/shared/lib/format';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string; clienteNome?: string }) {
   const { data: docs, isLoading } = useClienteDocs(clienteId);
@@ -211,7 +212,7 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
             <div className="space-y-3">
               {doc?.conteudo && (
                 <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-                  {doc.conteudo}
+                  <Linkify texto={doc.conteudo} />
                 </div>
               )}
               {doc?.anexo_url && (

@@ -2,6 +2,7 @@ import type { CsResposta } from '@/modules/cs-clientes/api/csEnviosApi';
 import { dataHora } from '@/modules/cs-clientes/lib/mensagens';
 import { Modal } from '@/shared/ui/Modal';
 import { Badge } from '@/shared/ui/Badge';
+import { Linkify } from '@/shared/ui/Linkify';
 
 const TIPO_LABEL: Record<CsResposta['tipo'], string> = { semanal: 'CS de sexta', nps: 'NPS' };
 
@@ -29,7 +30,7 @@ export function RespostasModal({ clienteNome, respostas, onClose }: Props) {
                 {r.respostas.map((i) => (
                   <div key={i.pergunta}>
                     <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{i.pergunta}</dt>
-                    <dd className="whitespace-pre-line text-sm text-slate-100">{i.resposta}</dd>
+                    <dd className="whitespace-pre-line text-sm text-slate-100"><Linkify texto={i.resposta} /></dd>
                   </div>
                 ))}
               </dl>

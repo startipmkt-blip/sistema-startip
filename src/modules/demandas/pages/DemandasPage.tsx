@@ -27,6 +27,7 @@ import { KanbanBoard } from '@/shared/ui/KanbanBoard';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 type Aba = 'quadro' | 'concluidas' | 'recorrentes';
 
@@ -187,7 +188,7 @@ export function DemandasPage() {
             <Badge tone={PRIORIDADE_TONE[d.prioridade]} className="shrink-0 !px-2 !py-0 text-[10px]">{PRIORIDADE_LABEL[d.prioridade]}</Badge>
           </div>
           {d.descricao && (
-            <p className="mt-0.5 line-clamp-2 whitespace-pre-wrap text-[11px] leading-snug text-slate-300">{d.descricao}</p>
+            <p className="mt-0.5 line-clamp-2 whitespace-pre-wrap text-[11px] leading-snug text-slate-300"><Linkify texto={d.descricao} /></p>
           )}
           <div className="text-[11px] text-slate-400">{d.cliente_nome}</div>
           {tocadores?.[d.id] && (

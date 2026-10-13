@@ -13,6 +13,7 @@ import {
   FREQUENCIA_LABEL, useExcluirFuncao, useFuncoes, useSalvarFuncao,
   type DesignerFuncao, type FuncaoForm, type FuncaoFrequencia,
 } from '../api/funcoesApi';
+import { Linkify } from '@/shared/ui/Linkify';
 
 const MAX_CHIPS = 8;
 
@@ -198,7 +199,7 @@ export function FuncoesDesigner() {
                   <Badge tone="blue">{FREQUENCIA_LABEL[f.frequencia]}</Badge>
                 </div>
                 {f.descricao && (
-                  <p className="whitespace-pre-line text-xs leading-relaxed text-slate-300">{f.descricao}</p>
+                  <p className="whitespace-pre-line text-xs leading-relaxed text-slate-300"><Linkify texto={f.descricao} /></p>
                 )}
                 <div className="flex flex-wrap gap-1">
                   {f.todos_clientes ? (

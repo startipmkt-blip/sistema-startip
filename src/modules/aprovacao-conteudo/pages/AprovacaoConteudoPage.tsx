@@ -13,6 +13,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 const MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -226,7 +227,7 @@ export function AprovacaoConteudoPage() {
                             )}
                           </div>
                           <h3 className="mb-1 text-sm font-semibold text-slate-100">{i.titulo}</h3>
-                          <p className="whitespace-pre-line text-xs leading-relaxed text-slate-300">{i.descricao || <span className="italic text-slate-500">Sem descrição — clique em editar.</span>}</p>
+                          <p className="whitespace-pre-line text-xs leading-relaxed text-slate-300">{i.descricao ? <Linkify texto={i.descricao} /> : <span className="italic text-slate-500">Sem descrição — clique em editar.</span>}</p>
                           {i.status === 'reprovado' && i.justificativa && (
                             <div className="mt-2 rounded-md border border-red-500/20 bg-red-500/5 p-2 text-[11px] text-red-300">
                               <strong>Motivo:</strong> {i.justificativa}

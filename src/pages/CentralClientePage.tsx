@@ -4,6 +4,7 @@ import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 interface Dados {
   cliente: { id: string; nome: string; logo_url: string | null; status: string; servicos: string[]; data_entrada: string; tipo_negocio: string };
@@ -190,7 +191,7 @@ function AbaOtimizacoes({ itens }: { itens: Dados['otimizacoes'] }) {
                 <span className="text-[11px] text-slate-500">{new Date(o.criada_em).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
               </div>
               <div className="text-sm font-medium text-slate-100">{o.titulo}</div>
-              {o.descricao && <p className="mt-1 whitespace-pre-line text-xs text-slate-400">{o.descricao}</p>}
+              {o.descricao && <p className="mt-1 whitespace-pre-line text-xs text-slate-400"><Linkify texto={o.descricao} /></p>}
             </Card>
           </li>
         ))}
@@ -215,7 +216,7 @@ function AbaInvestimento({ itens }: { itens: Dados['investimento'] }) {
                 <div className="text-[11px] text-slate-500">média diária: {fmtMoney(Number(s.media_diaria))}</div>
               </div>
             </div>
-            {s.observacoes && <p className="mt-2 whitespace-pre-line text-xs text-slate-400">{s.observacoes}</p>}
+            {s.observacoes && <p className="mt-2 whitespace-pre-line text-xs text-slate-400"><Linkify texto={s.observacoes} /></p>}
           </Card>
         ))}
       </div>
@@ -235,7 +236,7 @@ function AbaAvisos({ itens }: { itens: Dados['avisos'] }) {
                 <span className="text-[11px] text-slate-500">{new Date(a.criado_em).toLocaleDateString('pt-BR')}</span>
               </div>
               <div className="text-sm font-semibold text-slate-100">{a.titulo}</div>
-              <p className="mt-1 whitespace-pre-line text-xs text-slate-300">{a.conteudo}</p>
+              <p className="mt-1 whitespace-pre-line text-xs text-slate-300"><Linkify texto={a.conteudo} /></p>
             </Card>
           </li>
         ))}
@@ -247,10 +248,10 @@ function AbaPersona({ p }: { p: Dados['persona'] }) {
   if (!p) return <Card className="p-6 text-center text-sm text-slate-500">Persona ainda não foi mapeada.</Card>;
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {p.persona && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="target" /> Persona</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.persona}</p></Card>}
-      {p.planejamento_estrategico && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="clipboard" /> Planejamento estratégico</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.planejamento_estrategico}</p></Card>}
-      {p.tom_de_voz && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="mic" /> Tom de voz</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.tom_de_voz}</p></Card>}
-      {p.produtos_servicos && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="shopping-bag" /> Produtos / serviços</h3><p className="whitespace-pre-line text-sm text-slate-200">{p.produtos_servicos}</p></Card>}
+      {p.persona && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="target" /> Persona</h3><p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={p.persona} /></p></Card>}
+      {p.planejamento_estrategico && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="clipboard" /> Planejamento estratégico</h3><p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={p.planejamento_estrategico} /></p></Card>}
+      {p.tom_de_voz && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="mic" /> Tom de voz</h3><p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={p.tom_de_voz} /></p></Card>}
+      {p.produtos_servicos && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="shopping-bag" /> Produtos / serviços</h3><p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={p.produtos_servicos} /></p></Card>}
     </div>
   );
 }

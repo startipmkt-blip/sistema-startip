@@ -3,6 +3,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { useResponderData } from '@/modules/datas-comemorativas/api/datasApi';
 import type { Aprovacao, Ocorrencia } from '@/modules/datas-comemorativas/types';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { Linkify } from '@/shared/ui/Linkify';
 
 function quando(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
@@ -32,7 +33,7 @@ export function AprovacaoStatus({ aprovacao: a, visao }: StatusProps) {
       </div>
       {!aprovada && a.justificativa && (
         <p className="mt-1 whitespace-pre-wrap leading-relaxed text-slate-200">
-          <span className="text-slate-400">Motivo: </span>{a.justificativa}
+          <span className="text-slate-400">Motivo: </span><Linkify texto={a.justificativa} />
         </p>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
+import { LinksDoCampo } from '@/shared/ui/Linkify';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -19,6 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={`glass-field px-3 py-2 text-sm transition-colors focus:border-brand-400/60 focus:outline-none focus:ring-1 focus:ring-brand-400/50 ${className}`}
           {...props}
         />
+        {(!props.type || props.type === 'text' || props.type === 'url') && <LinksDoCampo valor={props.value} />}
       </div>
     );
   },
