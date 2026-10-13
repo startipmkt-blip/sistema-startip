@@ -68,6 +68,7 @@ export interface DesignerDemanda {
   id: string;
   cliente_id: string | null;
   cliente_nome?: string | null;
+  cliente_logo?: string | null;
   titulo: string;
   descricao: string | null;
   briefing: string | null;
@@ -100,6 +101,8 @@ interface Filtros {
   clienteIds?: string[] | null;
 }
 
+type CliMin = { id: string; nome: string; logo_url: string | null };
+
 async function fetchDemandas(): Promise<DesignerDemanda[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from as any)('designer_demandas')
@@ -116,15 +119,16 @@ async function fetchDemandas(): Promise<DesignerDemanda[]> {
   const [clientes, profiles] = await Promise.all([
     cliIds.length
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ? (supabase.from as any)('clientes').select('id, nome').in('id', cliIds)
-      : Promise.resolve({ data: [] as { id: string; nome: string }[] }),
+      ? (supabase.from as any)('clientes').select('id, nome, logo_url').in('id', cliIds)
+      : Promise.resolve({ data: [] as CliMin[] }),
     respIds.length
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ? (supabase.from as any)('profiles').select('id, nome').in('id', respIds)
       : Promise.resolve({ data: [] as { id: string; nome: string }[] }),
   ]);
 
-  const mapaCli = new Map<string, string>((clientes.data ?? []).map((c: { id: string; nome: string }) => [c.id, c.nome]));
+  const mapaCli = new Map<string, string>((clientes.data ?? []).map((c: CliMin) => [c.id, c.nome]));
+  const mapaLogo = new Map<string, string | null>((clientes.data ?? []).map((c: CliMin) => [c.id, c.logo_url || null]));
   const mapaProf = new Map<string, string>((profiles.data ?? []).map((p: { id: string; nome: string }) => [p.id, p.nome]));
   return rows.map((r) => {
     const pos = posicaoDaDemanda(r);
@@ -135,6 +139,7 @@ async function fetchDemandas(): Promise<DesignerDemanda[]> {
     carregada: pos.carregada,
     ref_data: pos.ref,
     cliente_nome: r.cliente_id ? (mapaCli.get(r.cliente_id) ?? null) : null,
+    cliente_logo: r.cliente_id ? (mapaLogo.get(r.cliente_id) ?? null) : null,
     responsavel_nome: r.responsavel_id ? (mapaProf.get(r.responsavel_id) ?? null) : null,
     };
   });

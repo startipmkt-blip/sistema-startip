@@ -106,6 +106,30 @@ export function useSalvarCliente() {
   });
 }
 
+// Troca só a logo, sem passar pelo formulário de edição.
+export function useAtualizarLogoCliente() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: { id: string; logo_url: string | null }) => {
+      if (IS_DEMO) {
+        const atual = demoFindCliente(params.id);
+        if (atual) demoUpdateCliente(params.id, { ...atual, logo_url: params.logo_url });
+        return;
+      }
+      const { error } = await supabase
+        .from('clientes')
+        .update({ logo_url: params.logo_url } as never)
+        .eq('id', params.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: clientesKeys.all });
+      // Telas que mostram a logo junto do nome do cliente.
+      qc.invalidateQueries({ queryKey: ['designer'] });
+    },
+  });
+}
+
 async function deleteCliente(id: string): Promise<void> {
   if (IS_DEMO) {
     demoDeleteCliente(id);

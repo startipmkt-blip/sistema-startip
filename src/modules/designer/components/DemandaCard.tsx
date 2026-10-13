@@ -79,7 +79,12 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
       </div>
 
       <p className="text-sm leading-snug text-slate-100 line-clamp-3">{d.titulo}</p>
-      {d.cliente_nome && <p className="mt-0.5 truncate text-[11px] text-slate-400">{d.cliente_nome}</p>}
+      {d.cliente_nome && (
+        <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
+          {d.cliente_logo && <img src={d.cliente_logo} alt="" className="h-4 w-4 shrink-0 rounded-full object-cover" />}
+          <span className="truncate">{d.cliente_nome}</span>
+        </p>
+      )}
       {d.carregada && d.prazo && (
         <p className="mt-0.5 text-[11px] text-red-300">↪ veio de {labelMes(mesDaSemana(d.prazo.slice(0, 10)))}</p>
       )}
