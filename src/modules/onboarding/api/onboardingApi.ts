@@ -25,6 +25,7 @@ function etapasDoModelo(etapas: EtapaModelo[], feitas = 0): EtapaAndamento[] {
     etapa: e.titulo,
     tempo: e.tempo,
     itens: [...e.itens],
+    itens_feitos: i < feitas ? e.itens.map((_, k) => k) : [],
     concluida: i < feitas,
     concluida_em: i < feitas ? '2026-07-22T10:00:00Z' : null,
   }));
@@ -122,7 +123,7 @@ async function fetchAndamentos(): Promise<OnboardingAndamento[]> {
       .order('created_at', { ascending: false }),
     supabase
       .from('onboarding_etapas')
-      .select('id, cliente_id, etapa, tempo, itens, concluida, concluida_em, ordem, created_at')
+      .select('id, cliente_id, etapa, tempo, itens, itens_feitos, concluida, concluida_em, ordem, created_at')
       .order('ordem', { ascending: true })
       .order('created_at', { ascending: true }),
   ]);
@@ -147,6 +148,7 @@ async function fetchAndamentos(): Promise<OnboardingAndamento[]> {
       etapa: row.etapa,
       tempo: row.tempo ?? '',
       itens: row.itens ?? [],
+      itens_feitos: row.itens_feitos ?? [],
       concluida: row.concluida,
       concluida_em: row.concluida_em,
     });
@@ -190,6 +192,7 @@ async function iniciarOnboarding(templateId: string, clienteId: string): Promise
     etapa: e.titulo,
     tempo: e.tempo || null,
     itens: e.itens,
+    itens_feitos: [],
     concluida: false,
     ordem,
   }));
@@ -215,6 +218,34 @@ async function toggleEtapa(etapaId: string, concluida: boolean): Promise<void> {
     .update({ concluida, concluida_em: concluida ? new Date().toISOString() : null } as never)
     .eq('id', etapaId);
   if (error) throw error;
+}
+
+async function toggleItem(etapaId: string, index: number, feito: boolean): Promise<void> {
+  if (IS_DEMO) {
+    for (const a of demoAndamentos) {
+      const e = a.etapas.find((x) => x.id === etapaId);
+      if (!e) continue;
+      const set = new Set(e.itens_feitos);
+      if (feito) set.add(index); else set.delete(index);
+      e.itens_feitos = [...set].sort((x, y) => x - y);
+    }
+    return;
+  }
+  const { data, error } = await supabase
+    .from('onboarding_etapas')
+    .select('itens_feitos')
+    .eq('id', etapaId)
+    .single();
+  if (error) throw error;
+  const atuais: number[] = ((data as any)?.itens_feitos ?? []) as number[];
+  const set = new Set(atuais);
+  if (feito) set.add(index); else set.delete(index);
+  const novos = [...set].sort((x, y) => x - y);
+  const { error: eUp } = await supabase
+    .from('onboarding_etapas')
+    .update({ itens_feitos: novos } as never)
+    .eq('id', etapaId);
+  if (eUp) throw eUp;
 }
 
 async function excluirOnboarding(clienteId: string): Promise<void> {
@@ -293,6 +324,14 @@ export function useToggleEtapa() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (p: { etapaId: string; concluida: boolean }) => toggleEtapa(p.etapaId, p.concluida),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['onboarding', 'andamentos'] }),
+  });
+}
+export function useToggleItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { etapaId: string; index: number; feito: boolean }) =>
+      toggleItem(p.etapaId, p.index, p.feito),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['onboarding', 'andamentos'] }),
   });
 }

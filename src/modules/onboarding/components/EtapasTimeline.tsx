@@ -1,7 +1,10 @@
 
-import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';interface EtapaTimeline {  etapa: string;
+import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+interface EtapaTimeline {
+  etapa: string;
   tempo: string;
   itens: string[];
+  itens_feitos?: number[];
   concluida?: boolean;
 }
 
@@ -53,12 +56,32 @@ export function EtapasTimeline({ etapas, comStatus = false }: { etapas: EtapaTim
                 </div>
                 {e.itens.length > 0 && (
                   <ul className="mt-2 space-y-1">
-                    {e.itens.map((it, j) => (
-                      <li key={j} className="flex items-start gap-2 text-xs text-slate-300">
-                        <span className="mt-px text-brand-400" aria-hidden>›</span>
-                        {it}
-                      </li>
-                    ))}
+                    {e.itens.map((it, j) => {
+                      const feito = comStatus && ((e.itens_feitos ?? []).includes(j) || e.concluida);
+                      if (!comStatus) {
+                        return (
+                          <li key={j} className="flex items-start gap-2 text-xs text-slate-300">
+                            <span className="mt-px text-brand-400" aria-hidden>›</span>
+                            {it}
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={j} className="flex items-start gap-2 text-xs">
+                          <span
+                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
+                              feito
+                                ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-200'
+                                : 'border-white/20 bg-white/5 text-transparent'
+                            }`}
+                            aria-hidden
+                          >
+                            {feito ? '✓' : ''}
+                          </span>
+                          <span className={feito ? 'text-slate-500 line-through' : 'text-slate-300'}>{it}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </div>

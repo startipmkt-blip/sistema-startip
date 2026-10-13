@@ -4,6 +4,7 @@ import {
   useOnboardingTemplates,
   useOnboardingAndamentos,
   useToggleEtapa,
+  useToggleItem,
   useOnboardingConclusoes,
   useConcluirOnboarding,
   useReabrirOnboarding,
@@ -105,16 +106,17 @@ export function OnboardingPage() {
 
 function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: boolean }) {
   const toggle = useToggleEtapa();
+  const toggleItem = useToggleItem();
   const concluir = useConcluirOnboarding();
   const reabrir = useReabrirOnboarding();
   const excluir = useExcluirOnboarding();
-  const [detalhes, setDetalhes] = useState(false);
+  const [detalhes, setDetalhes] = useState(true);
 
   const total = a.etapas.length;
   const feitas = a.etapas.filter((e) => e.concluida).length;
   const pct = total ? Math.round((feitas / total) * 100) : 0;
   const link = linkPublicoOnboarding(a.token);
-  const erro = toggle.error ?? concluir.error ?? reabrir.error ?? excluir.error;
+  const erro = toggle.error ?? toggleItem.error ?? concluir.error ?? reabrir.error ?? excluir.error;
 
   return (
     <Card className={`p-5 ${concluido ? 'opacity-90' : ''}`}>
@@ -135,36 +137,68 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
       </div>
 
       <ul className="mt-4 space-y-2">
-        {a.etapas.map((e) => (
-          <li key={e.id}>
-            <button
-              onClick={() => toggle.mutate({ etapaId: e.id, concluida: !e.concluida })}
-              disabled={concluido || toggle.isPending}
-              className="flex w-full items-start gap-2 text-left text-sm"
-            >
-              <span
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                  e.concluida ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/10 text-slate-400'
-                }`}
-              >{glassify(e.concluida ? '✓' : '')}</span>
-              <span className="min-w-0 flex-1">
-                <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>{e.etapa}</span>
-                {e.tempo && <span className="ml-2 text-xs text-amber-300/80"><GlassIcon name="timer" /> {e.tempo}</span>}
-              </span>
-            </button>
-            {detalhes && e.itens.length > 0 && (
-              <ul className="ml-7 mt-1 space-y-0.5">
-                {e.itens.map((it, j) => (
-                  <li key={j} className="text-xs text-slate-400">› {it}</li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
+        {a.etapas.map((e) => {
+          const feitosSet = new Set(e.itens_feitos ?? []);
+          const subTotal = e.itens.length;
+          const subFeitos = e.itens.reduce((n, _it, j) => n + (feitosSet.has(j) ? 1 : 0), 0);
+          return (
+            <li key={e.id}>
+              <button
+                onClick={() => toggle.mutate({ etapaId: e.id, concluida: !e.concluida })}
+                disabled={concluido || toggle.isPending}
+                className="flex w-full items-start gap-2 text-left text-sm"
+              >
+                <span
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
+                    e.concluida ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/10 text-slate-400'
+                  }`}
+                >{glassify(e.concluida ? '✓' : '')}</span>
+                <span className="min-w-0 flex-1">
+                  <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>{e.etapa}</span>
+                  {e.tempo && <span className="ml-2 text-xs text-amber-300/80"><GlassIcon name="timer" /> {e.tempo}</span>}
+                  {subTotal > 0 && (
+                    <span className="ml-2 text-xs text-slate-400">{subFeitos}/{subTotal}</span>
+                  )}
+                </span>
+              </button>
+              {detalhes && e.itens.length > 0 && (
+                <ul className="ml-7 mt-1 space-y-1">
+                  {e.itens.map((it, j) => {
+                    const feito = feitosSet.has(j);
+                    return (
+                      <li key={j}>
+                        <button
+                          type="button"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            toggleItem.mutate({ etapaId: e.id, index: j, feito: !feito });
+                          }}
+                          disabled={concluido || toggleItem.isPending}
+                          className="flex w-full items-start gap-2 text-left text-xs"
+                        >
+                          <span
+                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
+                              feito
+                                ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-200'
+                                : 'border-white/20 bg-white/5 text-transparent'
+                            }`}
+                          >
+                            {feito ? '✓' : ''}
+                          </span>
+                          <span className={feito ? 'text-slate-500 line-through' : 'text-slate-300'}>{it}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
+          );
+        })}
       </ul>
       {a.etapas.some((e) => e.itens.length > 0) && (
         <button className="mt-3 text-xs font-medium text-brand-300 hover:underline" onClick={() => setDetalhes((d) => !d)}>
-          {detalhes ? 'Ocultar passos de cada etapa' : 'Ver passos de cada etapa'}
+          {detalhes ? 'Ocultar sub-tarefas' : 'Ver sub-tarefas de cada etapa'}
         </button>
       )}
 
