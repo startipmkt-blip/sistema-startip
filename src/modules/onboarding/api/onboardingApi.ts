@@ -26,6 +26,8 @@ function etapasDoModelo(etapas: EtapaModelo[], feitas = 0): EtapaAndamento[] {
     tempo: e.tempo,
     itens: [...e.itens],
     itens_feitos: i < feitas ? e.itens.map((_, k) => k) : [],
+    itens_internos: [],
+    interno: false,
     concluida: i < feitas,
     concluida_em: i < feitas ? '2026-07-22T10:00:00Z' : null,
   }));
@@ -123,7 +125,7 @@ async function fetchAndamentos(): Promise<OnboardingAndamento[]> {
       .order('created_at', { ascending: false }),
     supabase
       .from('onboarding_etapas')
-      .select('id, cliente_id, etapa, tempo, itens, itens_feitos, concluida, concluida_em, ordem, created_at')
+      .select('id, cliente_id, etapa, tempo, itens, itens_feitos, itens_internos, interno, concluida, concluida_em, ordem, created_at')
       .order('ordem', { ascending: true })
       .order('created_at', { ascending: true }),
   ]);
@@ -149,6 +151,8 @@ async function fetchAndamentos(): Promise<OnboardingAndamento[]> {
       tempo: row.tempo ?? '',
       itens: row.itens ?? [],
       itens_feitos: row.itens_feitos ?? [],
+      itens_internos: row.itens_internos ?? [],
+      interno: Boolean(row.interno),
       concluida: row.concluida,
       concluida_em: row.concluida_em,
     });
@@ -193,6 +197,8 @@ async function iniciarOnboarding(templateId: string, clienteId: string): Promise
     tempo: e.tempo || null,
     itens: e.itens,
     itens_feitos: [],
+    itens_internos: [],
+    interno: false,
     concluida: false,
     ordem,
   }));
@@ -244,6 +250,49 @@ async function toggleItem(etapaId: string, index: number, feito: boolean): Promi
   const { error: eUp } = await supabase
     .from('onboarding_etapas')
     .update({ itens_feitos: novos } as never)
+    .eq('id', etapaId);
+  if (eUp) throw eUp;
+}
+
+async function toggleEtapaInterna(etapaId: string, interno: boolean): Promise<void> {
+  if (IS_DEMO) {
+    for (const a of demoAndamentos) {
+      const e = a.etapas.find((x) => x.id === etapaId);
+      if (e) e.interno = interno;
+    }
+    return;
+  }
+  const { error } = await supabase
+    .from('onboarding_etapas')
+    .update({ interno } as never)
+    .eq('id', etapaId);
+  if (error) throw error;
+}
+
+async function toggleItemInterno(etapaId: string, index: number, interno: boolean): Promise<void> {
+  if (IS_DEMO) {
+    for (const a of demoAndamentos) {
+      const e = a.etapas.find((x) => x.id === etapaId);
+      if (!e) continue;
+      const set = new Set(e.itens_internos);
+      if (interno) set.add(index); else set.delete(index);
+      e.itens_internos = [...set].sort((x, y) => x - y);
+    }
+    return;
+  }
+  const { data, error } = await supabase
+    .from('onboarding_etapas')
+    .select('itens_internos')
+    .eq('id', etapaId)
+    .single();
+  if (error) throw error;
+  const atuais: number[] = ((data as any)?.itens_internos ?? []) as number[];
+  const set = new Set(atuais);
+  if (interno) set.add(index); else set.delete(index);
+  const novos = [...set].sort((x, y) => x - y);
+  const { error: eUp } = await supabase
+    .from('onboarding_etapas')
+    .update({ itens_internos: novos } as never)
     .eq('id', etapaId);
   if (eUp) throw eUp;
 }
@@ -332,6 +381,21 @@ export function useToggleItem() {
   return useMutation({
     mutationFn: (p: { etapaId: string; index: number; feito: boolean }) =>
       toggleItem(p.etapaId, p.index, p.feito),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['onboarding', 'andamentos'] }),
+  });
+}
+export function useToggleEtapaInterna() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { etapaId: string; interno: boolean }) => toggleEtapaInterna(p.etapaId, p.interno),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['onboarding', 'andamentos'] }),
+  });
+}
+export function useToggleItemInterno() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (p: { etapaId: string; index: number; interno: boolean }) =>
+      toggleItemInterno(p.etapaId, p.index, p.interno),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['onboarding', 'andamentos'] }),
   });
 }

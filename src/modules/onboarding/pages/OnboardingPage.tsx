@@ -5,6 +5,8 @@ import {
   useOnboardingAndamentos,
   useToggleEtapa,
   useToggleItem,
+  useToggleEtapaInterna,
+  useToggleItemInterno,
   useOnboardingConclusoes,
   useConcluirOnboarding,
   useReabrirOnboarding,
@@ -107,6 +109,8 @@ export function OnboardingPage() {
 function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: boolean }) {
   const toggle = useToggleEtapa();
   const toggleItem = useToggleItem();
+  const toggleEtapaInterna = useToggleEtapaInterna();
+  const toggleItemInterno = useToggleItemInterno();
   const concluir = useConcluirOnboarding();
   const reabrir = useReabrirOnboarding();
   const excluir = useExcluirOnboarding();
@@ -116,7 +120,7 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
   const feitas = a.etapas.filter((e) => e.concluida).length;
   const pct = total ? Math.round((feitas / total) * 100) : 0;
   const link = linkPublicoOnboarding(a.token);
-  const erro = toggle.error ?? toggleItem.error ?? concluir.error ?? reabrir.error ?? excluir.error;
+  const erro = toggle.error ?? toggleItem.error ?? toggleEtapaInterna.error ?? toggleItemInterno.error ?? concluir.error ?? reabrir.error ?? excluir.error;
 
   return (
     <Card className={`p-5 ${concluido ? 'opacity-90' : ''}`}>
@@ -139,34 +143,54 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
       <ul className="mt-4 space-y-2">
         {a.etapas.map((e) => {
           const feitosSet = new Set(e.itens_feitos ?? []);
+          const internosSet = new Set(e.itens_internos ?? []);
           const subTotal = e.itens.length;
           const subFeitos = e.itens.reduce((n, _it, j) => n + (feitosSet.has(j) ? 1 : 0), 0);
           return (
             <li key={e.id}>
-              <button
-                onClick={() => toggle.mutate({ etapaId: e.id, concluida: !e.concluida })}
-                disabled={concluido || toggle.isPending}
-                className="flex w-full items-start gap-2 text-left text-sm"
-              >
-                <span
-                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                    e.concluida ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/10 text-slate-400'
+              <div className="flex w-full items-start gap-2 text-sm">
+                <button
+                  onClick={() => toggle.mutate({ etapaId: e.id, concluida: !e.concluida })}
+                  disabled={concluido || toggle.isPending}
+                  className="flex min-w-0 flex-1 items-start gap-2 text-left"
+                >
+                  <span
+                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
+                      e.concluida ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/10 text-slate-400'
+                    }`}
+                  >{glassify(e.concluida ? '✓' : '')}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>{e.etapa}</span>
+                    {e.interno && (
+                      <span className="ml-2 rounded bg-slate-500/20 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                        só equipe
+                      </span>
+                    )}
+                    {e.tempo && <span className="ml-2 text-xs text-amber-300/80"><GlassIcon name="timer" /> {e.tempo}</span>}
+                    {subTotal > 0 && (
+                      <span className="ml-2 text-xs text-slate-400">{subFeitos}/{subTotal}</span>
+                    )}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  title={e.interno ? 'Visível só para a equipe. Clique para mostrar ao cliente.' : 'Visível para o cliente. Clique para ocultar.'}
+                  onClick={() => toggleEtapaInterna.mutate({ etapaId: e.id, interno: !e.interno })}
+                  disabled={concluido || toggleEtapaInterna.isPending}
+                  className={`shrink-0 rounded p-1 text-xs transition-colors ${
+                    e.interno ? 'text-slate-400 hover:text-slate-200' : 'text-brand-300 hover:text-brand-200'
                   }`}
-                >{glassify(e.concluida ? '✓' : '')}</span>
-                <span className="min-w-0 flex-1">
-                  <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>{e.etapa}</span>
-                  {e.tempo && <span className="ml-2 text-xs text-amber-300/80"><GlassIcon name="timer" /> {e.tempo}</span>}
-                  {subTotal > 0 && (
-                    <span className="ml-2 text-xs text-slate-400">{subFeitos}/{subTotal}</span>
-                  )}
-                </span>
-              </button>
+                >
+                  {e.interno ? '🔒' : '👁'}
+                </button>
+              </div>
               {detalhes && e.itens.length > 0 && (
                 <ul className="ml-7 mt-1 space-y-1">
                   {e.itens.map((it, j) => {
                     const feito = feitosSet.has(j);
+                    const interno = internosSet.has(j);
                     return (
-                      <li key={j}>
+                      <li key={j} className="flex items-start gap-2">
                         <button
                           type="button"
                           onClick={(ev) => {
@@ -174,7 +198,7 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                             toggleItem.mutate({ etapaId: e.id, index: j, feito: !feito });
                           }}
                           disabled={concluido || toggleItem.isPending}
-                          className="flex w-full items-start gap-2 text-left text-xs"
+                          className="flex min-w-0 flex-1 items-start gap-2 text-left text-xs"
                         >
                           <span
                             className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
@@ -185,7 +209,28 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                           >
                             {feito ? '✓' : ''}
                           </span>
-                          <span className={feito ? 'text-slate-500 line-through' : 'text-slate-300'}>{it}</span>
+                          <span className={feito ? 'text-slate-500 line-through' : interno ? 'text-slate-400' : 'text-slate-300'}>
+                            {it}
+                            {interno && (
+                              <span className="ml-2 rounded bg-slate-500/20 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                                só equipe
+                              </span>
+                            )}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          title={interno ? 'Oculto do cliente. Clique para mostrar.' : 'Visível para o cliente. Clique para ocultar.'}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            toggleItemInterno.mutate({ etapaId: e.id, index: j, interno: !interno });
+                          }}
+                          disabled={concluido || toggleItemInterno.isPending}
+                          className={`shrink-0 rounded p-0.5 text-xs transition-colors ${
+                            interno ? 'text-slate-400 hover:text-slate-200' : 'text-brand-300/70 hover:text-brand-200'
+                          }`}
+                        >
+                          {interno ? '🔒' : '👁'}
                         </button>
                       </li>
                     );

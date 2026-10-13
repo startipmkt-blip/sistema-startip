@@ -25,6 +25,8 @@ export interface EtapaAndamento {
   tempo: string;
   itens: string[];
   itens_feitos: number[];
+  itens_internos: number[];
+  interno: boolean;
   concluida: boolean;
   concluida_em: string | null;
 }
