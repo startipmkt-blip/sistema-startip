@@ -70,6 +70,7 @@ export interface DesignerDemanda {
   cliente_nome?: string | null;
   titulo: string;
   descricao: string | null;
+  briefing: string | null;
   tipo: DesignerTipo;
   status: DesignerStatus;
   responsavel_id: string | null;
@@ -155,7 +156,7 @@ export function useDemandas(filtros: Filtros = {}) {
         }
         if (filtros.q) {
           const q = filtros.q.toLowerCase();
-          const hay = `${r.titulo} ${r.descricao ?? ''} ${r.cliente_nome ?? ''}`.toLowerCase();
+          const hay = `${r.titulo} ${r.descricao ?? ''} ${r.briefing ?? ''} ${r.cliente_nome ?? ''}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -170,6 +171,7 @@ interface UpsertInput {
   cliente_id: string | null;
   titulo: string;
   descricao?: string | null;
+  briefing?: string | null;
   tipo: DesignerTipo;
   status?: DesignerStatus;
   responsavel_id?: string | null;

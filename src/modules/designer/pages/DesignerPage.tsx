@@ -6,7 +6,7 @@ import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
-import { useDemandas, useDemandasRealtime, type DesignerDemanda } from '../api/demandasApi';
+import { useDemandas, useDemandasRealtime, type DesignerDemanda, type DesignerStatus } from '../api/demandasApi';
 import { DemandasKanban } from '../components/DemandasKanban';
 import { HistoricoDesigner } from '../components/HistoricoDesigner';
 import { ResumoDesigner } from '../components/ResumoDesigner';
@@ -83,6 +83,7 @@ function AbaDemandas() {
   const [visao, setVisao] = useState<'quadro' | 'historico'>('quadro');
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState<DesignerDemanda | null>(null);
+  const [statusNovo, setStatusNovo] = useState<DesignerStatus>('a_fazer');
 
   const { data: clientes } = useClientes('');
   const { data: operadores } = useOperadores();
@@ -113,8 +114,9 @@ function AbaDemandas() {
     return { total: t.length, atrasadas, hoje };
   }, [demandas]);
 
-  function abrir(d: DesignerDemanda | null) {
+  function abrir(d: DesignerDemanda | null, status: DesignerStatus = 'a_fazer') {
     setEditando(d);
+    setStatusNovo(status);
     setModalAberto(true);
   }
 
@@ -183,6 +185,7 @@ function AbaDemandas() {
           periodo={periodo}
           clienteIds={clienteIds}
           onEditar={abrir}
+          onNova={(status) => abrir(null, status)}
         />
       ) : (
         <HistoricoDesigner
@@ -195,7 +198,7 @@ function AbaDemandas() {
         />
       )}
 
-      <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} />
+      <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} statusInicial={statusNovo} />
     </div>
   );
 }

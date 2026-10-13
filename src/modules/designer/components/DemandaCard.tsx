@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Badge } from '@/shared/ui/Badge';
 import { diasEntre, hojeLocal, labelMes, mesDaSemana } from '../lib/periodo';
 import {
   TIPO_LABEL, formatarDuracao, segundosAberto,
   type DesignerDemanda, type TempoDemanda,
 } from '../api/demandasApi';
-import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
   d: DesignerDemanda;
@@ -14,17 +13,32 @@ interface Props {
   onDragStart: (id: string) => void;
 }
 
-const TIPO_COR: Record<string, 'slate' | 'blue' | 'green' | 'amber' | 'red'> = {
-  post: 'blue', carrossel: 'blue', reels: 'red', story: 'amber', web: 'green', extra: 'slate',
+// Etiquetas no estilo Trello: cor cheia por tipo de peça.
+const TIPO_ETIQUETA: Record<string, string> = {
+  post: 'bg-blue-600 text-blue-50',
+  carrossel: 'bg-purple-600 text-purple-50',
+  reels: 'bg-pink-600 text-pink-50',
+  story: 'bg-amber-500 text-amber-950',
+  web: 'bg-emerald-600 text-emerald-50',
+  extra: 'bg-slate-500 text-slate-50',
 };
+const ETIQUETA = 'rounded px-1.5 py-0.5 text-[10px] font-semibold leading-4';
 
-function diasAte(iso: string | null): { texto: string; tone: 'green' | 'amber' | 'red' | 'slate' } {
-  if (!iso) return { texto: 'sem prazo', tone: 'slate' };
-  const dias = diasEntre(hojeLocal(), iso);
-  if (dias < 0)  return { texto: `atrasada ${Math.abs(dias)}d`, tone: 'red' };
-  if (dias === 0) return { texto: 'hoje', tone: 'amber' };
-  if (dias <= 2)  return { texto: `${dias}d`, tone: 'amber' };
-  return { texto: `${dias}d`, tone: 'green' };
+const diaMes = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+
+function prazoChip(d: DesignerDemanda): { texto: string; cls: string } | null {
+  if (!d.prazo) return null;
+  const texto = diaMes(d.prazo);
+  if (d.status === 'concluido') return { texto, cls: 'bg-emerald-600 text-emerald-50' };
+  const dias = diasEntre(hojeLocal(), d.prazo);
+  if (dias < 0) return { texto, cls: 'bg-red-600 text-red-50' };
+  if (dias <= 2) return { texto: dias === 0 ? `${texto} · hoje` : texto, cls: 'bg-amber-500 text-amber-950' };
+  return { texto, cls: 'text-slate-400' };
+}
+
+function iniciais(nome: string): string {
+  const p = nome.trim().split(/\s+/);
+  return ((p[0]?.[0] ?? '') + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
 }
 
 // Soma fechados + o registro aberto, atualizando a cada segundo só enquanto roda.
@@ -41,62 +55,59 @@ export function useTempoTotal(tempo?: TempoDemanda): number {
 }
 
 export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
-  const prazoInfo = d.status === 'concluido' ? { texto: 'entregue', tone: 'green' as const } : diasAte(d.prazo);
+  const prazo = prazoChip(d);
   const total = useTempoTotal(tempo);
   const aberto = tempo?.aberto;
   const audios = d.anexos.filter((a) => a.type.startsWith('audio/')).length;
   const arquivos = d.anexos.length - audios;
   const atraso = d.atrasada && d.prazo ? diasEntre(d.prazo.slice(0, 10), hojeLocal()) : 0;
+  const temTexto = !!(d.descricao || d.briefing);
   return (
     <div
       draggable
       onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart(d.id); }}
       onClick={() => onEditar(d)}
-      className={`cursor-pointer rounded-lg border p-3 text-xs ${
-        d.atrasada
-          ? 'border-red-500/60 bg-red-500/10 hover:bg-red-500/15'
-          : 'border-white/10 bg-white/5 hover:border-brand-400/50 hover:bg-white/10'
+      className={`cursor-pointer rounded-lg bg-slate-800 px-3 py-2 shadow-md ring-1 hover:ring-2 hover:ring-brand-400/70 ${
+        d.atrasada ? 'ring-red-500/70' : 'ring-white/10'
       }`}
     >
-      {d.atrasada && (
-        <div className="mb-2 rounded-md bg-red-500/20 px-2 py-1 text-[11px] font-semibold text-red-200">
-          <GlassIcon name="alert" /> ATRASADA há {atraso} dia{atraso === 1 ? '' : 's'}
-          {d.carregada && d.prazo && (
-            <span className="block font-normal text-red-300/80">
-              ↪ veio de {labelMes(mesDaSemana(d.prazo.slice(0, 10)))}
-            </span>
-          )}
-        </div>
-      )}
-      <div className="mb-1 flex items-center gap-2">
-        <Badge tone={TIPO_COR[d.tipo] ?? 'slate'}>{TIPO_LABEL[d.tipo]}</Badge>
-        {d.origem === 'ideia_aprovada' && <Badge tone="green">ideia</Badge>}
-        {d.origem === 'calendario' && <Badge tone="blue">calendário</Badge>}
+      <div className="mb-1.5 flex flex-wrap gap-1">
+        <span className={`${ETIQUETA} ${TIPO_ETIQUETA[d.tipo] ?? TIPO_ETIQUETA.extra}`}>{TIPO_LABEL[d.tipo]}</span>
+        {d.atrasada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Atrasada {atraso}d</span>}
+        {d.origem === 'ideia_aprovada' && <span className={`${ETIQUETA} bg-emerald-600 text-emerald-50`}>Ideia</span>}
+        {d.origem === 'calendario' && <span className={`${ETIQUETA} bg-sky-600 text-sky-50`}>Calendário</span>}
       </div>
-      <p className="font-semibold text-slate-100 line-clamp-2">{d.titulo}</p>
-      {d.cliente_nome && (
-        <p className="mt-1 truncate text-[11px] text-slate-400"><GlassIcon name="building" /> {d.cliente_nome}</p>
+
+      <p className="text-sm leading-snug text-slate-100 line-clamp-3">{d.titulo}</p>
+      {d.cliente_nome && <p className="mt-0.5 truncate text-[11px] text-slate-400">{d.cliente_nome}</p>}
+      {d.carregada && d.prazo && (
+        <p className="mt-0.5 text-[11px] text-red-300">↪ veio de {labelMes(mesDaSemana(d.prazo.slice(0, 10)))}</p>
       )}
-      {d.descricao && (
-        <p className="mt-1 line-clamp-2 text-[11px] text-slate-500">{d.descricao}</p>
-      )}
-      {(audios > 0 || arquivos > 0) && (
-        <p className="mt-1 flex gap-3 text-[11px] text-slate-400">
-          {audios > 0 && <span><GlassIcon name="mic" /> {audios} áudio{audios > 1 ? 's' : ''}</span>}
-          {arquivos > 0 && <span><GlassIcon name="paperclip" /> {arquivos} anexo{arquivos > 1 ? 's' : ''}</span>}
-        </p>
-      )}
+
       {aberto && (
-        <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+        <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
           <GlassIcon name="timer" /> {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
         </div>
       )}
-      {!aberto && total > 0 && (
-        <p className="mt-2 text-[11px] text-slate-400"><GlassIcon name="timer" /> {formatarDuracao(total)} gastos</p>
-      )}
-      <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
-        <span>{glassify(d.responsavel_nome ? `👤 ${d.responsavel_nome}` : 'sem responsável')}</span>
-        <Badge tone={prazoInfo.tone}>{prazoInfo.texto}</Badge>
+
+      <div className="mt-2 flex min-h-6 items-center gap-2.5 text-[11px] text-slate-400">
+        {prazo && (
+          <span className={`inline-flex items-center gap-1 rounded px-1 py-0.5 ${prazo.cls}`} title="Prazo">
+            <GlassIcon name="clock" /> {prazo.texto}
+          </span>
+        )}
+        {temTexto && <span title="Tem descrição ou briefing"><GlassIcon name="note" /></span>}
+        {audios > 0 && <span title="Briefing em áudio"><GlassIcon name="mic" /> {audios}</span>}
+        {arquivos > 0 && <span title="Anexos"><GlassIcon name="paperclip" /> {arquivos}</span>}
+        {!aberto && total > 0 && <span title="Tempo gasto"><GlassIcon name="timer" /> {formatarDuracao(total)}</span>}
+        {d.responsavel_nome && (
+          <span
+            title={d.responsavel_nome}
+            className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/30 text-[10px] font-bold text-brand-100"
+          >
+            {iniciais(d.responsavel_nome)}
+          </span>
+        )}
       </div>
     </div>
   );

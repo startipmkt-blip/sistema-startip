@@ -10,17 +10,19 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   size?: 'md' | 'lg' | 'xl' | '2xl' | 'full';
+  // Formulários longos: clique fora e Esc não fecham, só os botões.
+  fecharSoPorBotao?: boolean;
 }
 
 const SIZES = { md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl', '2xl': 'max-w-6xl', full: 'max-w-[95vw]' } as const;
 
-export function Modal({ open, onClose, title, children, footer, size = 'md' }: ModalProps) {
+export function Modal({ open, onClose, title, children, footer, size = 'md', fecharSoPorBotao = false }: ModalProps) {
   useEffect(() => {
-    if (!open) return;
+    if (!open || fecharSoPorBotao) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [open, onClose, fecharSoPorBotao]);
 
   if (!open) return null;
 
@@ -29,7 +31,7 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
-      onClick={onClose}
+      onClick={fecharSoPorBotao ? undefined : onClose}
     >
       <div
         className={`w-full ${SIZES[size]} overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 shadow-glass backdrop-blur-2xl`}

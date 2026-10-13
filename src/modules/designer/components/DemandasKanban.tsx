@@ -15,9 +15,10 @@ interface Props {
   periodo?: { ini: string; fim: string } | null;
   clienteIds?: string[] | null;
   onEditar: (d: DesignerDemanda) => void;
+  onNova: (status: DesignerStatus) => void;
 }
 
-export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, onEditar }: Props) {
+export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, onEditar, onNova }: Props) {
   const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds });
   const { data: tempos } = useTempoDesigner();
   const mover = useMoverStatus();
@@ -52,8 +53,9 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
     );
   }
 
+  // Quadro estilo Trello: listas de largura fixa lado a lado, rolagem horizontal.
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <div className="flex items-start gap-3 overflow-x-auto pb-3">
       {STATUS_COLUNAS.map((col) => {
         const itens = porStatus[col.id];
         const highlighted = dropAlvo === col.id;
@@ -63,27 +65,28 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
             onDragOver={(e) => { e.preventDefault(); setDropAlvo(col.id); }}
             onDragLeave={() => setDropAlvo((v) => v === col.id ? null : v)}
             onDrop={() => handleDrop(col.id)}
-            className={`flex flex-col rounded-xl border p-3 transition-colors ${
-              highlighted ? 'border-brand-400 bg-brand-500/10' : 'border-white/10 bg-white/5'
+            className={`flex max-h-[75vh] w-72 shrink-0 flex-col rounded-xl bg-slate-900/80 transition-shadow ${
+              highlighted ? 'ring-2 ring-brand-400' : 'ring-1 ring-white/10'
             }`}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center justify-between px-3 pb-2 pt-3">
               <h3 className="text-sm font-semibold text-slate-100">
-                <span className="mr-1"><GlassIcon emoji={col.emoji} /></span>{col.label}
+                <span className="mr-1.5"><GlassIcon emoji={col.emoji} /></span>{col.label}
               </h3>
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-slate-300">{itens.length}</span>
+              <span className="text-xs text-slate-400">{itens.length}</span>
             </div>
-            <div className="space-y-2">
-              {itens.length === 0 ? (
-                <p className="rounded-md border border-dashed border-white/10 p-4 text-center text-[11px] text-slate-500">
-                  vazio
-                </p>
-              ) : (
-                itens.map((d) => (
-                  <DemandaCard key={d.id} d={d} tempo={tempos?.[d.id]} onEditar={onEditar} onDragStart={setArrastando} />
-                ))
-              )}
+            <div className="min-h-[2.5rem] flex-1 space-y-2 overflow-y-auto px-2 py-0.5">
+              {itens.map((d) => (
+                <DemandaCard key={d.id} d={d} tempo={tempos?.[d.id]} onEditar={onEditar} onDragStart={setArrastando} />
+              ))}
             </div>
+            <button
+              type="button"
+              onClick={() => onNova(col.id)}
+              className="m-2 flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-sm text-slate-400 hover:bg-white/10 hover:text-slate-200"
+            >
+              <GlassIcon name="plus" /> Adicionar um cartão
+            </button>
           </div>
         );
       })}

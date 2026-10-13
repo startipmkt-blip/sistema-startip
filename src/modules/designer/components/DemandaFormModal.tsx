@@ -3,7 +3,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
-import { Textarea } from '@/shared/ui/Textarea';
+import { TextareaExpansivel } from '@/shared/ui/TextareaExpansivel';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
 import { AnexosDemanda } from './AnexosDemanda';
@@ -21,9 +21,11 @@ interface Props {
   open: boolean;
   onClose: () => void;
   demanda: DesignerDemanda | null;
+  // Coluna de onde veio o "Adicionar um cartão".
+  statusInicial?: DesignerStatus;
 }
 
-export function DemandaFormModal({ open, onClose, demanda }: Props) {
+export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer' }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
   const { data: clientes } = useClientes('');
@@ -32,6 +34,7 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
   const [clienteId, setClienteId] = useState<string>('');
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [briefing, setBriefing] = useState('');
   const [tipo, setTipo] = useState<DesignerTipo>('post');
   const [status, setStatus] = useState<DesignerStatus>('a_fazer');
   const [responsavel, setResponsavel] = useState<string>('');
@@ -46,14 +49,15 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
     setClienteId(demanda?.cliente_id ?? '');
     setTitulo(demanda?.titulo ?? '');
     setDescricao(demanda?.descricao ?? '');
+    setBriefing(demanda?.briefing ?? '');
     setTipo(demanda?.tipo ?? 'post');
-    setStatus(demanda?.status ?? 'a_fazer');
+    setStatus(demanda?.status ?? statusInicial);
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
     setAnexos(demanda?.anexos ?? []);
     setNovos([]);
     setErro(null);
-  }, [open, demanda]);
+  }, [open, demanda, statusInicial]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +73,7 @@ export function DemandaFormModal({ open, onClose, demanda }: Props) {
         cliente_id: clienteId || null,
         titulo: titulo.trim(),
         descricao: descricao.trim() || null,
+        briefing: briefing.trim() || null,
         tipo, status,
         responsavel_id: responsavel || null,
         prazo: prazo || null,
@@ -112,6 +117,7 @@ ${r.cronometroErro}`);
       onClose={fechar}
       title={demanda ? 'Editar demanda' : 'Nova demanda'}
       size="lg"
+      fecharSoPorBotao
       footer={
         <>
           {demanda && (
@@ -156,7 +162,21 @@ ${r.cronometroErro}`);
 
         <Input id="tit" label="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
 
-        <Textarea id="desc" label="Descrição / briefing" value={descricao} onChange={(e) => setDescricao(e.target.value)} rows={4} />
+        <TextareaExpansivel
+          id="desc"
+          label="Descrição"
+          placeholder="O que é a demanda, em poucas linhas."
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+        />
+
+        <TextareaExpansivel
+          id="brief"
+          label="Briefing"
+          placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar."
+          value={briefing}
+          onChange={(e) => setBriefing(e.target.value)}
+        />
 
         <div className="grid gap-3 md:grid-cols-3">
           <Select
