@@ -7,6 +7,7 @@ import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   iniciarTimerDemanda, pararTimerDemanda, TOCADORES, type Tocador,
 } from '@/modules/demandas/api/cronometroApi';
+import { sincronizarGestaoConteudo } from './sincronizarConteudo';
 
 // Quem toca quando o responsável da demanda não é um usuário do cronômetro.
 const DESIGNER_PADRAO: Tocador = 'Gabriel';
@@ -212,6 +213,7 @@ export function useSalvarDemanda() {
         if (error) throw error;
         id = (data as { id: string }).id;
       }
+      await sincronizarGestaoConteudo(id!);
       return sincronizarCronometro({
         id: id!, titulo: input.titulo, de: input.id ? de : undefined, para, responsavelNome: responsavel_nome,
       });
@@ -219,6 +221,7 @@ export function useSalvarDemanda() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['designer'] });
       qc.invalidateQueries({ queryKey: ['cronometro'] });
+      qc.invalidateQueries({ queryKey: ['gestao-conteudo'] });
     },
   });
 }
@@ -235,6 +238,7 @@ export function useMoverStatus() {
         .update({ status: v.status, updated_at: new Date().toISOString(), ...carimbos(v.de, v.status, v.iniciado_em) })
         .eq('id', v.id);
       if (error) throw error;
+      await sincronizarGestaoConteudo(v.id);
       return sincronizarCronometro({
         id: v.id, titulo: v.titulo, de: v.de, para: v.status, responsavelNome: v.responsavel_nome,
       });
@@ -242,6 +246,7 @@ export function useMoverStatus() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['designer'] });
       qc.invalidateQueries({ queryKey: ['cronometro'] });
+      qc.invalidateQueries({ queryKey: ['gestao-conteudo'] });
     },
   });
 }
