@@ -6,6 +6,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { useAtualizarLogoCliente } from '@/modules/clientes/api/clientesApi';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 export function ClienteHeader({ cliente }: { cliente: Cliente }) {
   const iniciais = cliente.nome.slice(0, 2).toUpperCase();
@@ -48,7 +49,7 @@ export function ClienteHeader({ cliente }: { cliente: Cliente }) {
           className="group relative h-16 w-16 overflow-hidden rounded-lg border border-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           {cliente.logo_url ? (
-            <img src={cliente.logo_url} alt={`Logo de ${cliente.nome}`} className="h-full w-full object-cover" />
+            <LogoCliente src={cliente.logo_url} alt={`Logo de ${cliente.nome}`} className="h-full w-full object-cover" />
           ) : (
             <span className="flex h-full w-full items-center justify-center bg-brand-500/10 text-lg font-semibold text-brand-300">
               {iniciais}

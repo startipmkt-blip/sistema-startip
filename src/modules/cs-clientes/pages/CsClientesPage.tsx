@@ -19,6 +19,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 const OUTRO = '__outro__';
 
@@ -223,7 +224,7 @@ function LinhaCliente({
     <li className="flex flex-wrap items-center gap-2 py-2.5">
       <div className="flex w-52 items-center gap-2">
         {cliente.logo_url
-          ? <img src={cliente.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
+          ? <LogoCliente src={cliente.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
           : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
         <span className="truncate text-sm text-slate-100">{cliente.nome}</span>
       </div>

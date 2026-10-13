@@ -13,6 +13,7 @@ import {
 import { PostCard } from './PostCard';
 import { PreviaDrive } from './PreviaDrive';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 interface BaseProps {
   clientes: ClienteGestao[];
@@ -24,7 +25,7 @@ interface BaseProps {
 
 function Logo({ c, tam = 'h-9 w-9' }: { c: ClienteGestao; tam?: string }) {
   return c.logo_url
-    ? <img src={c.logo_url} alt="" className={`${tam} shrink-0 rounded-full object-cover`} />
+    ? <LogoCliente src={c.logo_url} alt="" className={`${tam} shrink-0 rounded-full object-cover`} />
     : <span className={`${tam} grid shrink-0 place-items-center rounded-full bg-white/5`}><GlassIcon name="building" /></span>;
 }
 

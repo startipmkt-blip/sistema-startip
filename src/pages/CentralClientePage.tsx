@@ -5,6 +5,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 interface Dados {
   cliente: { id: string; nome: string; logo_url: string | null; status: string; servicos: string[]; data_entrada: string; tipo_negocio: string };
@@ -79,7 +80,7 @@ export function CentralClientePage() {
       <header className="border-b border-white/5 bg-gradient-to-b from-slate-900 to-slate-950 px-4 py-6">
         <div className="mx-auto flex max-w-5xl items-center gap-4">
           {c.logo_url ? (
-            <img src={c.logo_url} alt="" className="h-14 w-14 rounded-full border border-white/10 object-cover" />
+            <LogoCliente src={c.logo_url} alt="" className="h-14 w-14 rounded-full border border-white/10 object-cover" />
           ) : (
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-2xl"><GlassIcon name="building" /></div>
           )}

@@ -5,6 +5,7 @@ import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 interface Pergunta { id: string; label: string; ajuda?: string }
 interface Dados {
@@ -114,7 +115,7 @@ export function CsPublicoPage() {
       <form onSubmit={(e) => void enviar(e)} className="mx-auto max-w-xl space-y-6">
         <header className="text-center">
           {dados.cliente.logo_url && (
-            <img src={dados.cliente.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />
+            <LogoCliente src={dados.cliente.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />
           )}
           <h1 className="text-2xl font-semibold text-white">{dados.cliente.nome}</h1>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">{dados.titulo}</p>

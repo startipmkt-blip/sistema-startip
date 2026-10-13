@@ -8,6 +8,7 @@ import { Input } from '@/shared/ui/Input';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 export function ClientesListPage() {
   const [busca, setBusca] = useState('');
@@ -65,7 +66,7 @@ export function ClientesListPage() {
                     className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/5"
                   >
                     {cliente.logo_url ? (
-                      <img
+                      <LogoCliente
                         src={cliente.logo_url}
                         alt=""
                         className="h-10 w-10 rounded-md border border-white/10 object-cover"

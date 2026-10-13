@@ -3,6 +3,7 @@ import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 interface Produto {
   id: string;
@@ -103,7 +104,7 @@ export function MarketplacePublicoPage() {
               <Card key={e.cliente_id} className="flex flex-col p-4">
                 <div className="mb-3 flex items-start gap-3">
                   {e.logo_url ? (
-                    <img src={e.logo_url} alt="" className="h-12 w-12 rounded-lg border border-white/10 object-cover" />
+                    <LogoCliente src={e.logo_url} alt="" className="h-12 w-12 rounded-lg border border-white/10 object-cover" />
                   ) : (
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-500/15 text-lg text-brand-300"><GlassIcon name="building" /></div>
                   )}

@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/Button';
 import { Modal } from '@/shared/ui/Modal';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 type Status = 'enviada' | 'aprovada' | 'reprovada';
 
@@ -113,7 +114,7 @@ export function AprovacaoIdeiasPublicaPage() {
     <div className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto max-w-4xl space-y-6">
         <header className="text-center">
-          {c.logo_url && <img src={c.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />}
+          {c.logo_url && <LogoCliente src={c.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />}
           <h1 className="text-2xl font-semibold text-white">{c.nome}</h1>
           <p className="mt-1 text-xs text-slate-400">Aprovação de ideias de conteúdo · Startip</p>
         </header>

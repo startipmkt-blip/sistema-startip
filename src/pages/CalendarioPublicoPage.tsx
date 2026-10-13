@@ -10,6 +10,7 @@ import { OcorrenciaCard } from '@/modules/datas-comemorativas/components/Ocorren
 import { AprovacaoCliente, AprovacaoStatus } from '@/modules/datas-comemorativas/components/AprovacaoData';
 import { MESES } from '@/modules/datas-comemorativas/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 type Aba = 'proximas' | 'historico';
 
@@ -65,7 +66,7 @@ export function CalendarioPublicoPage() {
       <div className="mx-auto max-w-3xl space-y-6">
         <header className="text-center">
           {data.cliente.logo_url && (
-            <img src={data.cliente.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />
+            <LogoCliente src={data.cliente.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />
           )}
           <h1 className="text-2xl font-semibold uppercase tracking-wide text-white">{data.cliente.nome}</h1>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">Calendário de datas comemorativas</p>

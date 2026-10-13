@@ -14,6 +14,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 const MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -119,7 +120,7 @@ export function AprovacaoConteudoPage() {
                   }`}
                 >
                   {c.logo_url
-                    ? <img src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
+                    ? <LogoCliente src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
                     : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
                   <span className="truncate">{c.nome}</span>
                 </button>
