@@ -1,9 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import {
-  useEnviarMensagemCliente, useGruposWhatsapp, useVincularGrupo, useVincularVarios, type GrupoWhatsapp,
+  useGruposWhatsapp, useVincularGrupo, useVincularVarios, type GrupoWhatsapp,
 } from '@/modules/cs-clientes/api/csClientesApi';
+import {
+  useCsConfig, useCsEnvios, useCsLinks, useCsRespostas, useSalvarCsConfig, type CsResposta,
+} from '@/modules/cs-clientes/api/csEnviosApi';
 import { sugerirGrupo } from '@/modules/cs-clientes/lib/sugerirGrupo';
+import { MSG_SEMANAL_PADRAO, dataCurta } from '@/modules/cs-clientes/lib/mensagens';
+import { MensagemModal } from '@/modules/cs-clientes/components/MensagemModal';
+import { DispararCsModal } from '@/modules/cs-clientes/components/DispararCsModal';
+import { RespostasModal } from '@/modules/cs-clientes/components/RespostasModal';
 import type { Cliente } from '@/shared/types/database';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Button } from '@/shared/ui/Button';
@@ -11,7 +18,6 @@ import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
-import { Textarea } from '@/shared/ui/Textarea';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 const OUTRO = '__outro__';
@@ -19,9 +25,32 @@ const OUTRO = '__outro__';
 export function CsClientesPage() {
   const clientesQ = useClientes('');
   const gruposQ = useGruposWhatsapp();
+  const configQ = useCsConfig();
+  const linksQ = useCsLinks();
+  const respostasQ = useCsRespostas();
+  const enviosQ = useCsEnvios();
+  const salvarConfig = useSalvarCsConfig();
   const vincularVarios = useVincularVarios();
   const [mensagemPara, setMensagemPara] = useState<Cliente | null>(null);
+  const [respostasDe, setRespostasDe] = useState<Cliente | null>(null);
   const [revisando, setRevisando] = useState(false);
+  const [disparando, setDisparando] = useState(false);
+
+  const links = useMemo(() => linksQ.data ?? {}, [linksQ.data]);
+  const msgSemanal = configQ.data?.msg_semanal ?? MSG_SEMANAL_PADRAO;
+
+  const respostasPorCliente = useMemo(() => {
+    const mapa = new Map<string, CsResposta[]>();
+    for (const r of respostasQ.data ?? []) mapa.set(r.cliente_id, [...(mapa.get(r.cliente_id) ?? []), r]);
+    return mapa;
+  }, [respostasQ.data]);
+
+  // Envios vêm do mais recente para o mais antigo: o primeiro de cada cliente é o último disparo.
+  const ultimoEnvio = useMemo(() => {
+    const mapa: Record<string, string> = {};
+    for (const e of enviosQ.data ?? []) if (e.tipo === 'semanal' && !mapa[e.cliente_id]) mapa[e.cliente_id] = e.enviado_em;
+    return mapa;
+  }, [enviosQ.data]);
 
   const grupos = useMemo(() => gruposQ.data ?? [], [gruposQ.data]);
   const clientes = useMemo(
@@ -47,9 +76,25 @@ export function CsClientesPage() {
           <strong className="text-white">{comGrupo}</strong> de {clientes.length} com grupo
         </span>
         {sugestoes.length > 0 && (
-          <Button onClick={() => setRevisando(true)}>Revisar sugestões</Button>
+          <Button variant="secondary" onClick={() => setRevisando(true)}>Revisar sugestões</Button>
         )}
+        <Button onClick={() => setDisparando(true)} disabled={comGrupo === 0 || linksQ.isLoading}>
+          Disparar CS de sexta
+        </Button>
       </PageHeader>
+
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-slate-400">
+        <span>Quando um cliente responder, o aviso vai para o grupo:</span>
+        <select
+          value={configQ.data?.grupo_avisos_chat_id ?? ''}
+          onChange={(e) => salvarConfig.mutate({ grupo_avisos_chat_id: e.target.value || null })}
+          disabled={configQ.isLoading || salvarConfig.isPending}
+          className="rounded-md border border-white/10 bg-slate-800 px-2 py-1 text-xs text-slate-100 [color-scheme:dark]"
+        >
+          <option value="">— nenhum (sem aviso) —</option>
+          {grupos.map((g) => <option key={g.chatId} value={g.chatId}>{g.nome}</option>)}
+        </select>
+      </div>
 
       <Card className="p-4">
         {clientesQ.isLoading || gruposQ.isLoading ? (
@@ -73,7 +118,10 @@ export function CsClientesPage() {
                       ? clientes.filter((o) => o.id !== c.id && o.whatsapp_chat_id === c.whatsapp_chat_id).map((o) => o.nome)
                       : []
                   }
+                  ultimoEnvio={ultimoEnvio[c.id]}
+                  respostas={respostasPorCliente.get(c.id) ?? []}
                   onMensagem={() => setMensagemPara(c)}
+                  onRespostas={() => setRespostasDe(c)}
                 />
               ))}
               {clientes.length === 0 && <li className="p-6 text-center text-sm text-slate-500">Nenhum cliente ativo.</li>}
@@ -115,7 +163,28 @@ export function CsClientesPage() {
         <MensagemModal
           cliente={mensagemPara}
           grupoNome={nomeGrupo(mensagemPara.whatsapp_chat_id) ?? mensagemPara.whatsapp_chat_id ?? ''}
+          slug={links[mensagemPara.id]}
+          msgSemanal={msgSemanal}
           onClose={() => setMensagemPara(null)}
+        />
+      )}
+
+      {disparando && (
+        <DispararCsModal
+          clientes={clientes}
+          links={links}
+          ultimoEnvio={ultimoEnvio}
+          msgPadrao={msgSemanal}
+          nomeGrupo={nomeGrupo}
+          onClose={() => setDisparando(false)}
+        />
+      )}
+
+      {respostasDe && (
+        <RespostasModal
+          clienteNome={respostasDe.nome}
+          respostas={respostasPorCliente.get(respostasDe.id) ?? []}
+          onClose={() => setRespostasDe(null)}
         />
       )}
     </div>
@@ -127,10 +196,17 @@ interface LinhaProps {
   grupos: GrupoWhatsapp[];
   sugestao: GrupoWhatsapp | null;
   compartilhadoCom: string[];
+  ultimoEnvio: string | undefined;
+  respostas: CsResposta[];
   onMensagem: () => void;
+  onRespostas: () => void;
 }
 
-function LinhaCliente({ cliente, grupos, sugestao, compartilhadoCom, onMensagem }: LinhaProps) {
+function LinhaCliente({
+  cliente, grupos, sugestao, compartilhadoCom, ultimoEnvio, respostas, onMensagem, onRespostas,
+}: LinhaProps) {
+  const ultimaResposta = respostas[0]?.created_at;
+  const respondeuDepoisDoEnvio = !!ultimaResposta && (!ultimoEnvio || ultimaResposta >= ultimoEnvio);
   const vincular = useVincularGrupo();
   const atual = cliente.whatsapp_chat_id ?? '';
   const naLista = grupos.some((g) => g.chatId === atual);
@@ -197,56 +273,26 @@ function LinhaCliente({ cliente, grupos, sugestao, compartilhadoCom, onMensagem 
         </span>
       )}
 
+      <div className="ml-auto flex items-center gap-2">
+        {ultimoEnvio && (
+          respondeuDepoisDoEnvio
+            ? <Badge tone="green">Respondeu em {dataCurta(ultimaResposta!)}</Badge>
+            : <Badge tone="slate">CS enviado em {dataCurta(ultimoEnvio)}</Badge>
+        )}
+        {respostas.length > 0 && (
+          <button onClick={onRespostas} className="text-xs font-medium text-brand-300 hover:underline">
+            Respostas ({respostas.length})
+          </button>
+        )}
+      </div>
+
       <button
         onClick={onMensagem}
         disabled={!atual}
-        className="ml-auto rounded-md border border-white/10 px-2.5 py-1 text-xs text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+        className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Enviar mensagem
       </button>
     </li>
-  );
-}
-
-function MensagemModal({ cliente, grupoNome, onClose }: { cliente: Cliente; grupoNome: string; onClose: () => void }) {
-  const enviar = useEnviarMensagemCliente();
-  const [texto, setTexto] = useState('');
-  const [erro, setErro] = useState<string | null>(null);
-  const [enviado, setEnviado] = useState(false);
-
-  async function confirmar() {
-    setErro(null);
-    try {
-      await enviar.mutateAsync({ clienteId: cliente.id, texto: texto.trim() });
-      setEnviado(true);
-    } catch (e) {
-      setErro((e as Error).message);
-    }
-  }
-
-  return (
-    <Modal open onClose={onClose} title={`Mensagem para ${cliente.nome}`}>
-      {enviado ? (
-        <div className="space-y-3 text-center">
-          <div className="text-3xl"><GlassIcon name="check-circle" /></div>
-          <p className="text-sm text-slate-200">Mensagem enviada para <strong>{grupoNome}</strong>.</p>
-          <Button onClick={onClose}>Fechar</Button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-xs text-amber-200">
-            Será enviada <strong>agora</strong> no WhatsApp para: <strong>{grupoNome}</strong>. O cliente vai ver.
-          </div>
-          <Textarea id="cs-msg" label="Mensagem" value={texto} onChange={(e) => setTexto(e.target.value)} className="min-h-[120px]" />
-          {erro && <div className="rounded-md border border-red-500/20 bg-red-500/5 p-2 text-xs text-red-300">{erro}</div>}
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-            <Button onClick={() => void confirmar()} disabled={!texto.trim() || enviar.isPending}>
-              {enviar.isPending ? 'Enviando…' : 'Enviar no grupo'}
-            </Button>
-          </div>
-        </div>
-      )}
-    </Modal>
   );
 }

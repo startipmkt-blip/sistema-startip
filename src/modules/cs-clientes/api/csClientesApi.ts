@@ -34,8 +34,8 @@ async function fetchGrupos(): Promise<GrupoWhatsapp[]> {
 
 async function vincularGrupo(clienteId: string, chatId: string | null): Promise<void> {
   if (IS_DEMO) {
-    const c = demoClientes.find((x) => x.id === clienteId);
-    if (c) c.whatsapp_chat_id = chatId;
+    const i = demoClientes.findIndex((x) => x.id === clienteId);
+    if (i >= 0) demoClientes[i] = { ...demoClientes[i], whatsapp_chat_id: chatId };
     return;
   }
   const { error } = await supabase

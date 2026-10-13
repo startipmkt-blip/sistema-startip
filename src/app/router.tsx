@@ -39,6 +39,7 @@ import { CalendarioPublicoPage } from '@/pages/CalendarioPublicoPage';
 import { PainelTvPage } from '@/pages/PainelTvPage';
 import { PainelTvAdminPage } from '@/modules/painel-tv/pages/PainelTvAdminPage';
 import { CsClientesPage } from '@/modules/cs-clientes/pages/CsClientesPage';
+import { CsPublicoPage } from '@/pages/CsPublicoPage';
 import { OtimizacoesListaPage } from '@/modules/otimizacoes/pages/OtimizacoesListaPage';
 import { OtimizacoesClientePage } from '@/modules/otimizacoes/pages/OtimizacoesClientePage';
 import { OtimizacoesPublicaPage } from '@/pages/OtimizacoesPublicaPage';
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
   // Rota pública de auto-cadastro do cliente (sem auth).
   { path: '/cadastro/:slug', element: <CadastroPublicoPage /> },
   { path: '/formulario/:slug', element: <FormularioPublicoPage /> },
+  { path: '/cs/:slug', element: <CsPublicoPage /> },
   { path: '/central/:slug', element: <CentralClientePage /> },
   { path: '/aprovar/:slug', element: <AprovacaoPublicaPage /> },
   { path: '/aprovar-ideias/:slug', element: <AprovacaoIdeiasPublicaPage /> },
