@@ -194,7 +194,8 @@ function extPorMime(mime: string | null): string | null {
 // Eventos que não são pedido de atendimento (entrada/saída, edição, reação,
 // figurinha, etc.) são descartados no banco pela própria função.
 async function registrarAlerta(sb: any, payload: any, dados: Extracao): Promise<void> {
-  if (!dados.isGroup || !dados.chatId || !dados.waMessageId) return;
+  // Grupos e contatos privados: o banco descarta privados que não foram cadastrados.
+  if (!dados.chatId || !dados.waMessageId) return;
   if (payload?.notification || payload?.isEdit === true || payload?.isNewsletter === true) return;
   if (!['texto', 'imagem', 'audio', 'video', 'documento'].includes(dados.tipo)) return;
 

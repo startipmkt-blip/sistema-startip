@@ -17,6 +17,7 @@ export interface AlertasConfig {
 export interface GrupoAlerta {
   id: string;
   chat_id: string;
+  tipo: 'grupo' | 'contato';
   nome_grupo: string | null;
   cliente_nome: string | null;
   cliente_id: string | null;

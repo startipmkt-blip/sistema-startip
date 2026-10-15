@@ -30,18 +30,18 @@ const demoConfig: AlertasConfig = {
 };
 const demoGrupos: GrupoAlerta[] = [
   {
-    id: 'g1', chat_id: 'demo-1-group', nome_grupo: 'LG Internet | Startip', cliente_nome: 'LG Internet', cliente_id: null,
+    id: 'g1', chat_id: 'demo-1-group', tipo: 'grupo', nome_grupo: 'LG Internet | Startip', cliente_nome: 'LG Internet', cliente_id: null,
     monitorar: true, prazo_min: null, hc_ativo: null, hc_inicio: null, hc_fim: null, hc_dias: null,
     ultima_msg_cliente_em: iso(14), ultima_msg_cliente_texto: 'Pessoal, precisamos ajustar a campanha.',
     ultima_resposta_em: iso(180), ultima_resposta_por: 'Ana',
   },
   {
-    id: 'g2', chat_id: 'demo-2-group', nome_grupo: 'Clínica Exemplo | Startip', cliente_nome: 'Clínica Exemplo', cliente_id: null,
+    id: 'g2', chat_id: 'demo-2-group', tipo: 'grupo', nome_grupo: 'Clínica Exemplo | Startip', cliente_nome: 'Clínica Exemplo', cliente_id: null,
     monitorar: true, prazo_min: 15, hc_ativo: null, hc_inicio: null, hc_fim: null, hc_dias: null,
     ultima_msg_cliente_em: iso(50), ultima_msg_cliente_texto: 'Obrigado!', ultima_resposta_em: iso(45), ultima_resposta_por: 'Ana',
   },
   {
-    id: 'g3', chat_id: 'demo-3-group', nome_grupo: 'Loja Modelo | Startip', cliente_nome: 'Loja Modelo', cliente_id: null,
+    id: 'g3', chat_id: 'demo-3-group', tipo: 'grupo', nome_grupo: 'Loja Modelo | Startip', cliente_nome: 'Loja Modelo', cliente_id: null,
     monitorar: false, prazo_min: null, hc_ativo: null, hc_inicio: null, hc_fim: null, hc_dias: null,
     ultima_msg_cliente_em: null, ultima_msg_cliente_texto: null, ultima_resposta_em: null, ultima_resposta_por: null,
   },
@@ -258,6 +258,32 @@ export function useExcluirMembro() {
         return;
       }
       const { error } = await supabase.from('alertas_equipe').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: inv,
+  });
+}
+
+// Contato privado: o id da conversa na Z-API é o telefone só com dígitos (com 55).
+export function useAdicionarContato() {
+  const inv = useInvalidar(keys.grupos);
+  return useMutation({
+    mutationFn: async (c: { nome: string; telefone: string; cliente_nome: string | null; prazo_min: number | null }) => {
+      let d = c.telefone.replace(/\D/g, '');
+      if (!d.startsWith('55')) d = `55${d}`;
+      const linha = {
+        chat_id: d, tipo: 'contato', nome_grupo: c.nome, cliente_nome: c.cliente_nome ?? c.nome,
+        monitorar: true, prazo_min: c.prazo_min,
+      };
+      if (IS_DEMO) {
+        demoGrupos.push({
+          id: `g${demoGrupos.length + 1}`, hc_ativo: null, hc_inicio: null, hc_fim: null, hc_dias: null,
+          cliente_id: null, ultima_msg_cliente_em: null, ultima_msg_cliente_texto: null,
+          ultima_resposta_em: null, ultima_resposta_por: null, ...linha,
+        } as GrupoAlerta);
+        return;
+      }
+      const { error } = await supabase.from('alertas_grupos').insert(linha as never);
       if (error) throw error;
     },
     onSuccess: inv,

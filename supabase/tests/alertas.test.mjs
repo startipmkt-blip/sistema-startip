@@ -21,6 +21,7 @@ await db.exec(`
   create table public.crm_mensagens (wa_message_id text, direcao text);
 `);
 await db.exec(readFileSync(join(aqui, '../migrations/0068_startip_alertas.sql'), 'utf8'));
+await db.exec(readFileSync(join(aqui, '../migrations/0069_alertas_contatos.sql'), 'utf8'));
 
 // ---------- helpers ----------
 const T0 = Date.parse('2026-10-15T13:00:00Z'); // 10:00 em Sao Paulo
@@ -273,6 +274,21 @@ for (let i = 3; i <= 5; i += 1) {
 }
 await db.query(`select public.alertas_marcar_envio($1,false,null,'HTTP 500',null,$2::timestamptz)`, [r[0].envio_id, iso(200)]);
 ok((await q(`select status from public.alertas_envios`))[0].status === 'falhou', 'apos o maximo de tentativas fica como falhou (registrado)');
+
+console.log('\nContatos privados');
+await reset();
+const PRIV = '5511977770001';
+ok((await msg({ chat: PRIV, fone: PRIV, at: 0 })).motivo === 'contato_nao_cadastrado', 'privado nao cadastrado e descartado');
+ok((await q(`select count(*)::int c from public.alertas_eventos`))[0].c === 0, 'nada e gravado de conversa nao cadastrada');
+await db.exec(`insert into public.alertas_grupos (chat_id, nome_grupo, cliente_nome, monitorar, tipo)
+               values ('${PRIV}', 'Maria (privado)', 'Maria Cliente', true, 'contato')`);
+await msg({ chat: '551177770001', fone: '551177770001', chatNome: 'Maria', at: 0 });   // chega sem o 9o digito
+p = await pend(PRIV);
+ok(p.length === 1 && p[0].status === 'aguardando' && p[0].cliente_nome === 'Maria Cliente', 'contato cadastrado abre pendencia (id canonico)');
+await tick(10);
+ok(enviados.length === 1 && enviados[0].grupo_interno_id === INTERNO, 'alerta vai para o grupo interno');
+await msg({ chat: PRIV, fone: PRIV, fromMe: true, at: 12 });
+ok((await pend(PRIV))[0].status === 'respondida', 'resposta do numero conectado encerra a pendencia do privado');
 
 console.log('\nLeitura do painel');
 await reset();

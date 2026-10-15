@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import {
-  useAlertasConfig, useGruposAlerta, useSalvarGrupo, useSincronizarGrupos,
+  useAdicionarContato, useAlertasConfig, useGruposAlerta, useSalvarGrupo, useSincronizarGrupos,
 } from '@/modules/alertas/api/alertasApi';
 import { formatarHora } from '@/modules/alertas/lib/format';
 import { DIAS_SEMANA, type GrupoAlerta } from '@/modules/alertas/types';
@@ -24,6 +24,7 @@ export function GruposTab() {
   const [busca, setBusca] = useState('');
   const [editando, setEditando] = useState<GrupoAlerta | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [novoContato, setNovoContato] = useState(false);
 
   const internoId = cfgQ.data?.grupo_interno_id ?? null;
   const lista = useMemo(() => {
@@ -58,7 +59,11 @@ export function GruposTab() {
           </label>
         )
     ) },
-    { header: 'Grupo', render: (g) => <span className="font-medium text-white">{g.nome_grupo ?? g.chat_id}</span> },
+    { header: 'Grupo / contato', render: (g) => (
+      <span className="font-medium text-white">
+        {g.nome_grupo ?? g.chat_id} {g.tipo === 'contato' && <Badge tone="blue">Contato</Badge>}
+      </span>
+    ) },
     { header: 'Cliente', render: (g) => g.cliente_nome ?? <span className="text-slate-500">Não definido</span> },
     { header: 'Prazo', render: (g) => (g.prazo_min ? `${g.prazo_min} min` : `Padrão (${cfgQ.data?.nivel1_min ?? 10} min)`) },
     { header: 'Última msg do cliente', render: (g) => (
@@ -83,6 +88,7 @@ export function GruposTab() {
         <Button variant="secondary" onClick={sincronizar} disabled={sync.isPending}>
           {sync.isPending ? 'Buscando…' : 'Buscar grupos na Z-API'}
         </Button>
+        <Button variant="secondary" onClick={() => setNovoContato(true)}>Adicionar contato</Button>
       </div>
       {aviso && <p className="text-sm text-slate-300">{aviso}</p>}
       <p className="text-xs text-slate-500">
@@ -101,6 +107,7 @@ export function GruposTab() {
         )}
       </Card>
 
+      {novoContato && <NovoContato onClose={() => setNovoContato(false)} />}
       {editando && <EditarGrupo grupo={editando} internoId={internoId} onClose={() => setEditando(null)} />}
     </div>
   );
@@ -206,6 +213,55 @@ function EditarGrupo({ grupo, internoId, onClose }: { grupo: GrupoAlerta; intern
           <div>Última mensagem do cliente: {formatarHora(grupo.ultima_msg_cliente_em)}</div>
           <div>Última resposta identificada: {formatarHora(grupo.ultima_resposta_em)}{grupo.ultima_resposta_por ? ` · ${grupo.ultima_resposta_por}` : ''}</div>
         </div>
+        {erro && <p className="text-sm text-red-300">{erro}</p>}
+      </div>
+    </Modal>
+  );
+}
+
+function NovoContato({ onClose }: { onClose: () => void }) {
+  const add = useAdicionarContato();
+  const [nome, setNome] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [cliente, setCliente] = useState('');
+  const [prazo, setPrazo] = useState('');
+  const [erro, setErro] = useState<string | null>(null);
+
+  async function gravar() {
+    let d = telefone.replace(/\D/g, '');
+    if (d.startsWith('55') && d.length >= 12) d = d.slice(2);
+    if (!nome.trim()) { setErro('Informe o nome do contato.'); return; }
+    if (d.length !== 10 && d.length !== 11) { setErro('Telefone inválido. Use DDD + número.'); return; }
+    const p = prazo.trim() === '' ? null : Number(prazo);
+    if (p !== null && (!Number.isInteger(p) || p < 1 || p > 1440)) { setErro('Prazo deve estar entre 1 e 1440 minutos.'); return; }
+    try {
+      await add.mutateAsync({ nome: nome.trim(), telefone, cliente_nome: cliente.trim() || null, prazo_min: p });
+      onClose();
+    } catch (e) {
+      const m = (e as Error).message;
+      setErro(/duplicate|unique/i.test(m) ? 'Este contato já está cadastrado.' : m);
+    }
+  }
+
+  return (
+    <Modal
+      open onClose={onClose} title="Adicionar contato monitorado" fecharSoPorBotao
+      footer={(
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button onClick={gravar} disabled={add.isPending}>Adicionar</Button>
+        </div>
+      )}
+    >
+      <div className="space-y-4">
+        <Input label="Nome do contato" value={nome} onChange={(e) => setNome(e.target.value)} />
+        <Input label="WhatsApp com DDD" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
+        <Input label="Nome do cliente/empresa (opcional)" value={cliente} onChange={(e) => setCliente(e.target.value)} />
+        <Input label="Prazo em minutos (vazio = padrão)" type="number" min={1} max={1440} value={prazo} onChange={(e) => setPrazo(e.target.value)} />
+        <p className="text-xs text-slate-500">
+          Conversas privadas de números que não estão cadastrados aqui nunca são registradas.
+          A resposta da equipe é a enviada pelo número conectado (celular ou inbox do Startip OS).
+        </p>
         {erro && <p className="text-sm text-red-300">{erro}</p>}
       </div>
     </Modal>
