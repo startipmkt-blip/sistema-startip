@@ -81,6 +81,8 @@ export interface DesignerDemanda {
   origem: DesignerOrigem;
   ideia_id: string | null;
   anexos: CriativoAnexo[];
+  /** Link do conteúdo pronto (Drive etc.); vai como link_drive do post em gestão de conteúdo. */
+  link_conteudo?: string | null;
   iniciado_em: string | null;
   concluido_em: string | null;
   /** Cliente reprovou o conteúdo: motivo e quando (vale enquanto a peça não volta para aprovação). */
@@ -186,6 +188,7 @@ interface UpsertInput {
   responsavel_id?: string | null;
   prazo?: string | null;
   anexos?: CriativoAnexo[];
+  link_conteudo?: string | null;
   // Contexto pro cronômetro (não vai pro banco).
   de?: DesignerStatus;
   iniciado_em?: string | null;

@@ -39,6 +39,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const [status, setStatus] = useState<DesignerStatus>('a_fazer');
   const [responsavel, setResponsavel] = useState<string>('');
   const [prazo, setPrazo] = useState<string>('');
+  const [linkConteudo, setLinkConteudo] = useState('');
   const [anexos, setAnexos] = useState<CriativoAnexo[]>([]);
   // Enviados nesta abertura do formulário: se cancelar, somem do storage.
   const [novos, setNovos] = useState<string[]>([]);
@@ -54,6 +55,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setStatus(demanda?.status ?? statusInicial);
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
+    setLinkConteudo(demanda?.link_conteudo ?? '');
     setAnexos(demanda?.anexos ?? []);
     setNovos([]);
     setErro(null);
@@ -63,6 +65,8 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     e.preventDefault();
     setErro(null);
     if (!titulo.trim()) { setErro('Título é obrigatório.'); return; }
+    const link = linkConteudo.trim();
+    if (link && !/^https?:\/\//i.test(link)) { setErro('O link do conteúdo deve começar com http:// ou https://'); return; }
     try {
       const respNome = (operadores ?? []).find((op) => op.id === responsavel)?.nome ?? null;
       const r = await salvar.mutateAsync({
@@ -78,6 +82,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
         responsavel_id: responsavel || null,
         prazo: prazo || null,
         anexos,
+        link_conteudo: link || null,
       });
       // Anexos que existiam e foram removidos agora saem do storage.
       const mantidos = new Set(anexos.map((a) => a.path));
@@ -208,6 +213,15 @@ ${r.cronometroErro}`);
           />
           <Input id="pz" type="date" label="Prazo" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
         </div>
+
+        <Input
+          id="lnk"
+          type="url"
+          label="Link do conteúdo pronto (Drive)"
+          placeholder="Cole aqui o link depois de subir o arquivo. Vai junto para a Gestão de Conteúdo."
+          value={linkConteudo}
+          onChange={(e) => setLinkConteudo(e.target.value)}
+        />
 
         <AnexosDemanda anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />
 

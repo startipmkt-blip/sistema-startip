@@ -83,6 +83,7 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
         {d.atrasada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Atrasada {atraso}d</span>}
         {d.origem === 'ideia_aprovada' && <span className={`${ETIQUETA} bg-emerald-600 text-emerald-50`}>Ideia</span>}
         {d.origem === 'calendario' && <span className={`${ETIQUETA} bg-sky-600 text-sky-50`}>Calendário</span>}
+        {d.link_conteudo && <span className={`${ETIQUETA} bg-violet-600 text-violet-50`}>Link pronto</span>}
       </div>
 
       <p className="text-sm leading-snug text-slate-100 line-clamp-3">{d.titulo}</p>
