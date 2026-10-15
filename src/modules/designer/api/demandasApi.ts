@@ -45,12 +45,13 @@ function carimbos(de: DesignerStatus | undefined, para: DesignerStatus, jaInicia
   return patch;
 }
 
-export type DesignerStatus = 'a_fazer' | 'em_andamento' | 'aprovacao' | 'concluido';
+export type DesignerStatus = 'a_fazer' | 'alteracao' | 'em_andamento' | 'aprovacao' | 'concluido';
 export type DesignerOrigem = 'manual' | 'ideia_aprovada' | 'calendario';
 export type DesignerTipo = 'post' | 'carrossel' | 'reels' | 'story' | 'web' | 'extra';
 
 export const STATUS_COLUNAS: Array<{ id: DesignerStatus; label: string; cor: string; emoji: string }> = [
   { id: 'a_fazer',      label: 'A fazer',        cor: 'slate',   emoji: '📥' },
+  { id: 'alteracao',    label: 'Alteração',      cor: 'red',     emoji: '🔁' },
   { id: 'em_andamento', label: 'Em andamento',   cor: 'blue',    emoji: '🎨' },
   { id: 'aprovacao',    label: 'Aguardando aprovação', cor: 'amber', emoji: '👀' },
   { id: 'concluido',    label: 'Concluído',      cor: 'green',   emoji: '✅' },

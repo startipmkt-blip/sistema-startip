@@ -57,7 +57,7 @@ export function useTempoTotal(tempo?: TempoDemanda): number {
 
 /** Reprovada pelo cliente e ainda não refeita (voltou para aprovação = aviso some). */
 export const reprovadaPeloCliente = (d: DesignerDemanda) =>
-  !!d.reprovado_em && (d.status === 'a_fazer' || d.status === 'em_andamento');
+  !!d.reprovado_em && (d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento');
 
 export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const prazo = prazoChip(d);
@@ -79,6 +79,7 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
     >
       <div className="mb-1.5 flex flex-wrap gap-1">
         <span className={`${ETIQUETA} ${TIPO_ETIQUETA[d.tipo] ?? TIPO_ETIQUETA.extra}`}>{TIPO_LABEL[d.tipo]}</span>
+        {d.status === 'alteracao' && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Alteração</span>}
         {reprovada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>↩ Reprovado pelo cliente</span>}
         {d.atrasada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Atrasada {atraso}d</span>}
         {d.origem === 'ideia_aprovada' && <span className={`${ETIQUETA} bg-emerald-600 text-emerald-50`}>Ideia</span>}

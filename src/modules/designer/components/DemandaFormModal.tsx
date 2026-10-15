@@ -165,7 +165,7 @@ ${r.cronometroErro}`);
           />
         )}
 
-        {demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'em_andamento') && (
+        {demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'alteracao' || demanda.status === 'em_andamento') && (
           <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100">
             <p className="mb-1 font-semibold">↩ Reprovado pelo cliente — o que precisa ser refeito</p>
             <p className="whitespace-pre-line">{demanda.reprovado_justificativa || '(sem justificativa)'}</p>

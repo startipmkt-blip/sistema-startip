@@ -26,7 +26,7 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
   const [dropAlvo, setDropAlvo] = useState<DesignerStatus | null>(null);
 
   const porStatus = useMemo(() => {
-    const m: Record<DesignerStatus, DesignerDemanda[]> = { a_fazer: [], em_andamento: [], aprovacao: [], concluido: [] };
+    const m: Record<DesignerStatus, DesignerDemanda[]> = { a_fazer: [], alteracao: [], em_andamento: [], aprovacao: [], concluido: [] };
     for (const d of data ?? []) m[d.status].push(d);
     return m;
   }, [data]);
