@@ -16,6 +16,8 @@ import { alertasDoCliente, contar, textoTempoMedio, type ClienteGestao } from '@
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import { videoDriveUrl } from './VideoDrive';
 import { PostCard } from './PostCard';
+import { AprovadoresModal } from './AprovadoresModal';
+import { useAprovadores, useVotosDoCliente } from '@/modules/gestao-conteudo/api/aprovadoresApi';
 import { PostFormModal } from './PostFormModal';
 import { PreviaDrive } from './PreviaDrive';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
@@ -39,6 +41,13 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const salvarMeta = useSalvarMeta();
 
   const [agrupar, setAgrupar] = useState<Agrupar>('semanas');
+  const [aprovadoresAberto, setAprovadoresAberto] = useState(false);
+  const aprovadoresQ = useAprovadores(cliente.id);
+  const aprovadoresAtivos = (aprovadoresQ.data ?? []).filter((a) => a.ativo);
+  const votosQ = useVotosDoCliente(
+    cliente.id,
+    aprovadoresAtivos.length >= 2 ? posts.filter((p) => p.etapa === 'enviado').map((p) => p.id) : [],
+  );
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const [formAberto, setFormAberto] = useState(false);
   const [editando, setEditando] = useState<Post | undefined>();
@@ -132,6 +141,13 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       onPrevia={() => setPrevia(p)}
       onEditar={() => { setEditando(p); setFormAberto(true); }}
       onExcluir={() => { if (confirm(`Excluir "${p.titulo}"?`)) excluir.mutate(p.id); }}
+      aprovacoes={aprovadoresAtivos.length >= 2 ? {
+        total: aprovadoresAtivos.length,
+        feitos: aprovadoresAtivos.filter((a) => (votosQ.data ?? []).some(
+          (v) => v.post_id === p.id && v.aprovador_id === a.id && v.decisao === 'aprovado')).length,
+        faltam: aprovadoresAtivos.filter((a) => !(votosQ.data ?? []).some(
+          (v) => v.post_id === p.id && v.aprovador_id === a.id && v.decisao === 'aprovado')).map((a) => a.nome),
+      } : undefined}
     />
   );
 
@@ -162,6 +178,9 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             title={!cliente.whatsapp_chat_id ? 'Cliente sem WhatsApp cadastrado' : undefined}
           >
             {glassify(enviar.isPending ? 'Enviando…' : `📤 Enviar para aprovação (${selecionados.length})`)}
+          </Button>
+          <Button variant="secondary" onClick={() => setAprovadoresAberto(true)}>
+            <GlassIcon name="users" /> Aprovadores{aprovadoresAtivos.length >= 2 ? ` (${aprovadoresAtivos.length})` : ''}
           </Button>
           <Button onClick={() => abrirNovo(1)}>+ Novo conteúdo</Button>
         </div>
@@ -317,6 +336,12 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
           </p>
         </div>
       </Modal>
+      <AprovadoresModal
+        open={aprovadoresAberto}
+        onClose={() => setAprovadoresAberto(false)}
+        clienteId={cliente.id}
+        clienteNome={cliente.nome}
+      />
       <PostFormModal
         open={formAberto} onClose={() => setFormAberto(false)}
         clienteId={cliente.id} mes={mes} post={editando} semanaInicial={semanaNova}

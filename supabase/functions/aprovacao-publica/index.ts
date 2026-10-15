@@ -83,6 +83,35 @@ async function devolverAoDesigner(sb: any, post: any, justificativa: string): Pr
   } catch (_e) { /* best effort */ }
 }
 
+// Marca como aprovado os posts cujos aprovadores ativos TODOS votaram "aprovado".
+// Retorna quantos foram finalizados.
+async function finalizarSeTodosAprovaram(sb: any, postIds: string[], aprovadorIds: string[]): Promise<number> {
+  if (postIds.length === 0 || aprovadorIds.length === 0) return 0;
+  const { data: votos } = await sb
+    .from('conteudo_aprovacao_votos')
+    .select('post_id, aprovador_id, decisao')
+    .in('post_id', postIds);
+  const aprovou = new Map<string, Set<string>>();
+  for (const v of (votos ?? []) as any[]) {
+    if (v.decisao !== 'aprovado') continue;
+    const s = aprovou.get(v.post_id) ?? new Set<string>();
+    s.add(v.aprovador_id);
+    aprovou.set(v.post_id, s);
+  }
+  const completos = postIds.filter((pid) => {
+    const s = aprovou.get(pid);
+    return !!s && aprovadorIds.every((a) => s.has(a));
+  });
+  if (completos.length === 0) return 0;
+  const { data: ok } = await sb
+    .from('conteudo_aprovacao')
+    .update({ status: 'aprovado', justificativa: '' } as any)
+    .in('id', completos)
+    .eq('status', 'pendente')
+    .select('id');
+  return (ok ?? []).length;
+}
+
 function mesAtual(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -147,14 +176,39 @@ serve(async (req) => {
     const mesesUnicos = [...new Set((meses ?? []).map((m: any) => m.mes_referencia))]
       .sort((a: string, b: string) => b.localeCompare(a));
 
-    return json({ cliente: cli, mes, meses: mesesUnicos, ideias: ideias ?? [] });
+    // Aprovacao em conjunto: aprovadores do cliente e o voto de cada um por conteudo.
+    const { data: aprovadores } = await sb
+      .from('cliente_aprovadores')
+      .select('id, nome')
+      .eq('cliente_id', (cli as any).id)
+      .eq('ativo', true)
+      .order('ordem', { ascending: true });
+    const lista = (ideias ?? []) as any[];
+    const votosPorPost = new Map<string, any[]>();
+    if ((aprovadores ?? []).length >= 2 && lista.length > 0) {
+      const { data: votos } = await sb
+        .from('conteudo_aprovacao_votos')
+        .select('post_id, aprovador_id, decisao, justificativa')
+        .in('post_id', lista.map((i) => i.id));
+      for (const v of (votos ?? []) as any[]) {
+        const arr = votosPorPost.get(v.post_id) ?? [];
+        arr.push({ aprovador_id: v.aprovador_id, decisao: v.decisao, justificativa: v.justificativa });
+        votosPorPost.set(v.post_id, arr);
+      }
+    }
+    const comVotos = lista.map((i) => ({ ...i, votos: votosPorPost.get(i.id) ?? [] }));
+
+    return json({
+      cliente: cli, mes, meses: mesesUnicos, ideias: comVotos,
+      aprovadores: (aprovadores ?? []).length >= 2 ? aprovadores : [],
+    });
   }
 
   if (req.method === 'POST') {
     const body = await req.json().catch(() => ({}));
-    const { slug, id, status, justificativa, acao, mes, tipo } = body as {
+    const { slug, id, status, justificativa, acao, mes, tipo, aprovador_id } = body as {
       slug?: string; id?: string; status?: string; justificativa?: string;
-      acao?: string; mes?: string; tipo?: string;
+      acao?: string; mes?: string; tipo?: string; aprovador_id?: string;
     };
 
     // ---- Ideias de conteúdo: aprovada | reprovada (reprovar exige justificativa) ----
@@ -213,6 +267,29 @@ serve(async (req) => {
       if (!slug || !mes) return json({ error: 'parâmetros faltando' }, 400);
       const { data: cli } = await sb.from('clientes').select('id, nome').eq('central_slug', slug).maybeSingle();
       if (!cli) return json({ error: 'link inválido' }, 404);
+      const { data: aprsT } = await sb
+        .from('cliente_aprovadores').select('id, nome')
+        .eq('cliente_id', (cli as any).id).eq('ativo', true);
+      if ((aprsT ?? []).length >= 2) {
+        const apr = (aprsT as any[]).find((a) => a.id === aprovador_id);
+        if (!apr) return json({ error: 'informe quem está aprovando' }, 400);
+        const { data: pend } = await sb
+          .from('conteudo_aprovacao').select('id')
+          .eq('cliente_id', (cli as any).id).eq('mes_referencia', mes)
+          .eq('status', 'pendente').neq('visivel_cliente', false);
+        const ids = ((pend ?? []) as any[]).map((p) => p.id);
+        if (ids.length === 0) return json({ ok: true, aprovados: 0, finalizados: 0 });
+        const { error: eV } = await sb.from('conteudo_aprovacao_votos').upsert(
+          ids.map((pid) => ({
+            post_id: pid, aprovador_id: apr.id, decisao: 'aprovado', justificativa: '', decidido_em: new Date().toISOString(),
+          })),
+          { onConflict: 'post_id,aprovador_id' },
+        );
+        if (eV) return json({ error: eV.message }, 500);
+        const finalizados = await finalizarSeTodosAprovaram(sb, ids, (aprsT as any[]).map((a) => a.id));
+        return json({ ok: true, aprovados: ids.length, finalizados });
+      }
+
       const { data: atualizados, error } = await sb
         .from('conteudo_aprovacao')
         .update({ status: 'aprovado', justificativa: '' } as any)
@@ -237,11 +314,52 @@ serve(async (req) => {
     // valida que a ideia pertence ao cliente do slug
     const { data: ideia } = await sb
       .from('conteudo_aprovacao')
-      .select('id, cliente_id, visivel_cliente, titulo, mes_referencia, formato, link_drive, designer_demanda_id')
+      .select('id, cliente_id, visivel_cliente, titulo, mes_referencia, formato, link_drive, designer_demanda_id, status')
       .eq('id', id)
       .maybeSingle();
     if (!ideia || (ideia as any).cliente_id !== (cli as any).id || (ideia as any).visivel_cliente === false) {
       return json({ error: 'ideia não pertence a este cliente' }, 403);
+    }
+
+    // Aprovacao em conjunto (2+ aprovadores): todos precisam aprovar; qualquer reprovacao devolve.
+    const { data: aprs } = await sb
+      .from('cliente_aprovadores').select('id, nome')
+      .eq('cliente_id', (cli as any).id).eq('ativo', true).order('ordem', { ascending: true });
+    if ((aprs ?? []).length >= 2) {
+      const apr = (aprs as any[]).find((a) => a.id === aprovador_id);
+      if (!apr) return json({ error: 'informe quem está aprovando' }, 400);
+      if ((ideia as any).status !== 'pendente') {
+        return json({ error: 'este conteúdo já foi decidido' }, 409);
+      }
+      const just = (justificativa ?? '').trim().slice(0, 2000);
+      const { error: eVoto } = await sb.from('conteudo_aprovacao_votos').upsert(
+        { post_id: id, aprovador_id: apr.id, decisao: status, justificativa: status === 'reprovado' ? just : '', decidido_em: new Date().toISOString() },
+        { onConflict: 'post_id,aprovador_id' },
+      );
+      if (eVoto) return json({ error: eVoto.message }, 500);
+
+      if (status === 'reprovado') {
+        const motivo = `${apr.nome}: ${just}`;
+        const { error: eUp } = await sb
+          .from('conteudo_aprovacao').update({ status: 'reprovado', justificativa: motivo } as any).eq('id', id);
+        if (eUp) return json({ error: eUp.message }, 500);
+        await devolverAoDesigner(sb, ideia, motivo);
+        await avisarEquipe(
+          sb,
+          `❌ ${apr.nome} (${(cli as any).nome}) não aprovou "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
+          `Alteração pedida: ${just}`,
+        );
+        return json({ ok: true, finalizado: false, reprovado: true });
+      }
+
+      const finalizados = await finalizarSeTodosAprovaram(sb, [id], (aprs as any[]).map((a) => a.id));
+      if (finalizados > 0) {
+        await avisarEquipe(
+          sb,
+          `✅ Todos os aprovadores de ${(cli as any).nome} aprovaram "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).`,
+        );
+      }
+      return json({ ok: true, finalizado: finalizados > 0 });
     }
 
     const { error } = await sb

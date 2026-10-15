@@ -24,6 +24,7 @@ interface Ideia {
   mes_referencia: string;
   link_drive?: string | null;
   etapa?: string;
+  votos?: { aprovador_id: string; decisao: 'aprovado' | 'reprovado'; justificativa: string }[];
 }
 
 interface Dados {
@@ -31,6 +32,8 @@ interface Dados {
   mes: string;
   meses: string[];
   ideias: Ideia[];
+  /** 2+ => aprovação em conjunto: todos precisam aprovar. */
+  aprovadores?: { id: string; nome: string }[];
 }
 
 const FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aprovacao-publica`;
@@ -55,6 +58,14 @@ export function AprovacaoPublicaPage() {
   const [reprovar, setReprovar] = useState<Ideia | null>(null);
   const [justificativa, setJustificativa] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const chaveAprovador = `aprovador-${slug}`;
+  const [aprovadorId, setAprovadorId] = useState<string>(() => {
+    try { return localStorage.getItem(chaveAprovador) ?? ''; } catch { return ''; }
+  });
+  function escolherAprovador(id: string) {
+    setAprovadorId(id);
+    try { localStorage.setItem(chaveAprovador, id); } catch { /* sem storage */ }
+  }
 
   async function carregar(mesAlvo?: string) {
     try {
@@ -79,7 +90,7 @@ export function AprovacaoPublicaPage() {
       const r = await fetch(FN_URL, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, id, status, justificativa: just }),
+        body: JSON.stringify({ slug, id, status, justificativa: just, aprovador_id: aprovadorId || undefined }),
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(body?.error ?? 'erro');
@@ -104,7 +115,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
       const r = await fetch(FN_URL, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, mes: alvo, acao: 'aprovar_todos' }),
+        body: JSON.stringify({ slug, mes: alvo, acao: 'aprovar_todos', aprovador_id: aprovadorId || undefined }),
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(body?.error ?? 'erro');
@@ -127,7 +138,15 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
   if (!dados) return <div className="flex min-h-screen items-center justify-center bg-slate-950"><Spinner /></div>;
 
   const c = dados.cliente;
-  const pendentes = dados.ideias.filter((i) => i.status === 'pendente').length;
+  const aprovadores = dados.aprovadores ?? [];
+  const emConjunto = aprovadores.length >= 2;
+  const eu = aprovadores.find((a) => a.id === aprovadorId);
+  const meuVoto = (i: Ideia) => i.votos?.find((v) => v.aprovador_id === aprovadorId);
+  // Em conjunto: "pendente para mim" = ainda não decidido e eu ainda não votei.
+  const pendentes = dados.ideias.filter(
+    (i) => i.status === 'pendente' && (!emConjunto || (eu && !meuVoto(i))),
+  ).length;
+  const podeDecidir = !emConjunto || !!eu;
 
   return (
     <div className="min-h-screen bg-slate-950 px-4 py-8">
@@ -137,6 +156,31 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
           <h1 className="text-2xl font-semibold text-white">{c.nome}</h1>
           <p className="mt-1 text-xs text-slate-400">Aprovação de Conteúdo · Startip</p>
         </header>
+
+        {emConjunto && (
+          <div className="rounded-2xl border border-brand-400/30 bg-brand-500/10 p-4 text-center">
+            <p className="text-sm font-medium text-white">Este conteúdo é aprovado em conjunto.</p>
+            <p className="mt-0.5 text-xs text-slate-300">
+              Cada pessoa aprova por si e o conteúdo só fica aprovado quando todos aprovarem. Quem está aprovando agora?
+            </p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {aprovadores.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => escolherAprovador(a.id)}
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium ${
+                    a.id === aprovadorId
+                      ? 'border-brand-400 bg-brand-500 text-white'
+                      : 'border-white/15 text-slate-200 hover:bg-white/10'
+                  }`}
+                >
+                  {a.nome}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Seletor de mês */}
         <div className="flex flex-wrap justify-center gap-2">
@@ -156,7 +200,10 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
         <div className="text-center text-xs text-slate-400">
           {glassify(dados.ideias.length === 0 ? 'Nenhum conteúdo publicado neste mês ainda.' :
             pendentes === 0 ? '✅ Todos os conteúdos deste mês já foram decididos.' :
-              `${pendentes} conteúdo(s) aguardando sua decisão.`)}
+              emConjunto && !eu ? 'Escolha seu nome acima para aprovar.' :
+                pendentes === 0 && dados.ideias.some((i) => i.status === 'pendente')
+                  ? 'Você já decidiu tudo o que era seu. Aguardando os demais aprovadores.'
+                  : `${pendentes} conteúdo(s) aguardando sua decisão.`)}
         </div>
 
         {pendentes >= 2 && (
@@ -231,20 +278,45 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                       ) : null}
                       <h3 className="mb-1.5 text-base font-semibold text-slate-100">{i.titulo}</h3>
                       <p className="whitespace-pre-line text-sm leading-relaxed text-slate-300"><Linkify texto={i.descricao} /></p>
+                      {emConjunto && i.status !== 'reprovado' && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {aprovadores.map((a) => {
+                            const v = i.votos?.find((x) => x.aprovador_id === a.id);
+                            const aprovou = v?.decisao === 'aprovado' || (!v && i.status === 'aprovado');
+                            return (
+                              <span
+                                key={a.id}
+                                className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${
+                                  aprovou ? 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30'
+                                    : 'bg-amber-500/10 text-amber-300 ring-amber-500/30'}`}
+                              >
+                                {aprovou ? '✓' : '…'} {a.nome}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                       {i.status === 'reprovado' && i.justificativa && (
                         <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-300">
                           <strong>Alteração pedida:</strong> {i.justificativa}
                         </div>
                       )}
-                      {i.status === 'pendente' && (
+                      {i.status === 'pendente' && emConjunto && eu && meuVoto(i) && (
+                        <p className="mt-4 rounded-lg bg-emerald-500/10 p-2 text-center text-xs text-emerald-300">
+                          Você ({eu.nome}) já aprovou. Aguardando: {
+                            aprovadores.filter((a) => !i.votos?.some((v) => v.aprovador_id === a.id && v.decisao === 'aprovado'))
+                              .map((a) => a.nome).join(', ') || '—'}.
+                        </p>
+                      )}
+                      {i.status === 'pendente' && !(emConjunto && eu && meuVoto(i)) && (
                         <div className="mt-4 flex gap-2">
-                          <Button onClick={() => void decidir(i.id, 'aprovado')} disabled={salvando} className="flex-1">
+                          <Button onClick={() => void decidir(i.id, 'aprovado')} disabled={salvando || !podeDecidir} className="flex-1">
                             <GlassIcon name="check-circle" /> Aprovado
                           </Button>
                           <Button
                             variant="secondary"
                             onClick={() => { setReprovar(i); setJustificativa(''); }}
-                            disabled={salvando}
+                            disabled={salvando || !podeDecidir}
                             className="flex-1"
                           >
                             <GlassIcon name="x-circle" /> Não aprovado
@@ -328,11 +400,11 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
             </a>
             {previa.status === 'pendente' && (
               <div className="flex gap-2">
-                <Button className="flex-1" disabled={salvando}
+                <Button className="flex-1" disabled={salvando || !podeDecidir}
                   onClick={() => { const i = previa; setPrevia(null); void decidir(i.id, 'aprovado'); }}>
                   <GlassIcon name="check-circle" /> Aprovado
                 </Button>
-                <Button variant="secondary" className="flex-1" disabled={salvando}
+                <Button variant="secondary" className="flex-1" disabled={salvando || !podeDecidir}
                   onClick={() => { const i = previa; setPrevia(null); setReprovar(i); setJustificativa(''); }}>
                   <GlassIcon name="x-circle" /> Não aprovado
                 </Button>

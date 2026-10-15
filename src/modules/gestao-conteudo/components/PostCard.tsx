@@ -14,10 +14,12 @@ interface Props {
   onPrevia: () => void;
   onEditar?: () => void;
   onExcluir?: () => void;
+  /** Aprovação em conjunto: quantos já aprovaram e quem falta. */
+  aprovacoes?: { feitos: number; total: number; faltam: string[] };
 }
 
 export function PostCard({
-  post, clienteNome, selecionado = false, onSelecionar, onEtapa, onPrevia, onEditar, onExcluir,
+  post, clienteNome, selecionado = false, onSelecionar, onEtapa, onPrevia, onEditar, onExcluir, aprovacoes,
 }: Props) {
   const info = driveInfo(post.link_drive);
   const pasta = useArquivosPasta(info.tipo === 'pasta' ? info.id : undefined);
@@ -81,6 +83,15 @@ export function PostCard({
           <button onClick={onExcluir} className="rounded px-1.5 py-1 text-slate-400 hover:bg-red-500/10 hover:text-red-300" title="Excluir"><GlassIcon name="trash" /></button>
         )}
       </div>
+      {aprovacoes && aprovacoes.total >= 2 && post.etapa === 'enviado' && (
+        <p
+          className="mt-1.5 rounded bg-amber-500/10 p-1.5 text-[11px] text-amber-200"
+          title={aprovacoes.faltam.length ? `Faltam: ${aprovacoes.faltam.join(', ')}` : undefined}
+        >
+          Aprovações: <strong>{aprovacoes.feitos}/{aprovacoes.total}</strong>
+          {aprovacoes.faltam.length > 0 && ` · faltam ${aprovacoes.faltam.join(', ')}`}
+        </p>
+      )}
       <div className="mt-1"><Badge tone={etapa.tone}><GlassIcon emoji={etapa.emoji} /> {etapa.label}</Badge></div>
     </div>
   );
