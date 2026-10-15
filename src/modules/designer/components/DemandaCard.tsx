@@ -55,6 +55,10 @@ export function useTempoTotal(tempo?: TempoDemanda): number {
   return tempo.segundosFechados + (tempo.aberto ? segundosAberto(tempo.aberto) : 0);
 }
 
+/** Reprovada pelo cliente e ainda não refeita (voltou para aprovação = aviso some). */
+export const reprovadaPeloCliente = (d: DesignerDemanda) =>
+  !!d.reprovado_em && (d.status === 'a_fazer' || d.status === 'em_andamento');
+
 export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const prazo = prazoChip(d);
   const total = useTempoTotal(tempo);
@@ -63,17 +67,19 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const arquivos = d.anexos.length - audios;
   const atraso = d.atrasada && d.prazo ? diasEntre(d.prazo.slice(0, 10), hojeLocal()) : 0;
   const temTexto = !!(d.descricao || d.briefing);
+  const reprovada = reprovadaPeloCliente(d);
   return (
     <div
       draggable
       onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart(d.id); }}
       onClick={() => onEditar(d)}
       className={`cursor-pointer rounded-lg bg-slate-800 px-3 py-2 shadow-md ring-1 hover:ring-2 hover:ring-brand-400/70 ${
-        d.atrasada ? 'ring-red-500/70' : 'ring-white/10'
+        d.atrasada || reprovada ? 'ring-red-500/70' : 'ring-white/10'
       }`}
     >
       <div className="mb-1.5 flex flex-wrap gap-1">
         <span className={`${ETIQUETA} ${TIPO_ETIQUETA[d.tipo] ?? TIPO_ETIQUETA.extra}`}>{TIPO_LABEL[d.tipo]}</span>
+        {reprovada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>↩ Reprovado pelo cliente</span>}
         {d.atrasada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Atrasada {atraso}d</span>}
         {d.origem === 'ideia_aprovada' && <span className={`${ETIQUETA} bg-emerald-600 text-emerald-50`}>Ideia</span>}
         {d.origem === 'calendario' && <span className={`${ETIQUETA} bg-sky-600 text-sky-50`}>Calendário</span>}
@@ -84,6 +90,11 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
         <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
           {d.cliente_logo && <LogoCliente src={d.cliente_logo} alt="" className="h-4 w-4 shrink-0 rounded-full object-cover" />}
           <span className="truncate">{d.cliente_nome}</span>
+        </p>
+      )}
+      {reprovada && d.reprovado_justificativa && (
+        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200 line-clamp-4">
+          <strong>Refazer:</strong> {d.reprovado_justificativa}
         </p>
       )}
       {d.carregada && d.prazo && (

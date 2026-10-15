@@ -50,6 +50,39 @@ async function avisarEquipe(sb: any, texto: string): Promise<void> {
   } catch (_e) { /* best effort */ }
 }
 
+const TIPO_DESIGNER: Record<string, string> = { reels: 'reels', carrossel: 'carrossel', estatico: 'post' };
+
+// Reprovação do cliente → volta para "A fazer" no Designer, já com a justificativa.
+// Nunca derruba a decisão do cliente.
+async function devolverAoDesigner(sb: any, post: any, justificativa: string): Promise<void> {
+  try {
+    const motivo = { reprovado_justificativa: justificativa, reprovado_em: new Date().toISOString() };
+    if (post.designer_demanda_id) {
+      await sb.from('designer_demandas')
+        .update({ status: 'a_fazer', concluido_em: null, ...motivo } as any)
+        .eq('id', post.designer_demanda_id);
+      return;
+    }
+    // Post criado direto na Gestão (sem demanda): abre uma demanda de ajuste para o designer.
+    const { data: nova } = await sb.from('designer_demandas')
+      .insert({
+        cliente_id: post.cliente_id,
+        titulo: `Ajuste: ${post.titulo}`,
+        descricao: post.link_drive ? `Material reprovado: ${post.link_drive}` : null,
+        tipo: TIPO_DESIGNER[post.formato] ?? 'post',
+        status: 'a_fazer',
+        origem: 'manual',
+        post_id: post.id,
+        ...motivo,
+      } as any)
+      .select('id')
+      .maybeSingle();
+    if (nova?.id) {
+      await sb.from('conteudo_aprovacao').update({ designer_demanda_id: nova.id } as any).eq('id', post.id);
+    }
+  } catch (_e) { /* best effort */ }
+}
+
 function mesAtual(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -204,7 +237,7 @@ serve(async (req) => {
     // valida que a ideia pertence ao cliente do slug
     const { data: ideia } = await sb
       .from('conteudo_aprovacao')
-      .select('id, cliente_id, visivel_cliente, titulo, mes_referencia')
+      .select('id, cliente_id, visivel_cliente, titulo, mes_referencia, formato, link_drive, designer_demanda_id')
       .eq('id', id)
       .maybeSingle();
     if (!ideia || (ideia as any).cliente_id !== (cli as any).id || (ideia as any).visivel_cliente === false) {
@@ -218,6 +251,7 @@ serve(async (req) => {
     if (error) return json({ error: error.message }, 500);
 
     if (status === 'reprovado') {
+      await devolverAoDesigner(sb, ideia, (justificativa ?? '').trim());
       await avisarEquipe(
         sb,
         `❌ ${(cli as any).nome} não aprovou "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +

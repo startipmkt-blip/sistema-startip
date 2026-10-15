@@ -51,7 +51,11 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
     if (eSel) return;
 
     if (existente) {
-      // Repassa só dados editoriais; etapa continua a que o gestor escolheu.
+      // Repassa só dados editoriais; etapa continua a que o gestor escolheu — exceto peça
+      // reprovada pelo cliente e refeita: volta a "editado", pronta para reenviar.
+      const refeita = existente.etapa === 'reprovado'
+        ? { etapa: 'editado', status: 'pendente', visivel_cliente: false, enviado_em: null, decidido_em: null, justificativa: '' }
+        : {};
       await tbl
         .update({
           titulo: data.titulo,
@@ -59,6 +63,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
           formato,
           mes_referencia: mes,
           semana,
+          ...refeita,
         })
         .eq('id', existente.id);
     } else {

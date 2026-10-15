@@ -83,6 +83,9 @@ export interface DesignerDemanda {
   anexos: CriativoAnexo[];
   iniciado_em: string | null;
   concluido_em: string | null;
+  /** Cliente reprovou o conteúdo: motivo e quando (vale enquanto a peça não volta para aprovação). */
+  reprovado_justificativa?: string | null;
+  reprovado_em?: string | null;
   /** Calculados no cliente: vencida, levada de mês anterior, e data que define a semana. */
   atrasada?: boolean;
   carregada?: boolean;

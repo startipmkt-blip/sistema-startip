@@ -160,6 +160,16 @@ ${r.cronometroErro}`);
           />
         )}
 
+        {demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'em_andamento') && (
+          <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100">
+            <p className="mb-1 font-semibold">↩ Reprovado pelo cliente — o que precisa ser refeito</p>
+            <p className="whitespace-pre-line">{demanda.reprovado_justificativa || '(sem justificativa)'}</p>
+            <p className="mt-1 text-[11px] text-red-300">
+              em {new Date(demanda.reprovado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+            </p>
+          </div>
+        )}
+
         <Input id="tit" label="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
 
         <TextareaExpansivel
