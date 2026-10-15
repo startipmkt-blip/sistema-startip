@@ -16,9 +16,7 @@ import {
   type DesignerDemanda, type DesignerTipo, type DesignerStatus,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
-import {
-  hojeLocal, labelMes, mesAnteriorProximo, mesDaSemana, semanaDe, semanasDoMes,
-} from '../lib/periodo';
+import { opcoesDeSemana } from '../lib/periodo';
 
 interface Props {
   open: boolean;
@@ -68,27 +66,13 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setErro(null);
   }, [open, demanda, statusInicial, semanaSugerida]);
 
-  // Semanas de 1 mês atrás a 2 meses à frente, mais a semana já escolhida (se fora da faixa).
-  const opcoesSemana = useMemo(() => {
-    const hoje = hojeLocal();
-    const mesAtual = mesDaSemana(hoje);
-    const mapa = new Map<string, string>();
-    for (const delta of [-1, 0, 1, 2]) {
-      const mes = mesAnteriorProximo(mesAtual, delta);
-      for (const s of semanasDoMes(mes)) {
-        mapa.set(s.ini, `Semana ${s.numero} de ${labelMes(mes)} (${s.label})`);
-      }
-    }
-    for (const ini of [semanaSugerida, demanda?.semana_ref?.slice(0, 10)]) {
-      if (ini && !mapa.has(ini)) {
-        const mes = mesDaSemana(ini);
-        const s = semanaDe(mes, ini);
-        mapa.set(s.ini, `Semana ${s.numero} de ${labelMes(mes)} (${s.label})`);
-      }
-    }
-    const ordenadas = [...mapa].sort(([a], [b]) => a.localeCompare(b)).map(([value, label]) => ({ value, label }));
-    return [{ value: '', label: 'Automática (semana do prazo ou de hoje)' }, ...ordenadas];
-  }, [demanda, semanaSugerida]);
+  const opcoesSemana = useMemo(
+    () => [
+      { value: '', label: 'Automática (semana do prazo ou de hoje)' },
+      ...opcoesDeSemana([semanaSugerida, demanda?.semana_ref]),
+    ],
+    [demanda, semanaSugerida],
+  );
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

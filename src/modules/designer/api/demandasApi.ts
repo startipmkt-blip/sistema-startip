@@ -236,6 +236,33 @@ export function useSalvarDemanda() {
   });
 }
 
+export interface DemandaLote {
+  cliente_id: string;
+  titulo: string;
+  tipo: DesignerTipo;
+  semana_ref: string;
+}
+
+/** Cria varias demandas "A fazer" de uma vez (gerar a semana a partir da carteira). */
+export function useGerarSemana() {
+  const qc = useQueryClient();
+  const { profile } = useAuth();
+  return useMutation({
+    mutationFn: async (lote: DemandaLote[]): Promise<number> => {
+      if (lote.length === 0) return 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from as any)('designer_demandas').insert(
+        lote.map((l) => ({
+          ...l, status: 'a_fazer', origem: 'manual', criado_por: profile?.id ?? null,
+        })),
+      );
+      if (error) throw error;
+      return lote.length;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['designer'] }),
+  });
+}
+
 export function useMoverStatus() {
   const qc = useQueryClient();
   return useMutation({

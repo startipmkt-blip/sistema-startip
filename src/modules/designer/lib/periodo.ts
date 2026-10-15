@@ -112,3 +112,22 @@ export function posicaoDaDemanda(d: DemandaDatas, hoje = hojeLocal()): Posicao {
   }
   return { ref: base, atrasada, carregada: false };
 }
+
+/** Semanas de 1 mes atras a 2 a frente (+ as extras informadas), ordenadas por inicio. */
+export function opcoesDeSemana(extras: (string | null | undefined)[] = []): { value: string; label: string }[] {
+  const mesAtual = mesDaSemana(hojeLocal());
+  const mapa = new Map<string, string>();
+  for (const delta of [-1, 0, 1, 2]) {
+    const mes = mesAnteriorProximo(mesAtual, delta);
+    for (const s of semanasDoMes(mes)) mapa.set(s.ini, `Semana ${s.numero} de ${labelMes(mes)} (${s.label})`);
+  }
+  for (const e of extras) {
+    const ini = e?.slice(0, 10);
+    if (ini && !mapa.has(ini)) {
+      const mes = mesDaSemana(ini);
+      const sem = semanaDe(mes, ini);
+      mapa.set(sem.ini, `Semana ${sem.numero} de ${labelMes(mes)} (${sem.label})`);
+    }
+  }
+  return [...mapa].sort(([a], [b]) => a.localeCompare(b)).map(([value, label]) => ({ value, label }));
+}

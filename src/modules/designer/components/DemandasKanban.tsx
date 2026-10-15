@@ -16,9 +16,11 @@ interface Props {
   clienteIds?: string[] | null;
   onEditar: (d: DesignerDemanda) => void;
   onNova: (status: DesignerStatus) => void;
+  /** Gera as demandas da semana a partir da meta de cada cliente (coluna A fazer). */
+  onGerarSemana?: () => void;
 }
 
-export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, onEditar, onNova }: Props) {
+export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, onEditar, onNova, onGerarSemana }: Props) {
   const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds });
   const { data: tempos } = useTempoDesigner();
   const mover = useMoverStatus();
@@ -87,6 +89,15 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
             >
               <GlassIcon name="plus" /> Adicionar um cartão
             </button>
+            {col.id === 'a_fazer' && onGerarSemana && (
+              <button
+                type="button"
+                onClick={onGerarSemana}
+                className="mx-2 mb-2 flex items-center gap-1.5 rounded-lg border border-dashed border-brand-400/40 px-2 py-1.5 text-left text-sm text-brand-200 hover:bg-brand-500/10"
+              >
+                <GlassIcon name="sparkles" /> Gerar semana (todos os clientes)
+              </button>
+            )}
           </div>
         );
       })}

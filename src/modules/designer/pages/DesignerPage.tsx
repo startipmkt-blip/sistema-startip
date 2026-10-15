@@ -14,6 +14,7 @@ import { FuncoesDesigner } from '../components/FuncoesDesigner';
 import { PeriodoSeletor } from '../components/PeriodoSeletor';
 import { hojeLocal, mesDaSemana, periodoDoMes, semanaDe, semanasDoMes } from '../lib/periodo';
 import { DemandaFormModal } from '../components/DemandaFormModal';
+import { GerarSemanaModal } from '../components/GerarSemanaModal';
 import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
@@ -84,6 +85,7 @@ function AbaDemandas() {
   const semanaSugerida = semana === null ? undefined : periodo.ini;
   const [visao, setVisao] = useState<'quadro' | 'historico'>('quadro');
   const [modalAberto, setModalAberto] = useState(false);
+  const [gerarAberto, setGerarAberto] = useState(false);
   const [editando, setEditando] = useState<DesignerDemanda | null>(null);
   const [statusNovo, setStatusNovo] = useState<DesignerStatus>('a_fazer');
 
@@ -188,6 +190,7 @@ function AbaDemandas() {
           clienteIds={clienteIds}
           onEditar={abrir}
           onNova={(status) => abrir(null, status)}
+          onGerarSemana={() => setGerarAberto(true)}
         />
       ) : (
         <HistoricoDesigner
@@ -200,6 +203,7 @@ function AbaDemandas() {
         />
       )}
 
+      <GerarSemanaModal open={gerarAberto} onClose={() => setGerarAberto(false)} semanaInicial={semanaSugerida} />
       <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} statusInicial={statusNovo} semanaSugerida={semanaSugerida} />
     </div>
   );
