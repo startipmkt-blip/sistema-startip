@@ -40,7 +40,6 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
     const mes = mesDaSemana(pos.ref);
     const semana = semanaDe(mes, pos.ref).numero;
     const formato = formatoDaDemanda(data.tipo as DesignerTipo);
-    const descricao = (data.descricao ?? data.briefing ?? '') as string;
     const link = ((data.link_conteudo ?? '') as string).trim() || null;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +51,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
     if (eSel) return;
 
     if (existente) {
-      // Repassa só dados editoriais; etapa continua a que o gestor escolheu — exceto peça
+      // Repassa só dados editoriais (a descrição/briefing da demanda é interna e NUNCA vai ao cliente); etapa continua a que o gestor escolheu — exceto peça
       // reprovada pelo cliente e refeita: volta a "editado", pronta para reenviar.
       const refeita = existente.etapa === 'reprovado'
         ? { etapa: 'editado', status: 'pendente', visivel_cliente: false, enviado_em: null, decidido_em: null, justificativa: '' }
@@ -60,7 +59,6 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
       await tbl
         .update({
           titulo: data.titulo,
-          descricao,
           formato,
           mes_referencia: mes,
           semana,
@@ -75,7 +73,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
         mes_referencia: mes,
         semana,
         titulo: data.titulo,
-        descricao,
+        descricao: '',
         formato,
         link_drive: link,
         visivel_cliente: false,
