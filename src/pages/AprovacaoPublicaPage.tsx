@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { driveInfo } from '@/modules/gestao-conteudo/types';
+import { CarrosselPasta } from '@/modules/gestao-conteudo/components/CarrosselPasta';
 import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
@@ -298,13 +299,17 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
       >
         {previa && driveInfo(previa.link_drive).previewUrl && (
           <div className="space-y-3">
-            <iframe
-              src={driveInfo(previa.link_drive).previewUrl}
-              title={previa.titulo}
-              allow="autoplay; fullscreen"
-              allowFullScreen
-              className="h-[65vh] w-full rounded-xl border border-white/10 bg-black"
-            />
+            {driveInfo(previa.link_drive).tipo === 'pasta' ? (
+              <CarrosselPasta pastaId={driveInfo(previa.link_drive).id as string} titulo={previa.titulo} />
+            ) : (
+              <iframe
+                src={driveInfo(previa.link_drive).previewUrl}
+                title={previa.titulo}
+                allow="autoplay; fullscreen"
+                allowFullScreen
+                className="h-[65vh] w-full rounded-xl border border-white/10 bg-black"
+              />
+            )}
             {previa.status === 'pendente' && (
               <div className="flex gap-2">
                 <Button className="flex-1" disabled={salvando}

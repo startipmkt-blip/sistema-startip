@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Badge } from '@/shared/ui/Badge';
 import { ETAPAS, ETAPA_INFO, driveInfo, type Etapa, type Post } from '@/modules/gestao-conteudo/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { miniaturaDrive, useArquivosPasta } from './CarrosselPasta';
 
 interface Props {
   post: Post;
@@ -19,6 +20,8 @@ export function PostCard({
   post, clienteNome, selecionado = false, onSelecionar, onEtapa, onPrevia, onEditar, onExcluir,
 }: Props) {
   const info = driveInfo(post.link_drive);
+  const pasta = useArquivosPasta(info.tipo === 'pasta' ? info.id : undefined);
+  const capa = info.tipo === 'pasta' ? pasta.data?.[0] : undefined;
   const etapa = ETAPA_INFO[post.etapa];
   const [thumbOk, setThumbOk] = useState(true);
 
@@ -39,6 +42,12 @@ export function PostCard({
             {post.lembretes_enviados > 0 && ` · lembrete ${post.lembretes_enviados}x`}
           </p>
         </div>
+        {capa && (
+          <button onClick={onPrevia} className="relative shrink-0" title="Ver carrossel">
+            <img src={miniaturaDrive(capa.id, 200)} alt="" className="h-12 w-12 rounded-md object-cover" loading="lazy" />
+            <span className="absolute -bottom-1 -right-1 rounded bg-black/70 px-1 text-[9px] text-white">{pasta.data?.length}</span>
+          </button>
+        )}
         {info.tipo === 'arquivo' && thumbOk && info.thumbUrl && (
           <button onClick={onPrevia} className="shrink-0" title="Ver prévia">
             <img src={info.thumbUrl} alt="" onError={() => setThumbOk(false)}

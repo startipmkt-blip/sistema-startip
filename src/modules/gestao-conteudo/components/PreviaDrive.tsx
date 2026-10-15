@@ -1,6 +1,7 @@
 import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { driveInfo } from '@/modules/gestao-conteudo/types';
+import { CarrosselPasta } from './CarrosselPasta';
 
 export function PreviaDrive({
   open, onClose, titulo, link,
@@ -15,7 +16,9 @@ export function PreviaDrive({
         </a>
       ) : undefined}
     >
-      {info.previewUrl ? (
+      {info.tipo === 'pasta' && info.id ? (
+        <CarrosselPasta pastaId={info.id} titulo={titulo} />
+      ) : info.previewUrl ? (
         <div className="space-y-2">
           <iframe
             src={info.previewUrl}

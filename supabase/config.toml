@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.cs-publico]
 verify_jwt = false
+
+[functions.drive-pasta]
+verify_jwt = false
