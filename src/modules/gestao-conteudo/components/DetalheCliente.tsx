@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
@@ -11,6 +11,7 @@ import {
   ETAPAS, deslocarMes, driveInfo, mesLabel, type Etapa, type Post,
 } from '@/modules/gestao-conteudo/types';
 import { alertasDoCliente, contar, textoTempoMedio, type ClienteGestao } from '@/modules/gestao-conteudo/utils';
+import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import { PostCard } from './PostCard';
 import { PostFormModal } from './PostFormModal';
 import { PreviaDrive } from './PreviaDrive';
@@ -44,11 +45,12 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const [porMes, setPorMes] = useState(String(cliente.posts_por_mes ?? 0));
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null);
 
+  const semanasMes = useMemo(() => semanasRotuladas(mes), [mes]);
   const visiveis = etapaFiltro ? posts.filter((p) => p.etapa === etapaFiltro) : posts;
   const n = contar(posts);
   const alertas = alertasDoCliente(
     { ...cliente, conteudos_por_semana: Number(porSemana) || 0, posts_por_mes: Number(porMes) || 0 },
-    posts, mesAtual,
+    posts, mesAtual, mes,
   );
   const tempo = textoTempoMedio(posts);
   const link = cliente.central_slug ? linkAprovacao(cliente.central_slug, mes) : null;
@@ -218,15 +220,18 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       </div>
 
       {agrupar === 'semanas' ? (
-        <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
-          {[1, 2, 3, 4].map((semana) => {
+        <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+          {semanasMes.map((sem) => {
+            const semana = sem.numero;
             const daSemana = visiveis.filter((p) => p.semana === semana);
             const total = posts.filter((p) => p.semana === semana).length;
             const meta = Number(porSemana) || 0;
             return (
               <section key={semana} className="rounded-xl border border-white/10 bg-white/[0.02] p-2">
                 <div className="mb-2 flex items-center justify-between px-1">
-                  <span className="text-sm font-semibold text-slate-100">Semana {semana}</span>
+                  <span className="text-sm font-semibold text-slate-100">
+                    Semana {semana} <span className="text-[11px] font-normal text-slate-400">· {sem.ini.slice(8)}/{sem.ini.slice(5, 7)} a {sem.fim.slice(8)}/{sem.fim.slice(5, 7)}</span>
+                  </span>
                   <span className={`text-[11px] ${meta && total < meta ? 'text-amber-300' : 'text-slate-400'}`}>
                     {total}{meta ? `/${meta}` : ''}
                   </span>

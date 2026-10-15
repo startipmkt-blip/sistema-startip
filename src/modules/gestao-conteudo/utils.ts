@@ -1,4 +1,5 @@
 import type { Cliente } from '@/modules/clientes/types';
+import { hojeLocal, mesDaSemana, semanasDoMes } from '@/modules/designer/lib/periodo';
 import { ETAPAS, formatarDuracao, type Etapa, type Post } from '@/modules/gestao-conteudo/types';
 
 /** Campos de cliente ainda fora do tipo gerado. */
@@ -38,7 +39,7 @@ export interface Alerta {
   gravidade: 'alta' | 'media';
 }
 
-export function alertasDoCliente(c: ClienteGestao, posts: Post[], mesAtual: boolean): Alerta[] {
+export function alertasDoCliente(c: ClienteGestao, posts: Post[], mesAtual: boolean, mes?: string): Alerta[] {
   const out: Alerta[] = [];
   const porMes = c.posts_por_mes ?? 0;
   const porSemana = c.conteudos_por_semana ?? 0;
@@ -55,9 +56,10 @@ export function alertasDoCliente(c: ClienteGestao, posts: Post[], mesAtual: bool
     out.push({ texto: `Faltam ${porMes - posts.length} post(s) para a meta do mês`, gravidade: 'media' });
   }
   if (mesAtual && porSemana > 0) {
-    const semanaHoje = Math.min(4, Math.ceil(new Date().getDate() / 7));
+    const hoje = hojeLocal();
+    const semanaHoje = semanasDoMes(mes ?? mesDaSemana(hoje)).find((s) => hoje >= s.ini && hoje <= s.fim)?.numero;
     const daSemana = posts.filter((p) => p.semana === semanaHoje).length;
-    if (daSemana < porSemana) {
+    if (semanaHoje && daSemana < porSemana) {
       out.push({ texto: `Semana ${semanaHoje}: ${daSemana}/${porSemana} posts`, gravidade: 'media' });
     }
   }

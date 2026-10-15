@@ -9,6 +9,7 @@ import {
   FORMATO_OPCOES, driveInfo, type Post, type PostForm,
 } from '@/modules/gestao-conteudo/types';
 import type { ConteudoTipo } from '@/modules/conteudo/types';
+import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
@@ -87,7 +88,7 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
             options={FORMATO_OPCOES} />
           <Select label="Semana do mês" value={String(form.semana)}
             onChange={(e) => set('semana', Number(e.target.value))}
-            options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: `Semana ${n}` }))} />
+            options={semanasRotuladas(mes).map((s) => ({ value: String(s.numero), label: s.label }))} />
         </div>
         <Input label="Dia da postagem" type="date" value={form.dia_postagem ?? ''}
           onChange={(e) => set('dia_postagem', e.target.value || null)} />

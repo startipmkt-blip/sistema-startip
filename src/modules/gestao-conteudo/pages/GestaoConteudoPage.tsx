@@ -12,6 +12,7 @@ import { usePostsDoMes } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
   ETAPAS, deslocarMes, mesAtualRef, mesLabel, type AbaGestao, type Etapa, type Visao,
 } from '@/modules/gestao-conteudo/types';
+import { SemanaAtual } from '@/modules/gestao-conteudo/components/SemanaAtual';
 import { IdeiasAprovacao } from '@/modules/gestao-conteudo/components/IdeiasAprovacao';
 import { contar, type ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { DetalheCliente } from '@/modules/gestao-conteudo/components/DetalheCliente';
@@ -27,6 +28,7 @@ const VISOES: { id: Visao; label: string }[] = [
 
 const ABAS: { id: AbaGestao; label: string }[] = [
   { id: 'conteudos', label: '🎬 Conteúdos' },
+  { id: 'semana',    label: '📌 Semana atual' },
   { id: 'ideias',    label: '💡 Aprovação de ideias' },
   { id: 'datas',     label: '🎉 Datas comemorativas' },
 ];
@@ -40,7 +42,7 @@ export function GestaoConteudoPage() {
   const visao = (params.get('visao') as Visao | null) ?? 'carteira';
   const etapaFiltro = (params.get('etapa') as Etapa | null) ?? '';
   const abaParam = params.get('aba');
-  const aba: AbaGestao = abaParam === 'ideias' || abaParam === 'datas' ? abaParam : 'conteudos';
+  const aba: AbaGestao = abaParam === 'ideias' || abaParam === 'datas' || abaParam === 'semana' ? abaParam : 'conteudos';
 
   function atualizar(mudancas: Record<string, string | null>) {
     const p = new URLSearchParams(params);
@@ -78,7 +80,7 @@ export function GestaoConteudoPage() {
         title="🗂️ Gestão de Conteúdo"
         subtitle="Acompanhe, por cliente e por mês, o que está em edição, em aprovação, aprovado e programado."
       >
-        {aba !== 'datas' && (
+        {aba !== 'datas' && aba !== 'semana' && (
           <div className="flex items-center gap-1">
             <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, -1) })}>←</Button>
             <span className="min-w-[10rem] text-center text-sm font-medium capitalize text-slate-100">{mesLabel(mes)}</span>
@@ -117,6 +119,10 @@ export function GestaoConteudoPage() {
       )}
 
       {aba === 'datas' && <DatasComemorativasPage />}
+
+      {aba === 'semana' && (
+        <SemanaAtual clientes={clientes} onAbrir={(id) => atualizar({ aba: null, cliente: id })} />
+      )}
 
       {aba === 'ideias' && (
         <IdeiasAprovacao
