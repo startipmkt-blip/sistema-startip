@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
@@ -16,7 +16,9 @@ import {
   type DesignerDemanda, type DesignerTipo, type DesignerStatus,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
-import { labelMes, mesDaSemana, semanaDe } from '../lib/periodo';
+import {
+  hojeLocal, labelMes, mesAnteriorProximo, mesDaSemana, semanaDe, semanasDoMes,
+} from '../lib/periodo';
 
 interface Props {
   open: boolean;
@@ -24,11 +26,11 @@ interface Props {
   demanda: DesignerDemanda | null;
   // Coluna de onde veio o "Adicionar um cartão".
   statusInicial?: DesignerStatus;
-  // Prazo pré-preenchido em demanda nova (ex.: semana futura aberta no quadro).
-  prazoSugerido?: string;
+  // Semana (início) já escolhida em demanda nova: a que está aberta no quadro.
+  semanaSugerida?: string;
 }
 
-export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer', prazoSugerido }: Props) {
+export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer', semanaSugerida }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
   const { data: clientes } = useClientes('');
@@ -43,6 +45,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const [responsavel, setResponsavel] = useState<string>('');
   const [prazo, setPrazo] = useState<string>('');
   const [linkConteudo, setLinkConteudo] = useState('');
+  const [semanaRef, setSemanaRef] = useState('');
   const [anexos, setAnexos] = useState<CriativoAnexo[]>([]);
   // Enviados nesta abertura do formulário: se cancelar, somem do storage.
   const [novos, setNovos] = useState<string[]>([]);
@@ -57,12 +60,35 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setTipo(demanda?.tipo ?? 'post');
     setStatus(demanda?.status ?? statusInicial);
     setResponsavel(demanda?.responsavel_id ?? '');
-    setPrazo(demanda?.prazo ?? (demanda ? '' : prazoSugerido ?? ''));
+    setPrazo(demanda?.prazo ?? '');
+    setSemanaRef(demanda ? (demanda.semana_ref?.slice(0, 10) ?? '') : (semanaSugerida ?? ''));
     setLinkConteudo(demanda?.link_conteudo ?? '');
     setAnexos(demanda?.anexos ?? []);
     setNovos([]);
     setErro(null);
-  }, [open, demanda, statusInicial, prazoSugerido]);
+  }, [open, demanda, statusInicial, semanaSugerida]);
+
+  // Semanas de 1 mês atrás a 2 meses à frente, mais a semana já escolhida (se fora da faixa).
+  const opcoesSemana = useMemo(() => {
+    const hoje = hojeLocal();
+    const mesAtual = mesDaSemana(hoje);
+    const mapa = new Map<string, string>();
+    for (const delta of [-1, 0, 1, 2]) {
+      const mes = mesAnteriorProximo(mesAtual, delta);
+      for (const s of semanasDoMes(mes)) {
+        mapa.set(s.ini, `Semana ${s.numero} de ${labelMes(mes)} (${s.label})`);
+      }
+    }
+    for (const ini of [semanaSugerida, demanda?.semana_ref?.slice(0, 10)]) {
+      if (ini && !mapa.has(ini)) {
+        const mes = mesDaSemana(ini);
+        const s = semanaDe(mes, ini);
+        mapa.set(s.ini, `Semana ${s.numero} de ${labelMes(mes)} (${s.label})`);
+      }
+    }
+    const ordenadas = [...mapa].sort(([a], [b]) => a.localeCompare(b)).map(([value, label]) => ({ value, label }));
+    return [{ value: '', label: 'Automática (semana do prazo ou de hoje)' }, ...ordenadas];
+  }, [demanda, semanaSugerida]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,6 +112,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
         prazo: prazo || null,
         anexos,
         link_conteudo: link || null,
+        semana_ref: semanaRef || null,
       });
       // Anexos que existiam e foram removidos agora saem do storage.
       const mantidos = new Set(anexos.map((a) => a.path));
@@ -214,12 +241,18 @@ ${r.cronometroErro}`);
               ...((operadores ?? []).map((op) => ({ value: op.id, label: op.nome }))),
             ]}
           />
-          <Input id="pz" type="date" label="Prazo" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
+          <Input id="pz" type="date" label="Prazo (opcional)" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
         </div>
+
+        <Select
+          id="sem"
+          label="Semana da demanda"
+          value={semanaRef}
+          onChange={(e) => setSemanaRef(e.target.value)}
+          options={opcoesSemana}
+        />
         <p className="-mt-1 text-[11px] text-slate-400">
-          {prazo
-            ? `Aparece na semana ${semanaDe(mesDaSemana(prazo), prazo).numero} de ${labelMes(mesDaSemana(prazo))} (${semanaDe(mesDaSemana(prazo), prazo).label}). Mude o prazo para mudar a semana.`
-            : 'Sem prazo, a demanda aparece na semana em que foi criada. Defina um prazo para colocá-la em outra semana.'}
+          Define em qual semana do quadro a demanda aparece, sem precisar de prazo.
         </p>
 
         <Input

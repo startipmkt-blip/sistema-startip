@@ -80,6 +80,8 @@ interface DemandaDatas {
   concluido_em: string | null;
   prazo: string | null;
   created_at: string;
+  /** Semana escolhida na demanda (início da semana); vence prazo e criação. */
+  semana_ref?: string | null;
 }
 
 export interface Posicao {
@@ -100,7 +102,8 @@ export function posicaoDaDemanda(d: DemandaDatas, hoje = hojeLocal()): Posicao {
 
   if (!aberta && d.concluido_em) return { ref: iso(new Date(d.concluido_em)), atrasada: false, carregada: false };
 
-  const base = prazo ?? iso(new Date(d.created_at));
+  const semanaRef = d.semana_ref ? d.semana_ref.slice(0, 10) : null;
+  const base = semanaRef ?? prazo ?? iso(new Date(d.created_at));
   if (atrasada) {
     const mesAtual = mesDaSemana(hoje);
     if (mesDaSemana(base) < mesAtual) {

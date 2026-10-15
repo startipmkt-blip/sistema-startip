@@ -80,14 +80,8 @@ function AbaDemandas() {
     const s = semanasDoMes(mes).find((x) => x.numero === semana);
     return s ? { ini: s.ini, fim: s.fim } : periodoDoMes(mes);
   }, [mes, semana]);
-  // Semana futura aberta no quadro: nova demanda já nasce com prazo (sexta) nela,
-  // senão cairia na semana atual (a posição vem do prazo, ou da criação sem prazo).
-  const prazoSugerido = useMemo(() => {
-    if (semana === null || periodo.ini <= hojeLocal()) return undefined;
-    const d = new Date(`${periodo.fim}T00:00:00`);
-    d.setDate(d.getDate() - 1);
-    return d.toLocaleDateString('sv-SE');
-  }, [semana, periodo]);
+  // Semana aberta no quadro vira a semana padrão da demanda nova (início da semana).
+  const semanaSugerida = semana === null ? undefined : periodo.ini;
   const [visao, setVisao] = useState<'quadro' | 'historico'>('quadro');
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState<DesignerDemanda | null>(null);
@@ -206,7 +200,7 @@ function AbaDemandas() {
         />
       )}
 
-      <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} statusInicial={statusNovo} prazoSugerido={prazoSugerido} />
+      <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} statusInicial={statusNovo} semanaSugerida={semanaSugerida} />
     </div>
   );
 }

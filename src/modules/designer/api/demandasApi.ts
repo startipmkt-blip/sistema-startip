@@ -84,6 +84,8 @@ export interface DesignerDemanda {
   anexos: CriativoAnexo[];
   /** Link do conteúdo pronto (Drive etc.); vai como link_drive do post em gestão de conteúdo. */
   link_conteudo?: string | null;
+  /** Semana escolhida (data de início); vazio = semana do prazo ou da criação. */
+  semana_ref?: string | null;
   iniciado_em: string | null;
   concluido_em: string | null;
   /** Cliente reprovou o conteúdo: motivo e quando (vale enquanto a peça não volta para aprovação). */
@@ -190,6 +192,7 @@ interface UpsertInput {
   prazo?: string | null;
   anexos?: CriativoAnexo[];
   link_conteudo?: string | null;
+  semana_ref?: string | null;
   // Contexto pro cronômetro (não vai pro banco).
   de?: DesignerStatus;
   iniciado_em?: string | null;

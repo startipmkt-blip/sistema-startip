@@ -24,7 +24,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from as any)('designer_demandas')
-      .select('id, cliente_id, titulo, descricao, briefing, tipo, status, prazo, concluido_em, created_at, link_conteudo')
+      .select('id, cliente_id, titulo, descricao, briefing, tipo, status, prazo, concluido_em, created_at, link_conteudo, semana_ref')
       .eq('id', demandaId)
       .maybeSingle();
     if (error || !data) return;
@@ -36,6 +36,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
       concluido_em: data.concluido_em,
       prazo: data.prazo,
       created_at: data.created_at,
+      semana_ref: data.semana_ref,
     });
     const mes = mesDaSemana(pos.ref);
     const semana = semanaDe(mes, pos.ref).numero;
