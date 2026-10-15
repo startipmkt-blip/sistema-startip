@@ -57,7 +57,7 @@ export interface ConfigGestao {
 }
 
 export const CONFIG_PADRAO: ConfigGestao = {
-  whatsapp_equipe: null, avisar_reprovacao: true, avisar_aprovacao: true,
+  whatsapp_equipe: null, avisar_reprovacao: false, avisar_aprovacao: true,
   lembrete_ativo: true, lembrete_horas: 24, lembrete_maximo: 0,
 };
 
