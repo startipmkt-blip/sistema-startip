@@ -66,7 +66,15 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const audios = d.anexos.filter((a) => a.type.startsWith('audio/')).length;
   const arquivos = d.anexos.length - audios;
   const atraso = d.atrasada && d.prazo ? diasEntre(d.prazo.slice(0, 10), hojeLocal()) : 0;
-  const temTexto = !!(d.descricao || d.briefing);
+  // O que o designer encontra para trabalhar. Cartão sem nada não mostra etiqueta alguma.
+  const textoLivre = `${d.descricao ?? ''}
+${d.briefing ?? ''}`;
+  const material: { chave: string; texto: string; icone: 'note' | 'link' | 'mic' | 'paperclip' }[] = [];
+  if (d.descricao?.trim()) material.push({ chave: 'desc', texto: 'Descrição', icone: 'note' });
+  if (d.briefing?.trim()) material.push({ chave: 'brief', texto: 'Briefing', icone: 'note' });
+  if (/https?:\/\//i.test(textoLivre)) material.push({ chave: 'link', texto: 'Link do material', icone: 'link' });
+  if (audios > 0) material.push({ chave: 'audio', texto: audios === 1 ? 'Áudio' : `${audios} áudios`, icone: 'mic' });
+  if (arquivos > 0) material.push({ chave: 'arq', texto: arquivos === 1 ? '1 arquivo' : `${arquivos} arquivos`, icone: 'paperclip' });
   const reprovada = reprovadaPeloCliente(d);
   return (
     <div
@@ -94,6 +102,18 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
           <span className="truncate">{d.cliente_nome}</span>
         </p>
       )}
+      {material.length > 0 && (
+        <div className="mt-1.5 flex flex-wrap gap-1" title="O que já foi enviado para o designer">
+          {material.map((m) => (
+            <span
+              key={m.chave}
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-500/30"
+            >
+              <GlassIcon name={m.icone} /> {m.texto}
+            </span>
+          ))}
+        </div>
+      )}
       {reprovada && d.reprovado_justificativa && (
         <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200 line-clamp-4">
           <strong>Refazer:</strong> {d.reprovado_justificativa}
@@ -115,9 +135,6 @@ export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
             <GlassIcon name="clock" /> {prazo.texto}
           </span>
         )}
-        {temTexto && <span title="Tem descrição ou briefing"><GlassIcon name="note" /></span>}
-        {audios > 0 && <span title="Briefing em áudio"><GlassIcon name="mic" /> {audios}</span>}
-        {arquivos > 0 && <span title="Anexos"><GlassIcon name="paperclip" /> {arquivos}</span>}
         {!aberto && total > 0 && <span title="Tempo gasto"><GlassIcon name="timer" /> {formatarDuracao(total)}</span>}
         {d.responsavel_nome && (
           <span
