@@ -19,18 +19,6 @@ if (!preg_match('/^[A-Za-z0-9_-]{10,80}$/', $id)) {
 @ini_set('zlib.output_compression', '0');
 while (ob_get_level() > 0) { ob_end_clean(); }
 
-$origem = 'https://drive.usercontent.google.com/download?id=' . $id . '&export=download&confirm=t';
-$dir    = rtrim(sys_get_temp_dir(), '/\') . '/startip-drive-video';
-@mkdir($dir, 0700, true);
-$arquivo = $dir . '/' . $id . '.mp4';
-
-// Limpeza ocasional de cópias antigas.
-if (mt_rand(1, 20) === 1) {
-    foreach (glob($dir . '/*') ?: [] as $f) {
-        if (is_file($f) && filemtime($f) < time() - VALIDADE) { @unlink($f); }
-    }
-}
-
 /** Baixa o vídeo inteiro para $destino. Retorna true se for um vídeo válido. */
 function baixar(string $url, string $destino): bool {
     $tmp = $destino . '.' . bin2hex(random_bytes(4)) . '.part';
@@ -90,6 +78,20 @@ function proxy_direto(string $url): void {
     curl_close($ch);
 }
 
+
+try {
+$origem = 'https://drive.usercontent.google.com/download?id=' . $id . '&export=download&confirm=t';
+$dir    = rtrim(sys_get_temp_dir(), '/\') . '/startip-drive-video';
+@mkdir($dir, 0700, true);
+$arquivo = $dir . '/' . $id . '.mp4';
+
+// Limpeza ocasional de cópias antigas.
+if (mt_rand(1, 20) === 1) {
+    foreach (glob($dir . '/*') ?: [] as $f) {
+        if (is_file($f) && filemtime($f) < time() - VALIDADE) { @unlink($f); }
+    }
+}
+
 if (!is_file($arquivo) || filesize($arquivo) < 1024) {
     if (!baixar($origem, $arquivo)) {
         proxy_direto($origem);
@@ -141,3 +143,8 @@ while ($restante > 0 && !feof($fh) && !connection_aborted()) {
     $restante -= strlen($bloco);
 }
 fclose($fh);
+
+} catch (Throwable $e) {
+    if (!headers_sent()) { header('X-Erro: ' . substr(preg_replace('/[^\w .:()\/-]/', '', $e->getMessage()), 0, 120)); }
+    proxy_direto('https://drive.usercontent.google.com/download?id=' . $id . '&export=download&confirm=t');
+}
