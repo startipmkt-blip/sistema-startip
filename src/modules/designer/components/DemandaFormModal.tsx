@@ -16,6 +16,7 @@ import {
   type DesignerDemanda, type DesignerTipo, type DesignerStatus,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { labelMes, mesDaSemana, semanaDe } from '../lib/periodo';
 
 interface Props {
   open: boolean;
@@ -23,9 +24,11 @@ interface Props {
   demanda: DesignerDemanda | null;
   // Coluna de onde veio o "Adicionar um cartão".
   statusInicial?: DesignerStatus;
+  // Prazo pré-preenchido em demanda nova (ex.: semana futura aberta no quadro).
+  prazoSugerido?: string;
 }
 
-export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer' }: Props) {
+export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer', prazoSugerido }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
   const { data: clientes } = useClientes('');
@@ -54,12 +57,12 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setTipo(demanda?.tipo ?? 'post');
     setStatus(demanda?.status ?? statusInicial);
     setResponsavel(demanda?.responsavel_id ?? '');
-    setPrazo(demanda?.prazo ?? '');
+    setPrazo(demanda?.prazo ?? (demanda ? '' : prazoSugerido ?? ''));
     setLinkConteudo(demanda?.link_conteudo ?? '');
     setAnexos(demanda?.anexos ?? []);
     setNovos([]);
     setErro(null);
-  }, [open, demanda, statusInicial]);
+  }, [open, demanda, statusInicial, prazoSugerido]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -213,6 +216,11 @@ ${r.cronometroErro}`);
           />
           <Input id="pz" type="date" label="Prazo" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
         </div>
+        <p className="-mt-1 text-[11px] text-slate-400">
+          {prazo
+            ? `Aparece na semana ${semanaDe(mesDaSemana(prazo), prazo).numero} de ${labelMes(mesDaSemana(prazo))} (${semanaDe(mesDaSemana(prazo), prazo).label}). Mude o prazo para mudar a semana.`
+            : 'Sem prazo, a demanda aparece na semana em que foi criada. Defina um prazo para colocá-la em outra semana.'}
+        </p>
 
         <Input
           id="lnk"
