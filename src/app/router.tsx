@@ -40,6 +40,7 @@ import { PainelTvPage } from '@/pages/PainelTvPage';
 import { PainelTvAdminPage } from '@/modules/painel-tv/pages/PainelTvAdminPage';
 import { CsClientesPage } from '@/modules/cs-clientes/pages/CsClientesPage';
 import { CsPublicoPage } from '@/pages/CsPublicoPage';
+import { AlertasPage } from '@/modules/alertas/pages/AlertasPage';
 import { OtimizacoesListaPage } from '@/modules/otimizacoes/pages/OtimizacoesListaPage';
 import { OtimizacoesClientePage } from '@/modules/otimizacoes/pages/OtimizacoesClientePage';
 import { OtimizacoesPublicaPage } from '@/pages/OtimizacoesPublicaPage';
@@ -105,6 +106,7 @@ export const router = createBrowserRouter([
           { path: 'meta-ads',   element: <RequireModulo modulo="diretoria"><MetaAdsGestorPage /></RequireModulo> },
           { path: 'painel-cliente', element: <Navigate to="/area-cliente" replace /> },
           { path: 'trafego',    element: <RequireModulo modulo="diretoria"><TrafegoPage /></RequireModulo> },
+          { path: 'alertas', element: <RequireModulo modulo="alertas"><AlertasPage /></RequireModulo> },
           { path: 'otimizacoes', element: <RequireModulo modulo="otimizacoes"><OtimizacoesListaPage /></RequireModulo> },
           { path: 'otimizacoes/:slug', element: <RequireModulo modulo="otimizacoes"><OtimizacoesClientePage /></RequireModulo> },
           { path: 'social-media', element: <Navigate to="/designer" replace /> },

@@ -29,6 +29,7 @@ export const navItems: NavItem[] = [
   { label: 'Contratos', to: '/contratos', icon: 'contratos', comingSoon: false },
   { label: 'Tráfego Pago', to: '/trafego', icon: 'financeiro', comingSoon: false, equipeOnly: true },
   { label: 'Otimizações', to: '/otimizacoes', icon: 'financeiro', comingSoon: false, equipeOnly: true },
+  { label: 'Alertas', to: '/alertas', icon: 'bell', comingSoon: false, equipeOnly: true },
   { label: 'Usuários', to: '/usuarios', icon: 'usuarios', comingSoon: false },
 ];
 

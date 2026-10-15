@@ -34,6 +34,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'social-media', label: 'Social Media' },
   { key: 'diretoria', label: 'Tráfego Pago' },
   { key: 'otimizacoes', label: 'Otimização de Campanhas' },
+  { key: 'alertas', label: 'Startip Alertas' },
   { key: 'usuarios', label: 'Usuários' },
 ];
 

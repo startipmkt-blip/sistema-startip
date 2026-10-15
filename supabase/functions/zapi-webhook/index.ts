@@ -189,6 +189,35 @@ function extPorMime(mime: string | null): string | null {
   return m[mime] ?? null;
 }
 
+// STARTIP ALERTAS: registra a mensagem de grupo no motor de atendimento.
+// Roda ANTES do fluxo do CRM e nunca derruba o webhook (falha só é logada).
+// Eventos que não são pedido de atendimento (entrada/saída, edição, reação,
+// figurinha, etc.) são descartados no banco pela própria função.
+async function registrarAlerta(sb: any, payload: any, dados: Extracao): Promise<void> {
+  if (!dados.isGroup || !dados.chatId || !dados.waMessageId) return;
+  if (payload?.notification || payload?.isEdit === true || payload?.isNewsletter === true) return;
+  if (!['texto', 'imagem', 'audio', 'video', 'documento'].includes(dados.tipo)) return;
+
+  const m = Number(payload?.momment ?? payload?.moment ?? payload?.timestamp);
+  let ocorrido = Number.isFinite(m) && m > 0 ? new Date(m < 1e12 ? m * 1000 : m) : new Date();
+  if (ocorrido.getTime() > Date.now() + 3600_000) ocorrido = new Date();
+
+  const { error } = await sb.rpc('alertas_registrar_evento', {
+    p_instance: txt(payload?.instanceId) ?? Deno.env.get('ZAPI_INSTANCE_ID') ?? 'default',
+    p_message_id: dados.waMessageId,
+    p_chat_id: dados.chatId,
+    p_chat_nome: dados.chatName,
+    p_remetente_fone: dados.senderPhone,
+    p_remetente_nome: dados.senderName,
+    p_from_me: dados.fromMe,
+    p_from_api: payload?.fromApi === true,
+    p_tipo: dados.tipo,
+    p_texto: dados.texto,
+    p_ocorrido_em: ocorrido.toISOString(),
+  });
+  if (error) console.log('ALERTAS_ERRO', error.message);
+}
+
 serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
@@ -264,6 +293,9 @@ serve(async (req) => {
   const direcao: 'recebida' | 'enviada' = dados.fromMe ? 'enviada' : 'recebida';
 
   const sb = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
+
+  try { await registrarAlerta(sb, payload, dados); }
+  catch (e) { console.log('ALERTAS_EXCECAO', String((e as Error)?.message ?? e)); }
 
   // Reação a mensagem existente — atualiza o campo reacoes da mensagem alvo,
   // não cria linha nova.

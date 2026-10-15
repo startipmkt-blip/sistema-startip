@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.drive-pasta]
 verify_jwt = false
+
+[functions.alertas-processar]
+verify_jwt = false
