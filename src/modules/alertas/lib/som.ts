@@ -1,5 +1,5 @@
 // Sons de alerta gerados no navegador (Web Audio): sem arquivo de áudio.
-// Três timbres, cada vez mais urgentes: nível 1 (chime), 2 (triplo), 3 (sirene).
+// Três timbres: nível 1 (triplo, o mais chamativo no 1º aviso), 2 (chime), 3 (sirene).
 
 const CHAVE_PREFS = 'startip-alertas-som';
 const CHAVE_VISTOS = 'startip-alertas-vistos';
@@ -68,10 +68,10 @@ export function tocarAlerta(nivel: 1 | 2 | 3, volume = 0.8): boolean {
   if (c.state !== 'running') return false;
   const t = c.currentTime + 0.02;
   const v = Math.min(1, Math.max(0, volume)) * 0.6;
-  if (nivel === 1) {
+  if (nivel === 2) {
     nota(c, 784, t, 0.35, v);
     nota(c, 1047, t + 0.18, 0.5, v);
-  } else if (nivel === 2) {
+  } else if (nivel === 1) {
     [880, 880, 1175].forEach((f, i) => nota(c, f, t + i * 0.22, 0.3, v, 'triangle'));
   } else {
     for (let i = 0; i < 4; i += 1) {
