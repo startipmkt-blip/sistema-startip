@@ -15,7 +15,7 @@ export function PreviaDrive({
         </a>
       ) : undefined}
     >
-      {info.tipo === 'arquivo' && info.previewUrl ? (
+      {info.previewUrl ? (
         <div className="space-y-2">
           <iframe
             src={info.previewUrl}
@@ -26,14 +26,9 @@ export function PreviaDrive({
           />
           <p className="text-[11px] text-slate-500">
             Se a prévia não carregar, o arquivo precisa estar compartilhado como
-            "Qualquer pessoa com o link" no Drive.
+            "Qualquer pessoa com o link" no Drive (vale para pastas também).
           </p>
         </div>
-      ) : info.tipo === 'pasta' ? (
-        <p className="text-sm text-slate-300">
-          Esse link é de uma <strong>pasta</strong>. Para ver a prévia aqui, cole o link de um
-          arquivo específico (vídeo ou imagem).
-        </p>
       ) : (
         <p className="text-sm text-slate-300">
           Nenhum link do Drive válido neste conteúdo. Cole um link do tipo

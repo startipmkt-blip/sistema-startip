@@ -97,7 +97,7 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
             placeholder="https://drive.google.com/file/d/…"
             value={form.link_drive ?? ''} onChange={(e) => set('link_drive', e.target.value)} />
           {info.tipo === 'arquivo' && <p className="text-[11px] text-emerald-400"><GlassIcon name="check" /> Arquivo reconhecido — a prévia aparece para você e para o cliente.</p>}
-          {info.tipo === 'pasta' && <p className="text-[11px] text-amber-300">Isso é uma pasta. Cole o link do arquivo (vídeo ou imagem) para ter a prévia.</p>}
+          {info.tipo === 'pasta' && <p className="text-[11px] text-amber-300">Pasta reconhecida (carrossel): a prévia mostra todas as imagens. Compartilhe a pasta como "Qualquer pessoa com o link".</p>}
           <p className="text-[11px] text-slate-500">
             No Drive: Compartilhar → "Qualquer pessoa com o link" → Copiar link.
           </p>

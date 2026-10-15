@@ -194,7 +194,15 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                           </span>
                         )}
                       </div>
-                      {driveInfo(i.link_drive).tipo === 'arquivo' ? (
+                      {driveInfo(i.link_drive).tipo === 'pasta' ? (
+                        <button
+                          type="button"
+                          onClick={() => setPrevia(i)}
+                          className="mb-3 block w-full rounded-xl border border-white/10 bg-white/5 px-3 py-6 text-center text-sm font-medium text-brand-300 hover:bg-white/10"
+                        >
+                          <GlassIcon name="play" /> Ver todas as imagens do carrossel
+                        </button>
+                      ) : driveInfo(i.link_drive).tipo === 'arquivo' ? (
                         <button
                           type="button"
                           onClick={() => setPrevia(i)}

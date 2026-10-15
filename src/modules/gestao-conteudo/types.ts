@@ -201,7 +201,11 @@ export function driveInfo(url: string | null | undefined): DriveInfo {
   const bruto = (url ?? '').trim();
   if (!bruto) return { tipo: 'invalido', abrirUrl: '' };
   const pasta = bruto.match(/\/folders\/([\w-]{10,})/);
-  if (pasta) return { tipo: 'pasta', id: pasta[1], abrirUrl: bruto };
+  if (pasta) return {
+    tipo: 'pasta', id: pasta[1], abrirUrl: bruto,
+    // Grade com todas as imagens da pasta (carrossel); exige pasta compartilhada por link.
+    previewUrl: `https://drive.google.com/embeddedfolderview?id=${pasta[1]}#grid`,
+  };
   const arquivo =
     bruto.match(/\/file\/d\/([\w-]{10,})/) ??
     bruto.match(/[?&]id=([\w-]{10,})/);

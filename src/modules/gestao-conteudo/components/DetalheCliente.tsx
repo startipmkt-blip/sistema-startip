@@ -66,7 +66,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
 
   function enviarSelecionados() {
     const escolhidos = posts.filter((p) => selecionados.includes(p.id));
-    const semArquivo = escolhidos.filter((p) => driveInfo(p.link_drive).tipo !== 'arquivo').length;
+    const semArquivo = escolhidos.filter((p) => driveInfo(p.link_drive).tipo === 'invalido').length;
     const extra = semArquivo
       ? `\n\n⚠ ${semArquivo} conteúdo(s) sem link do Drive válido (o cliente não verá a prévia).`
       : '';
