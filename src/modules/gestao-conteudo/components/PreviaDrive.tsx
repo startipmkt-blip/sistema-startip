@@ -9,7 +9,7 @@ export function PreviaDrive({
   const info = driveInfo(link);
 
   return (
-    <Modal open={open} onClose={onClose} title={titulo || 'Prévia'} size="xl"
+    <Modal open={open} onClose={onClose} title={titulo || 'Prévia'} size="xl" semBlur
       footer={info.abrirUrl ? (
         <a href={info.abrirUrl} target="_blank" rel="noreferrer noopener">
           <Button variant="secondary">Abrir no Drive ↗</Button>

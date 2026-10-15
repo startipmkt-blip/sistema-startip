@@ -12,11 +12,13 @@ interface ModalProps {
   size?: 'md' | 'lg' | 'xl' | '2xl' | 'full';
   // Formulários longos: clique fora e Esc não fecham, só os botões.
   fecharSoPorBotao?: boolean;
+  // Sem backdrop-filter: vídeo/iframe dentro de elemento com blur renderiza controles duplicados no celular.
+  semBlur?: boolean;
 }
 
 const SIZES = { md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl', '2xl': 'max-w-6xl', full: 'max-w-[95vw]' } as const;
 
-export function Modal({ open, onClose, title, children, footer, size = 'md', fecharSoPorBotao = false }: ModalProps) {
+export function Modal({ open, onClose, title, children, footer, size = 'md', fecharSoPorBotao = false, semBlur = false }: ModalProps) {
   useEffect(() => {
     if (!open || fecharSoPorBotao) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -30,11 +32,11 @@ export function Modal({ open, onClose, title, children, footer, size = 'md', fec
   // relativo ao cartão e o modal sai da tela (rodapé com os botões fica cortado).
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${semBlur ? 'bg-slate-950/90' : 'bg-slate-950/60 backdrop-blur-sm'}`}
       onClick={fecharSoPorBotao ? undefined : onClose}
     >
       <div
-        className={`w-full ${SIZES[size]} overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 shadow-glass backdrop-blur-2xl`}
+        className={`w-full ${SIZES[size]} overflow-hidden rounded-2xl border border-white/10 shadow-glass ${semBlur ? 'bg-slate-900' : 'bg-slate-900/80 backdrop-blur-2xl'}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">

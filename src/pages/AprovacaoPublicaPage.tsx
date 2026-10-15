@@ -295,6 +295,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
         open={previa !== null}
         onClose={() => setPrevia(null)}
         size="xl"
+        semBlur
         title={previa?.titulo ?? ''}
       >
         {previa && driveInfo(previa.link_drive).previewUrl && (
@@ -310,6 +311,13 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                 className="h-[65vh] w-full rounded-xl border border-white/10 bg-black"
               />
             )}
+            <a
+              href={driveInfo(previa.link_drive).abrirUrl}
+              target="_blank" rel="noreferrer noopener"
+              className="block text-center text-xs text-brand-300 hover:underline"
+            >
+              Se o vídeo não abrir direito, toque aqui para ver no Drive ↗
+            </a>
             {previa.status === 'pendente' && (
               <div className="flex gap-2">
                 <Button className="flex-1" disabled={salvando}
