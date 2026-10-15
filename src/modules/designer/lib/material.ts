@@ -11,5 +11,5 @@ export function temMaterial(d: DesignerDemanda): boolean {
 
 /** Pedido de alteração do cliente (com justificativa) também conta como informação. */
 export function temInformacao(d: DesignerDemanda): boolean {
-  return temMaterial(d) || !!(d.reprovado_em && d.reprovado_justificativa?.trim());
+  return temMaterial(d) || !!(d.reprovado_em && d.reprovado_justificativa?.trim()) || !!d.alteracao_obs?.trim();
 }

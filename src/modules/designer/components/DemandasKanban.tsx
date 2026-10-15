@@ -58,6 +58,8 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
           if (r?.cronometroErro) {
             alert(`A demanda foi movida, mas o cronômetro não acompanhou:\n\n${r.cronometroErro}`);
           }
+          // Mandada manualmente para Alteração: abre o cartão para descrever o que alterar.
+          if (status === 'alteracao') onEditar({ ...d, status: 'alteracao' });
         },
       },
     );

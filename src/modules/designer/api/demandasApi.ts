@@ -90,6 +90,8 @@ export interface DesignerDemanda {
   concluido_em: string | null;
   /** Cliente reprovou o conteúdo: motivo e quando (vale enquanto a peça não volta para aprovação). */
   reprovado_justificativa?: string | null;
+  /** O que alterar, escrito pela equipe ao mandar para Alteração (vale enquanto a peça não volta para aprovação). */
+  alteracao_obs?: string | null;
   reprovado_em?: string | null;
   /** Calculados no cliente: vencida, levada de mês anterior, e data que define a semana. */
   atrasada?: boolean;
@@ -193,6 +195,7 @@ interface UpsertInput {
   anexos?: CriativoAnexo[];
   link_conteudo?: string | null;
   semana_ref?: string | null;
+  alteracao_obs?: string | null;
   // Contexto pro cronômetro (não vai pro banco).
   de?: DesignerStatus;
   iniciado_em?: string | null;
@@ -208,6 +211,7 @@ export function useSalvarDemanda() {
       const para = dados.status ?? 'a_fazer';
       const payload = {
         ...dados,
+        ...(para === 'aprovacao' || para === 'concluido' ? { alteracao_obs: null } : {}),
         ...carimbos(input.id ? de : undefined, para, iniciado_em),
         criado_por: input.id ? undefined : profile?.id ?? null,
       };
@@ -272,7 +276,12 @@ export function useMoverStatus() {
     }): Promise<ResultadoCronometro> => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from as any)('designer_demandas')
-        .update({ status: v.status, updated_at: new Date().toISOString(), ...carimbos(v.de, v.status, v.iniciado_em) })
+        .update({
+          status: v.status,
+          updated_at: new Date().toISOString(),
+          ...(v.status === 'aprovacao' || v.status === 'concluido' ? { alteracao_obs: null } : {}),
+          ...carimbos(v.de, v.status, v.iniciado_em),
+        })
         .eq('id', v.id);
       if (error) throw error;
       await sincronizarGestaoConteudo(v.id);

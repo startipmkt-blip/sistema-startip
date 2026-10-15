@@ -76,6 +76,10 @@ ${d.briefing ?? ''}`;
   if (audios > 0) material.push({ chave: 'audio', texto: audios === 1 ? 'Áudio' : `${audios} áudios`, icone: 'mic' });
   if (arquivos > 0) material.push({ chave: 'arq', texto: arquivos === 1 ? '1 arquivo' : `${arquivos} arquivos`, icone: 'paperclip' });
   const reprovada = reprovadaPeloCliente(d);
+  const obsAlteracao = (d.alteracao_obs ?? '').trim();
+  const emRevisao = d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento';
+  // Em Alteração sem nenhum texto (nem do cliente nem da equipe): a barra pede para descrever.
+  const faltaDescrever = d.status === 'alteracao' && !obsAlteracao && !reprovada;
   return (
     <div
       draggable
@@ -113,6 +117,16 @@ ${d.briefing ?? ''}`;
             </span>
           ))}
         </div>
+      )}
+      {emRevisao && obsAlteracao && (
+        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200 line-clamp-4">
+          <strong>Alterar:</strong> {obsAlteracao}
+        </p>
+      )}
+      {faltaDescrever && (
+        <p className="mt-1.5 rounded border border-dashed border-red-500/60 bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200">
+          <strong>Alteração:</strong> clique e descreva o que precisa mudar.
+        </p>
       )}
       {reprovada && d.reprovado_justificativa && (
         <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200 line-clamp-4">

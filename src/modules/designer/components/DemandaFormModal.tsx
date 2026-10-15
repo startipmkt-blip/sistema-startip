@@ -44,6 +44,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const [prazo, setPrazo] = useState<string>('');
   const [linkConteudo, setLinkConteudo] = useState('');
   const [semanaRef, setSemanaRef] = useState('');
+  const [alteracaoObs, setAlteracaoObs] = useState('');
   const [anexos, setAnexos] = useState<CriativoAnexo[]>([]);
   // Enviados nesta abertura do formulário: se cancelar, somem do storage.
   const [novos, setNovos] = useState<string[]>([]);
@@ -59,6 +60,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setStatus(demanda?.status ?? statusInicial);
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
+    setAlteracaoObs(demanda?.alteracao_obs ?? '');
     setSemanaRef(demanda ? (demanda.semana_ref?.slice(0, 10) ?? '') : (semanaSugerida ?? ''));
     setLinkConteudo(demanda?.link_conteudo ?? '');
     setAnexos(demanda?.anexos ?? []);
@@ -97,6 +99,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
         anexos,
         link_conteudo: link || null,
         semana_ref: semanaRef || null,
+        alteracao_obs: alteracaoObs.trim() || null,
       });
       // Anexos que existiam e foram removidos agora saem do storage.
       const mantidos = new Set(anexos.map((a) => a.path));
@@ -186,6 +189,18 @@ ${r.cronometroErro}`);
             <p className="mt-1 text-[11px] text-red-300">
               em {new Date(demanda.reprovado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
             </p>
+          </div>
+        )}
+
+        {(status === 'alteracao' || ((status === 'a_fazer' || status === 'em_andamento') && alteracaoObs.trim())) && (
+          <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3">
+            <TextareaExpansivel
+              id="alt"
+              label="Alteração — o que precisa ser alterado"
+              placeholder="Descreva o que deve mudar neste conteúdo (texto, corte, música, cor…). O designer vê isso em vermelho no cartão."
+              value={alteracaoObs}
+              onChange={(e) => setAlteracaoObs(e.target.value)}
+            />
           </div>
         )}
 
