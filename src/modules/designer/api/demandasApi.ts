@@ -51,8 +51,8 @@ export type DesignerTipo = 'post' | 'carrossel' | 'reels' | 'story' | 'web' | 'e
 
 export const STATUS_COLUNAS: Array<{ id: DesignerStatus; label: string; cor: string; emoji: string }> = [
   { id: 'a_fazer',      label: 'A fazer',        cor: 'slate',   emoji: '📥' },
-  { id: 'alteracao',    label: 'Alteração',      cor: 'red',     emoji: '🔁' },
   { id: 'em_andamento', label: 'Em andamento',   cor: 'blue',    emoji: '🎨' },
+  { id: 'alteracao',    label: 'Alteração',      cor: 'red',     emoji: '🔁' },
   { id: 'aprovacao',    label: 'Aguardando aprovação', cor: 'amber', emoji: '👀' },
   { id: 'concluido',    label: 'Concluído',      cor: 'green',   emoji: '✅' },
 ];
