@@ -14,6 +14,7 @@ import {
 } from '@/modules/gestao-conteudo/types';
 import { alertasDoCliente, contar, textoTempoMedio, type ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
+import { videoDriveUrl } from './VideoDrive';
 import { PostCard } from './PostCard';
 import { PostFormModal } from './PostFormModal';
 import { PreviaDrive } from './PreviaDrive';
@@ -79,6 +80,11 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
     if (mensagemEnvio === null) return;
     const texto = mensagemEnvio;
     setAviso(null);
+    // Aquece o cache dos vídeos: o cliente abre o link já com o Reels pronto para tocar.
+    for (const p of posts.filter((x) => selecionados.includes(x.id) && x.formato === 'reels')) {
+      const id = driveInfo(p.link_drive).id;
+      if (id) void fetch(videoDriveUrl(id), { headers: { Range: 'bytes=0-0' } }).catch(() => {});
+    }
     enviar.mutate(
       { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: selecionados, texto },
       {

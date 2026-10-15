@@ -81,7 +81,7 @@ function proxy_direto(string $url): void {
 
 try {
 $origem = 'https://drive.usercontent.google.com/download?id=' . $id . '&export=download&confirm=t';
-$dir    = rtrim(sys_get_temp_dir(), '/\') . '/startip-drive-video';
+$dir    = rtrim(sys_get_temp_dir(), "/\\") . '/startip-drive-video';
 @mkdir($dir, 0700, true);
 $arquivo = $dir . '/' . $id . '.mp4';
 
