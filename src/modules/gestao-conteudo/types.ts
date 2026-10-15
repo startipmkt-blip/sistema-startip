@@ -49,13 +49,15 @@ export interface Post {
 export interface ConfigGestao {
   whatsapp_equipe: string | null;
   avisar_reprovacao: boolean;
+  /** Avisa o grupo da equipe quando o cliente aprova. */
+  avisar_aprovacao: boolean;
   lembrete_ativo: boolean;
   lembrete_horas: number;
   lembrete_maximo: number;
 }
 
 export const CONFIG_PADRAO: ConfigGestao = {
-  whatsapp_equipe: null, avisar_reprovacao: true,
+  whatsapp_equipe: null, avisar_reprovacao: true, avisar_aprovacao: true,
   lembrete_ativo: true, lembrete_horas: 24, lembrete_maximo: 0,
 };
 

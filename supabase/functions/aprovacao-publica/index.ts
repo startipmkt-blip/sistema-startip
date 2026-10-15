@@ -34,11 +34,12 @@ function json(o: unknown, status = 200) {
 }
 
 // Aviso interno de reprovação: nunca pode derrubar a decisão do cliente.
-async function avisarEquipe(sb: any, texto: string): Promise<void> {
+async function avisarEquipe(sb: any, texto: string, tipo: 'reprovacao' | 'aprovacao' = 'reprovacao'): Promise<void> {
   try {
     const { data: cfg } = await sb.from('gestao_conteudo_config').select('*').limit(1).maybeSingle();
     const chat = cfg?.whatsapp_equipe?.trim();
-    if (!cfg?.avisar_reprovacao || !chat) return;
+    const ligado = tipo === 'aprovacao' ? cfg?.avisar_aprovacao !== false : cfg?.avisar_reprovacao;
+    if (!ligado || !chat) return;
     await fetch(`https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`, {
       method: 'POST',
       headers: {
@@ -287,6 +288,13 @@ serve(async (req) => {
         );
         if (eV) return json({ error: eV.message }, 500);
         const finalizados = await finalizarSeTodosAprovaram(sb, ids, (aprsT as any[]).map((a) => a.id));
+        if (finalizados > 0) {
+          await avisarEquipe(
+            sb,
+            `✅ ${(cli as any).nome}: ${finalizados} conteúdo(s) de ${mes} aprovado(s) por todos os aprovadores.`,
+            'aprovacao',
+          );
+        }
         return json({ ok: true, aprovados: ids.length, finalizados });
       }
 
@@ -299,7 +307,16 @@ serve(async (req) => {
         .neq('visivel_cliente', false)
         .select('id');
       if (error) return json({ error: error.message }, 500);
-      return json({ ok: true, aprovados: (atualizados ?? []).length });
+      const qtd = (atualizados ?? []).length;
+      if (qtd > 0) {
+        await avisarEquipe(
+          sb,
+          `✅ ${(cli as any).nome} aprovou ${qtd === 1 ? '1 conteúdo' : `${qtd} conteúdos`} de ${mes}.\n\n` +
+          `Já pode programar a publicação.`,
+          'aprovacao',
+        );
+      }
+      return json({ ok: true, aprovados: qtd });
     }
 
     if (!slug || !id || !status) return json({ error: 'parâmetros faltando' }, 400);
@@ -357,6 +374,7 @@ serve(async (req) => {
         await avisarEquipe(
           sb,
           `✅ Todos os aprovadores de ${(cli as any).nome} aprovaram "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).`,
+          'aprovacao',
         );
       }
       return json({ ok: true, finalizado: finalizados > 0 });
@@ -374,6 +392,20 @@ serve(async (req) => {
         sb,
         `❌ ${(cli as any).nome} não aprovou "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
         `Alteração pedida: ${justificativa}`,
+      );
+    } else {
+      const { count } = await sb
+        .from('conteudo_aprovacao')
+        .select('id', { count: 'exact', head: true })
+        .eq('cliente_id', (cli as any).id)
+        .eq('mes_referencia', (ideia as any).mes_referencia)
+        .eq('status', 'pendente')
+        .neq('visivel_cliente', false);
+      await avisarEquipe(
+        sb,
+        `✅ ${(cli as any).nome} aprovou "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
+        (count ? `Ainda aguardando decisão: ${count}.` : 'Todos os conteúdos do mês já foram decididos.'),
+        'aprovacao',
       );
     }
 

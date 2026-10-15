@@ -61,13 +61,17 @@ export function ConfigModal({ open, onClose }: { open: boolean; onClose: () => v
         <section className="space-y-2">
           <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="bell" /> Aviso interno da equipe</h3>
           <p className="text-xs text-slate-400">
-            Quando o cliente clicar em "Não aprovado", este WhatsApp recebe o conteúdo e a alteração pedida.
+            Quando o cliente aprovar ou clicar em "Não aprovado", este WhatsApp recebe o aviso (com a alteração pedida, se for reprovação).
           </p>
           <Input label="WhatsApp da equipe (número ou ID do grupo)" placeholder="5511999999999 ou 1203630…@g.us"
             value={cfg.whatsapp_equipe ?? ''} onChange={(e) => set('whatsapp_equipe', e.target.value)} />
           <label className="flex items-center gap-2 text-sm text-slate-200">
             <input type="checkbox" checked={cfg.avisar_reprovacao} onChange={(e) => set('avisar_reprovacao', e.target.checked)} />
             Avisar a equipe quando o cliente reprovar
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-200">
+            <input type="checkbox" checked={cfg.avisar_aprovacao} onChange={(e) => set('avisar_aprovacao', e.target.checked)} />
+            Avisar a equipe quando o cliente aprovar
           </label>
         </section>
       </div>

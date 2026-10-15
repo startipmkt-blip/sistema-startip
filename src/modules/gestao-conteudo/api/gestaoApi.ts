@@ -72,6 +72,7 @@ export function useSalvarConfigGestao() {
         .update({
           whatsapp_equipe: c.whatsapp_equipe?.trim() || null,
           avisar_reprovacao: c.avisar_reprovacao,
+          avisar_aprovacao: c.avisar_aprovacao,
           lembrete_ativo: c.lembrete_ativo,
           lembrete_horas: c.lembrete_horas,
           lembrete_maximo: c.lembrete_maximo,
