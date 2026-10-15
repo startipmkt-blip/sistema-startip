@@ -2,10 +2,11 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { driveInfo } from '@/modules/gestao-conteudo/types';
 import { CarrosselPasta } from './CarrosselPasta';
+import { VideoDrive } from './VideoDrive';
 
 export function PreviaDrive({
-  open, onClose, titulo, link,
-}: { open: boolean; onClose: () => void; titulo: string; link: string | null }) {
+  open, onClose, titulo, link, formato,
+}: { open: boolean; onClose: () => void; titulo: string; link: string | null; formato?: string }) {
   const info = driveInfo(link);
 
   return (
@@ -18,6 +19,8 @@ export function PreviaDrive({
     >
       {info.tipo === 'pasta' && info.id ? (
         <CarrosselPasta pastaId={info.id} titulo={titulo} />
+      ) : formato === 'reels' && info.id ? (
+        <VideoDrive id={info.id} titulo={titulo} abrirUrl={info.abrirUrl} thumbUrl={info.thumbUrl} />
       ) : info.previewUrl ? (
         <div className="space-y-2">
           <iframe

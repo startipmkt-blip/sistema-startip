@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { driveInfo } from '@/modules/gestao-conteudo/types';
+import { VideoDrive } from '@/modules/gestao-conteudo/components/VideoDrive';
 import { CarrosselPasta } from '@/modules/gestao-conteudo/components/CarrosselPasta';
 import { Card } from '@/shared/ui/Card';
 import { Badge } from '@/shared/ui/Badge';
@@ -302,6 +303,13 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
           <div className="space-y-3">
             {driveInfo(previa.link_drive).tipo === 'pasta' ? (
               <CarrosselPasta pastaId={driveInfo(previa.link_drive).id as string} titulo={previa.titulo} />
+            ) : previa.formato === 'reels' && driveInfo(previa.link_drive).id ? (
+              <VideoDrive
+                id={driveInfo(previa.link_drive).id as string}
+                titulo={previa.titulo}
+                abrirUrl={driveInfo(previa.link_drive).abrirUrl}
+                thumbUrl={driveInfo(previa.link_drive).thumbUrl}
+              />
             ) : (
               <iframe
                 src={driveInfo(previa.link_drive).previewUrl}

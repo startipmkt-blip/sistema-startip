@@ -230,7 +230,7 @@ export function AgendaSemana({
 
       <PreviaDrive
         open={previa !== null} onClose={() => setPrevia(null)}
-        titulo={previa?.titulo ?? ''} link={previa?.link_drive ?? null}
+        titulo={previa?.titulo ?? ''} link={previa?.link_drive ?? null} formato={previa?.formato}
       />
     </div>
   );
