@@ -234,17 +234,15 @@ export function mensagemLembrete(p: { clienteNome: string; qtd: number; link: st
 }
 
 /** Texto padrão enviado ao cliente no WhatsApp. */
-export function mensagemAprovacao(p: {
-  clienteNome: string;
-  mes: string;
-  qtd: number;
-  link: string;
-}): string {
+export function mensagemAprovacao(p: { link: string }): string {
   return (
-    `Olá, ${p.clienteNome}! 👋\n\n` +
-    `Seus conteúdos de ${mesLabel(p.mes)} estão prontos para aprovação ` +
-    `(${p.qtd} ${p.qtd === 1 ? 'conteúdo' : 'conteúdos'}).\n\n` +
-    `Veja a prévia e aprove ou peça ajustes por aqui:\n${p.link}\n\n` +
-    `Se pedir ajuste, é só contar o que deseja alterar. Obrigado!`
+    `Olá pessoal, tudo bem?
+
+` +
+    `Passando para enviar os conteúdos da semana para aprovação.
+
+` +
+    `Segue o link dos materiais abaixo:
+${p.link}`
   );
 }

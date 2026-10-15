@@ -207,10 +207,7 @@ export function useEnviarParaAprovacao() {
         .in('id', p.ids);
       if (eUp) throw eUp;
 
-      const texto = mensagemAprovacao({
-        clienteNome: p.clienteNome, mes: p.mes, qtd: p.ids.length,
-        link: linkAprovacao(p.slug, p.mes),
-      });
+      const texto = mensagemAprovacao({ link: linkAprovacao(p.slug, p.mes) });
       const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
         body: { cliente_id: p.clienteId, texto },
       });
