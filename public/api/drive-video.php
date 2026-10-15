@@ -33,7 +33,7 @@ if (mt_rand(1, 20) === 1) {
 
 /** Baixa o vídeo inteiro para $destino. Retorna true se for um vídeo válido. */
 function baixar(string $url, string $destino): bool {
-    $tmp = $destino . '.' . getmypid() . '.part';
+    $tmp = $destino . '.' . bin2hex(random_bytes(4)) . '.part';
     $fh = @fopen($tmp, 'wb');
     if (!$fh) { return false; }
     $ch = curl_init($url);
