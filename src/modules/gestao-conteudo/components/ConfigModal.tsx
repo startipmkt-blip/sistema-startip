@@ -52,9 +52,9 @@ export function ConfigModal({ open, onClose }: { open: boolean; onClose: () => v
           </label>
           <div className="grid grid-cols-2 gap-3">
             <Input label="Lembrar após (horas)" type="number" min={1} max={720}
-              value={cfg.lembrete_horas} onChange={(e) => set('lembrete_horas', Math.max(1, Number(e.target.value) || 48))} />
-            <Input label="Máximo de lembretes" type="number" min={1} max={10}
-              value={cfg.lembrete_maximo} onChange={(e) => set('lembrete_maximo', Math.max(1, Number(e.target.value) || 3))} />
+              value={cfg.lembrete_horas} onChange={(e) => set('lembrete_horas', Math.max(1, Number(e.target.value) || 24))} />
+            <Input label="Máximo de lembretes (0 = até responder)" type="number" min={0} max={100}
+              value={cfg.lembrete_maximo} onChange={(e) => set('lembrete_maximo', Math.min(100, Math.max(0, Math.floor(Number(e.target.value) || 0))))} />
           </div>
         </section>
 

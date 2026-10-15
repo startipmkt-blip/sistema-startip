@@ -2,8 +2,9 @@
 // lembrete-aprovacao — lembra o cliente de conteudos parados em aprovacao
 // =============================================================
 // Chamada por pg_cron (a cada hora, 09h-18h, seg-sex). Sem JWT.
-// E idempotente: so envia quando o prazo configurado venceu e respeita
-// o maximo de lembretes, entao chamadas repetidas nao duplicam mensagens.
+// E idempotente: so envia quando a janela configurada (padrao 24h) venceu desde
+// o envio/ultimo lembrete e repete ate o cliente aprovar ou reprovar
+// (maximo 0 = sem limite), entao chamadas repetidas nao duplicam mensagens.
 // =============================================================
 
 // deno-lint-ignore-file no-explicit-any
@@ -42,19 +43,21 @@ serve(async () => {
   const { data: cfg } = await sb.from('gestao_conteudo_config').select('*').limit(1).maybeSingle();
   if (!cfg || !(cfg as any).lembrete_ativo) return json({ ok: true, enviados: 0, motivo: 'desativado' });
 
-  const horas  = Number((cfg as any).lembrete_horas ?? 48);
-  const maximo = Number((cfg as any).lembrete_maximo ?? 3);
+  const horas  = Number((cfg as any).lembrete_horas ?? 24);
+  // 0 = sem limite: continua lembrando a cada janela ate o cliente responder.
+  const maximo = Number((cfg as any).lembrete_maximo ?? 0);
   const limite = new Date(Date.now() - horas * 3600_000).toISOString();
 
-  const { data: posts, error } = await sb
+  let consulta = sb
     .from('conteudo_aprovacao')
     .select('id, cliente_id, mes_referencia, lembretes_enviados')
     .eq('etapa', 'enviado')
     .eq('status', 'pendente')
     .eq('visivel_cliente', true)
     .lt('enviado_em', limite)
-    .lt('lembretes_enviados', maximo)
     .or(`lembrete_em.is.null,lembrete_em.lt.${limite}`);
+  if (maximo > 0) consulta = consulta.lt('lembretes_enviados', maximo);
+  const { data: posts, error } = await consulta;
   if (error) return json({ ok: false, erro: error.message }, 500);
 
   const porCliente = new Map<string, any[]>();
@@ -75,13 +78,9 @@ serve(async () => {
     if (!c?.whatsapp_chat_id || !c?.central_slug) { semContato.push(c?.nome ?? clienteId); continue; }
 
     const mes = lista.map((p: any) => p.mes_referencia).sort()[0];
-    const n = lista.length;
     const texto =
-      `Olá pessoal, tudo bem?\n\n` +
-      `Passando pra lembrar que ${n === 1 ? 'há 1 conteúdo' : `há ${n} conteúdos`} ` +
-      `que vocês ainda não aprovaram.\n\n` +
-      `Segue o link do material para aprovação:\n` +
-      `${SITE}/aprovar/${c.central_slug}?mes=${mes}\n\nObrigado!`;
+      `Oi, conseguiram olhar os conteúdos orgânicos?\n\n` +
+      `${SITE}/aprovar/${c.central_slug}?mes=${mes}`;
 
     const ok = await enviarWhatsapp(c.whatsapp_chat_id, texto);
     if (!ok) { falhas.push(c.nome); continue; }

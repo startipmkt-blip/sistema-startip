@@ -56,7 +56,7 @@ export interface ConfigGestao {
 
 export const CONFIG_PADRAO: ConfigGestao = {
   whatsapp_equipe: null, avisar_reprovacao: true,
-  lembrete_ativo: true, lembrete_horas: 48, lembrete_maximo: 3,
+  lembrete_ativo: true, lembrete_horas: 24, lembrete_maximo: 0,
 };
 
 export type Visao = 'carteira' | 'tabela' | 'semana';
