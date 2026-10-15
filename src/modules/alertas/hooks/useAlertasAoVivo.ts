@@ -39,7 +39,7 @@ export function useAvisosAtuais() {
 }
 
 // Avisos ao vivo: toca o som uma vez por cliente e por nível, em qualquer tela do sistema.
-export function useAlertasAoVivo(habilitado: boolean) {
+export function useAlertasAoVivo(habilitado: boolean, onAbrir?: () => void) {
   const { avisos, abertas: dados } = useAvisosAtuais();
   const [novos, setNovos] = useState<AvisoAoVivo[]>([]);
 
@@ -74,11 +74,18 @@ export function useAlertasAoVivo(habilitado: boolean) {
       const prefs = lerPrefs();
       if (prefs.ativo) tocarAlerta(Math.max(...disparar.map((d) => d.nivel)) as 1 | 2 | 3, prefs.volume);
       if (prefs.desktop && 'Notification' in window && Notification.permission === 'granted') {
-        const a = disparar[0];
-        new Notification('Cliente sem resposta', {
-          body: `${a.pendencia.cliente_nome ?? a.pendencia.grupo_nome ?? 'Cliente'} está há ${Math.round(a.minutos)} min sem resposta.`,
-          tag: `alerta-${a.pendencia.id}`,
-        });
+        // Notificação do sistema: toca o som do próprio Windows e aparece com a aba em segundo plano.
+        for (const a of disparar.slice(0, 3)) {
+          try {
+            const n = new Notification(`Cliente sem resposta há ${Math.round(a.minutos)} min`, {
+              body: `${a.pendencia.cliente_nome ?? a.pendencia.grupo_nome ?? 'Cliente'} aguarda atendimento (nível ${a.nivel}).`,
+              tag: `alerta-${a.pendencia.id}-${a.nivel}`,
+              requireInteraction: a.nivel >= 2,
+              silent: false,
+            });
+            n.onclick = () => { window.focus(); onAbrir?.(); n.close(); };
+          } catch { /* navegador sem suporte a esta chamada */ }
+        }
       }
       setNovos((atual) => {
         const porId = new Map(atual.map((n) => [n.pendencia.id, n]));
@@ -86,7 +93,7 @@ export function useAlertasAoVivo(habilitado: boolean) {
         return [...porId.values()];
       });
     }
-  }, [avisos, habilitado, dados]);
+  }, [avisos, habilitado, dados, onAbrir]);
 
   // Título da aba do navegador chama atenção enquanto houver cliente esperando.
   useEffect(() => {

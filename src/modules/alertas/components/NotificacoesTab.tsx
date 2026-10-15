@@ -27,6 +27,15 @@ export function NotificacoesTab() {
     }, 50);
   }
 
+  function testarDesktop() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      setMsg('Permissão de notificação não concedida neste navegador.'); return;
+    }
+    new Notification('Teste: cliente sem resposta há 10 min', {
+      body: 'Assim o aviso do Startip Alertas aparece no Windows.', silent: false,
+    });
+  }
+
   async function ativarDesktop() {
     if (!('Notification' in window)) { setMsg('Este navegador não suporta notificações do sistema.'); return; }
     const r = await Notification.requestPermission();
@@ -55,6 +64,9 @@ export function NotificacoesTab() {
           <Button variant="ghost" onClick={ativarDesktop}>
             {prefs.desktop ? 'Notificação do sistema ativa' : 'Ativar notificação do sistema'}
           </Button>
+          {prefs.desktop && (
+            <Button variant="ghost" onClick={testarDesktop}>Testar notificação do sistema</Button>
+          )}
         </div>
         {msg && <p className="text-sm text-amber-300">{msg}</p>}
         <p className="text-xs text-slate-500">

@@ -8,6 +8,7 @@ export interface PrefsSom {
   ativo: boolean;
   volume: number; // 0..1
   desktop: boolean; // notificação do sistema operacional
+  dispensouDesktop?: boolean; // não perguntar de novo neste navegador
 }
 
 export function lerPrefs(): PrefsSom {
