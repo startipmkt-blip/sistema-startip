@@ -50,7 +50,7 @@ serve(async () => {
 
   let consulta = sb
     .from('conteudo_aprovacao')
-    .select('id, cliente_id, mes_referencia, lembretes_enviados')
+    .select('id, cliente_id, mes_referencia, lembretes_enviados, enviado_em')
     .eq('etapa', 'enviado')
     .eq('status', 'pendente')
     .eq('visivel_cliente', true)
@@ -78,9 +78,13 @@ serve(async () => {
     if (!c?.whatsapp_chat_id || !c?.central_slug) { semContato.push(c?.nome ?? clienteId); continue; }
 
     const mes = lista.map((p: any) => p.mes_referencia).sort()[0];
-    const texto =
-      `Oi, conseguiram olhar os conteúdos orgânicos?\n\n` +
-      `${SITE}/aprovar/${c.central_slug}?mes=${mes}`;
+    // Ate 48h de espera: pergunta simples. Depois de 48h sem resposta: cobra a aprovacao.
+    const maisAntigo = Math.min(...lista.map((p: any) => new Date(p.enviado_em).getTime()));
+    const passou48h = Date.now() - maisAntigo >= 48 * 3600_000;
+    const link = `${SITE}/aprovar/${c.central_slug}?mes=${mes}`;
+    const texto = passou48h
+      ? `Lembrando que os materiais orgânicos ainda não foram aprovados. Segue o link abaixo.\n\n${link}`
+      : `Oi, conseguiram olhar os conteúdos orgânicos?\n\n${link}`;
 
     const ok = await enviarWhatsapp(c.whatsapp_chat_id, texto);
     if (!ok) { falhas.push(c.nome); continue; }
