@@ -1,8 +1,10 @@
 import { useState } from 'react';
 
-/** Link direto do arquivo no Drive (suporta Range, então o <video> adianta/volta normalmente). */
-export const videoDriveUrl = (id: string) =>
-  `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;
+/**
+ * Vídeo servido pelo nosso domínio (public/api/drive-video.php): o link direto do Drive
+ * vem como download (Content-Disposition: attachment) e o iPhone não toca assim.
+ */
+export const videoDriveUrl = (id: string) => `/api/drive-video.php?id=${encodeURIComponent(id)}`;
 
 /**
  * Player nativo do navegador para vídeo do Drive. O player embutido do Drive (iframe)
