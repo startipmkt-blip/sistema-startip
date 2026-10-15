@@ -3,12 +3,14 @@ import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Input } from '@/shared/ui/Input';
+import { Modal } from '@/shared/ui/Modal';
+import { Textarea } from '@/shared/ui/Textarea';
 import {
   linkAprovacao, useCopiarMesAnterior, useEnviarParaAprovacao, useExcluirPost,
   useLembrarCliente, useMudarEtapa, useSalvarMeta,
 } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
-  ETAPAS, deslocarMes, driveInfo, mesLabel, type Etapa, type Post,
+  ETAPAS, deslocarMes, driveInfo, mensagemAprovacao, mesLabel, type Etapa, type Post,
 } from '@/modules/gestao-conteudo/types';
 import { alertasDoCliente, contar, textoTempoMedio, type ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
@@ -43,6 +45,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const [previa, setPrevia] = useState<Post | null>(null);
   const [porSemana, setPorSemana] = useState(String(cliente.conteudos_por_semana ?? 0));
   const [porMes, setPorMes] = useState(String(cliente.posts_por_mes ?? 0));
+  const [mensagemEnvio, setMensagemEnvio] = useState<string | null>(null);
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null);
 
   const semanasMes = useMemo(() => semanasRotuladas(mes), [mes]);
@@ -67,14 +70,21 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   function enviarSelecionados() {
     const escolhidos = posts.filter((p) => selecionados.includes(p.id));
     const semArquivo = escolhidos.filter((p) => driveInfo(p.link_drive).tipo === 'invalido').length;
-    const extra = semArquivo
-      ? `\n\n⚠ ${semArquivo} conteúdo(s) sem link do Drive válido (o cliente não verá a prévia).`
-      : '';
-    if (!confirm(`Enviar ${escolhidos.length} conteúdo(s) para aprovação no WhatsApp de ${cliente.nome}?${extra}`)) return;
+    if (semArquivo && !confirm(`⚠ ${semArquivo} conteúdo(s) sem link do Drive válido (o cliente não verá a prévia). Continuar?`)) return;
+    setAviso(null);
+    setMensagemEnvio(mensagemAprovacao({ link: link ?? '(link do cliente)' }));
+  }
+
+  function confirmarEnvio() {
+    if (mensagemEnvio === null) return;
+    const texto = mensagemEnvio;
     setAviso(null);
     enviar.mutate(
-      { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: selecionados },
-      { onSuccess: () => { setSelecionados([]); ok('Enviado! O cliente recebeu o link de aprovação no WhatsApp.'); }, onError: erro },
+      { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: selecionados, texto },
+      {
+        onSuccess: () => { setMensagemEnvio(null); setSelecionados([]); ok('Enviado! O cliente recebeu o link de aprovação no WhatsApp.'); },
+        onError: (e) => { setMensagemEnvio(null); erro(e); },
+      },
     );
   }
 
@@ -269,6 +279,38 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
         </div>
       )}
 
+      <Modal
+        open={mensagemEnvio !== null}
+        onClose={() => !enviar.isPending && setMensagemEnvio(null)}
+        title={`Enviar para aprovação · ${selecionados.length} conteúdo(s)`}
+        footer={(
+          <>
+            <Button variant="secondary" onClick={() => setMensagemEnvio(null)} disabled={enviar.isPending}>Cancelar</Button>
+            <Button onClick={confirmarEnvio} disabled={enviar.isPending || !(mensagemEnvio ?? '').trim()}>
+              {enviar.isPending ? 'Enviando…' : 'Enviar no WhatsApp'}
+            </Button>
+          </>
+        )}
+      >
+        <div className="space-y-2">
+          <Textarea
+            label={`Mensagem para ${cliente.nome}`}
+            rows={8}
+            value={mensagemEnvio ?? ''}
+            onChange={(e) => setMensagemEnvio(e.target.value)}
+          />
+          <p className="text-[11px] text-slate-500">
+            Edite à vontade. Mantenha o link — é por ele que o cliente aprova.
+            <button
+              type="button"
+              className="ml-2 text-brand-300 hover:underline"
+              onClick={() => setMensagemEnvio(mensagemAprovacao({ link: link ?? '(link do cliente)' }))}
+            >
+              Restaurar padrão
+            </button>
+          </p>
+        </div>
+      </Modal>
       <PostFormModal
         open={formAberto} onClose={() => setFormAberto(false)}
         clienteId={cliente.id} mes={mes} post={editando} semanaInicial={semanaNova}

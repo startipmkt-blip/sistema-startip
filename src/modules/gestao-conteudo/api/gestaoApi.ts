@@ -191,7 +191,7 @@ export function useEnviarParaAprovacao() {
   return useMutation({
     mutationFn: async (p: {
       clienteId: string; clienteNome: string; slug: string | null | undefined;
-      mes: string; ids: string[];
+      mes: string; ids: string[]; texto?: string;
     }) => {
       if (p.ids.length === 0) throw new Error('Selecione ao menos um conteúdo.');
       if (!p.slug) {
@@ -207,7 +207,7 @@ export function useEnviarParaAprovacao() {
         .in('id', p.ids);
       if (eUp) throw eUp;
 
-      const texto = mensagemAprovacao({ link: linkAprovacao(p.slug, p.mes) });
+      const texto = p.texto?.trim() || mensagemAprovacao({ link: linkAprovacao(p.slug, p.mes) });
       const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
         body: { cliente_id: p.clienteId, texto },
       });
