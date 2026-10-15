@@ -1,3 +1,4 @@
+import { temInformacao } from '../lib/material';
 import { useMemo, useState } from 'react';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
@@ -30,6 +31,13 @@ export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteId
   const porStatus = useMemo(() => {
     const m: Record<DesignerStatus, DesignerDemanda[]> = { a_fazer: [], alteracao: [], em_andamento: [], aprovacao: [], concluido: [] };
     for (const d of data ?? []) m[d.status].push(d);
+    // Com informação para o designer vem primeiro; a ordem original é mantida dentro de cada grupo.
+    for (const k of Object.keys(m) as DesignerStatus[]) {
+      m[k] = m[k]
+        .map((d, i) => ({ d, i, p: temInformacao(d) ? 0 : 1 }))
+        .sort((a, b) => a.p - b.p || a.i - b.i)
+        .map((x) => x.d);
+    }
     return m;
   }, [data]);
 
