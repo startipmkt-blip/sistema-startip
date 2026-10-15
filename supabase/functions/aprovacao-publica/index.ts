@@ -52,14 +52,14 @@ async function avisarEquipe(sb: any, texto: string): Promise<void> {
 
 const TIPO_DESIGNER: Record<string, string> = { reels: 'reels', carrossel: 'carrossel', estatico: 'post' };
 
-// Reprovação do cliente → volta para "A fazer" no Designer, já com a justificativa.
+// Reprovação do cliente → vai para "Alteração" no Designer, já com a justificativa.
 // Nunca derruba a decisão do cliente.
 async function devolverAoDesigner(sb: any, post: any, justificativa: string): Promise<void> {
   try {
     const motivo = { reprovado_justificativa: justificativa, reprovado_em: new Date().toISOString() };
     if (post.designer_demanda_id) {
       await sb.from('designer_demandas')
-        .update({ status: 'a_fazer', concluido_em: null, ...motivo } as any)
+        .update({ status: 'alteracao', concluido_em: null, ...motivo } as any)
         .eq('id', post.designer_demanda_id);
       return;
     }
@@ -70,7 +70,7 @@ async function devolverAoDesigner(sb: any, post: any, justificativa: string): Pr
         titulo: `Ajuste: ${post.titulo}`,
         descricao: post.link_drive ? `Material reprovado: ${post.link_drive}` : null,
         tipo: TIPO_DESIGNER[post.formato] ?? 'post',
-        status: 'a_fazer',
+        status: 'alteracao',
         origem: 'manual',
         post_id: post.id,
         ...motivo,
