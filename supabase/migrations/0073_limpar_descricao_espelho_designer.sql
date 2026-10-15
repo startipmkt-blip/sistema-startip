@@ -4,6 +4,10 @@
 -- Limpa SOMENTE as copias identicas ao texto da demanda. Se o texto trazia um link
 -- e o post nao tinha link_drive, o 1o link vira link_drive antes de limpar.
 
+-- O gatilho que protege colunas do cliente trata a migration (sem usuario) como cliente;
+-- desliga so durante esta correcao pontual.
+alter table public.conteudo_aprovacao disable trigger trg_aprovacao_restringe_cliente;
+
 update public.conteudo_aprovacao c
    set link_drive = coalesce(nullif(btrim(c.link_drive), ''),
                              (regexp_match(c.descricao, 'https?://[^\s]+'))[1],
@@ -13,3 +17,5 @@ update public.conteudo_aprovacao c
  where c.designer_demanda_id = d.id
    and coalesce(btrim(c.descricao), '') <> ''
    and btrim(c.descricao) = btrim(coalesce(d.descricao, d.briefing, ''));
+
+alter table public.conteudo_aprovacao enable trigger trg_aprovacao_restringe_cliente;
