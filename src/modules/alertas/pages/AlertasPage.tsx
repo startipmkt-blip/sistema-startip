@@ -2,13 +2,16 @@ import { useSearchParams } from 'react-router-dom';
 import { ConfigTab } from '@/modules/alertas/components/ConfigTab';
 import { EquipeTab } from '@/modules/alertas/components/EquipeTab';
 import { GruposTab } from '@/modules/alertas/components/GruposTab';
+import { NotificacoesTab } from '@/modules/alertas/components/NotificacoesTab';
+import { useAvisosAtuais } from '@/modules/alertas/hooks/useAlertasAoVivo';
 import { PainelTab } from '@/modules/alertas/components/PainelTab';
 import { RelatoriosTab } from '@/modules/alertas/components/RelatoriosTab';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
 const ABAS = [
   { id: 'painel', label: 'Painel' },
-  { id: 'grupos', label: 'Grupos monitorados' },
+  { id: 'notificacoes', label: 'Notificações' },
+  { id: 'grupos', label: 'Grupos e contatos' },
   { id: 'equipe', label: 'Equipe' },
   { id: 'relatorios', label: 'Relatórios' },
   { id: 'config', label: 'Configurações' },
@@ -17,6 +20,7 @@ type AbaId = (typeof ABAS)[number]['id'];
 
 export function AlertasPage() {
   const [params, setParams] = useSearchParams();
+  const { avisos } = useAvisosAtuais();
   const p = params.get('aba');
   const aba: AbaId = ABAS.some((a) => a.id === p) ? (p as AbaId) : 'painel';
 
@@ -37,11 +41,15 @@ export function AlertasPage() {
             }`}
           >
             {a.label}
+            {a.id === 'notificacoes' && avisos.length > 0 && (
+              <span className="ml-2 rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-semibold text-white">{avisos.length}</span>
+            )}
           </button>
         ))}
       </nav>
 
       {aba === 'painel' && <PainelTab />}
+      {aba === 'notificacoes' && <NotificacoesTab />}
       {aba === 'grupos' && <GruposTab />}
       {aba === 'equipe' && <EquipeTab />}
       {aba === 'relatorios' && <RelatoriosTab />}

@@ -6,6 +6,7 @@ import { DemoBanner } from '@/shared/layout/DemoBanner';
 import { CommandPalette } from '@/shared/layout/CommandPalette';
 import { PwaInstallHint } from '@/shared/layout/PwaInstallHint';
 import { useAuth } from '@/shared/auth/AuthProvider';
+import { AlertasAoVivo } from '@/modules/alertas/components/AlertasAoVivo';
 
 // Casca da aplicação interna (equipe). Menu lateral fixo no desktop e em
 // gaveta (drawer) no mobile. Na tela inicial, a sidebar some — a navegação
@@ -29,6 +30,7 @@ export function AppShell() {
       </div>
       <CommandPalette />
       <PwaInstallHint />
+      <AlertasAoVivo />
     </div>
   );
 }
