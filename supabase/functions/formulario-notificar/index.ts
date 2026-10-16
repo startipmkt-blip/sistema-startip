@@ -41,6 +41,7 @@ const TIPO_LABEL: Record<string, string> = {
   icp: 'ICP Padrão',
   nicho: 'Adaptado ao Nicho',
   unificado: 'Unificado (ICP + Nicho)',
+  padrao: 'Briefing Padrão',
 };
 
 async function enviarEmail(nomeCliente: string, tipo: string, link: string) {

@@ -1,4 +1,4 @@
-export type FormularioTipo = 'icp' | 'nicho' | 'unificado';
+export type FormularioTipo = 'icp' | 'nicho' | 'unificado' | 'padrao';
 export type FormularioStatus = 'pendente' | 'preenchido' | 'arquivado';
 
 export interface Pergunta {
@@ -7,6 +7,10 @@ export interface Pergunta {
   label: string;
   obrigatoria?: boolean;
   opcoes?: string[];
+  secao?: string;
+  ajuda?: string;
+  // só entra no formulário se o cliente tiver o serviço
+  condicao?: 'trafego_pago';
 }
 
 export interface FormularioModelo {
@@ -40,4 +44,5 @@ export const TIPO_LABEL: Record<FormularioTipo, string> = {
   icp: 'ICP Padrão',
   nicho: 'Adaptado ao Nicho',
   unificado: 'Unificado (ICP + Nicho)',
+  padrao: 'Briefing Padrão',
 };

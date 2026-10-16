@@ -119,18 +119,50 @@ export function FormularioPublicoPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          {form?.perguntas.map((p) => (
-            <Card key={p.id} className="p-4">
-              <label className="mb-2 block text-sm font-medium text-slate-100">
+          {form?.perguntas.map((p, i, todas) => (
+            <div key={p.id} className="space-y-3">
+              {p.secao && p.secao !== todas[i - 1]?.secao && (
+                <h2 className="pt-4 text-base font-semibold text-emerald-300">{p.secao}</h2>
+              )}
+            <Card className="p-4">
+              <label className="mb-1 block text-sm font-medium text-slate-100">
                 {p.label}
                 {p.obrigatoria && <span className="ml-1 text-emerald-300">*</span>}
               </label>
+              {p.ajuda && <p className="mb-2 text-xs text-slate-400">{p.ajuda}</p>}
               {p.tipo === 'texto' ? (
                 <Input
                   value={respostas[p.id] ?? ''}
                   onChange={(e) => up(p.id, e.target.value)}
                   required={p.obrigatoria}
                 />
+              ) : p.tipo === 'escolha' ? (
+                <div className="space-y-1">
+                  {(p.opcoes ?? []).map((o) => (
+                    <label key={o} className="flex cursor-pointer items-center gap-2 text-sm text-slate-200">
+                      <input type="radio" name={p.id} checked={respostas[p.id] === o} onChange={() => up(p.id, o)} />
+                      {o}
+                    </label>
+                  ))}
+                </div>
+              ) : p.tipo === 'multipla' ? (
+                <div className="space-y-1">
+                  {(p.opcoes ?? []).map((o) => {
+                    const sel = (respostas[p.id] ?? '').split(', ').filter(Boolean);
+                    return (
+                      <label key={o} className="flex cursor-pointer items-center gap-2 text-sm text-slate-200">
+                        <input
+                          type="checkbox"
+                          checked={sel.includes(o)}
+                          onChange={(e) =>
+                            up(p.id, (e.target.checked ? [...sel, o] : sel.filter((x) => x !== o)).join(', '))
+                          }
+                        />
+                        {o}
+                      </label>
+                    );
+                  })}
+                </div>
               ) : (
                 <Textarea
                   value={respostas[p.id] ?? ''}
@@ -140,6 +172,7 @@ export function FormularioPublicoPage() {
                 />
               )}
             </Card>
+            </div>
           ))}
 
           {erro && <div className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">{erro}</div>}

@@ -73,17 +73,33 @@ function slugAleatorio(): string {
 
 export interface CriarFormularioParams {
   clienteId: string;
+  comTrafego?: boolean; // inclui as perguntas condicionais de tráfego pago
   tipo: FormularioTipo;
   perguntasNicho?: Pergunta[]; // obrigatório para 'nicho' e 'unificado'
 }
 
+async function fetchModeloPadrao(): Promise<FormularioModelo | null> {
+  const { data, error } = await supabase
+    .from('formularios_modelos')
+    .select('*')
+    .eq('chave', 'briefing_padrao')
+    .maybeSingle();
+  if (error) throw error;
+  return (data as FormularioModelo | null) ?? null;
+}
+
 async function criarFormulario(p: CriarFormularioParams): Promise<Formulario> {
-  const modelo = await fetchModeloIcp();
+  const modelo = p.tipo === 'padrao' ? await fetchModeloPadrao() : await fetchModeloIcp();
   let perguntas: Pergunta[] = [];
   let titulo = '';
   let modeloId: string | null = null;
 
-  if (p.tipo === 'icp') {
+  if (p.tipo === 'padrao') {
+    if (!modelo) throw new Error('Briefing padrão não encontrado. Rode a migration 0080 no Supabase.');
+    perguntas = modelo.perguntas.filter((q) => !q.condicao || (q.condicao === 'trafego_pago' && p.comTrafego));
+    titulo = modelo.titulo;
+    modeloId = modelo.id;
+  } else if (p.tipo === 'icp') {
     if (!modelo) throw new Error('Modelo ICP padrão não encontrado.');
     perguntas = modelo.perguntas;
     titulo = modelo.titulo;
