@@ -1,12 +1,23 @@
 export type FormularioTipo = 'icp' | 'nicho' | 'unificado' | 'padrao';
 export type FormularioStatus = 'pendente' | 'preenchido' | 'arquivado';
 
+export interface CampoPergunta {
+  id: string;
+  label: string;
+  placeholder?: string;
+  longo?: boolean;
+}
+
 export interface Pergunta {
   id: string;
-  tipo: 'texto' | 'longo' | 'escolha' | 'multipla';
+  tipo: 'texto' | 'longo' | 'escolha' | 'multipla' | 'campos';
   label: string;
   obrigatoria?: boolean;
   opcoes?: string[];
+  // 'campos': vários campos curtos na mesma pergunta; com `repetir`, vira lista com botão "+"
+  campos?: CampoPergunta[];
+  repetir?: boolean;
+  rotuloItem?: string;
   secao?: string;
   ajuda?: string;
   // só entra no formulário se o cliente tiver o serviço

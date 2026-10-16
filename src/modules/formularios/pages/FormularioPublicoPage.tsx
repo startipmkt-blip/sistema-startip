@@ -10,6 +10,7 @@ import {
   enviarFormularioPublico,
   type FormularioPublico,
 } from '@/modules/formularios/api/formulariosApi';
+import { CamposInput } from '@/modules/formularios/components/CamposInput';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 export function FormularioPublicoPage() {
@@ -136,6 +137,8 @@ export function FormularioPublicoPage() {
                   onChange={(e) => up(p.id, e.target.value)}
                   required={p.obrigatoria}
                 />
+              ) : p.tipo === 'campos' ? (
+                <CamposInput pergunta={p} onChange={(t) => up(p.id, t)} />
               ) : p.tipo === 'escolha' ? (
                 <div className="space-y-1">
                   {(p.opcoes ?? []).map((o) => (
