@@ -8,6 +8,7 @@
 
 const MAX_BYTES = 300 * 1024 * 1024;   // não guarda vídeos maiores que isso (cai no proxy direto)
 const VALIDADE  = 3 * 24 * 3600;       // cópias mais velhas que 3 dias são apagadas
+const RECHECAR  = 5 * 60;              // de quanto em quanto tempo confere se o arquivo mudou no Drive
 
 $id = $_GET['id'] ?? '';
 if (!preg_match('/^[A-Za-z0-9_-]{10,80}$/', $id)) {
@@ -47,6 +48,27 @@ function baixar(string $url, string $destino): bool {
         return false;
     }
     return @rename($tmp, $destino);
+}
+
+/** Tamanho atual do arquivo no Drive (pedindo só 1 byte), ou null se não der para saber. */
+function tamanho_no_drive(string $url): ?int {
+    $total = null;
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_HTTPHEADER     => ['Range: bytes=0-0'],
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 StartipOS-DriveVideo',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADERFUNCTION => function ($c, $l) use (&$total) {
+            if (preg_match('#^content-range:\s*bytes\s+\d+-\d+/(\d+)#i', trim($l), $m)) { $total = (int)$m[1]; }
+            return strlen($l);
+        },
+    ]);
+    curl_exec($ch);
+    curl_close($ch);
+    return $total;
 }
 
 /** Último recurso: repassa direto do Drive (sem cópia). */
@@ -92,6 +114,17 @@ if (mt_rand(1, 20) === 1) {
     }
 }
 
+// Uma nova versão enviada no mesmo arquivo do Drive mantém o mesmo ID; sem esta
+// conferência a cópia local antiga seria servida para sempre.
+$marca = $arquivo . '.chk';
+if (is_file($arquivo) && (!is_file($marca) || filemtime($marca) < time() - RECHECAR)) {
+    $atual = tamanho_no_drive($origem);
+    @touch($marca);
+    if ($atual !== null && $atual !== filesize($arquivo)) {
+        @unlink($arquivo);
+    }
+}
+
 if (!is_file($arquivo) || filesize($arquivo) < 1024) {
     if (!baixar($origem, $arquivo)) {
         proxy_direto($origem);
@@ -125,7 +158,7 @@ http_response_code($parcial ? 206 : 200);
 header('Content-Type: video/mp4');
 header('Accept-Ranges: bytes');
 header('Content-Disposition: inline');
-header('Cache-Control: private, max-age=3600');
+header('Cache-Control: private, max-age=300');
 header('X-Content-Type-Options: nosniff');
 if ($parcial) { header("Content-Range: bytes $ini-$fim/$tamanho"); }
 header('Content-Length: ' . ($fim - $ini + 1));

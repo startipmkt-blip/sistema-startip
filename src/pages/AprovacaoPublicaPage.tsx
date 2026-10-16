@@ -239,7 +239,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                         </Badge>
                         {i.dia_postagem && (
                           <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
-                            <GlassIcon name="calendar" /> postar em {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                            <GlassIcon name="calendar" /> postar em {new Date(`${i.dia_postagem}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
                           </span>
                         )}
                       </div>
