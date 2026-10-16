@@ -38,9 +38,10 @@ jobs:
             code=$(curl -s -o /dev/null -r 0-99 -w '%{http_code}' "$SITE/previas/$id.mp4")
             if [ "$code" = "206" ]; then continue; fi
             echo "::group::Previa de $id"
-            if ! curl -fsSL -m 1500 -o orig.mp4 "https://drive.usercontent.google.com/download?id=$id&export=download&confirm=t" \
-               || ! ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of csv=p=0 orig.mp4 | grep -q .; then
-              echo "Nao baixou como video (arquivo privado ou ainda enviando?) - pulando"; rm -f orig.mp4; echo "::endgroup::"; continue
+            info=$(curl -sSL -m 1500 -o orig.mp4 -w '%{http_code} %{content_type} %{size_download}' "https://drive.usercontent.google.com/download?id=$id&export=download&confirm=t") || info="erro-curl"
+            echo "Download: $info"
+            if ! ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of csv=p=0 orig.mp4 2>/dev/null | grep -q .; then
+              echo "Nao baixou como video (arquivo privado ou ainda enviando?) - pulando"; rm -f orig.mp4; falhas=$((falhas+1)); echo "::endgroup::"; continue
             fi
             ffmpeg -v error -y -i orig.mp4 -vf "scale='min(1080,iw)':-2,fps=30" \
               -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 23 -maxrate 6M -bufsize 12M -preset medium \
