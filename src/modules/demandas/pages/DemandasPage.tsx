@@ -11,7 +11,9 @@ import {
   type DemandaStatus,
   type DemandaView,
 } from '@/modules/demandas/types';
-import { useTocadoresAtivos, type Tocador } from '@/modules/demandas/api/cronometroApi';
+import { useTempoDemandas, type Tocador } from '@/modules/demandas/api/cronometroApi';
+import { formatarDuracao, type TempoDemanda } from '@/modules/designer/api/demandasApi';
+import { useTempoTotal } from '@/modules/designer/components/DemandaCard';
 import { TocadorModal } from '@/modules/demandas/components/TocadorModal';
 import { DemandaFormModal } from '@/modules/demandas/components/DemandaFormModal';
 import { TarefasRecorrentes } from '@/modules/demandas/components/TarefasRecorrentes';
@@ -46,6 +48,27 @@ function labelSemana(iso: string): string {
   return `Semana de ${d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} a ${fim.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}`;
 }
 
+// Mesmo visual da aba Designer: rodando/pausado com contagem ao vivo; depois de parar, o tempo gasto.
+function TempoBadge({ tempo }: { tempo?: TempoDemanda }) {
+  const total = useTempoTotal(tempo);
+  const aberto = tempo?.aberto;
+  if (aberto) {
+    return (
+      <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+        <GlassIcon name="timer" /> {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
+      </div>
+    );
+  }
+  if (total > 0) {
+    return (
+      <div className="mt-1 text-[11px] text-slate-300" title="Tempo gasto">
+        <GlassIcon name="timer" /> {formatarDuracao(total)}
+      </div>
+    );
+  }
+  return null;
+}
+
 export function DemandasPage() {
   const { isAdmin } = useAuth();
   const [clienteId, setClienteId] = useState('');
@@ -64,7 +87,7 @@ export function DemandasPage() {
   const [aba, setAba] = useState<Aba>('quadro');
   // Demanda aguardando a escolha de quem vai tocá-la (antes de ir para "Em andamento").
   const [iniciando, setIniciando] = useState<DemandaView | null>(null);
-  const { data: tocadores } = useTocadoresAtivos();
+  const { data: tempos } = useTempoDemandas();
 
   const setoresVisiveis = DEMANDA_SETORES.filter((s) => !s.adminOnly || isAdmin);
   const [setor, setSetor] = useState<DemandaSetor>(setoresVisiveis[0]?.id ?? 'geral');
@@ -191,11 +214,7 @@ export function DemandasPage() {
             <p className="mt-0.5 line-clamp-2 whitespace-pre-wrap text-[11px] leading-snug text-slate-300"><Linkify texto={d.descricao} /></p>
           )}
           <div className="text-[11px] text-slate-400">{d.cliente_nome}</div>
-          {tocadores?.[d.id] && (
-            <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
-              <GlassIcon name="timer" /> {tocadores[d.id]} está tocando
-            </div>
-          )}
+          <TempoBadge tempo={tempos?.[d.id]} />
           <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
             <span><GlassIcon name="user" /> {d.responsavel || '—'}</span>
             <span className={atrasada ? 'font-semibold text-red-400' : venceHoje ? 'font-semibold text-amber-300' : ''}>
@@ -344,6 +363,7 @@ export function DemandasPage() {
                         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
                           <div className="truncate text-slate-100 line-through opacity-70">{d.titulo}</div>
                           <div className="text-xs text-slate-500">{d.cliente_nome} · <GlassIcon name="user" /> {d.responsavel || '—'} · criada em {formatDate(d.created_at)}</div>
+                          <TempoBadge tempo={tempos?.[d.id]} />
                         </button>
                         <span className="text-xs text-slate-500"><GlassIcon name="calendar" /> {formatDate(d.prazo)}</span>
                         <button

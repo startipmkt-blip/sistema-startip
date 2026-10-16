@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
+import type { TempoDemanda } from '@/modules/designer/api/demandasApi';
 
 // Quem pode tocar uma demanda. Os nomes precisam bater com `usuarios.nome` do cronômetro.
 export const TOCADORES = ['Dhomini', 'Iuri', 'Gabriel'] as const;
@@ -93,22 +94,29 @@ export async function pararTimerDemanda(
   await fecharRegistrosAbertos({ [origem]: demandaId } as FiltroRegistro);
 }
 
-// Mapa demanda_id -> nome de quem está com o timer rodando.
-export function useTocadoresAtivos() {
+// Mapa demanda_id -> tempo gasto (registros fechados) + registro aberto, se houver.
+export function useTempoDemandas() {
   return useQuery({
     queryKey: ['cronometro', 'ativos'],
-    queryFn: async (): Promise<Record<string, string>> => {
+    queryFn: async (): Promise<Record<string, TempoDemanda>> => {
       if (IS_DEMO) return {};
       const { data, error } = await db
         .from('registros_tempo')
-        .select('demanda_id, usuarios(nome)')
-        .is('fim', null)
+        .select('demanda_id, inicio, fim, duracao_segundos, pausado, inicio_pausa, tempo_pausado_total, usuarios(nome)')
         .not('demanda_id', 'is', null);
       if (error) throw error;
-      const mapa: Record<string, string> = {};
-      for (const r of data ?? []) mapa[r.demanda_id] = r.usuarios?.nome ?? '';
+      const mapa: Record<string, TempoDemanda> = {};
+      for (const r of data ?? []) {
+        const t = (mapa[r.demanda_id] ??= { segundosFechados: 0, aberto: null });
+        if (r.fim) t.segundosFechados += r.duracao_segundos ?? 0;
+        else t.aberto = {
+          inicio: r.inicio, quem: r.usuarios?.nome ?? '', pausado: !!r.pausado,
+          pausadoSeg: r.tempo_pausado_total ?? 0, inicioPausa: r.inicio_pausa ?? null,
+        };
+      }
       return mapa;
     },
+    refetchInterval: 30_000,
     retry: false,
   });
 }
