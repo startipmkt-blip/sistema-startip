@@ -199,6 +199,10 @@ export interface DriveInfo {
   abrirUrl: string;
 }
 
+/** Muda a cada carregamento do app: o Drive/navegador cacheiam miniatura e player pelo ID,
+ *  e uma nova versão do arquivo mantém o mesmo ID. */
+const VERSAO_SESSAO = Date.now();
+
 export function driveInfo(url: string | null | undefined): DriveInfo {
   const bruto = (url ?? '').trim();
   if (!bruto) return { tipo: 'invalido', abrirUrl: '' };
@@ -216,8 +220,8 @@ export function driveInfo(url: string | null | undefined): DriveInfo {
     return {
       tipo: 'arquivo',
       id,
-      previewUrl: `https://drive.google.com/file/d/${id}/preview`,
-      thumbUrl: `https://drive.google.com/thumbnail?id=${id}&sz=w640`,
+      previewUrl: `https://drive.google.com/file/d/${id}/preview?v=${VERSAO_SESSAO}`,
+      thumbUrl: `https://drive.google.com/thumbnail?id=${id}&sz=w640&v=${VERSAO_SESSAO}`,
       abrirUrl: `https://drive.google.com/file/d/${id}/view`,
     };
   }

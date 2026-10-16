@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { driveInfo } from '@/modules/gestao-conteudo/types';
 import { VideoDrive } from '@/modules/gestao-conteudo/components/VideoDrive';
@@ -72,17 +72,31 @@ export function AprovacaoPublicaPage() {
       const u = new URL(FN_URL);
       u.searchParams.set('slug', slug);
       if (mesAlvo) u.searchParams.set('mes', mesAlvo);
-      const r = await fetch(u.toString());
+      const r = await fetch(u.toString(), { cache: 'no-store' });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(body?.error ?? 'erro');
       setDados(body as Dados);
       setMes((body as Dados).mes);
+      // modal aberto acompanha o dado novo (link/status trocados pela equipe)
+      setPrevia((atual) => (atual ? (body as Dados).ideias.find((i) => i.id === atual.id) ?? atual : atual));
     } catch (e) {
       setErro((e as Error).message);
     }
   }
 
   useEffect(() => { void carregar(mesDoLink); /* eslint-disable-line react-hooks/exhaustive-deps */ }, [slug]);
+
+  // aba aberta há tempo: busca de novo ao voltar o foco e a cada 60s
+  const mesRef = useRef<string | null>(null);
+  mesRef.current = mes;
+  useEffect(() => {
+    const recarregar = () => {
+      if (document.visibilityState === 'visible') void carregar(mesRef.current ?? mesDoLink);
+    };
+    const t = window.setInterval(recarregar, 60_000);
+    document.addEventListener('visibilitychange', recarregar);
+    return () => { window.clearInterval(t); document.removeEventListener('visibilitychange', recarregar); };
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function decidir(id: string, status: 'aprovado' | 'reprovado', just = '') {
     setSalvando(true);

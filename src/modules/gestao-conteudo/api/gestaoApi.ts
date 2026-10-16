@@ -102,8 +102,19 @@ export function useSalvarPost() {
         dia_postagem: p.dados.dia_postagem || null,
       };
       if (p.id) {
+        // material trocado num post já enviado/reprovado: volta a pendente para o cliente rever
+        const { data: atual } = await supabase
+          .from('conteudo_aprovacao').select('link_drive, etapa').eq('id', p.id).maybeSingle();
+        const antigo = atual as { link_drive: string | null; etapa: Etapa } | null;
+        const trocouLink = !!antigo && (antigo.link_drive ?? null) !== payload.link_drive;
+        const reabrir = trocouLink && (antigo.etapa === 'enviado' || antigo.etapa === 'reprovado');
         const { error } = await supabase
-          .from('conteudo_aprovacao').update(payload as never).eq('id', p.id);
+          .from('conteudo_aprovacao')
+          .update((reabrir
+            ? { ...payload, etapa: 'enviado', status: 'pendente', justificativa: '',
+                visivel_cliente: true, enviado_em: new Date().toISOString() }
+            : payload) as never)
+          .eq('id', p.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('conteudo_aprovacao').insert({

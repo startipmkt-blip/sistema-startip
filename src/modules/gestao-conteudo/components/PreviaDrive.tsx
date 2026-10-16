@@ -24,6 +24,7 @@ export function PreviaDrive({
       ) : info.previewUrl ? (
         <div className="space-y-2">
           <iframe
+            key={info.previewUrl}
             src={info.previewUrl}
             title={titulo}
             allow="autoplay; fullscreen"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/shared/ui/Badge';
 import { ETAPAS, ETAPA_INFO, driveInfo, type Etapa, type Post } from '@/modules/gestao-conteudo/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
@@ -26,6 +26,8 @@ export function PostCard({
   const capa = info.tipo === 'pasta' ? pasta.data?.[0] : undefined;
   const etapa = ETAPA_INFO[post.etapa];
   const [thumbOk, setThumbOk] = useState(true);
+  // link novo = nova chance para a miniatura (antes ficava presa após uma falha)
+  useEffect(() => { setThumbOk(true); }, [post.link_drive]);
 
   return (
     <div className={`rounded-lg border p-2 text-xs ${
