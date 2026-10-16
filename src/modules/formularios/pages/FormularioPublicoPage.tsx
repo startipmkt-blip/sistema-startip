@@ -10,6 +10,7 @@ import {
   enviarFormularioPublico,
   type FormularioPublico,
 } from '@/modules/formularios/api/formulariosApi';
+import { BrandMark } from '@/shared/ui/BrandMark';
 import { CamposInput } from '@/modules/formularios/components/CamposInput';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
@@ -103,14 +104,14 @@ export function FormularioPublicoPage() {
     <Shell>
       <div className="mx-auto w-full max-w-2xl space-y-4">
         <header className="text-center">
-          <div className="mb-2 text-2xl font-bold text-emerald-300">Agência Startip</div>
+          <BrandMark sub="" className="mb-3 justify-center" />
           <h1 className="text-xl font-semibold text-white">{form?.titulo}</h1>
         </header>
 
         {total > 3 && (
           <div className="rounded-full bg-white/5 p-1">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-brand-400 transition-all"
+              className="h-2 rounded-full bg-gradient-to-r from-brand-600 to-brand-400 transition-all"
               style={{ width: `${progresso}%` }}
             />
             <div className="mt-1 text-center text-xs text-slate-400">
@@ -123,12 +124,12 @@ export function FormularioPublicoPage() {
           {form?.perguntas.map((p, i, todas) => (
             <div key={p.id} className="space-y-3">
               {p.secao && p.secao !== todas[i - 1]?.secao && (
-                <h2 className="pt-4 text-base font-semibold text-emerald-300">{p.secao}</h2>
+                <h2 className="pt-4 text-base font-semibold text-brand-300">{p.secao}</h2>
               )}
             <Card className="p-4">
               <label className="mb-1 block text-sm font-medium text-slate-100">
                 {p.label}
-                {p.obrigatoria && <span className="ml-1 text-emerald-300">*</span>}
+                {p.obrigatoria && <span className="ml-1 text-brand-300">*</span>}
               </label>
               {p.ajuda && <p className="mb-2 text-xs text-slate-400">{p.ajuda}</p>}
               {p.tipo === 'texto' ? (
@@ -205,11 +206,11 @@ function TelaObrigado({ titulo }: { titulo?: string }) {
   return (
     <Card className="w-full max-w-xl p-8 text-center">
       <div className="mb-4 flex justify-center">
-        <div className="flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-emerald-500/15 text-5xl">
+        <div className="flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-brand-500/15 text-5xl">
           <GlassIcon name="check" />
         </div>
       </div>
-      <div className="mb-2 text-xl font-bold text-emerald-300">Agência Startip</div>
+      <BrandMark sub="" className="mb-4 justify-center" />
       <h1 className="mb-3 text-2xl font-semibold text-white">
         {glassify(titulo ?? 'Obrigado por preencher as informações! 🎉')}
       </h1>
