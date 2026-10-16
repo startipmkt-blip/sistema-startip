@@ -107,6 +107,12 @@ $dir    = rtrim(sys_get_temp_dir(), "/\\") . '/startip-drive-video';
 @mkdir($dir, 0700, true);
 $arquivo = $dir . '/' . $id . '.mp4';
 
+// Prévia leve (1080p H.264, gerada por scripts/gerar-previa.ps1): quando existe, é ela que o
+// cliente vê. O arquivo original no Drive não é alterado — vídeos 4K HEVC de 25 Mbps travam.
+$previa = dirname(__DIR__) . '/previas/' . $id . '.mp4';
+$usaPrevia = is_file($previa) && filesize($previa) > 1024;
+if ($usaPrevia) { $arquivo = $previa; }
+
 // Limpeza ocasional de cópias antigas.
 if (mt_rand(1, 20) === 1) {
     foreach (glob($dir . '/*') ?: [] as $f) {
@@ -117,7 +123,7 @@ if (mt_rand(1, 20) === 1) {
 // Uma nova versão enviada no mesmo arquivo do Drive mantém o mesmo ID; sem esta
 // conferência a cópia local antiga seria servida para sempre.
 $marca = $arquivo . '.chk';
-if (is_file($arquivo) && (!is_file($marca) || filemtime($marca) < time() - RECHECAR)) {
+if (!$usaPrevia && is_file($arquivo) && (!is_file($marca) || filemtime($marca) < time() - RECHECAR)) {
     $atual = tamanho_no_drive($origem);
     @touch($marca);
     if ($atual !== null && $atual !== filesize($arquivo)) {
@@ -125,13 +131,15 @@ if (is_file($arquivo) && (!is_file($marca) || filemtime($marca) < time() - RECHE
     }
 }
 
-if (!is_file($arquivo) || filesize($arquivo) < 1024) {
-    if (!baixar($origem, $arquivo)) {
-        proxy_direto($origem);
-        exit;
+if (!$usaPrevia) {
+    if (!is_file($arquivo) || filesize($arquivo) < 1024) {
+        if (!baixar($origem, $arquivo)) {
+            proxy_direto($origem);
+            exit;
+        }
     }
+    @touch($arquivo);
 }
-@touch($arquivo);
 
 // ---- Serve a cópia local com suporte a Range ----
 $tamanho = filesize($arquivo);
