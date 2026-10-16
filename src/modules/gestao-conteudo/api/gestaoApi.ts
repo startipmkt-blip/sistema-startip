@@ -3,7 +3,7 @@ import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
 import type { ConfigGestao, Etapa, Post, PostForm } from '@/modules/gestao-conteudo/types';
 import {
-  CONFIG_PADRAO, mensagemAprovacao, mensagemLembrete, mesmoDiaEmOutroMes,
+  CONFIG_PADRAO, mensagemAprovacao, mensagemLembrete, mensagemReenvio, mesmoDiaEmOutroMes,
 } from '@/modules/gestao-conteudo/types';
 
 const chaves = {
@@ -135,15 +135,17 @@ export function useSalvarPost() {
 export function useMudarEtapa() {
   const invalidar = useInvalidar();
   return useMutation({
-    mutationFn: async (p: { id: string; etapa: Etapa }) => {
+    mutationFn: async (p: { id: string; etapa: Etapa; anterior?: Etapa }) => {
       if (IS_DEMO) return;
       let patch: Record<string, unknown> = { etapa: p.etapa };
       if (p.etapa === 'em_edicao' || p.etapa === 'editado') {
         // volta para a mesa: sai do portal e pode ser reenviado depois
         patch = { etapa: p.etapa, status: 'pendente', visivel_cliente: false };
+        // reprovada e devolvida à mesa: depois de refeita, é reenvio
+        if (p.anterior === 'reprovado') patch.refeito = true;
       } else if (p.etapa === 'enviado') {
         patch = {
-          etapa: 'enviado', status: 'pendente', visivel_cliente: true,
+          etapa: 'enviado', status: 'pendente', visivel_cliente: true, refeito: false,
           enviado_em: new Date().toISOString(),
         };
       } else if (p.etapa === 'aprovado') {
@@ -213,7 +215,7 @@ export function useEnviarParaAprovacao() {
       const { error: eUp } = await supabase
         .from('conteudo_aprovacao')
         .update({
-          etapa: 'enviado', status: 'pendente', visivel_cliente: true,
+          etapa: 'enviado', status: 'pendente', visivel_cliente: true, refeito: false,
           enviado_em: new Date().toISOString(),
         } as never)
         .in('id', p.ids);
@@ -228,6 +230,46 @@ export function useEnviarParaAprovacao() {
         await supabase
           .from('conteudo_aprovacao')
           .update({ etapa: 'editado', visivel_cliente: false, enviado_em: null } as never)
+          .in('id', p.ids);
+        throw new Error(await erroDaFuncao(error));
+      }
+    },
+    onSuccess: invalidar,
+  });
+}
+
+/**
+ * Reenvio com um clique: peças reprovadas e refeitas voltam ao portal e o grupo
+ * do cliente recebe o aviso de que o material foi alterado.
+ */
+export function useReenviarAlterados() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: async (p: {
+      clienteId: string; slug: string | null | undefined; mes: string; ids: string[];
+    }) => {
+      if (p.ids.length === 0) throw new Error('Não há conteúdo alterado para reenviar.');
+      if (!p.slug) {
+        throw new Error('Este cliente ainda não tem link público. Gere o link na página do cliente.');
+      }
+      // Libera no portal ANTES de avisar, para o link já abrir com tudo.
+      const { error: eUp } = await supabase
+        .from('conteudo_aprovacao')
+        .update({
+          etapa: 'enviado', status: 'pendente', visivel_cliente: true, refeito: false,
+          enviado_em: new Date().toISOString(),
+        } as never)
+        .in('id', p.ids);
+      if (eUp) throw eUp;
+
+      const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
+        body: { cliente_id: p.clienteId, texto: mensagemReenvio({ link: linkAprovacao(p.slug, p.mes) }) },
+      });
+      if (error) {
+        // o cliente não foi avisado: devolve as peças ao estado anterior
+        await supabase
+          .from('conteudo_aprovacao')
+          .update({ etapa: 'editado', visivel_cliente: false, enviado_em: null, refeito: true } as never)
           .in('id', p.ids);
         throw new Error(await erroDaFuncao(error));
       }

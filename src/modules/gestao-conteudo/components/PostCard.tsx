@@ -94,7 +94,10 @@ export function PostCard({
           {aprovacoes.faltam.length > 0 && ` · faltam ${aprovacoes.faltam.join(', ')}`}
         </p>
       )}
-      <div className="mt-1"><Badge tone={etapa.tone}><GlassIcon emoji={etapa.emoji} /> {etapa.label}</Badge></div>
+      <div className="mt-1 flex flex-wrap items-center gap-1">
+        <Badge tone={etapa.tone}><GlassIcon emoji={etapa.emoji} /> {etapa.label}</Badge>
+        {post.refeito && post.etapa !== 'enviado' && <Badge tone="amber">Refeito · reenviar</Badge>}
+      </div>
     </div>
   );
 }

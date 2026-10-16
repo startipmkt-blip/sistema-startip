@@ -39,6 +39,8 @@ export interface Post {
   status: 'pendente' | 'aprovado' | 'reprovado';
   justificativa: string;
   visivel_cliente: boolean;
+  /** Reprovada pelo cliente e refeita pela equipe, ainda sem reenvio. */
+  refeito: boolean;
   enviado_em: string | null;
   decidido_em: string | null;
   lembrete_em: string | null;
@@ -236,6 +238,14 @@ export function mensagemLembrete(p: { clienteNome: string; qtd: number; link: st
     `que vocês ainda não aprovaram.\n\n` +
     `Segue o link do material para aprovação:\n${p.link}\n\n` +
     `Obrigado!`
+  );
+}
+
+/** Aviso de reenvio: o material reprovado foi refeito e volta para aprovação. */
+export function mensagemReenvio(p: { link: string }): string {
+  return (
+    `Pessoal, o material foi alterado, segue para aprovação novamente.\n\n` +
+    `Segue o link dos materiais abaixo:\n${p.link}`
   );
 }
 

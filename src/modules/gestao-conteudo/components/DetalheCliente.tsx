@@ -7,7 +7,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Textarea } from '@/shared/ui/Textarea';
 import {
   linkAprovacao, useCopiarMesAnterior, useEnviarParaAprovacao, useExcluirPost,
-  useLembrarCliente, useMudarEtapa, useSalvarMeta,
+  useLembrarCliente, useMudarEtapa, useReenviarAlterados, useSalvarMeta,
 } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
   ETAPAS, deslocarMes, driveInfo, mensagemAprovacao, mesLabel, type Etapa, type Post,
@@ -37,6 +37,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const excluir = useExcluirPost();
   const enviar = useEnviarParaAprovacao();
   const lembrar = useLembrarCliente();
+  const reenviar = useReenviarAlterados();
   const copiar = useCopiarMesAnterior();
   const salvarMeta = useSalvarMeta();
 
@@ -68,6 +69,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const tempo = textoTempoMedio(posts);
   const link = cliente.central_slug ? linkAprovacao(cliente.central_slug, mes) : null;
   const aguardando = posts.filter((p) => p.etapa === 'enviado');
+  const alterados = posts.filter((p) => p.refeito && (p.etapa === 'editado' || p.etapa === 'em_edicao'));
   const metaMes = Number(porMes) > 0 ? Number(porMes) : 0;
 
   const ok = (texto: string) => setAviso({ tipo: 'ok', texto });
@@ -112,6 +114,19 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
     );
   }
 
+  function reenviarAlterados() {
+    const semArquivo = alterados.filter((p) => driveInfo(p.link_drive).tipo === 'invalido').length;
+    if (semArquivo && !confirm(`⚠ ${semArquivo} conteúdo(s) sem link do Drive válido (o cliente não verá a prévia). Reenviar mesmo assim?`)) return;
+    setAviso(null);
+    reenviar.mutate(
+      { clienteId: cliente.id, slug: cliente.central_slug, mes, ids: alterados.map((p) => p.id) },
+      {
+        onSuccess: () => ok('Reenviado! O grupo do cliente foi avisado de que o material foi alterado.'),
+        onError: erro,
+      },
+    );
+  }
+
   function copiarMesAnterior() {
     const origem = deslocarMes(mes, -1);
     if (!confirm(
@@ -137,7 +152,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       key={p.id} post={p}
       selecionado={selecionados.includes(p.id)}
       onSelecionar={() => alternar(p.id)}
-      onEtapa={(etapa) => mudarEtapa.mutate({ id: p.id, etapa })}
+      onEtapa={(etapa) => mudarEtapa.mutate({ id: p.id, etapa, anterior: p.etapa })}
       onPrevia={() => setPrevia(p)}
       onEditar={() => { setEditando(p); setFormAberto(true); }}
       onExcluir={() => { if (confirm(`Excluir "${p.titulo}"?`)) excluir.mutate(p.id); }}
@@ -172,6 +187,17 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
           >
             {glassify(lembrar.isPending ? 'Enviando…' : `⏰ Lembrar cliente (${aguardando.length})`)}
           </Button>
+          {alterados.length > 0 && (
+            <Button
+              onClick={reenviarAlterados}
+              disabled={reenviar.isPending || !cliente.whatsapp_chat_id}
+              title={!cliente.whatsapp_chat_id
+                ? 'Cliente sem WhatsApp cadastrado'
+                : 'Avisa o grupo do cliente que o material foi alterado e libera para nova aprovação'}
+            >
+              {glassify(reenviar.isPending ? 'Enviando…' : `🔁 Reenviar alterados (${alterados.length})`)}
+            </Button>
+          )}
           <Button
             onClick={enviarSelecionados}
             disabled={selecionados.length === 0 || enviar.isPending || !cliente.whatsapp_chat_id}
