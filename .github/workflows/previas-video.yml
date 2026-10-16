@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Converter e enviar previas que faltam
         env:
           SUPA_URL: ${{ secrets.VITE_SUPABASE_URL }}
