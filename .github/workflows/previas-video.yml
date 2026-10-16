@@ -28,6 +28,7 @@ jobs:
           FTP_DIR: ${{ secrets.FTP_DIR }}
         run: |
           set -u
+          falhas=0
           SITE=https://cerebro.agenciastartip.com.br
           ids=$(curl -sf -X POST "$SUPA_URL/rest/v1/rpc/previas_pendentes" \
             -H "apikey: $SUPA_KEY" -H "Authorization: Bearer $SUPA_KEY" \
@@ -43,11 +44,12 @@ jobs:
             fi
             ffmpeg -v error -y -i orig.mp4 -vf "scale='min(1080,iw)':-2,fps=30" \
               -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 23 -maxrate 6M -bufsize 12M -preset medium \
-              -c:a aac -b:a 128k -movflags +faststart previa.mp4 || { echo "Falha ao converter"; echo "::endgroup::"; continue; }
+              -c:a aac -b:a 128k -movflags +faststart previa.mp4 || { echo "Falha ao converter"; falhas=$((falhas+1)); echo "::endgroup::"; continue; }
             curl -fsS --ssl --ftp-create-dirs -k -T previa.mp4 \
               "ftp://$FTP_SERVER/${dir}previas/$id.mp4.part" --user "$FTP_USERNAME:$FTP_PASSWORD" \
               -Q "-RNFR ${dir}previas/$id.mp4.part" -Q "-RNTO ${dir}previas/$id.mp4" \
-              && echo "Enviada: $id ($(du -h previa.mp4 | cut -f1))"
+              && echo "Enviada: $id ($(du -h previa.mp4 | cut -f1))"               || { echo "Falha no envio FTP"; falhas=$((falhas+1)); }
             rm -f orig.mp4 previa.mp4
             echo "::endgroup::"
           done
+          [ "$falhas" -eq 0 ] || { echo "$falhas falha(s)"; exit 1; }
