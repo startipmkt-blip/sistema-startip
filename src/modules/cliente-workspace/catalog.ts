@@ -21,8 +21,7 @@ export const GRUPO_LABEL: Record<DocGrupo, string> = {
 export const DOC_ITENS: DocItem[] = [
   // Materiais de referência
   { chave: 'info', titulo: 'Informações importantes', icon: '💡', grupo: 'materiais' },
-  { chave: 'persona', titulo: 'Mapeamento de Persona', icon: '🧑', grupo: 'materiais' },
-  { chave: 'icp', titulo: 'ICP', icon: '🎯', grupo: 'materiais' },
+  { chave: 'dna', titulo: 'DNA', icon: '🧬', grupo: 'materiais' },
   { chave: 'referencias', titulo: 'Referências', icon: '🔗', grupo: 'materiais' },
   { chave: 'dores', titulo: 'Dores / mecanismo único / diferenciais', icon: '⚡', grupo: 'materiais' },
   { chave: 'reunioes', titulo: 'Reuniões (PDFs e resumos)', icon: '📁', grupo: 'materiais' },
@@ -36,8 +35,6 @@ export const DOC_ITENS: DocItem[] = [
   { chave: 'pilares', titulo: 'Pilares de conteúdo', icon: '🏛️', grupo: 'fluxo' },
   { chave: 'pautas', titulo: 'Pautas de conteúdo', icon: '📌', grupo: 'fluxo' },
   { chave: 'calendario', titulo: 'Calendário editorial', icon: '🗓️', grupo: 'fluxo' },
-  { chave: 'instagram', titulo: 'Estrutura de Instagram', icon: '📸', grupo: 'fluxo' },
-  { chave: 'gmn', titulo: 'Google Meu Negócio (GMN)', icon: '📍', grupo: 'fluxo' },
   { chave: 'formularios', titulo: 'Formulários', icon: '📝', grupo: 'fluxo' },
 ];
 
