@@ -144,6 +144,17 @@ export function useCriarFormulario(clienteId: string) {
   });
 }
 
+export function useExcluirFormulario(clienteId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('formularios').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: keys.porCliente(clienteId) }),
+  });
+}
+
 export function useArquivarFormulario(clienteId: string) {
   const qc = useQueryClient();
   return useMutation({

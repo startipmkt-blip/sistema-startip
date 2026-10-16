@@ -54,6 +54,7 @@ export function FormulariosAba({ clienteId }: { clienteId: string }) {
         <div className="flex justify-center p-6"><Spinner /></div>
       ) : (
         <ListaFormularios
+          clienteId={clienteId}
           formularios={formularios ?? []}
           nomeCliente={cliente?.nome ?? 'Cliente'}
           whatsappChatId={(cliente as unknown as { whatsapp_chat_id?: string | null })?.whatsapp_chat_id}

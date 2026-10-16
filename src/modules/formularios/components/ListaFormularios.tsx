@@ -3,6 +3,7 @@ import { Button } from '@/shared/ui/Button';
 import { Modal } from '@/shared/ui/Modal';
 import { Badge } from '@/shared/ui/Badge';
 import { formatDate } from '@/shared/lib/format';
+import { useExcluirFormulario } from '@/modules/formularios/api/formulariosApi';
 import type { Formulario } from '@/modules/formularios/types';
 import { TIPO_LABEL } from '@/modules/formularios/types';
 import { EnviarWhatsappBtn } from './EnviarWhatsappBtn';
@@ -11,6 +12,7 @@ import { RespostasView } from './RespostasView';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 interface Props {
+  clienteId: string;
   formularios: Formulario[];
   nomeCliente: string;
   whatsappChatId: string | null | undefined;
@@ -20,9 +22,23 @@ function linkPublico(slug: string): string {
   return `${window.location.origin}/formulario/${slug}`;
 }
 
-export function ListaFormularios({ formularios, nomeCliente, whatsappChatId }: Props) {
+export function ListaFormularios({ clienteId, formularios, nomeCliente, whatsappChatId }: Props) {
   const [verRespostas, setVerRespostas] = useState<Formulario | null>(null);
   const [copiado, setCopiado] = useState<string>('');
+  const [excluir, setExcluir] = useState<Formulario | null>(null);
+  const [erroExcluir, setErroExcluir] = useState('');
+  const excluirForm = useExcluirFormulario(clienteId);
+
+  async function confirmarExclusao() {
+    if (!excluir) return;
+    setErroExcluir('');
+    try {
+      await excluirForm.mutateAsync(excluir.id);
+      setExcluir(null);
+    } catch (e) {
+      setErroExcluir((e as Error).message ?? 'Erro ao excluir.');
+    }
+  }
 
   async function copiarLink(slug: string) {
     const link = linkPublico(slug);
@@ -73,6 +89,13 @@ export function ListaFormularios({ formularios, nomeCliente, whatsappChatId }: P
                 <Button variant="ghost" onClick={() => copiarLink(f.slug)}>
                   {glassify(copiado === f.slug ? '✅ Copiado' : '📋 Copiar link')}
                 </Button>
+                <Button
+                  variant="ghost"
+                  className="text-red-300 hover:text-red-200"
+                  onClick={() => { setErroExcluir(''); setExcluir(f); }}
+                >
+                  Excluir
+                </Button>
                 {f.status === 'pendente' && (
                   <EnviarWhatsappBtn
                     formulario={f}
@@ -93,6 +116,28 @@ export function ListaFormularios({ formularios, nomeCliente, whatsappChatId }: P
           );
         })}
       </div>
+
+      <Modal
+        open={!!excluir}
+        onClose={() => setExcluir(null)}
+        title="Excluir formulário"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setExcluir(null)}>Cancelar</Button>
+            <Button onClick={confirmarExclusao} disabled={excluirForm.isPending}>
+              {excluirForm.isPending ? 'Excluindo…' : 'Excluir'}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-slate-200">
+          Excluir o formulário <strong>{excluir ? TIPO_LABEL[excluir.tipo] : ''}</strong>?
+          O link deixa de funcionar
+          {excluir?.status === 'preenchido' ? ' e as respostas já enviadas serão apagadas' : ''}.
+          Isso não pode ser desfeito.
+        </p>
+        {erroExcluir && <div className="mt-3 rounded-md border border-red-500/40 bg-red-500/10 p-2 text-xs text-red-300">{erroExcluir}</div>}
+      </Modal>
 
       <Modal
         open={!!verRespostas}
