@@ -7,6 +7,7 @@ import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   iniciarTimerDemanda, pararTimerDemanda, TOCADORES, type Tocador,
 } from '@/modules/demandas/api/cronometroApi';
+import { proximaData, segundaDaSemana, type Renovacao } from '@/modules/demandas/lib/renovacao';
 import { sincronizarGestaoConteudo } from './sincronizarConteudo';
 
 // Quem toca quando o responsável da demanda não é um usuário do cronômetro.
@@ -86,6 +87,8 @@ export interface DesignerDemanda {
   link_conteudo?: string | null;
   /** Semana escolhida (data de início); vazio = semana do prazo ou da criação. */
   semana_ref?: string | null;
+  /** Ao concluir, cria a próxima cópia para a semana/mês seguinte. */
+  renovacao?: Renovacao;
   iniciado_em: string | null;
   concluido_em: string | null;
   /** Cliente reprovou o conteúdo: motivo e quando (vale enquanto a peça não volta para aprovação). */
@@ -196,10 +199,34 @@ interface UpsertInput {
   link_conteudo?: string | null;
   semana_ref?: string | null;
   alteracao_obs?: string | null;
+  renovacao?: Renovacao;
   // Contexto pro cronômetro (não vai pro banco).
   de?: DesignerStatus;
   iniciado_em?: string | null;
   responsavel_nome?: string | null;
+}
+
+// Concluiu uma demanda que se renova: cria a próxima (A fazer) e desliga a renovação da antiga,
+// assim reabrir e concluir de novo não gera cópia duplicada.
+async function renovarDemanda(id: string, criadoPor: string | null): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tbl = (supabase.from as any)('designer_demandas');
+  const { data, error } = await tbl.select('*').eq('id', id).single();
+  if (error) throw error;
+  const d = data as DesignerDemanda;
+  if (!d.renovacao || d.renovacao === 'nenhuma') return;
+  const semana = d.semana_ref?.slice(0, 10) ?? null;
+  const { error: errIns } = await tbl.insert({
+    cliente_id: d.cliente_id, titulo: d.titulo, descricao: d.descricao, briefing: d.briefing, tipo: d.tipo,
+    status: 'a_fazer', responsavel_id: d.responsavel_id, origem: 'manual', renovacao: d.renovacao,
+    prazo: d.prazo ? proximaData(d.prazo, d.renovacao) : null,
+    // Sem prazo, a semana define onde a demanda aparece no quadro: empurra a de agora para a próxima.
+    semana_ref: d.prazo ? null : proximaData(semana ?? segundaDaSemana(), d.renovacao),
+    criado_por: criadoPor,
+  });
+  if (errIns) throw errIns;
+  const { error: errUpd } = await tbl.update({ renovacao: 'nenhuma' }).eq('id', id);
+  if (errUpd) throw errUpd;
 }
 
 export function useSalvarDemanda() {
@@ -228,6 +255,7 @@ export function useSalvarDemanda() {
         id = (data as { id: string }).id;
       }
       await sincronizarGestaoConteudo(id!);
+      if (para === 'concluido' && de !== 'concluido') await renovarDemanda(id!, profile?.id ?? null);
       return sincronizarCronometro({
         id: id!, titulo: input.titulo, de: input.id ? de : undefined, para, responsavelNome: responsavel_nome,
       });
@@ -269,6 +297,7 @@ export function useGerarSemana() {
 
 export function useMoverStatus() {
   const qc = useQueryClient();
+  const { profile } = useAuth();
   return useMutation({
     mutationFn: async (v: {
       id: string; status: DesignerStatus; titulo: string; de: DesignerStatus;
@@ -285,6 +314,7 @@ export function useMoverStatus() {
         .eq('id', v.id);
       if (error) throw error;
       await sincronizarGestaoConteudo(v.id);
+      if (v.status === 'concluido' && v.de !== 'concluido') await renovarDemanda(v.id, profile?.id ?? null);
       return sincronizarCronometro({
         id: v.id, titulo: v.titulo, de: v.de, para: v.status, responsavelNome: v.responsavel_nome,
       });

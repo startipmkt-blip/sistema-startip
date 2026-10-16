@@ -3,6 +3,7 @@ import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
 import { demoClienteNome } from '@/shared/lib/demoData';
 import type { Demanda, DemandaView } from '@/modules/demandas/types';
+import { proximaData, hojeStr } from '@/modules/demandas/lib/renovacao';
 import { iniciarTimerDemanda, pararTimerDemanda, type Tocador } from '@/modules/demandas/api/cronometroApi';
 
 const demoDemandas: Demanda[] = [
@@ -46,7 +47,7 @@ export function useDemandas(clienteId: string) {
 // ---------- Criar / editar ----------
 export type DemandaFormData = Pick<
   Demanda,
-  'cliente_id' | 'setor' | 'privada' | 'titulo' | 'descricao' | 'responsavel' | 'prioridade' | 'status' | 'prazo'
+  'cliente_id' | 'setor' | 'privada' | 'titulo' | 'descricao' | 'responsavel' | 'prioridade' | 'status' | 'prazo' | 'renovacao'
 >;
 
 async function saveDemanda(id: string | undefined, dados: DemandaFormData): Promise<string> {
@@ -102,6 +103,33 @@ async function sincronizarCronometro(opts: {
   }
 }
 
+// Concluiu uma demanda que se renova: cria a próxima (aberta) e desliga a renovação da antiga,
+// assim reabrir e concluir de novo não gera cópia duplicada.
+async function renovarDemanda(id: string): Promise<void> {
+  if (IS_DEMO) {
+    const d = demoDemandas.find((x) => x.id === id);
+    if (!d || !d.renovacao || d.renovacao === 'nenhuma') return;
+    demoDemandas.unshift({
+      ...d, id: crypto.randomUUID(), status: 'aberta', created_at: new Date().toISOString(),
+      prazo: proximaData(d.prazo || hojeStr(), d.renovacao),
+    });
+    d.renovacao = 'nenhuma';
+    return;
+  }
+  const { data, error } = await supabase.from('demandas').select('*').eq('id', id).single();
+  if (error) throw error;
+  const d = data as unknown as Demanda;
+  if (!d.renovacao || d.renovacao === 'nenhuma') return;
+  const { error: errIns } = await supabase.from('demandas').insert({
+    cliente_id: d.cliente_id, setor: d.setor, privada: d.privada, titulo: d.titulo, descricao: d.descricao,
+    responsavel: d.responsavel, prioridade: d.prioridade, status: 'aberta',
+    prazo: proximaData(d.prazo || hojeStr(), d.renovacao), renovacao: d.renovacao,
+  } as never);
+  if (errIns) throw errIns;
+  const { error: errUpd } = await supabase.from('demandas').update({ renovacao: 'nenhuma' } as never).eq('id', id);
+  if (errUpd) throw errUpd;
+}
+
 export function useSalvarDemanda() {
   const qc = useQueryClient();
   return useMutation({
@@ -109,6 +137,7 @@ export function useSalvarDemanda() {
       id?: string; dados: DemandaFormData; de?: Demanda['status']; tocador?: Tocador;
     }): Promise<ResultadoCronometro> => {
       const id = await saveDemanda(p.id, p.dados);
+      if (p.dados.status === 'concluida' && p.de !== 'concluida') await renovarDemanda(id);
       if (IS_DEMO) return {};
       return sincronizarCronometro({
         id, titulo: p.dados.titulo, de: p.id ? p.de : undefined, para: p.dados.status, tocador: p.tocador,
@@ -130,10 +159,12 @@ export function useAtualizarStatusDemanda() {
       if (IS_DEMO) {
         const d = demoDemandas.find((x) => x.id === p.id);
         if (d) d.status = p.status;
+        if (p.status === 'concluida' && p.de !== 'concluida') await renovarDemanda(p.id);
         return {};
       }
       const { error } = await supabase.from('demandas').update({ status: p.status } as never).eq('id', p.id);
       if (error) throw error;
+      if (p.status === 'concluida' && p.de !== 'concluida') await renovarDemanda(p.id);
       return sincronizarCronometro({ id: p.id, titulo: p.titulo, de: p.de, para: p.status, tocador: p.tocador });
     },
     // Move o card na tela antes do servidor responder; volta atrás se der erro.

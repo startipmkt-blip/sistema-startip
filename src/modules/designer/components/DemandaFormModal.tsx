@@ -17,6 +17,7 @@ import {
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { opcoesDeSemana } from '../lib/periodo';
+import { RENOVACAO_OPTIONS, type Renovacao } from '@/modules/demandas/lib/renovacao';
 
 interface Props {
   open: boolean;
@@ -45,6 +46,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const [linkConteudo, setLinkConteudo] = useState('');
   const [semanaRef, setSemanaRef] = useState('');
   const [alteracaoObs, setAlteracaoObs] = useState('');
+  const [renovacao, setRenovacao] = useState<Renovacao>('nenhuma');
   const [anexos, setAnexos] = useState<CriativoAnexo[]>([]);
   // Enviados nesta abertura do formulário: se cancelar, somem do storage.
   const [novos, setNovos] = useState<string[]>([]);
@@ -61,6 +63,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
     setAlteracaoObs(demanda?.alteracao_obs ?? '');
+    setRenovacao(demanda?.renovacao ?? 'nenhuma');
     setSemanaRef(demanda ? (demanda.semana_ref?.slice(0, 10) ?? '') : (semanaSugerida ?? ''));
     setLinkConteudo(demanda?.link_conteudo ?? '');
     setAnexos(demanda?.anexos ?? []);
@@ -100,6 +103,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
         link_conteudo: link || null,
         semana_ref: semanaRef || null,
         alteracao_obs: alteracaoObs.trim() || null,
+        renovacao,
       });
       // Anexos que existiam e foram removidos agora saem do storage.
       const mantidos = new Set(anexos.map((a) => a.path));
@@ -253,6 +257,19 @@ ${r.cronometroErro}`);
         <p className="-mt-1 text-[11px] text-slate-400">
           Define em qual semana do quadro a demanda aparece, sem precisar de prazo.
         </p>
+
+        <Select
+          id="renov"
+          label="Renovação"
+          value={renovacao}
+          onChange={(e) => setRenovacao(e.target.value as Renovacao)}
+          options={RENOVACAO_OPTIONS}
+        />
+        {renovacao !== 'nenhuma' && (
+          <p className="-mt-1 text-[11px] text-slate-400">
+            Ao concluir, o sistema cria a próxima demanda em A fazer, {renovacao === 'semanal' ? 'na semana seguinte' : 'no mês seguinte'}.
+          </p>
+        )}
 
         <Input
           id="lnk"

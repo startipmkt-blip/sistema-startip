@@ -13,6 +13,7 @@ import {
   type DemandaSetor,
   type DemandaView,
 } from '@/modules/demandas/types';
+import { RENOVACAO_OPTIONS, type Renovacao } from '@/modules/demandas/lib/renovacao';
 import { TOCADORES, type Tocador } from '@/modules/demandas/api/cronometroApi';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { Modal } from '@/shared/ui/Modal';
@@ -75,6 +76,7 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       prioridade: demanda?.prioridade ?? 'media',
       status: demanda?.status ?? 'aberta',
       prazo: demanda?.prazo ?? new Date().toISOString().slice(0, 10),
+      renovacao: (demanda?.renovacao ?? 'nenhuma') as Renovacao,
     };
     if (demanda) return base;
     const rascunho = lerRascunho();
@@ -212,6 +214,20 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
             onChange={(e) => set('status', e.target.value as typeof form.status)}
           />
           <Input id="prazo" type="date" label="Prazo" value={form.prazo ?? ''} onChange={(e) => set('prazo', e.target.value)} />
+        </div>
+        <div>
+          <Select
+            id="renovacao"
+            label="Renovação"
+            options={RENOVACAO_OPTIONS}
+            value={form.renovacao}
+            onChange={(e) => set('renovacao', e.target.value as Renovacao)}
+          />
+          {form.renovacao !== 'nenhuma' && (
+            <p className="mt-1 text-[11px] text-slate-400">
+              Ao concluir, o sistema cria a próxima demanda sozinho, com o prazo {form.renovacao === 'semanal' ? '7 dias' : '1 mês'} depois.
+            </p>
+          )}
         </div>
         {precisaTocador && (
           <Select

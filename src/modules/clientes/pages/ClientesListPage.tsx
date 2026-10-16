@@ -9,6 +9,7 @@ import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { SinoLembretes } from '@/modules/cliente-lembretes/components/SinoLembretes';
 
 export function ClientesListPage() {
   const [busca, setBusca] = useState('');
@@ -60,10 +61,10 @@ export function ClientesListPage() {
             {clientes.map((cliente) => {
               const iniciais = cliente.nome.slice(0, 2).toUpperCase();
               return (
-                <li key={cliente.id}>
+                <li key={cliente.id} className="flex items-center transition-colors hover:bg-white/5">
                   <Link
                     to={`/clientes/${cliente.id}`}
-                    className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/5"
+                    className="flex min-w-0 flex-1 items-center gap-4 py-3 pl-5"
                   >
                     {cliente.logo_url ? (
                       <LogoCliente
@@ -86,6 +87,9 @@ export function ClientesListPage() {
                     </div>
                     <StatusBadge status={cliente.status} />
                   </Link>
+                  <div className="py-3 pl-3 pr-5">
+                    <SinoLembretes clienteId={cliente.id} clienteNome={cliente.nome} />
+                  </div>
                 </li>
               );
             })}

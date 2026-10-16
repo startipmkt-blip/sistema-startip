@@ -1,3 +1,5 @@
+import type { Renovacao } from '@/modules/demandas/lib/renovacao';
+
 export type DemandaStatus = 'aberta' | 'iuri' | 'domini' | 'fazendo' | 'concluida';
 export type DemandaPrioridade = 'baixa' | 'media' | 'alta';
 export type DemandaSetor = 'socios' | 'trafego' | 'design' | 'geral';
@@ -13,6 +15,8 @@ export interface Demanda {
   prioridade: DemandaPrioridade;
   status: DemandaStatus;
   prazo: string; // date
+  /** Ao concluir, cria a próxima cópia para a semana/mês seguinte. */
+  renovacao?: Renovacao;
   created_at: string;
 }
 
