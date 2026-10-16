@@ -9,6 +9,7 @@ import {
   itensDoGrupo,
   type DocItem,
 } from '@/modules/cliente-workspace/catalog';
+import { DnaCliente } from '@/modules/cliente-workspace/components/DnaCliente';
 import { ReunioesPanel } from '@/modules/reunioes/ReunioesPanel';
 import { FormulariosAba } from '@/modules/formularios/pages/FormulariosAba';
 import { RegrasCliente } from '@/modules/cliente-perfil/components/RegrasCliente';
@@ -67,6 +68,7 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
     if (chave === 'regras') return (regras?.length ?? 0) > 0;
     if (chave === 'pautas') return (pautas?.length ?? 0) > 0;
     if (chave === 'identidade') return (arquivosIdentidade?.length ?? 0) > 0 || Boolean(docs?.identidade?.conteudo?.trim());
+    if (chave === 'dna') return Boolean(docs?.dna?.anexo_url);
     return Boolean(docs?.[chave]?.conteudo?.trim());
   };
 
@@ -129,7 +131,9 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
       </div>
 
       {/* Documento selecionado */}
-      {item.chave === 'identidade' ? (
+      {item.chave === 'dna' ? (
+        <DnaCliente clienteId={clienteId} />
+      ) : item.chave === 'identidade' ? (
         <IdentidadeVisual clienteId={clienteId} />
       ) : item.chave === 'regras' ? (
         <RegrasCliente clienteId={clienteId} />
