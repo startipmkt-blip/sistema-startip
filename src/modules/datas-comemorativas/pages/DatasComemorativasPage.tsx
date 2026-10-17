@@ -11,7 +11,7 @@ import { OcorrenciaCard } from '@/modules/datas-comemorativas/components/Ocorren
 import { AprovacaoStatus } from '@/modules/datas-comemorativas/components/AprovacaoData';
 import { BaseMaeModal } from '@/modules/datas-comemorativas/components/BaseMaeModal';
 import { AdicionarDatasModal } from '@/modules/datas-comemorativas/components/AdicionarDatasModal';
-import { EnviarDesignerModal } from '@/modules/datas-comemorativas/components/EnviarDesignerModal';
+import { EnviarDesignerModal, useDemandaDaData } from '@/modules/datas-comemorativas/components/EnviarDesignerModal';
 import { EditarDataClienteModal } from '@/modules/datas-comemorativas/components/EditarDataClienteModal';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Button } from '@/shared/ui/Button';
@@ -24,6 +24,10 @@ import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
 
 type Filtro = 'todas' | 'proximas' | 'historico' | 'reprovadas';
+
+function EnviadaAoDesigner({ o, clienteId, clienteNome }: { o: Ocorrencia; clienteId: string; clienteNome: string }) {
+  return useDemandaDaData(o, clienteId, clienteNome) ? <Badge tone="green"><GlassIcon name="check-circle" /> Já enviada ao designer</Badge> : null;
+}
 
 export function DatasComemorativasPage() {
   const hoje = hojeSaoPaulo();
@@ -173,6 +177,7 @@ export function DatasComemorativasPage() {
                             rodape={aprovacoes.get(o.key) && <AprovacaoStatus aprovacao={aprovacoes.get(o.key)!} visao="equipe" />}
                             etiquetas={
                               <>
+                                {clienteAtual && <EnviadaAoDesigner o={o} clienteId={clienteAtual.id} clienteNome={clienteAtual.nome} />}
                                 {o.item.visivel_cliente === false && <Badge tone="amber"><GlassIcon name="eye-off" /> Oculta do cliente</Badge>}
                                 {cal && o.data < cal.inicio && <Badge tone="slate">Antes do início do calendário</Badge>}
                               </>
