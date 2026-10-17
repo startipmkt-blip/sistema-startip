@@ -11,6 +11,7 @@ import { OcorrenciaCard } from '@/modules/datas-comemorativas/components/Ocorren
 import { AprovacaoStatus } from '@/modules/datas-comemorativas/components/AprovacaoData';
 import { BaseMaeModal } from '@/modules/datas-comemorativas/components/BaseMaeModal';
 import { AdicionarDatasModal } from '@/modules/datas-comemorativas/components/AdicionarDatasModal';
+import { EnviarDesignerModal } from '@/modules/datas-comemorativas/components/EnviarDesignerModal';
 import { EditarDataClienteModal } from '@/modules/datas-comemorativas/components/EditarDataClienteModal';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Button } from '@/shared/ui/Button';
@@ -32,6 +33,7 @@ export function DatasComemorativasPage() {
   const [baseAberta, setBaseAberta] = useState(false);
   const [adicionarAberto, setAdicionarAberto] = useState(false);
   const [editando, setEditando] = useState<DataCliente | null>(null);
+  const [paraDesigner, setParaDesigner] = useState<Ocorrencia | null>(null);
   const remover = useRemoverDataCliente();
 
   const clientesQ = useClientes('');
@@ -177,6 +179,7 @@ export function DatasComemorativasPage() {
                             }
                             acoes={
                               <>
+                                <button onClick={() => setParaDesigner(o)} className="text-xs font-medium text-emerald-300 hover:underline"><GlassIcon name="palette" /> Enviar ao designer</button>
                                 <button onClick={() => setEditando(o.item)} className="text-xs font-medium text-brand-300 hover:underline"><GlassIcon name="pencil" /> Ajustar</button>
                                 <button onClick={() => removerData(o)} className="text-xs text-slate-500 hover:text-red-300">Remover</button>
                               </>
@@ -202,6 +205,14 @@ export function DatasComemorativasPage() {
           clienteNome={clienteAtual.nome}
           base={base}
           itens={itens}
+        />
+      )}
+      {paraDesigner && clienteAtual && (
+        <EnviarDesignerModal
+          ocorrencia={paraDesigner}
+          clienteId={clienteAtual.id}
+          clienteNome={clienteAtual.nome}
+          onClose={() => setParaDesigner(null)}
         />
       )}
       {editando && base.find((b) => b.id === editando.data_id) && (
