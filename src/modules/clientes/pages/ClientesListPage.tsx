@@ -7,6 +7,7 @@ import { ClienteFormModal } from '@/modules/clientes/components/ClienteFormModal
 import { Input } from '@/shared/ui/Input';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
+import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
 import { SinoLembretes } from '@/modules/cliente-lembretes/components/SinoLembretes';
@@ -84,6 +85,14 @@ export function ClientesListPage() {
                       <div className="text-xs text-slate-400">
                         {TIPO_NEGOCIO_LABEL[cliente.tipo_negocio]}
                       </div>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-end gap-1.5">
+                      {cliente.servicos?.includes('social_midia') && (
+                        <Badge tone="green">Social media</Badge>
+                      )}
+                      {cliente.servicos?.includes('trafego_pago') && (
+                        <Badge tone="blue">Tráfego pago</Badge>
+                      )}
                     </div>
                     <StatusBadge status={cliente.status} />
                   </Link>
