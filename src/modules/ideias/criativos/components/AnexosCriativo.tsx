@@ -1,4 +1,4 @@
-import { useState, type DragEvent } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { urlDoArquivo } from '@/shared/lib/storage';
 import {
   ACCEPT_ANEXOS, MAX_ANEXO_MB, ehImagem, formatarTamanho, iconeAnexo,
@@ -63,6 +63,30 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
     }
   }
 
+  // Ctrl+V em qualquer lugar da tela (print, imagem copiada ou arquivo copiado) vira anexo.
+  // Ref para o handler sempre enxergar a lista atual de anexos.
+  const processarRef = useRef(processar);
+  processarRef.current = processar;
+  useEffect(() => {
+    function aoColar(e: ClipboardEvent) {
+      const files = Array.from(e.clipboardData?.files ?? []);
+      if (files.length === 0) return; // texto normal: deixa colar no campo
+      e.preventDefault();
+      const stamp = new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', 'h');
+      const nomeados = files.map((f, i) => {
+        // Print colado vem como "image.png"; dá um nome que ajuda a achar depois.
+        if (f.type.startsWith('image/') && /^image\.\w+$/i.test(f.name)) {
+          const ext = f.type.split('/')[1]?.replace('jpeg', 'jpg') || 'png';
+          return new File([f], `print-${stamp}${files.length > 1 ? `-${i + 1}` : ''}.${ext}`, { type: f.type });
+        }
+        return f;
+      });
+      void processarRef.current(nomeados);
+    }
+    document.addEventListener('paste', aoColar);
+    return () => document.removeEventListener('paste', aoColar);
+  }, []);
+
   async function remover(a: CriativoAnexo) {
     onChange(anexos.filter((x) => x.path !== a.path));
     if (novos.includes(a.path)) {
@@ -89,6 +113,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
       >
         <span className="text-xl"><GlassIcon name="paperclip" /></span>
         <span>{enviando ? 'Enviando…' : 'Arraste arquivos aqui ou toque para anexar'}</span>
+        <span className="text-xs font-medium text-brand-200">Dica: tire o print e aperte Ctrl+V aqui na tela para colar</span>
         <span className="rounded-lg bg-brand-500/20 px-3 py-1 text-xs font-medium text-brand-100">Anexar arquivo</span>
         <span className="text-[11px] text-slate-500">
           Imagens, PDF, DOC, XLS, PPT e TXT · até {MAX_ANEXO_MB} MB cada

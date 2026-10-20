@@ -21,6 +21,9 @@ import { Input } from '@/shared/ui/Input';
 import { Textarea } from '@/shared/ui/Textarea';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
+import { AnexosCriativo } from '@/modules/ideias/criativos/components/AnexosCriativo';
+import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
+import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 
 interface Props {
   open: boolean;
@@ -56,6 +59,7 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
     if (!demanda) return;
     if (!confirm(`Excluir "${demanda.titulo}"?`)) return;
     await excluir.mutateAsync(demanda.id);
+    for (const a of demanda.anexos ?? []) void descartarAnexo(a.path);
     onClose();
   }
   const { data: clientes } = useClientes('');
@@ -94,9 +98,19 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
     setForm((f) => ({ ...f, [k]: v }));
   }
 
+  const [anexos, setAnexos] = useState<CriativoAnexo[]>(demanda?.anexos ?? []);
+  // Enviados nesta abertura do formulário: se cancelar, somem do storage.
+  const [novos, setNovos] = useState<string[]>([]);
+
+  function fechar() {
+    for (const p of novos) void descartarAnexo(p);
+    setNovos([]);
+    onClose();
+  }
+
   function cancelar() {
     limparRascunho();
-    onClose();
+    fechar();
   }
 
   // Entrar em "Em andamento" liga o cronômetro, que precisa saber quem está tocando.
@@ -112,6 +126,7 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       setor: form.setor as DemandaSetor,
       prioridade: form.prioridade as DemandaPrioridade,
       status: form.status as DemandaFormData['status'],
+      anexos,
     };
     const r = await salvar.mutateAsync({
       id: demanda?.id,
@@ -119,6 +134,10 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       de: demanda?.status,
       tocador: tocador || undefined,
     });
+    // Anexos que existiam e foram removidos agora saem do storage.
+    const mantidos = new Set(anexos.map((a) => a.path));
+    for (const a of demanda?.anexos ?? []) if (!mantidos.has(a.path)) void descartarAnexo(a.path);
+    setNovos([]);
     limparRascunho();
     onClose();
     if (r?.cronometroErro) {
@@ -129,7 +148,7 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={fechar}
       title={demanda ? 'Editar demanda' : 'Nova demanda'}
       footer={
         <div className="flex w-full items-center justify-between">
@@ -162,6 +181,10 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
           onChange={(e) => set('descricao', e.target.value)}
           placeholder="Detalhes, contexto ou orientações sobre a demanda (opcional)"
         />
+        <div>
+          <p className="mb-1 text-xs font-medium text-slate-300">Prints e anexos</p>
+          <AnexosCriativo anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <Select
             id="setor"

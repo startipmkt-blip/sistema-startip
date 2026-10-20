@@ -207,6 +207,9 @@ export function DemandasPage() {
             <span className="text-[13px] font-medium leading-snug text-slate-100">
               {d.privada && <span title="Privada"><GlassIcon name="lock" /> </span>}
               {d.titulo}
+              {!!d.anexos?.length && (
+                <span className="ml-1 text-[11px] text-slate-400" title="Anexos"><GlassIcon name="paperclip" /> {d.anexos.length}</span>
+              )}
             </span>
             <Badge tone={PRIORIDADE_TONE[d.prioridade]} className="shrink-0 !px-2 !py-0 text-[10px]">{PRIORIDADE_LABEL[d.prioridade]}</Badge>
           </div>

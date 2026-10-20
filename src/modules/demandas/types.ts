@@ -1,4 +1,5 @@
 import type { Renovacao } from '@/modules/demandas/lib/renovacao';
+import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 
 export type DemandaStatus = 'aberta' | 'iuri' | 'domini' | 'fazendo' | 'concluida';
 export type DemandaPrioridade = 'baixa' | 'media' | 'alta';
@@ -17,6 +18,8 @@ export interface Demanda {
   prazo: string; // date
   /** Ao concluir, cria a próxima cópia para a semana/mês seguinte. */
   renovacao?: Renovacao;
+  /** Prints/imagens/PDFs anexados (bucket anexos-internos). */
+  anexos?: CriativoAnexo[];
   created_at: string;
 }
 

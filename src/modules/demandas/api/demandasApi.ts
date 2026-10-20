@@ -48,7 +48,7 @@ export function useDemandas(clienteId: string) {
 export type DemandaFormData = Pick<
   Demanda,
   'cliente_id' | 'setor' | 'privada' | 'titulo' | 'descricao' | 'responsavel' | 'prioridade' | 'status' | 'prazo' | 'renovacao'
->;
+> & Partial<Pick<Demanda, 'anexos'>>;
 
 async function saveDemanda(id: string | undefined, dados: DemandaFormData): Promise<string> {
   if (IS_DEMO) {
