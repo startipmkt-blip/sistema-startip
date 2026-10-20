@@ -13,6 +13,8 @@ import type { ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { IdeiaFormModal } from './IdeiaFormModal';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { useBancoIdeias } from '@/modules/gestao-conteudo/api/bancoIdeiasApi';
+import { BancoIdeias } from './BancoIdeias';
 
 interface Props {
   cliente: ClienteGestao;
@@ -27,7 +29,7 @@ const FORMATO_LABEL: Record<string, string> = {
 /** Só rascunhos e reprovadas voltam para o cliente. */
 const ENVIAVEL: StatusIdeia[] = ['rascunho', 'reprovada'];
 
-export function DetalheIdeias({ cliente, mes, ideias }: Props) {
+function IdeiasDoMes({ cliente, mes, ideias }: Props) {
   const enviar = useEnviarIdeias();
   const lembrar = useLembrarIdeias();
   const excluir = useExcluirIdeia();
@@ -240,6 +242,36 @@ export function DetalheIdeias({ cliente, mes, ideias }: Props) {
         open={formAberto} onClose={() => setFormAberto(false)}
         clienteId={cliente.id} mes={mes} ideia={editando} semanaInicial={semanaNova}
       />
+    </div>
+  );
+}
+
+/** Duas sub-abas: ideias do mês (por semana) e o banco de ideias gerais do cliente. */
+export function DetalheIdeias(props: Props) {
+  const [sub, setSub] = useState<'mes' | 'banco'>('mes');
+  const banco = useBancoIdeias(props.cliente.id);
+  const livres = (banco.data ?? []).filter((i) => !i.usada_em).length;
+
+  const aba = (id: 'mes' | 'banco', texto: string) => (
+    <button
+      type="button"
+      onClick={() => setSub(id)}
+      className={`-mb-px border-b-2 px-3 py-1.5 text-sm font-medium transition-colors ${
+        sub === id ? 'border-brand-400 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+    >
+      {glassify(texto)}
+    </button>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1 border-b border-white/10">
+        {aba('mes', `📅 Ideias de ${mesLabel(props.mes)}`)}
+        {aba('banco', `💡 Banco de ideias (${livres})`)}
+      </div>
+      {sub === 'mes'
+        ? <IdeiasDoMes {...props} />
+        : <BancoIdeias clienteId={props.cliente.id} mes={props.mes} ideias={banco.data ?? []} carregando={banco.isLoading} />}
     </div>
   );
 }
