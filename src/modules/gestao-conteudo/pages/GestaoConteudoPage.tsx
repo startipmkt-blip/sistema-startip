@@ -16,6 +16,7 @@ import { SemanaAtual } from '@/modules/gestao-conteudo/components/SemanaAtual';
 import { IdeiasAprovacao } from '@/modules/gestao-conteudo/components/IdeiasAprovacao';
 import { contar, type ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import { DetalheCliente } from '@/modules/gestao-conteudo/components/DetalheCliente';
+import { CriativosAba } from '@/modules/gestao-conteudo/components/CriativosAba';
 import { ConfigModal } from '@/modules/gestao-conteudo/components/ConfigModal';
 import { AgendaSemana, VisaoCarteira, VisaoTabela } from '@/modules/gestao-conteudo/components/VisoesCarteira';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
@@ -31,6 +32,7 @@ const ABAS: { id: AbaGestao; label: string }[] = [
   { id: 'semana',    label: '📌 Semana atual' },
   { id: 'ideias',    label: '💡 Aprovação de ideias' },
   { id: 'datas',     label: '🎉 Datas comemorativas' },
+  { id: 'criativos', label: '🎯 Criativos (tráfego pago)' },
 ];
 
 export function GestaoConteudoPage() {
@@ -42,7 +44,7 @@ export function GestaoConteudoPage() {
   const visao = (params.get('visao') as Visao | null) ?? 'carteira';
   const etapaFiltro = (params.get('etapa') as Etapa | null) ?? '';
   const abaParam = params.get('aba');
-  const aba: AbaGestao = abaParam === 'ideias' || abaParam === 'datas' || abaParam === 'semana' ? abaParam : 'conteudos';
+  const aba: AbaGestao = abaParam === 'ideias' || abaParam === 'datas' || abaParam === 'semana' || abaParam === 'criativos' ? abaParam : 'conteudos';
 
   function atualizar(mudancas: Record<string, string | null>) {
     const p = new URLSearchParams(params);
@@ -108,7 +110,7 @@ export function GestaoConteudoPage() {
         ))}
       </div>
 
-      {aba !== 'datas' && (
+      {aba !== 'datas' && aba !== 'criativos' && (
         cliente ? (
           <PautasCliente key={cliente.id} clienteId={cliente.id} clienteNome={cliente.nome} />
         ) : (
@@ -119,6 +121,15 @@ export function GestaoConteudoPage() {
       )}
 
       {aba === 'datas' && <DatasComemorativasPage />}
+
+      {aba === 'criativos' && (
+        <CriativosAba
+          clientes={((clientesQ.data ?? []) as ClienteGestao[]).filter((c) => c.status === 'ativo')}
+          mes={mes}
+          clienteId={clienteId}
+          onCliente={(id) => atualizar({ cliente: id })}
+        />
+      )}
 
       {aba === 'semana' && (
         <SemanaAtual clientes={clientes} onAbrir={(id) => atualizar({ aba: null, cliente: id })} />

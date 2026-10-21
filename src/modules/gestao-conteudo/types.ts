@@ -25,6 +25,8 @@ export const ETAPA_INFO: Record<Etapa, EtapaInfo> = Object.fromEntries(
   ETAPAS.map((e) => [e.id, e]),
 ) as Record<Etapa, EtapaInfo>;
 
+export type Categoria = 'organico' | 'criativo';
+
 export interface Post {
   id: string;
   cliente_id: string;
@@ -41,6 +43,8 @@ export interface Post {
   visivel_cliente: boolean;
   /** Reprovada pelo cliente e refeita pela equipe, ainda sem reenvio. */
   refeito: boolean;
+  /** 'criativo' = criativo de tráfego pago (sem meta, link de aprovação próprio). */
+  categoria?: Categoria;
   enviado_em: string | null;
   decidido_em: string | null;
   lembrete_em: string | null;
@@ -65,7 +69,7 @@ export const CONFIG_PADRAO: ConfigGestao = {
 
 export type Visao = 'carteira' | 'tabela' | 'semana';
 
-export type AbaGestao = 'conteudos' | 'semana' | 'ideias' | 'datas';
+export type AbaGestao = 'conteudos' | 'semana' | 'ideias' | 'datas' | 'criativos';
 
 // ---------- Ideias de conteúdo (aprovação antes da produção) ----------
 export type StatusIdeia = 'rascunho' | 'enviada' | 'aprovada' | 'reprovada';
@@ -164,6 +168,12 @@ export const FORMATO_OPCOES: { value: ConteudoTipo; label: string }[] = [
   { value: 'estatico', label: 'Estático' },
 ];
 
+export const FORMATO_CRIATIVO_OPCOES: { value: ConteudoTipo; label: string }[] = [
+  { value: 'estatico', label: 'Imagem' },
+  { value: 'reels', label: 'Vídeo' },
+  { value: 'carrossel', label: 'Carrossel' },
+];
+
 export const MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
@@ -259,6 +269,49 @@ export function mensagemAprovacao(p: { link: string }): string {
 
 ` +
     `Segue o link dos materiais abaixo:
+${p.link}`
+  );
+}
+
+/** Texto padrão enviado ao cliente com o link de aprovação dos criativos de tráfego pago. */
+export function mensagemCriativos(p: { link: string }): string {
+  return (
+    `Olá pessoal, tudo bem?
+
+` +
+    `Passando para enviar os criativos das campanhas (tráfego pago) para aprovação.
+
+` +
+    `Segue o link para ver e aprovar:
+${p.link}
+
+` +
+    `Se algum precisar de ajuste, é só reprovar e explicar o que mudar. Obrigado!`
+  );
+}
+
+export function mensagemLembreteCriativos(p: { qtd: number; link: string }): string {
+  return (
+    `Olá pessoal, tudo bem?
+
+` +
+    `Passando pra lembrar que ${p.qtd === 1 ? 'há 1 criativo' : `há ${p.qtd} criativos`} ` +
+    `que vocês ainda não aprovaram.
+
+` +
+    `Segue o link para aprovar:
+${p.link}
+
+Obrigado!`
+  );
+}
+
+export function mensagemReenvioCriativos(p: { link: string }): string {
+  return (
+    `Pessoal, os criativos foram alterados, seguem para aprovação novamente.
+
+` +
+    `Segue o link dos criativos abaixo:
 ${p.link}`
   );
 }

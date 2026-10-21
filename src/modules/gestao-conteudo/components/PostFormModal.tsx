@@ -6,7 +6,7 @@ import { Select } from '@/shared/ui/Select';
 import { Textarea } from '@/shared/ui/Textarea';
 import { useSalvarPost } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
-  FORMATO_OPCOES, driveInfo, type Post, type PostForm,
+  FORMATO_CRIATIVO_OPCOES, FORMATO_OPCOES, driveInfo, type Categoria, type Post, type PostForm,
 } from '@/modules/gestao-conteudo/types';
 import type { ConteudoTipo } from '@/modules/conteudo/types';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
@@ -19,13 +19,16 @@ interface Props {
   mes: string;
   post?: Post;
   semanaInicial?: number;
+  /** Criativo de tráfego: sem semana nem dia de postagem. */
+  categoria?: Categoria;
 }
 
 const VAZIO: PostForm = {
   titulo: '', descricao: '', formato: 'reels', semana: 1, dia_postagem: null, link_drive: '',
 };
 
-export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInicial }: Props) {
+export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInicial, categoria = 'organico' }: Props) {
+  const criativo = categoria === 'criativo';
   const salvar = useSalvarPost();
   const [form, setForm] = useState<PostForm>(VAZIO);
   const [erro, setErro] = useState<string | null>(null);
@@ -45,14 +48,14 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
   const info = driveInfo(form.link_drive);
 
   function handleSalvar() {
-    if (!form.titulo.trim()) { setErro('Informe o título do conteúdo.'); return; }
+    if (!form.titulo.trim()) { setErro(`Informe o título do ${criativo ? 'criativo' : 'conteúdo'}.`); return; }
     if (form.link_drive?.trim() && info.tipo === 'invalido') {
       setErro('Link inválido. Cole o link de compartilhamento do Google Drive.');
       return;
     }
     setErro(null);
     salvar.mutate(
-      { id: post?.id, clienteId, mes, dados: { ...form, titulo: form.titulo.trim() } },
+      { id: post?.id, clienteId, mes, categoria, dados: { ...form, titulo: form.titulo.trim() } },
       {
         onSuccess: onClose,
         onError: (e) => setErro(`Não foi possível salvar: ${(e as Error).message}`),
@@ -64,7 +67,7 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
     <Modal
       open={open}
       onClose={onClose}
-      title={post ? 'Editar conteúdo' : 'Novo conteúdo'}
+      title={`${post ? 'Editar' : 'Novo'} ${criativo ? 'criativo' : 'conteúdo'}`}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Cancelar</Button>
@@ -79,19 +82,27 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
           <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{erro}</p>
         )}
         <Input label="Título *" value={form.titulo} onChange={(e) => set('titulo', e.target.value)}
-          placeholder="Ex: Reels — bastidores da produção" autoFocus />
-        <Textarea label="Legenda / descrição" rows={3} value={form.descricao}
+          placeholder={criativo ? 'Ex: Criativo 01 — oferta de outubro' : 'Ex: Reels — bastidores da produção'} autoFocus />
+        <Textarea label={criativo ? 'Copy / descrição' : 'Legenda / descrição'} rows={3} value={form.descricao}
           onChange={(e) => set('descricao', e.target.value)} />
-        <div className="grid grid-cols-2 gap-3">
+        {criativo ? (
           <Select label="Formato" value={form.formato}
             onChange={(e) => set('formato', e.target.value as ConteudoTipo)}
-            options={FORMATO_OPCOES} />
-          <Select label="Semana do mês" value={String(form.semana)}
-            onChange={(e) => set('semana', Number(e.target.value))}
-            options={semanasRotuladas(mes).map((s) => ({ value: String(s.numero), label: s.label }))} />
-        </div>
-        <Input label="Dia da postagem" type="date" value={form.dia_postagem ?? ''}
-          onChange={(e) => set('dia_postagem', e.target.value || null)} />
+            options={FORMATO_CRIATIVO_OPCOES} />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <Select label="Formato" value={form.formato}
+                onChange={(e) => set('formato', e.target.value as ConteudoTipo)}
+                options={FORMATO_OPCOES} />
+              <Select label="Semana do mês" value={String(form.semana)}
+                onChange={(e) => set('semana', Number(e.target.value))}
+                options={semanasRotuladas(mes).map((s) => ({ value: String(s.numero), label: s.label }))} />
+            </div>
+            <Input label="Dia da postagem" type="date" value={form.dia_postagem ?? ''}
+              onChange={(e) => set('dia_postagem', e.target.value || null)} />
+          </>
+        )}
         <div className="space-y-1">
           <Input label="Link do arquivo no Drive" type="url" inputMode="url"
             placeholder="https://drive.google.com/file/d/…"

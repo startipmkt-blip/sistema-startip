@@ -75,7 +75,7 @@ serve(async (req) => {
       .eq('cliente_id', clienteId).maybeSingle(),
     sb.from('conteudo_aprovacao')
       .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia')
-      .eq('cliente_id', clienteId).eq('mes_referencia', mes).eq('visivel_cliente', true)
+      .eq('cliente_id', clienteId).eq('mes_referencia', mes).eq('visivel_cliente', true).eq('categoria', 'organico')
       .order('semana').order('created_at'),
   ]);
 

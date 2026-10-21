@@ -24,7 +24,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from as any)('designer_demandas')
-      .select('id, cliente_id, titulo, descricao, briefing, tipo, status, prazo, concluido_em, created_at, link_conteudo, semana_ref')
+      .select('id, cliente_id, titulo, descricao, briefing, tipo, categoria, status, prazo, concluido_em, created_at, link_conteudo, semana_ref')
       .eq('id', demandaId)
       .maybeSingle();
     if (error || !data) return;
@@ -42,6 +42,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
     const semana = semanaDe(mes, pos.ref).numero;
     const formato = formatoDaDemanda(data.tipo as DesignerTipo);
     const link = ((data.link_conteudo ?? '') as string).trim() || null;
+    const categoria = data.categoria === 'criativo' ? 'criativo' : 'organico';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tbl = (supabase.from as any)('conteudo_aprovacao');
@@ -63,6 +64,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
           formato,
           mes_referencia: mes,
           semana,
+          categoria,
           // Só repassa quando há link: nunca apaga o que o gestor já colou no post.
           ...(link ? { link_drive: link } : {}),
           ...refeita,
@@ -73,6 +75,7 @@ export async function sincronizarGestaoConteudo(demandaId: string): Promise<void
         cliente_id: data.cliente_id,
         mes_referencia: mes,
         semana,
+        categoria,
         titulo: data.titulo,
         descricao: '',
         formato,

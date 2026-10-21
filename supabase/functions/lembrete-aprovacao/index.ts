@@ -50,7 +50,7 @@ serve(async () => {
 
   let consulta = sb
     .from('conteudo_aprovacao')
-    .select('id, cliente_id, mes_referencia, lembretes_enviados, enviado_em')
+    .select('id, cliente_id, mes_referencia, lembretes_enviados, enviado_em, categoria')
     .eq('etapa', 'enviado')
     .eq('status', 'pendente')
     .eq('visivel_cliente', true)
@@ -60,18 +60,21 @@ serve(async () => {
   const { data: posts, error } = await consulta;
   if (error) return json({ ok: false, erro: error.message }, 500);
 
+  // Orgânico e criativos de tráfego têm links próprios: um lembrete por cliente e categoria.
   const porCliente = new Map<string, any[]>();
   for (const p of posts ?? []) {
-    const lista = porCliente.get((p as any).cliente_id) ?? [];
+    const chave = `${(p as any).cliente_id}|${(p as any).categoria === 'criativo' ? 'criativo' : 'organico'}`;
+    const lista = porCliente.get(chave) ?? [];
     lista.push(p);
-    porCliente.set((p as any).cliente_id, lista);
+    porCliente.set(chave, lista);
   }
 
   let enviados = 0;
   const semContato: string[] = [];
   const falhas: string[] = [];
 
-  for (const [clienteId, lista] of porCliente) {
+  for (const [chave, lista] of porCliente) {
+    const [clienteId, categoria] = chave.split('|');
     const { data: cli } = await sb
       .from('clientes').select('nome, whatsapp_chat_id, central_slug').eq('id', clienteId).maybeSingle();
     const c = cli as any;
@@ -81,10 +84,11 @@ serve(async () => {
     // Ate 48h de espera: pergunta simples. Depois de 48h sem resposta: cobra a aprovacao.
     const maisAntigo = Math.min(...lista.map((p: any) => new Date(p.enviado_em).getTime()));
     const passou48h = Date.now() - maisAntigo >= 48 * 3600_000;
-    const link = `${SITE}/aprovar/${c.central_slug}?mes=${mes}`;
+    const criativo = categoria === 'criativo';
+    const link = `${SITE}/${criativo ? 'aprovar-criativos' : 'aprovar'}/${c.central_slug}?mes=${mes}`;
     const texto = passou48h
-      ? `Lembrando que os materiais orgânicos ainda não foram aprovados. Segue o link abaixo.\n\n${link}`
-      : `Oi, conseguiram olhar os conteúdos orgânicos?\n\n${link}`;
+      ? `Lembrando que os ${criativo ? 'criativos' : 'materiais orgânicos'} ainda não foram aprovados. Segue o link abaixo.\n\n${link}`
+      : `Oi, conseguiram olhar os ${criativo ? 'criativos' : 'conteúdos orgânicos'}?\n\n${link}`;
 
     const ok = await enviarWhatsapp(c.whatsapp_chat_id, texto);
     if (!ok) { falhas.push(c.nome); continue; }

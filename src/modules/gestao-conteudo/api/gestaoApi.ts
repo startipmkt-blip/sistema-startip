@@ -1,25 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
-import type { ConfigGestao, Etapa, Post, PostForm } from '@/modules/gestao-conteudo/types';
+import type { Categoria, ConfigGestao, Etapa, Post, PostForm } from '@/modules/gestao-conteudo/types';
 import {
-  CONFIG_PADRAO, mensagemAprovacao, mensagemLembrete, mensagemReenvio, mesmoDiaEmOutroMes,
+  CONFIG_PADRAO, mensagemAprovacao, mensagemCriativos, mensagemLembrete, mensagemLembreteCriativos,
+  mensagemReenvio, mensagemReenvioCriativos, mesmoDiaEmOutroMes,
 } from '@/modules/gestao-conteudo/types';
 
 const chaves = {
-  mes: (mes: string) => ['gestao-conteudo', 'mes', mes] as const,
+  mes: (mes: string, categoria: Categoria) => ['gestao-conteudo', 'mes', mes, categoria] as const,
   todos: ['gestao-conteudo'] as const,
 };
 
 // ---------- Leitura ----------
-export function usePostsDoMes(mes: string) {
+export function usePostsDoMes(mes: string, categoria: Categoria = 'organico') {
   return useQuery({
-    queryKey: chaves.mes(mes),
+    queryKey: chaves.mes(mes, categoria),
     queryFn: async (): Promise<Post[]> => {
       if (IS_DEMO) return [];
       const { data, error } = await supabase
         .from('conteudo_aprovacao')
         .select('*')
+        .eq('categoria', categoria)
         .eq('mes_referencia', mes)
         .order('semana', { ascending: true })
         .order('dia_postagem', { ascending: true, nullsFirst: false })
@@ -39,6 +41,7 @@ export function usePostsPeriodo(inicio: string, fim: string) {
       const { data, error } = await supabase
         .from('conteudo_aprovacao')
         .select('*')
+        .eq('categoria', 'organico')
         .gte('dia_postagem', inicio)
         .lte('dia_postagem', fim)
         .order('dia_postagem', { ascending: true })
@@ -94,7 +97,7 @@ function useInvalidar() {
 export function useSalvarPost() {
   const invalidar = useInvalidar();
   return useMutation({
-    mutationFn: async (p: { id?: string; clienteId: string; mes: string; dados: PostForm }) => {
+    mutationFn: async (p: { id?: string; clienteId: string; mes: string; dados: PostForm; categoria?: Categoria }) => {
       if (IS_DEMO) return;
       const payload = {
         ...p.dados,
@@ -121,6 +124,7 @@ export function useSalvarPost() {
           ...payload,
           cliente_id: p.clienteId,
           mes_referencia: p.mes,
+          categoria: p.categoria ?? 'organico',
           // nasce interno: o cliente só vê depois de "enviar para aprovação"
           visivel_cliente: false,
           etapa: 'em_edicao',
@@ -187,8 +191,9 @@ export function useSalvarMeta() {
 }
 
 // ---------- WhatsApp ----------
-export function linkAprovacao(slug: string, mes: string): string {
-  return `${window.location.origin}/aprovar/${slug}?mes=${mes}`;
+export function linkAprovacao(slug: string, mes: string, categoria: Categoria = 'organico'): string {
+  const rota = categoria === 'criativo' ? 'aprovar-criativos' : 'aprovar';
+  return `${window.location.origin}/${rota}/${slug}?mes=${mes}`;
 }
 
 async function erroDaFuncao(error: unknown): Promise<string> {
@@ -205,7 +210,7 @@ export function useEnviarParaAprovacao() {
   return useMutation({
     mutationFn: async (p: {
       clienteId: string; clienteNome: string; slug: string | null | undefined;
-      mes: string; ids: string[]; texto?: string;
+      mes: string; ids: string[]; texto?: string; categoria?: Categoria;
     }) => {
       if (p.ids.length === 0) throw new Error('Selecione ao menos um conteúdo.');
       if (!p.slug) {
@@ -221,7 +226,9 @@ export function useEnviarParaAprovacao() {
         .in('id', p.ids);
       if (eUp) throw eUp;
 
-      const texto = p.texto?.trim() || mensagemAprovacao({ link: linkAprovacao(p.slug, p.mes) });
+      const link = linkAprovacao(p.slug, p.mes, p.categoria);
+      const texto = p.texto?.trim()
+        || (p.categoria === 'criativo' ? mensagemCriativos({ link }) : mensagemAprovacao({ link }));
       const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
         body: { cliente_id: p.clienteId, texto },
       });
@@ -246,7 +253,7 @@ export function useReenviarAlterados() {
   const invalidar = useInvalidar();
   return useMutation({
     mutationFn: async (p: {
-      clienteId: string; slug: string | null | undefined; mes: string; ids: string[];
+      clienteId: string; slug: string | null | undefined; mes: string; ids: string[]; categoria?: Categoria;
     }) => {
       if (p.ids.length === 0) throw new Error('Não há conteúdo alterado para reenviar.');
       if (!p.slug) {
@@ -263,7 +270,12 @@ export function useReenviarAlterados() {
       if (eUp) throw eUp;
 
       const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
-        body: { cliente_id: p.clienteId, texto: mensagemReenvio({ link: linkAprovacao(p.slug, p.mes) }) },
+        body: {
+          cliente_id: p.clienteId,
+          texto: (p.categoria === 'criativo' ? mensagemReenvioCriativos : mensagemReenvio)({
+            link: linkAprovacao(p.slug, p.mes, p.categoria),
+          }),
+        },
       });
       if (error) {
         // o cliente não foi avisado: devolve as peças ao estado anterior
@@ -323,13 +335,14 @@ export function useLembrarCliente() {
   return useMutation({
     mutationFn: async (p: {
       clienteId: string; clienteNome: string; slug: string | null | undefined;
-      mes: string; ids: string[];
+      mes: string; ids: string[]; categoria?: Categoria;
     }) => {
       if (!p.slug) throw new Error('Este cliente ainda não tem link público.');
       if (p.ids.length === 0) throw new Error('Não há conteúdos aguardando aprovação.');
-      const texto = mensagemLembrete({
-        clienteNome: p.clienteNome, qtd: p.ids.length, link: linkAprovacao(p.slug, p.mes),
-      });
+      const link = linkAprovacao(p.slug, p.mes, p.categoria);
+      const texto = p.categoria === 'criativo'
+        ? mensagemLembreteCriativos({ qtd: p.ids.length, link })
+        : mensagemLembrete({ clienteNome: p.clienteNome, qtd: p.ids.length, link });
       const { error } = await supabase.functions.invoke('enviar-aviso-whatsapp', {
         body: { cliente_id: p.clienteId, texto },
       });

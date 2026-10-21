@@ -49,6 +49,14 @@ function carimbos(de: DesignerStatus | undefined, para: DesignerStatus, jaInicia
 export type DesignerStatus = 'a_fazer' | 'alteracao' | 'em_andamento' | 'aprovacao' | 'concluido';
 export type DesignerOrigem = 'manual' | 'ideia_aprovada' | 'calendario';
 export type DesignerTipo = 'post' | 'carrossel' | 'reels' | 'story' | 'web' | 'extra';
+/** 'criativo' = criativo de tráfego pago: vai para a aba Criativos da Gestão de Conteúdo. */
+export type DesignerCategoria = 'organico' | 'criativo';
+
+/** Nome do tipo quando a demanda é um criativo (post = imagem, reels = vídeo). */
+export const TIPO_LABEL_CRIATIVO: Partial<Record<DesignerTipo, string>> = {
+  post: 'Imagem', reels: 'Vídeo', carrossel: 'Carrossel',
+};
+export const TIPOS_CRIATIVO: DesignerTipo[] = ['post', 'reels', 'carrossel'];
 
 export const STATUS_COLUNAS: Array<{ id: DesignerStatus; label: string; cor: string; emoji: string }> = [
   { id: 'a_fazer',      label: 'A fazer',        cor: 'slate',   emoji: '📥' },
@@ -76,6 +84,7 @@ export interface DesignerDemanda {
   descricao: string | null;
   briefing: string | null;
   tipo: DesignerTipo;
+  categoria?: DesignerCategoria;
   status: DesignerStatus;
   responsavel_id: string | null;
   responsavel_nome?: string | null;
@@ -109,6 +118,7 @@ interface Filtros {
   clienteId?: string | null;
   responsavelId?: string | null;
   tipo?: DesignerTipo | null;
+  categoria?: DesignerCategoria | null;
   q?: string;
   periodo?: { ini: string; fim: string } | null;
   /** Restringe a demandas desses clientes (grupo orgânico / só tráfego). */
@@ -168,6 +178,7 @@ export function useDemandas(filtros: Filtros = {}) {
         if (filtros.clienteId && r.cliente_id !== filtros.clienteId) return false;
         if (filtros.responsavelId && r.responsavel_id !== filtros.responsavelId) return false;
         if (filtros.tipo && r.tipo !== filtros.tipo) return false;
+        if (filtros.categoria && (r.categoria ?? 'organico') !== filtros.categoria) return false;
         if (filtros.clienteIds && (!r.cliente_id || !filtros.clienteIds.includes(r.cliente_id))) return false;
         if (filtros.periodo) {
           const ref = r.ref_data ?? '';
@@ -192,6 +203,7 @@ interface UpsertInput {
   descricao?: string | null;
   briefing?: string | null;
   tipo: DesignerTipo;
+  categoria?: DesignerCategoria;
   status?: DesignerStatus;
   responsavel_id?: string | null;
   prazo?: string | null;
@@ -218,6 +230,7 @@ async function renovarDemanda(id: string, criadoPor: string | null): Promise<voi
   const semana = d.semana_ref?.slice(0, 10) ?? null;
   const { error: errIns } = await tbl.insert({
     cliente_id: d.cliente_id, titulo: d.titulo, descricao: d.descricao, briefing: d.briefing, tipo: d.tipo,
+    categoria: d.categoria ?? 'organico',
     status: 'a_fazer', responsavel_id: d.responsavel_id, origem: 'manual', renovacao: d.renovacao,
     prazo: d.prazo ? proximaData(d.prazo, d.renovacao) : null,
     // Sem prazo, a semana define onde a demanda aparece no quadro: empurra a de agora para a próxima.

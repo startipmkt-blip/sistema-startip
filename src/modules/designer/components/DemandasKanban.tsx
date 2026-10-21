@@ -4,7 +4,7 @@ import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import {
   useDemandas, useMoverStatus, useTempoDesigner, STATUS_COLUNAS,
-  type DesignerDemanda, type DesignerStatus,
+  type DesignerDemanda, type DesignerStatus, type DesignerCategoria,
 } from '../api/demandasApi';
 import { DemandaCard } from './DemandaCard';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
@@ -15,14 +15,15 @@ interface Props {
   q?: string;
   periodo?: { ini: string; fim: string } | null;
   clienteIds?: string[] | null;
+  categoria?: DesignerCategoria | null;
   onEditar: (d: DesignerDemanda) => void;
   onNova: (status: DesignerStatus) => void;
   /** Gera as demandas da semana a partir da meta de cada cliente (coluna A fazer). */
   onGerarSemana?: () => void;
 }
 
-export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, onEditar, onNova, onGerarSemana }: Props) {
-  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds });
+export function DemandasKanban({ clienteId, responsavelId, q, periodo, clienteIds, categoria, onEditar, onNova, onGerarSemana }: Props) {
+  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds, categoria });
   const { data: tempos } = useTempoDesigner();
   const mover = useMoverStatus();
   const [arrastando, setArrastando] = useState<string | null>(null);

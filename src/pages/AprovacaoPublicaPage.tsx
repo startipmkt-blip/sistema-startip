@@ -42,12 +42,17 @@ const FORMATO_LABEL: Record<string, string> = {
   reels: 'Reels', carrossel: 'Carrossel', estatico: 'Estático', story: 'Story', video: 'Vídeo',
 };
 
+const FORMATO_CRIATIVO_LABEL: Record<string, string> = { estatico: 'Imagem', reels: 'Vídeo', carrossel: 'Carrossel' };
+
 function formatMes(mes: string): string {
   const [y, m] = mes.split('-').map(Number);
   return new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 }
 
-export function AprovacaoPublicaPage() {
+/** `tipo="criativos"`: link próprio de aprovação dos criativos de tráfego pago (/aprovar-criativos/:slug). */
+export function AprovacaoPublicaPage({ tipo }: { tipo?: 'criativos' } = {}) {
+  const criativos = tipo === 'criativos';
+  const rotulo = criativos ? 'criativo' : 'conteúdo';
   const { slug = '' } = useParams<{ slug: string }>();
   const [query] = useSearchParams();
   const mesDoLink = query.get('mes') ?? undefined;
@@ -58,7 +63,7 @@ export function AprovacaoPublicaPage() {
   const [reprovar, setReprovar] = useState<Ideia | null>(null);
   const [justificativa, setJustificativa] = useState('');
   const [salvando, setSalvando] = useState(false);
-  const chaveAprovador = `aprovador-${slug}`;
+  const chaveAprovador = `aprovador-${slug}${criativos ? '-criativos' : ''}`;
   const [aprovadorId, setAprovadorId] = useState<string>(() => {
     try { return localStorage.getItem(chaveAprovador) ?? ''; } catch { return ''; }
   });
@@ -71,6 +76,7 @@ export function AprovacaoPublicaPage() {
     try {
       const u = new URL(FN_URL);
       u.searchParams.set('slug', slug);
+      if (criativos) u.searchParams.set('tipo', 'criativos');
       if (mesAlvo) u.searchParams.set('mes', mesAlvo);
       const r = await fetch(u.toString(), { cache: 'no-store' });
       const body = await r.json().catch(() => ({}));
@@ -121,7 +127,7 @@ export function AprovacaoPublicaPage() {
     const alvo = mes ?? dados?.mes;
     if (!alvo) return;
     const n = dados?.ideias.filter((i) => i.status === 'pendente').length ?? 0;
-    if (!confirm(`Aprovar todos os ${n} conteúdos pendentes deste mês?
+    if (!confirm(`Aprovar todos os ${n} ${rotulo}s pendentes deste mês?
 
 Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
     setSalvando(true);
@@ -129,7 +135,10 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
       const r = await fetch(FN_URL, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, mes: alvo, acao: 'aprovar_todos', aprovador_id: aprovadorId || undefined }),
+        body: JSON.stringify({
+          slug, mes: alvo, acao: 'aprovar_todos', aprovador_id: aprovadorId || undefined,
+          ...(criativos ? { tipo: 'criativos' } : {}),
+        }),
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(body?.error ?? 'erro');
@@ -168,14 +177,14 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
         <header className="text-center">
           {c.logo_url && <LogoCliente src={c.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />}
           <h1 className="text-2xl font-semibold text-white">{c.nome}</h1>
-          <p className="mt-1 text-xs text-slate-400">Aprovação de Conteúdo · Startip</p>
+          <p className="mt-1 text-xs text-slate-400">{criativos ? 'Aprovação de Criativos · Tráfego pago · Startip' : 'Aprovação de Conteúdo · Startip'}</p>
         </header>
 
         {emConjunto && (
           <div className="rounded-2xl border border-brand-400/30 bg-brand-500/10 p-4 text-center">
-            <p className="text-sm font-medium text-white">Este conteúdo é aprovado em conjunto.</p>
+            <p className="text-sm font-medium text-white">Este {rotulo} é aprovado em conjunto.</p>
             <p className="mt-0.5 text-xs text-slate-300">
-              Cada pessoa aprova por si e o conteúdo só fica aprovado quando todos aprovarem. Quem está aprovando agora?
+              Cada pessoa aprova por si e o {rotulo} só fica aprovado quando todos aprovarem. Quem está aprovando agora?
             </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
               {aprovadores.map((a) => (
@@ -212,12 +221,12 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
         </div>
 
         <div className="text-center text-xs text-slate-400">
-          {glassify(dados.ideias.length === 0 ? 'Nenhum conteúdo publicado neste mês ainda.' :
-            pendentes === 0 ? '✅ Todos os conteúdos deste mês já foram decididos.' :
+          {glassify(dados.ideias.length === 0 ? `Nenhum ${rotulo} publicado neste mês ainda.` :
+            pendentes === 0 ? `✅ Todos os ${rotulo}s deste mês já foram decididos.` :
               emConjunto && !eu ? 'Escolha seu nome acima para aprovar.' :
                 pendentes === 0 && dados.ideias.some((i) => i.status === 'pendente')
                   ? 'Você já decidiu tudo o que era seu. Aguardando os demais aprovadores.'
-                  : `${pendentes} conteúdo(s) aguardando sua decisão.`)}
+                  : `${pendentes} ${rotulo}(s) aguardando sua decisão.`)}
         </div>
 
         {pendentes >= 2 && (
@@ -228,24 +237,26 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
           </div>
         )}
 
-        {/* Cards de ideias agrupados por semana */}
+        {/* Conteúdos agrupados por semana; criativos de tráfego não têm semana: lista única */}
         <div className="space-y-6">
-          {[1, 2, 3, 4].map((semana) => {
-            const daSemana = dados.ideias.filter((i) => i.semana === semana);
+          {(criativos ? [0] : [1, 2, 3, 4]).map((semana) => {
+            const daSemana = criativos ? dados.ideias : dados.ideias.filter((i) => i.semana === semana);
             if (daSemana.length === 0) return null;
             return (
               <section key={semana}>
-                <div className="mb-3 flex items-center gap-3">
-                  <span className="rounded-full border border-brand-400/30 bg-brand-500/10 px-3 py-1 text-sm font-semibold text-brand-200">
-                    Semana {semana}
-                  </span>
-                  <div className="h-px flex-1 bg-white/10" />
-                </div>
+                {!criativos && (
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="rounded-full border border-brand-400/30 bg-brand-500/10 px-3 py-1 text-sm font-semibold text-brand-200">
+                      Semana {semana}
+                    </span>
+                    <div className="h-px flex-1 bg-white/10" />
+                  </div>
+                )}
                 <div className="grid gap-4 sm:grid-cols-2">
                   {daSemana.map((i) => (
                     <div key={i.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-sm">
                       <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <Badge tone="slate">{FORMATO_LABEL[i.formato] ?? i.formato}</Badge>
+                        <Badge tone="slate">{(criativos ? FORMATO_CRIATIVO_LABEL[i.formato] : undefined) ?? FORMATO_LABEL[i.formato] ?? i.formato}</Badge>
                         <Badge tone={i.status === 'aprovado' ? 'green' : i.status === 'reprovado' ? 'red' : 'amber'}>
                           {i.status === 'pendente' ? 'Aguardando' : i.status === 'aprovado'
                             ? (i.etapa === 'programado' ? 'Aprovado · programado' : 'Aprovado')

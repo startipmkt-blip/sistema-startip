@@ -6,7 +6,7 @@ import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
-import { useDemandas, useDemandasRealtime, type DesignerDemanda, type DesignerStatus } from '../api/demandasApi';
+import { useDemandas, useDemandasRealtime, type DesignerCategoria, type DesignerDemanda, type DesignerStatus } from '../api/demandasApi';
 import { DemandasKanban } from '../components/DemandasKanban';
 import { HistoricoDesigner } from '../components/HistoricoDesigner';
 import { ResumoDesigner } from '../components/ResumoDesigner';
@@ -19,6 +19,13 @@ import { ConteudoPage } from '@/modules/conteudo/pages/ConteudoPage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
 type GrupoCliente = 'todos' | 'organico' | 'trafego';
+type FiltroCategoria = 'todas' | DesignerCategoria;
+
+const CATEGORIAS: Array<{ id: FiltroCategoria; label: string; ajuda: string }> = [
+  { id: 'todas',    label: 'Todas as demandas',            ajuda: 'Orgânico e criativos juntos' },
+  { id: 'organico', label: '📱 Conteúdo orgânico',          ajuda: 'Posts, carrosséis, reels e stories das redes sociais' },
+  { id: 'criativo', label: '🎯 Criativos de tráfego pago',  ajuda: 'Criativos que vão para a aba Criativos da Gestão de Conteúdo' },
+];
 
 const GRUPOS: Array<{ id: GrupoCliente; label: string; ajuda: string }> = [
   { id: 'todos',    label: '👥 Todos os clientes',        ajuda: 'Todos os clientes' },
@@ -76,6 +83,8 @@ function AbaDemandas() {
     () => semanaDe(mesDaSemana(hojeLocal()), hojeLocal()).numero,
   );
   const [grupo, setGrupo] = useState<GrupoCliente>('todos');
+  const [categoria, setCategoria] = useState<FiltroCategoria>('todas');
+  const categoriaFiltro = categoria === 'todas' ? null : categoria;
   const periodo = useMemo(() => {
     if (semana === null) return periodoDoMes(mes);
     const s = semanasDoMes(mes).find((x) => x.numero === semana);
@@ -164,6 +173,24 @@ function AbaDemandas() {
         ))}
       </div>
 
+      <div className="flex flex-wrap gap-1.5">
+        {CATEGORIAS.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            title={c.ajuda}
+            onClick={() => setCategoria(c.id)}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              categoria === c.id
+                ? 'border-orange-400 bg-orange-500/20 text-orange-100'
+                : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+            }`}
+          >
+            {glassify(c.label)}
+          </button>
+        ))}
+      </div>
+
       <PeriodoSeletor mes={mes} semana={semana} onMes={setMes} onSemana={setSemana} />
 
       <div className="flex gap-1 border-b border-white/10">
@@ -188,6 +215,7 @@ function AbaDemandas() {
           q={busca}
           periodo={periodo}
           clienteIds={clienteIds}
+          categoria={categoriaFiltro}
           onEditar={abrir}
           onNova={(status) => abrir(null, status)}
           onGerarSemana={() => setGerarAberto(true)}
@@ -199,12 +227,13 @@ function AbaDemandas() {
           q={busca}
           periodo={periodo}
           clienteIds={clienteIds}
+          categoria={categoriaFiltro}
           onEditar={abrir}
         />
       )}
 
       <GerarSemanaModal open={gerarAberto} onClose={() => setGerarAberto(false)} semanaInicial={semanaSugerida} />
-      <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} statusInicial={statusNovo} semanaSugerida={semanaSugerida} />
+      <DemandaFormModal open={modalAberto} onClose={() => setModalAberto(false)} demanda={editando} statusInicial={statusNovo} semanaSugerida={semanaSugerida} categoriaInicial={categoriaFiltro ?? 'organico'} />
     </div>
   );
 }

@@ -8,6 +8,11 @@
 // GET  /?slug&mes&tipo=ideias
 // POST /  { tipo:'ideias', slug, id, status:'aprovada'|'reprovada', justificativa }
 // POST /  { tipo:'ideias', slug, mes, acao:'aprovar_todos' }
+// CRIATIVOS DE TRÁFEGO PAGO (conteudo_aprovacao.categoria = 'criativo') — link próprio
+// /aprovar-criativos/:slug, nunca misturado com o orgânico:
+// GET  /?slug&mes&tipo=criativos
+// POST /  { tipo:'criativos', slug, mes, acao:'aprovar_todos' }
+// (aprovar/reprovar um item por id funciona igual nos dois links)
 // Sem JWT. A validação é o slug do cliente + o vínculo id→cliente.
 // =============================================================
 
@@ -71,6 +76,7 @@ async function devolverAoDesigner(sb: any, post: any, justificativa: string): Pr
         titulo: `Ajuste: ${post.titulo}`,
         descricao: post.link_drive ? `Material reprovado: ${post.link_drive}` : null,
         tipo: TIPO_DESIGNER[post.formato] ?? 'post',
+        categoria: post.categoria ?? 'organico',
         status: 'alteracao',
         origem: 'manual',
         post_id: post.id,
@@ -112,6 +118,10 @@ async function finalizarSeTodosAprovaram(sb: any, postIds: string[], aprovadorId
     .select('id');
   return (ok ?? []).length;
 }
+
+type Categoria = 'organico' | 'criativo';
+const categoriaDoTipo = (tipo?: string | null): Categoria => (tipo === 'criativos' ? 'criativo' : 'organico');
+const rotuloDe = (c: Categoria) => (c === 'criativo' ? 'criativo' : 'conteúdo');
 
 function mesAtual(): string {
   const d = new Date();
@@ -159,10 +169,13 @@ serve(async (req) => {
       return json({ cliente: cli, mes: mesAlvo, meses: mesesIdeias, ideias: lista ?? [] });
     }
 
+    const categoria = categoriaDoTipo(url.searchParams.get('tipo'));
+
     const { data: ideias } = await sb
       .from('conteudo_aprovacao')
       .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia, link_drive, etapa')
       .eq('cliente_id', (cli as any).id)
+      .eq('categoria', categoria)
       .eq('mes_referencia', mes)
       .neq('visivel_cliente', false) // rascunhos internos nunca aparecem para o cliente
       .order('semana', { ascending: true })
@@ -173,6 +186,7 @@ serve(async (req) => {
       .from('conteudo_aprovacao')
       .select('mes_referencia')
       .eq('cliente_id', (cli as any).id)
+      .eq('categoria', categoria)
       .neq('visivel_cliente', false);
     const mesesUnicos = [...new Set((meses ?? []).map((m: any) => m.mes_referencia))]
       .sort((a: string, b: string) => b.localeCompare(a));
@@ -200,7 +214,7 @@ serve(async (req) => {
     const comVotos = lista.map((i) => ({ ...i, votos: votosPorPost.get(i.id) ?? [] }));
 
     return json({
-      cliente: cli, mes, meses: mesesUnicos, ideias: comVotos,
+      cliente: cli, mes, meses: mesesUnicos, ideias: comVotos, categoria,
       aprovadores: (aprovadores ?? []).length >= 2 ? aprovadores : [],
     });
   }
@@ -264,6 +278,7 @@ serve(async (req) => {
     }
 
     // Aprovar todos os pendentes de um mês de uma vez
+    const categoriaPost = categoriaDoTipo(tipo);
     if (acao === 'aprovar_todos') {
       if (!slug || !mes) return json({ error: 'parâmetros faltando' }, 400);
       const { data: cli } = await sb.from('clientes').select('id, nome').eq('central_slug', slug).maybeSingle();
@@ -276,7 +291,7 @@ serve(async (req) => {
         if (!apr) return json({ error: 'informe quem está aprovando' }, 400);
         const { data: pend } = await sb
           .from('conteudo_aprovacao').select('id')
-          .eq('cliente_id', (cli as any).id).eq('mes_referencia', mes)
+          .eq('cliente_id', (cli as any).id).eq('mes_referencia', mes).eq('categoria', categoriaPost)
           .eq('status', 'pendente').neq('visivel_cliente', false);
         const ids = ((pend ?? []) as any[]).map((p) => p.id);
         if (ids.length === 0) return json({ ok: true, aprovados: 0, finalizados: 0 });
@@ -291,7 +306,7 @@ serve(async (req) => {
         if (finalizados > 0) {
           await avisarEquipe(
             sb,
-            `✅ ${(cli as any).nome}: ${finalizados} conteúdo(s) de ${mes} aprovado(s) por todos os aprovadores.`,
+            `✅ ${(cli as any).nome}: ${finalizados} ${rotuloDe(categoriaPost)}(s) de ${mes} aprovado(s) por todos os aprovadores.`,
             'aprovacao',
           );
         }
@@ -303,6 +318,7 @@ serve(async (req) => {
         .update({ status: 'aprovado', justificativa: '' } as any)
         .eq('cliente_id', (cli as any).id)
         .eq('mes_referencia', mes)
+        .eq('categoria', categoriaPost)
         .eq('status', 'pendente')
         .neq('visivel_cliente', false)
         .select('id');
@@ -311,7 +327,9 @@ serve(async (req) => {
       if (qtd > 0) {
         await avisarEquipe(
           sb,
-          `✅ ${(cli as any).nome} aprovou ${qtd === 1 ? '1 conteúdo' : `${qtd} conteúdos`} de ${mes}.\n\n` +
+          `✅ ${(cli as any).nome} aprovou ${categoriaPost === 'criativo'
+            ? (qtd === 1 ? '1 criativo' : `${qtd} criativos`)
+            : (qtd === 1 ? '1 conteúdo' : `${qtd} conteúdos`)} de ${mes}.\n\n` +
           `Já pode programar a publicação.`,
           'aprovacao',
         );
@@ -331,7 +349,7 @@ serve(async (req) => {
     // valida que a ideia pertence ao cliente do slug
     const { data: ideia } = await sb
       .from('conteudo_aprovacao')
-      .select('id, cliente_id, visivel_cliente, titulo, mes_referencia, formato, link_drive, designer_demanda_id, status')
+      .select('id, cliente_id, visivel_cliente, titulo, mes_referencia, formato, link_drive, designer_demanda_id, status, categoria')
       .eq('id', id)
       .maybeSingle();
     if (!ideia || (ideia as any).cliente_id !== (cli as any).id || (ideia as any).visivel_cliente === false) {
@@ -380,6 +398,8 @@ serve(async (req) => {
       return json({ ok: true, finalizado: finalizados > 0 });
     }
 
+    const catItem: Categoria = (ideia as any).categoria === 'criativo' ? 'criativo' : 'organico';
+    const emoji = catItem === 'criativo' ? '🎯 ' : '';
     const { error } = await sb
       .from('conteudo_aprovacao')
       .update({ status, justificativa: justificativa ?? '' } as any)
@@ -390,7 +410,7 @@ serve(async (req) => {
       await devolverAoDesigner(sb, ideia, (justificativa ?? '').trim());
       await avisarEquipe(
         sb,
-        `❌ ${(cli as any).nome} não aprovou "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
+        `${emoji}❌ ${(cli as any).nome} não aprovou ${catItem === 'criativo' ? 'o criativo ' : ''}"${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
         `Alteração pedida: ${justificativa}`,
       );
     } else {
@@ -399,12 +419,15 @@ serve(async (req) => {
         .select('id', { count: 'exact', head: true })
         .eq('cliente_id', (cli as any).id)
         .eq('mes_referencia', (ideia as any).mes_referencia)
+        .eq('categoria', catItem)
         .eq('status', 'pendente')
         .neq('visivel_cliente', false);
       await avisarEquipe(
         sb,
-        `✅ ${(cli as any).nome} aprovou "${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
-        (count ? `Ainda aguardando decisão: ${count}.` : 'Todos os conteúdos do mês já foram decididos.'),
+        `${emoji}✅ ${(cli as any).nome} aprovou ${catItem === 'criativo' ? 'o criativo ' : ''}"${(ideia as any).titulo}" (${(ideia as any).mes_referencia}).\n\n` +
+        (count
+          ? `Ainda aguardando decisão: ${count}.`
+          : `Todos os ${catItem === 'criativo' ? 'criativos' : 'conteúdos'} do mês já foram decididos.`),
         'aprovacao',
       );
     }

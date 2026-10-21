@@ -12,8 +12,8 @@ import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   useSalvarDemanda, useExcluirDemanda,
-  TIPO_LABEL, STATUS_COLUNAS,
-  type DesignerDemanda, type DesignerTipo, type DesignerStatus,
+  TIPO_LABEL, TIPO_LABEL_CRIATIVO, TIPOS_CRIATIVO, STATUS_COLUNAS,
+  type DesignerDemanda, type DesignerTipo, type DesignerStatus, type DesignerCategoria,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { opcoesDeSemana } from '../lib/periodo';
@@ -27,9 +27,11 @@ interface Props {
   statusInicial?: DesignerStatus;
   // Semana (início) já escolhida em demanda nova: a que está aberta no quadro.
   semanaSugerida?: string;
+  // Demanda nova nasce na categoria que o quadro está filtrando.
+  categoriaInicial?: DesignerCategoria;
 }
 
-export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer', semanaSugerida }: Props) {
+export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer', semanaSugerida, categoriaInicial = 'organico' }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
   const { data: clientes } = useClientes('');
@@ -40,6 +42,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const [descricao, setDescricao] = useState('');
   const [briefing, setBriefing] = useState('');
   const [tipo, setTipo] = useState<DesignerTipo>('post');
+  const [categoria, setCategoria] = useState<DesignerCategoria>('organico');
   const [status, setStatus] = useState<DesignerStatus>('a_fazer');
   const [responsavel, setResponsavel] = useState<string>('');
   const [prazo, setPrazo] = useState<string>('');
@@ -59,6 +62,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setDescricao(demanda?.descricao ?? '');
     setBriefing(demanda?.briefing ?? '');
     setTipo(demanda?.tipo ?? 'post');
+    setCategoria(demanda?.categoria ?? categoriaInicial);
     setStatus(demanda?.status ?? statusInicial);
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
@@ -69,7 +73,16 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setAnexos(demanda?.anexos ?? []);
     setNovos([]);
     setErro(null);
-  }, [open, demanda, statusInicial, semanaSugerida]);
+  }, [open, demanda, statusInicial, semanaSugerida, categoriaInicial]);
+
+  const criativo = categoria === 'criativo';
+  const tiposDisponiveis = criativo ? TIPOS_CRIATIVO : (Object.keys(TIPO_LABEL) as DesignerTipo[]);
+
+  function trocarCategoria(c: DesignerCategoria) {
+    setCategoria(c);
+    // Criativo só tem imagem, vídeo e carrossel.
+    if (c === 'criativo' && !TIPOS_CRIATIVO.includes(tipo)) setTipo('post');
+  }
 
   const opcoesSemana = useMemo(
     () => [
@@ -96,7 +109,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
         titulo: titulo.trim(),
         descricao: descricao.trim() || null,
         briefing: briefing.trim() || null,
-        tipo, status,
+        tipo, categoria, status,
         responsavel_id: responsavel || null,
         prazo: prazo || null,
         anexos,
@@ -159,6 +172,22 @@ ${r.cronometroErro}`);
       }
     >
       <form onSubmit={submit} className="space-y-3">
+        <Select
+          id="cat"
+          label="Tipo de trabalho"
+          value={categoria}
+          onChange={(e) => trocarCategoria(e.target.value as DesignerCategoria)}
+          options={[
+            { value: 'organico', label: 'Conteúdo orgânico (redes sociais)' },
+            { value: 'criativo', label: '🎯 Criativo de tráfego pago' },
+          ]}
+        />
+        {criativo && (
+          <p className="-mt-1 text-[11px] text-orange-300">
+            Ao ficar pronto, esta demanda aparece na aba <strong>Criativos</strong> da Gestão de Conteúdo, com link de aprovação próprio.
+          </p>
+        )}
+
         <div className="grid gap-3 md:grid-cols-2">
           <Select
             id="cli"
@@ -172,10 +201,12 @@ ${r.cronometroErro}`);
           />
           <Select
             id="tipo"
-            label="Tipo"
+            label={criativo ? 'Formato do criativo' : 'Tipo'}
             value={tipo}
             onChange={(e) => setTipo(e.target.value as DesignerTipo)}
-            options={(Object.keys(TIPO_LABEL) as DesignerTipo[]).map((t) => ({ value: t, label: TIPO_LABEL[t] }))}
+            options={tiposDisponiveis.map((t) => ({
+              value: t, label: (criativo ? TIPO_LABEL_CRIATIVO[t] : undefined) ?? TIPO_LABEL[t],
+            }))}
           />
         </div>
 

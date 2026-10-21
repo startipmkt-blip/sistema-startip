@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { diasEntre, hojeLocal, labelMes, mesDaSemana } from '../lib/periodo';
 import {
-  TIPO_LABEL, formatarDuracao, segundosAberto,
+  TIPO_LABEL, TIPO_LABEL_CRIATIVO, formatarDuracao, segundosAberto,
   type DesignerDemanda, type TempoDemanda,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
@@ -90,7 +90,12 @@ ${d.briefing ?? ''}`;
       }`}
     >
       <div className="mb-1.5 flex flex-wrap gap-1">
-        <span className={`${ETIQUETA} ${TIPO_ETIQUETA[d.tipo] ?? TIPO_ETIQUETA.extra}`}>{TIPO_LABEL[d.tipo]}</span>
+        {d.categoria === 'criativo' && (
+          <span className={`${ETIQUETA} bg-orange-600 text-orange-50`}><GlassIcon emoji="🎯" /> Criativo de tráfego</span>
+        )}
+        <span className={`${ETIQUETA} ${TIPO_ETIQUETA[d.tipo] ?? TIPO_ETIQUETA.extra}`}>
+          {(d.categoria === 'criativo' ? TIPO_LABEL_CRIATIVO[d.tipo] : undefined) ?? TIPO_LABEL[d.tipo]}
+        </span>
         {d.status === 'alteracao' && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Alteração</span>}
         {reprovada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>↩ Reprovado pelo cliente</span>}
         {d.atrasada && <span className={`${ETIQUETA} bg-red-600 text-red-50`}>Atrasada {atraso}d</span>}

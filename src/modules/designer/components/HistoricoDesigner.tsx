@@ -4,7 +4,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import {
   useDemandas, useTempoDesigner, formatarDuracao, TIPO_LABEL,
-  type DesignerDemanda,
+  type DesignerDemanda, type DesignerCategoria,
 } from '../api/demandasApi';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
@@ -14,6 +14,7 @@ interface Props {
   q?: string;
   periodo?: { ini: string; fim: string } | null;
   clienteIds?: string[] | null;
+  categoria?: DesignerCategoria | null;
   onEditar: (d: DesignerDemanda) => void;
 }
 
@@ -34,8 +35,8 @@ function labelSemana(chave: string): string {
 }
 
 // O que o designer já entregou, por semana, com o tempo real do cronômetro.
-export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, clienteIds, onEditar }: Props) {
-  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds });
+export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, clienteIds, categoria, onEditar }: Props) {
+  const { data, isLoading } = useDemandas({ clienteId, responsavelId, q, periodo, clienteIds, categoria });
   const { data: tempos } = useTempoDesigner();
 
   const semanas = useMemo(() => {

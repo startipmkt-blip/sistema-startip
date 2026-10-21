@@ -56,6 +56,7 @@ export const router = createBrowserRouter([
   { path: '/cs/:slug', element: <CsPublicoPage /> },
   { path: '/central/:slug', element: <CentralClientePage /> },
   { path: '/aprovar/:slug', element: <AprovacaoPublicaPage /> },
+  { path: '/aprovar-criativos/:slug', element: <AprovacaoPublicaPage tipo="criativos" /> },
   { path: '/aprovar-ideias/:slug', element: <AprovacaoIdeiasPublicaPage /> },
   { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
   { path: '/tv/:slug', element: <PainelTvPage /> },
