@@ -1,5 +1,5 @@
 -- =============================================================
--- 0083_categoria_criativos.sql — Criativos de tráfego pago
+-- 0086_categoria_criativos.sql — Criativos de tráfego pago
 -- =============================================================
 -- A aba "Criativos" da Gestão de Conteúdo e a demanda do Designer usam as mesmas
 -- tabelas do orgânico, separadas por `categoria`:
