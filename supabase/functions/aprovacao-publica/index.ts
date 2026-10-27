@@ -4,6 +4,7 @@
 // GET  /?slug=<central_slug>&mes=YYYY-MM  → cliente + ideias do mês
 // POST /  { slug, id, status, justificativa } → registra decisão
 // POST /  { slug, mes, acao: 'aprovar_todos' } → aprova todos os pendentes do mês
+// POST /  { slug, id, acao: 'desfazer', aprovador_id? } → volta a decisão para pendente (até 24h)
 // IDEIAS (tabela ideias_conteudo) — mesmos verbos com tipo 'ideias':
 // GET  /?slug&mes&tipo=ideias
 // POST /  { tipo:'ideias', slug, id, status:'aprovada'|'reprovada', justificativa }
@@ -119,6 +120,31 @@ async function finalizarSeTodosAprovaram(sb: any, postIds: string[], aprovadorId
   return (ok ?? []).length;
 }
 
+// Prazo para o cliente voltar atrás numa decisão tomada por engano.
+const PRAZO_DESFAZER_MS = 24 * 60 * 60 * 1000;
+
+// Desfaz o efeito de devolverAoDesigner: a demanda de ajuste aberta só por
+// causa da reprovação some; uma demanda que já existia volta a "concluído".
+async function cancelarAjusteDoDesigner(sb: any, post: any): Promise<void> {
+  try {
+    if (!post.designer_demanda_id) return;
+    const { data: dem } = await sb.from('designer_demandas')
+      .select('id, titulo, status, post_id, origem').eq('id', post.designer_demanda_id).maybeSingle();
+    if (!dem || dem.status !== 'alteracao') return;
+    const abertaPelaReprovacao = dem.origem === 'manual' && dem.post_id === post.id
+      && String(dem.titulo ?? '').startsWith('Ajuste: ');
+    if (abertaPelaReprovacao) {
+      await sb.from('conteudo_aprovacao').update({ designer_demanda_id: null } as any).eq('id', post.id);
+      await sb.from('designer_demandas').delete().eq('id', dem.id);
+    } else {
+      await sb.from('designer_demandas').update({
+        status: 'concluido', concluido_em: new Date().toISOString(),
+        reprovado_justificativa: null, reprovado_em: null,
+      } as any).eq('id', dem.id);
+    }
+  } catch (_e) { /* best effort */ }
+}
+
 type Categoria = 'organico' | 'criativo';
 const categoriaDoTipo = (tipo?: string | null): Categoria => (tipo === 'criativos' ? 'criativo' : 'organico');
 const rotuloDe = (c: Categoria) => (c === 'criativo' ? 'criativo' : 'conteúdo');
@@ -173,7 +199,7 @@ serve(async (req) => {
 
     const { data: ideias } = await sb
       .from('conteudo_aprovacao')
-      .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia, link_drive, etapa')
+      .select('id, titulo, descricao, formato, semana, dia_postagem, status, justificativa, mes_referencia, link_drive, etapa, decidido_em')
       .eq('cliente_id', (cli as any).id)
       .eq('categoria', categoria)
       .eq('mes_referencia', mes)
@@ -335,6 +361,74 @@ serve(async (req) => {
         );
       }
       return json({ ok: true, aprovados: qtd });
+    }
+
+    // Voltar atrás numa decisão (aprovação ou reprovação) feita por engano.
+    if (acao === 'desfazer') {
+      if (!slug || !id) return json({ error: 'parâmetros faltando' }, 400);
+      const { data: cliD } = await sb.from('clientes').select('id, nome').eq('central_slug', slug).maybeSingle();
+      if (!cliD) return json({ error: 'link inválido' }, 404);
+      const { data: post } = await sb
+        .from('conteudo_aprovacao')
+        .select('id, cliente_id, visivel_cliente, titulo, mes_referencia, status, etapa, decidido_em, designer_demanda_id')
+        .eq('id', id)
+        .maybeSingle();
+      if (!post || (post as any).cliente_id !== (cliD as any).id || (post as any).visivel_cliente === false) {
+        return json({ error: 'conteúdo não pertence a este cliente' }, 403);
+      }
+      const p = post as any;
+
+      const { data: aprsD } = await sb
+        .from('cliente_aprovadores').select('id, nome')
+        .eq('cliente_id', (cliD as any).id).eq('ativo', true);
+      const emConjunto = (aprsD ?? []).length >= 2;
+      const apr = emConjunto ? (aprsD as any[]).find((a) => a.id === aprovador_id) : null;
+      if (emConjunto && !apr) return json({ error: 'informe quem está desfazendo' }, 400);
+      const quem = apr?.nome ?? (cliD as any).nome;
+
+      // Em conjunto, com o conteúdo ainda aguardando: só retira o voto desta pessoa.
+      if (emConjunto && p.status === 'pendente') {
+        await sb.from('conteudo_aprovacao_votos').delete().eq('post_id', id).eq('aprovador_id', apr.id);
+        return json({ ok: true });
+      }
+
+      if (p.status === 'pendente') return json({ error: 'este conteúdo ainda não foi decidido' }, 409);
+      if (p.etapa !== 'aprovado' && p.etapa !== 'reprovado') {
+        return json({ error: 'a equipe já programou este conteúdo; fale com seu gerente para alterar' }, 409);
+      }
+      if (!p.decidido_em || Date.now() - new Date(p.decidido_em).getTime() > PRAZO_DESFAZER_MS) {
+        return json({ error: 'o prazo para voltar atrás (24 horas) já passou; fale com seu gerente' }, 409);
+      }
+
+      // Votos de quem não está desfazendo continuam valendo depois que o post volta a "pendente"
+      // (o gatilho conteudo_votos_zerar apaga todos ao reabrir).
+      let manter: any[] = [];
+      if (emConjunto) {
+        const { data: votos } = await sb
+          .from('conteudo_aprovacao_votos').select('post_id, aprovador_id, decisao, justificativa, decidido_em')
+          .eq('post_id', id);
+        const meu = (votos ?? []).find((v: any) => v.aprovador_id === apr.id);
+        if (p.status === 'reprovado' && meu?.decisao !== 'reprovado') {
+          return json({ error: 'só quem não aprovou pode voltar atrás nesta decisão' }, 403);
+        }
+        manter = (votos ?? []).filter((v: any) => v.aprovador_id !== apr.id && v.decisao === 'aprovado');
+      }
+
+      const eraReprovado = p.status === 'reprovado';
+      const { error: eUp } = await sb
+        .from('conteudo_aprovacao').update({ status: 'pendente', justificativa: '' } as any).eq('id', id);
+      if (eUp) return json({ error: eUp.message }, 500);
+      if (manter.length > 0) {
+        await sb.from('conteudo_aprovacao_votos').upsert(manter, { onConflict: 'post_id,aprovador_id' });
+      }
+      if (eraReprovado) await cancelarAjusteDoDesigner(sb, p);
+
+      await avisarEquipe(
+        sb,
+        `↩️ ${quem} (${(cliD as any).nome}) voltou atrás na ${eraReprovado ? 'reprovação' : 'aprovação'} de "${p.titulo}" (${p.mes_referencia}). O conteúdo voltou para aguardando decisão.`,
+        eraReprovado ? 'reprovacao' : 'aprovacao',
+      );
+      return json({ ok: true });
     }
 
     if (!slug || !id || !status) return json({ error: 'parâmetros faltando' }, 400);

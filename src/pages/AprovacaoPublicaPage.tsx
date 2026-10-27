@@ -24,7 +24,8 @@ interface Ideia {
   mes_referencia: string;
   link_drive?: string | null;
   etapa?: string;
-  votos?: { aprovador_id: string; decisao: 'aprovado' | 'reprovado'; justificativa: string }[];
+  decidido_em?: string | null;
+  votos?:{ aprovador_id: string; decisao: 'aprovado' | 'reprovado'; justificativa: string }[];
 }
 
 interface Dados {
@@ -123,6 +124,26 @@ export function AprovacaoPublicaPage({ tipo }: { tipo?: 'criativos' } = {}) {
     }
   }
 
+  async function desfazer(i: Ideia) {
+    const oQue = i.status === 'pendente' ? 'o seu voto' : i.status === 'aprovado' ? 'a aprovação' : 'a reprovação';
+    if (!confirm(`Voltar atrás ${oQue} de "${i.titulo}"?\n\nEle volta para "Aguardando" e você pode decidir de novo.`)) return;
+    setSalvando(true);
+    try {
+      const r = await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ slug, id: i.id, acao: 'desfazer', aprovador_id: aprovadorId || undefined }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body?.error ?? 'erro');
+      await carregar(mes ?? undefined);
+    } catch (e) {
+      alert((e as Error).message);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
   async function aprovarTodos() {
     const alvo = mes ?? dados?.mes;
     if (!alvo) return;
@@ -170,6 +191,14 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
     (i) => i.status === 'pendente' && (!emConjunto || (eu && !meuVoto(i))),
   ).length;
   const podeDecidir = !emConjunto || !!eu;
+  // Mesmas regras do servidor (ação 'desfazer'): até 24h e antes de a equipe programar.
+  const podeVoltarAtras = (i: Ideia) => {
+    if (i.status === 'pendente' || (i.etapa !== 'aprovado' && i.etapa !== 'reprovado')) return false;
+    if (!i.decidido_em || Date.now() - new Date(i.decidido_em).getTime() > 24 * 60 * 60 * 1000) return false;
+    if (!emConjunto) return true;
+    if (!eu) return false;
+    return i.status === 'aprovado' || meuVoto(i)?.decisao === 'reprovado';
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 px-4 py-8">
@@ -239,7 +268,9 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
 
         {/* Conteúdos agrupados por semana; criativos de tráfego não têm semana: lista única */}
         <div className="space-y-6">
-          {(criativos ? [0] : [1, 2, 3, 4]).map((semana) => {
+          {/* Semanas vindas dos próprios posts: meses com 5 sábados têm semana 5, e
+              uma lista fixa escondia esses posts (que o "Aprovar todos" ainda aprovava). */}
+          {(criativos ? [0] : [...new Set(dados.ideias.map((i) => i.semana))].sort((a, b) => a - b)).map((semana) => {
             const daSemana = criativos ? dados.ideias : dados.ideias.filter((i) => i.semana === semana);
             if (daSemana.length === 0) return null;
             return (
@@ -330,8 +361,22 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                         <p className="mt-4 rounded-lg bg-emerald-500/10 p-2 text-center text-xs text-emerald-300">
                           Você ({eu.nome}) já aprovou. Aguardando: {
                             aprovadores.filter((a) => !i.votos?.some((v) => v.aprovador_id === a.id && v.decisao === 'aprovado'))
-                              .map((a) => a.nome).join(', ') || '—'}.
+                              .map((a) => a.nome).join(', ') || '—'}.{' '}
+                          <button onClick={() => void desfazer(i)} disabled={salvando} className="underline hover:text-emerald-200">
+                            Voltar atrás
+                          </button>
                         </p>
+                      )}
+                      {podeVoltarAtras(i) && (
+                        <div className="mt-3 text-right">
+                          <button
+                            onClick={() => void desfazer(i)}
+                            disabled={salvando}
+                            className="text-xs text-slate-400 underline hover:text-slate-200 disabled:opacity-50"
+                          >
+                            Errei, voltar atrás
+                          </button>
+                        </div>
                       )}
                       {i.status === 'pendente' && !(emConjunto && eu && meuVoto(i)) && (
                         <div className="mt-4 flex gap-2">

@@ -8,9 +8,8 @@ interface Props {
   renderAcoes?: (ideia: ConteudoIdeia) => ReactNode;
 }
 
-// Mostra as ideias agrupadas por Semana 1..4.
 export function IdeiasPorSemana({ ideias, renderAcoes }: Props) {
-  const semanas = [1, 2, 3, 4].filter((s) => ideias.some((i) => i.semana === s));
+  const semanas = [...new Set(ideias.map((i) => i.semana))].sort((a, b) => a - b);
 
   return (
     <div className="space-y-5">

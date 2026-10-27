@@ -184,7 +184,7 @@ export function AprovacaoConteudoPage() {
             <Card><EmptyState message={`Nenhuma ideia em ${MESES[mesIdx]} de ${ano} para ${clienteAtual?.nome}. Crie a primeira.`} /></Card>
           ) : (
             <div className="space-y-5">
-              {[1, 2, 3, 4].map((semana) => {
+              {[...new Set(idsDoMes.map((i) => i.semana))].sort((a, b) => a - b).map((semana) => {
                 const daSemana = idsDoMes.filter((i) => i.semana === semana);
                 if (daSemana.length === 0) return null;
                 const pendSem = daSemana.filter((i) => i.status === 'pendente').length;
