@@ -4,10 +4,11 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Input } from '@/shared/ui/Input';
 import { Modal } from '@/shared/ui/Modal';
+import { Select } from '@/shared/ui/Select';
 import { Textarea } from '@/shared/ui/Textarea';
 import {
   linkAprovacao, useCopiarMesAnterior, useEnviarParaAprovacao, useExcluirPost,
-  useLembrarCliente, useMudarEtapa, useReenviarAlterados, useSalvarMeta,
+  useLembrarCliente, useMoverPosts, useMudarEtapa, useReenviarAlterados, useSalvarMeta,
 } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
   ETAPAS, deslocarMes, driveInfo, mensagemAprovacao, mesLabel, type Etapa, type Post,
@@ -39,6 +40,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const lembrar = useLembrarCliente();
   const reenviar = useReenviarAlterados();
   const copiar = useCopiarMesAnterior();
+  const mover = useMoverPosts();
   const salvarMeta = useSalvarMeta();
 
   const [agrupar, setAgrupar] = useState<Agrupar>('semanas');
@@ -57,6 +59,8 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
   const [porSemana, setPorSemana] = useState(String(cliente.conteudos_por_semana ?? 0));
   const [porMes, setPorMes] = useState(String(cliente.posts_por_mes ?? 0));
   const [mensagemEnvio, setMensagemEnvio] = useState<string | null>(null);
+  const [moverAberto, setMoverAberto] = useState(false);
+  const [mesDestino, setMesDestino] = useState(() => deslocarMes(mes, 1));
   const [aviso, setAviso] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null);
 
   const semanasMes = useMemo(() => semanasRotuladas(mes), [mes]);
@@ -143,6 +147,27 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
     );
   }
 
+  function abrirMover() {
+    setMesDestino(deslocarMes(mes, 1));
+    setMoverAberto(true);
+  }
+
+  function confirmarMover() {
+    const escolhidos = posts.filter((p) => selecionados.includes(p.id));
+    setAviso(null);
+    mover.mutate(
+      { posts: escolhidos, mesDestino },
+      {
+        onSuccess: (qtd) => {
+          setMoverAberto(false);
+          setSelecionados([]);
+          ok(`${qtd} conteúdo(s) movido(s) para ${mesLabel(mesDestino)}.`);
+        },
+        onError: (e) => { setMoverAberto(false); erro(e); },
+      },
+    );
+  }
+
   function abrirNovo(semana: number) {
     setEditando(undefined); setSemanaNova(semana); setFormAberto(true);
   }
@@ -204,6 +229,9 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             title={!cliente.whatsapp_chat_id ? 'Cliente sem WhatsApp cadastrado' : undefined}
           >
             {glassify(enviar.isPending ? 'Enviando…' : `📤 Enviar para aprovação (${selecionados.length})`)}
+          </Button>
+          <Button variant="secondary" onClick={abrirMover} disabled={selecionados.length === 0 || mover.isPending}>
+            Mover para outro mês ({selecionados.length})
           </Button>
           <Button variant="secondary" onClick={() => setAprovadoresAberto(true)}>
             <GlassIcon name="users" /> Aprovadores{aprovadoresAtivos.length >= 2 ? ` (${aprovadoresAtivos.length})` : ''}
@@ -359,6 +387,32 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             >
               Restaurar padrão
             </button>
+          </p>
+        </div>
+      </Modal>
+      <Modal
+        open={moverAberto}
+        onClose={() => !mover.isPending && setMoverAberto(false)}
+        title={`Mover ${selecionados.length} conteúdo(s) de mês`}
+        footer={(
+          <>
+            <Button variant="secondary" onClick={() => setMoverAberto(false)} disabled={mover.isPending}>Cancelar</Button>
+            <Button onClick={confirmarMover} disabled={mover.isPending || mesDestino === mes}>
+              {mover.isPending ? 'Movendo…' : 'Mover'}
+            </Button>
+          </>
+        )}
+      >
+        <div className="space-y-2">
+          <Select
+            label="Mês de destino"
+            value={mesDestino}
+            onChange={(e) => setMesDestino(e.target.value)}
+            options={Array.from({ length: 10 }, (_, i) => deslocarMes(mes, i - 3))
+              .map((m) => ({ value: m, label: mesLabel(m) }))}
+          />
+          <p className="text-[11px] text-slate-500">
+            Mantém link do Drive, etapa e status. O dia de postagem vai para o mesmo dia do novo mês e a semana é recalculada.
           </p>
         </div>
       </Modal>

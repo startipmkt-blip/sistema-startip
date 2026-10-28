@@ -40,3 +40,10 @@ export function semanasRotuladas(mes: string): SemanaRotulada[] {
 export function rotuloSemana(mes: string, numero: number): string {
   return semanasRotuladas(mes).find((s) => s.numero === numero)?.label ?? `Semana ${numero}`;
 }
+
+/** Semana do mês de destino que contém o dia; sem dia (ou fora das semanas), mantém o número, limitado ao mês. */
+export function semanaParaDia(mes: string, dia: string | null, atual: number): number {
+  const semanas = semanasDoMes(mes);
+  const achada = dia ? semanas.find((s) => dia >= s.ini && dia <= s.fim) : undefined;
+  return achada?.numero ?? Math.min(Math.max(atual, 1), semanas.length);
+}

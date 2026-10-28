@@ -6,6 +6,7 @@ import {
   CONFIG_PADRAO, mensagemAprovacao, mensagemCriativos, mensagemLembrete, mensagemLembreteCriativos,
   mensagemReenvio, mensagemReenvioCriativos, mesmoDiaEmOutroMes,
 } from '@/modules/gestao-conteudo/types';
+import { semanaParaDia } from '@/modules/gestao-conteudo/lib/semanas';
 
 const chaves = {
   mes: (mes: string, categoria: Categoria) => ['gestao-conteudo', 'mes', mes, categoria] as const,
@@ -114,9 +115,9 @@ export function useSalvarPost() {
         const { error } = await supabase
           .from('conteudo_aprovacao')
           .update((reabrir
-            ? { ...payload, etapa: 'enviado', status: 'pendente', justificativa: '',
+            ? { ...payload, mes_referencia: p.mes, etapa: 'enviado', status: 'pendente', justificativa: '',
                 visivel_cliente: true, enviado_em: new Date().toISOString() }
-            : payload) as never)
+            : { ...payload, mes_referencia: p.mes }) as never)
           .eq('id', p.id);
         if (error) throw error;
       } else {
@@ -131,6 +132,30 @@ export function useSalvarPost() {
         } as never);
         if (error) throw error;
       }
+    },
+    onSuccess: invalidar,
+  });
+}
+
+/** Move conteúdos para outro mês mantendo link, etapa e status; o dia acompanha o mês e a semana é recalculada. */
+export function useMoverPosts() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: async (p: { posts: Post[]; mesDestino: string }): Promise<number> => {
+      if (IS_DEMO) return 0;
+      for (const o of p.posts) {
+        const dia = mesmoDiaEmOutroMes(o.dia_postagem, p.mesDestino);
+        const { error } = await supabase
+          .from('conteudo_aprovacao')
+          .update({
+            mes_referencia: p.mesDestino,
+            dia_postagem: dia,
+            semana: semanaParaDia(p.mesDestino, dia, o.semana),
+          } as never)
+          .eq('id', o.id);
+        if (error) throw error;
+      }
+      return p.posts.length;
     },
     onSuccess: invalidar,
   });

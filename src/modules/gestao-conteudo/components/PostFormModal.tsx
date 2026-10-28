@@ -6,10 +6,10 @@ import { Select } from '@/shared/ui/Select';
 import { Textarea } from '@/shared/ui/Textarea';
 import { useSalvarPost } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
-  FORMATO_CRIATIVO_OPCOES, FORMATO_OPCOES, driveInfo, type Categoria, type Post, type PostForm,
+  FORMATO_CRIATIVO_OPCOES, FORMATO_OPCOES, deslocarMes, driveInfo, mesLabel, mesmoDiaEmOutroMes, type Categoria, type Post, type PostForm,
 } from '@/modules/gestao-conteudo/types';
 import type { ConteudoTipo } from '@/modules/conteudo/types';
-import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
+import { semanaParaDia, semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
@@ -32,20 +32,31 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
   const salvar = useSalvarPost();
   const [form, setForm] = useState<PostForm>(VAZIO);
   const [erro, setErro] = useState<string | null>(null);
+  const [mesForm, setMesForm] = useState(mes);
 
   useEffect(() => {
     if (!open) return;
     setErro(null);
+    setMesForm(mes);
     setForm(post
       ? {
         titulo: post.titulo, descricao: post.descricao, formato: post.formato,
         semana: post.semana, dia_postagem: post.dia_postagem, link_drive: post.link_drive ?? '',
       }
       : { ...VAZIO, semana: semanaInicial ?? 1 });
-  }, [open, post, semanaInicial]);
+  }, [open, post, semanaInicial, mes]);
 
   const set = <K extends keyof PostForm>(k: K, v: PostForm[K]) => setForm((f) => ({ ...f, [k]: v }));
   const info = driveInfo(form.link_drive);
+  const opcoesMes = Array.from({ length: 10 }, (_, i) => deslocarMes(mes, i - 3))
+    .map((m) => ({ value: m, label: mesLabel(m) }));
+
+  // o dia acompanha o mês escolhido e a semana é recalculada para o novo mês
+  function trocarMes(novo: string) {
+    setMesForm(novo);
+    const dia = mesmoDiaEmOutroMes(form.dia_postagem, novo);
+    setForm((f) => ({ ...f, dia_postagem: dia, semana: semanaParaDia(novo, dia, f.semana) }));
+  }
 
   function handleSalvar() {
     if (!form.titulo.trim()) { setErro(`Informe o título do ${criativo ? 'criativo' : 'conteúdo'}.`); return; }
@@ -55,7 +66,7 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
     }
     setErro(null);
     salvar.mutate(
-      { id: post?.id, clienteId, mes, categoria, dados: { ...form, titulo: form.titulo.trim() } },
+      { id: post?.id, clienteId, mes: mesForm, categoria, dados: { ...form, titulo: form.titulo.trim() } },
       {
         onSuccess: onClose,
         onError: (e) => setErro(`Não foi possível salvar: ${(e as Error).message}`),
@@ -91,13 +102,16 @@ export function PostFormModal({ open, onClose, clienteId, mes, post, semanaInici
             options={FORMATO_CRIATIVO_OPCOES} />
         ) : (
           <>
+            {post && (
+              <Select label="Mês" value={mesForm} onChange={(e) => trocarMes(e.target.value)} options={opcoesMes} />
+            )}
             <div className="grid grid-cols-2 gap-3">
               <Select label="Formato" value={form.formato}
                 onChange={(e) => set('formato', e.target.value as ConteudoTipo)}
                 options={FORMATO_OPCOES} />
               <Select label="Semana do mês" value={String(form.semana)}
                 onChange={(e) => set('semana', Number(e.target.value))}
-                options={semanasRotuladas(mes).map((s) => ({ value: String(s.numero), label: s.label }))} />
+                options={semanasRotuladas(mesForm).map((s) => ({ value: String(s.numero), label: s.label }))} />
             </div>
             <Input label="Dia da postagem" type="date" value={form.dia_postagem ?? ''}
               onChange={(e) => set('dia_postagem', e.target.value || null)} />
