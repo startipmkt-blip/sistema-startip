@@ -34,6 +34,8 @@ import { FormularioPublicoPage } from '@/modules/formularios/pages/FormularioPub
 import { CentralClientePage } from '@/pages/CentralClientePage';
 import { AprovacaoPublicaPage } from '@/pages/AprovacaoPublicaPage';
 import { AprovacaoIdeiasPublicaPage } from '@/pages/AprovacaoIdeiasPublicaPage';
+import { PortalStories } from '@/portal/pages/PortalStories';
+import { StoriesPage } from '@/modules/stories/pages/StoriesPage';
 import { PortalAprovacao } from '@/portal/pages/PortalAprovacao';
 import { CalendarioPublicoPage } from '@/pages/CalendarioPublicoPage';
 import { PainelTvPage } from '@/pages/PainelTvPage';
@@ -76,6 +78,7 @@ export const router = createBrowserRouter([
           { path: 'andamento', element: <PortalAndamento /> },
           { path: 'reunioes', element: <PortalReunioes /> },
           { path: 'aprovacao', element: <PortalAprovacao /> },
+          { path: 'stories', element: <PortalStories /> },
           { path: 'indicacoes', element: <PortalIndicacoes /> },
         ],
       },
@@ -100,6 +103,7 @@ export const router = createBrowserRouter([
           { path: 'datas-comemorativas', element: <Navigate to="/gestao-conteudo?aba=datas" replace /> },
           { path: 'demandas', element: <RequireModulo modulo="demandas"><DemandasPage /></RequireModulo> },
           { path: 'ideias', element: <RequireModulo modulo="ideias"><IdeiasPage /></RequireModulo> },
+          { path: 'stories', element: <RequireModulo modulo="stories"><StoriesPage /></RequireModulo> },
           { path: 'gestao-conteudo', element: <RequireModulo modulo="gestao-conteudo"><GestaoConteudoPage /></RequireModulo> },
           { path: 'anotacoes', element: <Navigate to="/ideias?aba=anotacoes" replace /> },
           { path: 'usuarios', element: <RequireModulo modulo="usuarios"><UsuariosPage /></RequireModulo> },

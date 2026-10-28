@@ -25,6 +25,7 @@ export const navItems: NavItem[] = [
   { label: 'Designer', to: '/designer', icon: 'conteudo', comingSoon: false },
   { label: 'Demandas', to: '/demandas', icon: 'demandas', comingSoon: false },
   { label: 'Ideias/Anotações', to: '/ideias', icon: 'sparkles', comingSoon: false },
+  { label: 'Ideias de Stories', to: '/stories', icon: 'conteudo', comingSoon: false },
   { label: 'Gestão de Conteúdo', to: '/gestao-conteudo', icon: 'conteudo', comingSoon: false },
   { label: 'Contratos', to: '/contratos', icon: 'contratos', comingSoon: false },
   { label: 'Tráfego Pago', to: '/trafego', icon: 'financeiro', comingSoon: false, equipeOnly: true },

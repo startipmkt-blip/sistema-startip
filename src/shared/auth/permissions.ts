@@ -28,6 +28,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'cs-clientes', label: 'CS Clientes' },
   { key: 'demandas', label: 'Demandas' },
   { key: 'ideias', label: 'Ideias' },
+  { key: 'stories', label: 'Ideias de Stories' },
   { key: 'gestao-conteudo', label: 'Gestão de Conteúdo' },
   { key: 'anotacoes', label: 'Anotações' },
   { key: 'contratos', label: 'Contratos' },

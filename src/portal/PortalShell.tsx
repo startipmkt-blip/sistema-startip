@@ -10,6 +10,7 @@ const NAV = [
   { to: '/portal/andamento', label: 'Andamento', end: false },
   { to: '/portal/reunioes', label: 'Reuniões', end: false },
   { to: '/portal/aprovacao', label: 'Aprovar conteúdo', end: false },
+  { to: '/portal/stories', label: 'Ideias de Stories', end: false },
   { to: '/portal/indicacoes', label: 'Minhas indicações', end: false },
 ];
 
