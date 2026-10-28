@@ -18,9 +18,9 @@ type Grupo = 'acao' | 'cliente' | 'concluido';
 type EtapaVisual = 'producao' | 'aprovacao' | 'aprovado' | 'concluido';
 
 const ETAPAS_VISUAIS: { id: EtapaVisual; label: string; cor: string; texto: string }[] = [
-  { id: 'producao', label: 'Produção', cor: 'bg-slate-500', texto: 'text-white' },
+  { id: 'producao', label: 'Produção', cor: 'bg-slate-600', texto: 'text-[white]' },
   { id: 'aprovacao', label: 'Aguardando aprovação', cor: 'bg-amber-400', texto: 'text-slate-950' },
-  { id: 'aprovado', label: 'Aprovado, pronto para programar', cor: 'bg-sky-500', texto: 'text-white' },
+  { id: 'aprovado', label: 'Aprovado, pronto para programar', cor: 'bg-sky-700', texto: 'text-[white]' },
   { id: 'concluido', label: 'Concluído', cor: 'bg-emerald-500', texto: 'text-slate-950' },
 ];
 
@@ -234,14 +234,14 @@ export function SemanaAtual({ clientes, onAbrir }: Props) {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5 lg:justify-end">
-                          {n.aprovado > 0 && <span className="rounded-full bg-sky-800 px-2.5 py-1 text-xs font-medium text-white">Você: programar {n.aprovado} {n.aprovado === 1 ? 'post' : 'posts'}</span>}
-                          {n.editado > 0 && <span className="rounded-full bg-slate-600 px-2.5 py-1 text-xs font-medium text-white">Designer: enviar {n.editado} para aprovação</span>}
+                          {n.aprovado > 0 && <span className="rounded-full bg-sky-800 px-2.5 py-1 text-xs font-medium text-[white]">Você: programar {n.aprovado} {n.aprovado === 1 ? 'post' : 'posts'}</span>}
+                          {n.editado > 0 && <span className="rounded-full bg-slate-600 px-2.5 py-1 text-xs font-medium text-[white]">Designer: enviar {n.editado} para aprovação</span>}
                           {n.reprovado > 0 && <span className="rounded-full border border-red-400/70 bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-100">Designer: refazer {n.reprovado}</span>}
                           {n.enviado > 0 && <span className="rounded-full border border-amber-400/70 bg-amber-400/10 px-2.5 py-1 text-xs font-medium text-amber-100">Cliente: aprovar {n.enviado} {n.enviado === 1 ? 'post' : 'posts'}</span>}
-                          {n.em_edicao > 0 && <span className="rounded-full bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-100">Designer: editar {n.em_edicao}</span>}
+                          {n.em_edicao > 0 && <span className="rounded-full bg-slate-700 px-2.5 py-1 text-xs font-medium text-[white]">Designer: editar {n.em_edicao}</span>}
                           {meta > meus.length && <span className="rounded-full border border-slate-500 px-2.5 py-1 text-xs font-medium text-slate-200">{meta - meus.length} sem planejar</span>}
                           {meus.length > 0 && n.programado + n.publicado === meus.length && (
-                            <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-medium text-white">{n.publicado === meus.length ? 'Tudo publicado' : 'Tudo programado ou publicado'}</span>
+                            <span className="rounded-full bg-emerald-700 px-2.5 py-1 text-xs font-medium text-[white]">{n.publicado === meus.length ? 'Tudo publicado' : 'Tudo programado ou publicado'}</span>
                           )}
                         </div>
                       </div>
