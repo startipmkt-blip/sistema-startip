@@ -109,7 +109,7 @@ export function SemanaAtual({ clientes, onAbrir }: Props) {
       const pendencias = n.aprovado + n.editado + n.reprovado + n.em_edicao + Math.max(0, meta - meus.length);
       const grupo: Grupo = pendencias > 0 || meus.length === 0
         ? 'acao'
-        : meus.every((p) => p.etapa === 'enviado')
+        : n.enviado > 0 && meus.every((p) => p.etapa === 'enviado' || p.etapa === 'programado' || p.etapa === 'publicado')
           ? 'cliente'
           : meus.every((p) => p.etapa === 'programado' || p.etapa === 'publicado')
             ? 'concluido'
@@ -162,13 +162,13 @@ export function SemanaAtual({ clientes, onAbrir }: Props) {
             <Card className="border-sky-500/40 bg-sky-950/70 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-sky-200">Sua vez</p>
               <p className="mt-2 text-3xl font-bold text-white">{totais.aprovado}</p>
-              <p className="text-sm text-sky-100">aprovados para programar</p>
+              <p className="text-sm text-sky-100">{totais.aprovado === 1 ? 'aprovado' : 'aprovados'} para programar</p>
               <p className="mt-3 text-xs leading-relaxed text-sky-100">{detalhePorCliente(linhas, 'aprovado') || 'Nenhum post aguardando programação'}</p>
             </Card>
             <Card className="p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-300">Designer</p>
               <p className="mt-2 text-3xl font-bold text-white">{totais.editado}</p>
-              <p className="text-sm text-slate-200">editados para enviar à aprovação</p>
+              <p className="text-sm text-slate-200">{totais.editado === 1 ? 'editado' : 'editados'} para enviar à aprovação</p>
               <p className="mt-3 text-xs leading-relaxed text-slate-300">{detalhePorCliente(linhas, 'editado') || 'Nenhum post aguardando envio'}</p>
             </Card>
             <Card className="border-amber-400/40 bg-amber-400/10 p-4">
@@ -223,7 +223,7 @@ export function SemanaAtual({ clientes, onAbrir }: Props) {
                             : <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5"><GlassIcon name="building" /></span>}
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold text-white">{c.nome}</p>
-                            <p className="text-xs text-slate-300">{meta > 0 ? `${meus.length} de ${meta} posts` : `${meus.length} posts`}</p>
+                            <p className="text-xs text-slate-300">{meta > 0 ? `${meus.length} de ${meta} posts` : `${meus.length} ${meus.length === 1 ? 'post' : 'posts'}`}</p>
                           </div>
                         </div>
                         <div className="min-w-0">
@@ -234,10 +234,10 @@ export function SemanaAtual({ clientes, onAbrir }: Props) {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5 lg:justify-end">
-                          {n.aprovado > 0 && <span className="rounded-full bg-sky-800 px-2.5 py-1 text-xs font-medium text-white">Você: programar {n.aprovado} posts</span>}
+                          {n.aprovado > 0 && <span className="rounded-full bg-sky-800 px-2.5 py-1 text-xs font-medium text-white">Você: programar {n.aprovado} {n.aprovado === 1 ? 'post' : 'posts'}</span>}
                           {n.editado > 0 && <span className="rounded-full bg-slate-600 px-2.5 py-1 text-xs font-medium text-white">Designer: enviar {n.editado} para aprovação</span>}
                           {n.reprovado > 0 && <span className="rounded-full border border-red-400/70 bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-100">Designer: refazer {n.reprovado}</span>}
-                          {n.enviado > 0 && <span className="rounded-full border border-amber-400/70 bg-amber-400/10 px-2.5 py-1 text-xs font-medium text-amber-100">Cliente: aprovar {n.enviado} posts</span>}
+                          {n.enviado > 0 && <span className="rounded-full border border-amber-400/70 bg-amber-400/10 px-2.5 py-1 text-xs font-medium text-amber-100">Cliente: aprovar {n.enviado} {n.enviado === 1 ? 'post' : 'posts'}</span>}
                           {n.em_edicao > 0 && <span className="rounded-full bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-100">Designer: editar {n.em_edicao}</span>}
                           {meta > meus.length && <span className="rounded-full border border-slate-500 px-2.5 py-1 text-xs font-medium text-slate-200">{meta - meus.length} sem planejar</span>}
                           {meus.length > 0 && n.programado + n.publicado === meus.length && (
