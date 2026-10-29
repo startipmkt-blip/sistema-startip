@@ -35,6 +35,7 @@ import { CentralClientePage } from '@/pages/CentralClientePage';
 import { AprovacaoPublicaPage } from '@/pages/AprovacaoPublicaPage';
 import { AprovacaoIdeiasPublicaPage } from '@/pages/AprovacaoIdeiasPublicaPage';
 import { PortalStories } from '@/portal/pages/PortalStories';
+import { PortalIdeias } from '@/portal/pages/PortalIdeias';
 import { StoriesPage } from '@/modules/stories/pages/StoriesPage';
 import { PortalAprovacao } from '@/portal/pages/PortalAprovacao';
 import { CalendarioPublicoPage } from '@/pages/CalendarioPublicoPage';
@@ -79,6 +80,7 @@ export const router = createBrowserRouter([
           { path: 'reunioes', element: <PortalReunioes /> },
           { path: 'aprovacao', element: <PortalAprovacao /> },
           { path: 'stories', element: <PortalStories /> },
+          { path: 'ideias', element: <PortalIdeias /> },
           { path: 'indicacoes', element: <PortalIndicacoes /> },
         ],
       },

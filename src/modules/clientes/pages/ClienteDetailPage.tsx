@@ -8,6 +8,7 @@ import { ClienteWorkspace } from '@/modules/cliente-workspace/components/Cliente
 import { ScoreSaudeCard } from '@/modules/clientes/components/ScoreSaudeCard';
 import { CentralLinkCard } from '@/modules/clientes/components/CentralLinkCard';
 import { CriativosDoClienteCard } from '@/modules/ideias/criativos/components/CriativosDoClienteCard';
+import { IdeiasVipAdmin } from '@/modules/ideias-vip/components/IdeiasVipAdmin';
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Card } from '@/shared/ui/Card';
@@ -17,6 +18,7 @@ export function ClienteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: cliente, isLoading, isError } = useCliente(id);
   const [editando, setEditando] = useState(false);
+  const [aba, setAba] = useState<'geral' | 'ideias'>('geral');
 
   if (isLoading) {
     return (
@@ -60,6 +62,24 @@ export function ClienteDetailPage() {
         cliente={cliente}
       />
 
+      <div role="tablist" className="flex gap-2">
+        {([['geral', 'Visão geral'], ['ideias', 'Ideias']] as const).map(([id, label]) => (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={aba === id}
+            onClick={() => setAba(id)}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${aba === id ? 'bg-gradient-brand text-white shadow-glow' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {aba === 'ideias' ? (
+        <IdeiasVipAdmin clienteId={cliente.id} clienteNome={cliente.nome} />
+      ) : (
+      <>
       {/* Score de saúde + Central pública */}
       <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
         <ScoreSaudeCard clienteId={cliente.id} />
@@ -74,6 +94,8 @@ export function ClienteDetailPage() {
 
       {/* Contas de anúncio */}
       <ContasSection clienteId={cliente.id} />
+      </>
+      )}
     </div>
   );
 }
