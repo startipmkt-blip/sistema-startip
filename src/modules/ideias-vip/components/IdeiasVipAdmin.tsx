@@ -11,7 +11,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import {
   useAtualizarLote, useCriarLote, useDuplicarLote, useEstadosDoCliente, useExcluirIdeia, useExcluirLote, useIdeiasDoLote,
-  useLotes, useReordenar, useResumoLotes, useSalvarIdeia,
+  useLinkIdeias, useLotes, useReordenar, useResumoLotes, useSalvarIdeia,
 } from '@/modules/ideias-vip/api/ideiasVipApi';
 import { formatarDia, interpretar, modeloCsv, pendencias, temPendencia } from '@/modules/ideias-vip/lib/importar';
 import { IDEA_TYPES, ideaVazia, tipoInfo } from '@/modules/ideias-vip/types';
@@ -59,6 +59,8 @@ export function IdeiasVipAdmin({ clienteId, clienteNome }: { clienteId: string; 
         <Button className={`${BTN} w-full sm:w-auto`} onClick={() => setImportando(true)}>Importar lote</Button>
       </div>
 
+      <CompartilharLink clienteId={clienteId} clienteNome={clienteNome} />
+
       {isLoading ? <div className="flex justify-center py-10"><Spinner /></div>
         : !lotes?.length ? <Card><EmptyState message="Nenhum lote ainda. Use Importar lote para começar." /></Card>
         : (
@@ -96,6 +98,59 @@ export function IdeiasVipAdmin({ clienteId, clienteNome }: { clienteId: string; 
       {importando && <ImportarModal clienteId={clienteId} onClose={(id) => { setImportando(false); if (id) setAberto(id); }} />}
       {duplicando && <DuplicarModal lote={duplicando} clienteAtual={clienteId} onClose={() => setDuplicando(null)} />}
     </div>
+  );
+}
+
+// ---------- Link para o cliente ----------
+function CompartilharLink({ clienteId, clienteNome }: { clienteId: string; clienteNome: string }) {
+  const { slug, carregando, gerar, revogar } = useLinkIdeias(clienteId);
+  const [copiado, setCopiado] = useState(false);
+  const url = slug ? `${window.location.origin}/ideias/${slug}` : null;
+
+  async function copiar() {
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      window.prompt('Copie o link:', url);
+    }
+    setCopiado(true);
+    window.setTimeout(() => setCopiado(false), 2000);
+  }
+
+  const mensagem = `Oi, aqui estão as ideias de postagem do grupo VIP da ${clienteNome}. É só abrir, copiar o texto e usar: ${url ?? ''}`;
+
+  return (
+    <Card className="p-4">
+      <h3 className="text-base font-semibold text-white">Link para o cliente</h3>
+      <p className="mt-1 text-sm text-slate-400">
+        O cliente abre pelo link, sem precisar de senha, e vê só os lotes publicados.
+      </p>
+      {carregando ? null : !url ? (
+        <Button className={`${BTN} mt-3 w-full sm:w-auto`} onClick={() => gerar.mutate()} disabled={gerar.isPending}>
+          {gerar.isPending ? 'Gerando' : 'Gerar link'}
+        </Button>
+      ) : (
+        <div className="mt-3 space-y-3">
+          <div className="break-all rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-brand-200">{url}</div>
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            <Button className={`${BTN} col-span-2 sm:col-span-1`} onClick={() => void copiar()}>{copiado ? 'Link copiado' : 'Copiar link'}</Button>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(mensagem)}`} target="_blank" rel="noreferrer"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-white/10"
+            >Enviar no WhatsApp</a>
+            <a
+              href={url} target="_blank" rel="noreferrer"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-white/10"
+            >Abrir como cliente</a>
+            <Button
+              className={BTN} variant="ghost" disabled={revogar.isPending}
+              onClick={() => { if (window.confirm('Desativar este link? Quem tiver o link antigo deixa de acessar.')) revogar.mutate(); }}
+            >Desativar link</Button>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }
 

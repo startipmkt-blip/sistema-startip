@@ -12,9 +12,9 @@ const porHorario = (a: Idea, b: Idea) => (a.suggested_time ?? '99:99').localeCom
 // 16px no celular evita o zoom automático do iOS ao tocar no campo.
 const CAMPO = 'glass-field min-h-[44px] w-full px-3 py-2 text-base focus:border-brand-400/60 focus:outline-none focus:ring-1 focus:ring-brand-400/50 sm:text-sm [&>option]:bg-slate-900';
 
-export function IdeiasVipCliente({ clientId }: { clientId: string }) {
-  const { data, isLoading, isError } = useDadosPortal(clientId);
-  const marcar = useMarcarIdeia(clientId);
+export function IdeiasVipCliente({ clientId, slug }: { clientId: string; slug?: string }) {
+  const { data, isLoading, isError } = useDadosPortal(clientId, slug);
+  const marcar = useMarcarIdeia(clientId, slug);
   const [loteSel, setLoteSel] = useState('');
   const [tipo, setTipo] = useState<IdeaType | 'todas'>('todas');
   const [busca, setBusca] = useState('');

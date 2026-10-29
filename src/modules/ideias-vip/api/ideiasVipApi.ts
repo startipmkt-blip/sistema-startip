@@ -251,14 +251,61 @@ export function useReordenar() {
   });
 }
 
-// ---- Cliente (portal) ----
-export interface DadosPortal { lotes: IdeaBatch[]; ideias: Idea[]; estados: IdeaClientState[] }
+// ---- Link público para o cliente (sem login) ----
+let demoSlug: string | null = null;
 
-export function useDadosPortal(clientId: string) {
-  return useQuery({
-    queryKey: K.portal(clientId),
+export function useLinkIdeias(clientId: string) {
+  const qc = useQueryClient();
+  const chave = [...K.todos, 'link', clientId] as const;
+  const consulta = useQuery({
+    queryKey: chave,
     enabled: Boolean(clientId),
+    queryFn: async (): Promise<string | null> => {
+      if (IS_DEMO) return demoSlug;
+      const { data, error } = await tbl('clientes').select('ideias_slug').eq('id', clientId).maybeSingle();
+      if (error) throw error;
+      return (data?.ideias_slug as string | null) ?? null;
+    },
+  });
+  const gerar = useMutation({
+    mutationFn: async () => {
+      if (IS_DEMO) { demoSlug = 'demo1234'; return; }
+      const { data, error } = await supabase.rpc('_gerar_central_slug');
+      if (error) throw error;
+      const { error: e2 } = await tbl('clientes').update({ ideias_slug: data as string }).eq('id', clientId);
+      if (e2) throw e2;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: chave }),
+  });
+  const revogar = useMutation({
+    mutationFn: async () => {
+      if (IS_DEMO) { demoSlug = null; return; }
+      const { error } = await tbl('clientes').update({ ideias_slug: null }).eq('id', clientId);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: chave }),
+  });
+  return { slug: consulta.data ?? null, carregando: consulta.isLoading, gerar, revogar };
+}
+
+// ---- Cliente (portal) ----
+export interface DadosPortal {
+  lotes: IdeaBatch[]; ideias: Idea[]; estados: IdeaClientState[];
+  cliente?: { id: string; nome: string; logo_url: string | null };
+}
+
+// Com `slug`, lê pela página pública (sem login) em vez da sessão do usuário.
+export function useDadosPortal(clientId: string, slug?: string) {
+  return useQuery({
+    queryKey: [...K.portal(clientId), slug ?? ''] as const,
+    enabled: Boolean(clientId || slug),
     queryFn: async (): Promise<DadosPortal> => {
+      if (slug && !IS_DEMO) {
+        const { data, error } = await (supabase.rpc as any)('ideias_vip_publico', { p_slug: slug }); // eslint-disable-line @typescript-eslint/no-explicit-any
+        if (error) throw error;
+        if (!data) throw new Error('link invalido');
+        return { cliente: data.cliente, lotes: data.lotes, ideias: data.ideias, estados: data.estados } as DadosPortal;
+      }
       if (IS_DEMO) {
         const lotes = demoLotes.filter((l) => l.client_id === clientId && l.status === 'publicado');
         const ids = new Set(lotes.map((l) => l.id));
@@ -282,10 +329,17 @@ export function useDadosPortal(clientId: string) {
   });
 }
 
-export function useMarcarIdeia(clientId: string) {
+export function useMarcarIdeia(clientId: string, slug?: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (p: { ideaId: string; status?: IdeaState; copiou?: boolean; atual?: IdeaClientState }) => {
+      if (slug && !IS_DEMO) {
+        const { error } = await (supabase.rpc as any)('ideias_vip_marcar', { // eslint-disable-line @typescript-eslint/no-explicit-any
+          p_slug: slug, p_idea: p.ideaId, p_status: p.status ?? null, p_copiou: Boolean(p.copiou),
+        });
+        if (error) throw error;
+        return;
+      }
       const status = p.status ?? p.atual?.status ?? 'nova';
       const copied = (p.atual?.copied_count ?? 0) + (p.copiou ? 1 : 0);
       if (IS_DEMO) {

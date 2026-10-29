@@ -35,6 +35,7 @@ import { CentralClientePage } from '@/pages/CentralClientePage';
 import { AprovacaoPublicaPage } from '@/pages/AprovacaoPublicaPage';
 import { AprovacaoIdeiasPublicaPage } from '@/pages/AprovacaoIdeiasPublicaPage';
 import { PortalStories } from '@/portal/pages/PortalStories';
+import { IdeiasPublicaPage } from '@/modules/ideias-vip/pages/IdeiasPublicaPage';
 import { PortalIdeias } from '@/portal/pages/PortalIdeias';
 import { StoriesPage } from '@/modules/stories/pages/StoriesPage';
 import { PortalAprovacao } from '@/portal/pages/PortalAprovacao';
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
   { path: '/aprovar-criativos/:slug', element: <AprovacaoPublicaPage tipo="criativos" /> },
   { path: '/aprovar-ideias/:slug', element: <AprovacaoIdeiasPublicaPage /> },
   { path: '/calendario/:slug', element: <CalendarioPublicoPage /> },
+  { path: '/ideias/:slug', element: <IdeiasPublicaPage /> },
   { path: '/tv/:slug', element: <PainelTvPage /> },
   { path: '/otim/:token', element: <OtimizacoesPublicaPage /> },
   { path: '/onb/:token', element: <OnboardingPublicoPage /> },
