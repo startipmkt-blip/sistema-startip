@@ -63,6 +63,20 @@ export function useResumoLotes(clientId: string) {
   });
 }
 
+// O que o cliente marcou em cada ideia (feita, salva, quantas vezes copiou), para a equipe acompanhar.
+export function useEstadosDoCliente(clientId: string) {
+  return useQuery({
+    queryKey: [...K.todos, 'estados', clientId] as const,
+    enabled: Boolean(clientId),
+    queryFn: async (): Promise<Map<string, IdeaClientState>> => {
+      const lista: IdeaClientState[] = IS_DEMO
+        ? demoEstados.filter((e) => e.client_id === clientId)
+        : ((await tbl('idea_client_state').select('*').eq('client_id', clientId)).data ?? []);
+      return new Map(lista.map((e) => [e.idea_id, e]));
+    },
+  });
+}
+
 export function useIdeiasDoLote(batchId: string | null) {
   return useQuery({
     queryKey: K.ideias(batchId ?? ''),

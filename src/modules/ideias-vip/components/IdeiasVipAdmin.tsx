@@ -10,7 +10,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import {
-  useAtualizarLote, useCriarLote, useDuplicarLote, useExcluirIdeia, useExcluirLote, useIdeiasDoLote,
+  useAtualizarLote, useCriarLote, useDuplicarLote, useEstadosDoCliente, useExcluirIdeia, useExcluirLote, useIdeiasDoLote,
   useLotes, useReordenar, useResumoLotes, useSalvarIdeia,
 } from '@/modules/ideias-vip/api/ideiasVipApi';
 import { formatarDia, interpretar, modeloCsv, pendencias, temPendencia } from '@/modules/ideias-vip/lib/importar';
@@ -246,6 +246,8 @@ function EditorLote({ lote, onVoltar, onPublicar }: { lote: IdeaBatch; onVoltar:
   const excluir = useExcluirIdeia();
   const reordenar = useReordenar();
   const atualizar = useAtualizarLote();
+  const { data: estados } = useEstadosDoCliente(lote.client_id);
+  const feitas = (ideias ?? []).filter((i) => estados?.get(i.id)?.status === 'usada').length;
   const [form, setForm] = useState<{ id?: string; dados: IdeaDraft } | null>(null);
   const [titulo, setTitulo] = useState(lote.title);
   const pendentes = (ideias ?? []).filter((i) => temPendencia(i.body)).length;
@@ -257,6 +259,7 @@ function EditorLote({ lote, onVoltar, onPublicar }: { lote: IdeaBatch; onVoltar:
         <Input className={CAMPO} label="Título do lote" value={titulo} onChange={(e) => setTitulo(e.target.value)} onBlur={() => titulo.trim() && titulo !== lote.title && atualizar.mutate({ id: lote.id, title: titulo.trim() })} />
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone={lote.status === 'publicado' ? 'green' : 'amber'}>{lote.status === 'publicado' ? 'Publicado' : 'Rascunho'}</Badge>
+          {lote.status === 'publicado' && <span className="text-sm text-slate-300">{feitas} de {ideias?.length ?? 0} feitas pelo cliente</span>}
           <div className="grid w-full grid-cols-2 gap-2 sm:ml-auto sm:flex sm:w-auto">
             {lote.status === 'rascunho'
               ? <Button className={BTN} onClick={onPublicar} disabled={!ideias?.length}>Publicar</Button>
@@ -278,6 +281,9 @@ function EditorLote({ lote, onVoltar, onPublicar }: { lote: IdeaBatch; onVoltar:
                   {i.suggested_date && <span className="capitalize">{formatarDia(i.suggested_date, true)}</span>}
                   {i.suggested_time && <span>{i.suggested_time}</span>}
                   {temPendencia(i.body) && <Badge tone="red">Preencher {pendencias(i.body).join(' ')}</Badge>}
+                  {estados?.get(i.id)?.status === 'usada' && <Badge tone="green">✓ Feito pelo cliente</Badge>}
+                  {estados?.get(i.id)?.status === 'salva' && <Badge tone="amber">Salva pelo cliente</Badge>}
+                  {(estados?.get(i.id)?.copied_count ?? 0) > 0 && <span>Copiada {estados?.get(i.id)?.copied_count}x</span>}
                 </div>
                 {i.title && <div className="mt-2 text-sm font-semibold text-white">{i.title}</div>}
                 <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-200">{i.body}</p>
