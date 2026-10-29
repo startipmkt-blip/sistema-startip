@@ -17,6 +17,10 @@ import { formatarDia, interpretar, modeloCsv, pendencias, temPendencia } from '@
 import { IDEA_TYPES, ideaVazia, tipoInfo } from '@/modules/ideias-vip/types';
 import type { Idea, IdeaBatch, IdeaDraft, IdeaType } from '@/modules/ideias-vip/types';
 
+// 16px no celular evita o zoom automático do iOS ao tocar nos campos.
+const CAMPO = '!text-base sm:!text-sm min-h-[44px]';
+const BTN = 'min-h-[44px]';
+
 const mesTexto = (iso: string | null) => {
   if (!iso) return 'Sem mês';
   const [a, m] = iso.split('-').map(Number);
@@ -47,12 +51,12 @@ export function IdeiasVipAdmin({ clienteId, clienteNome }: { clienteId: string; 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-white">Ideias do grupo VIP</h2>
           <p className="text-sm text-slate-400">Lotes de ideias de {clienteNome}. O cliente só vê os lotes publicados.</p>
         </div>
-        <Button onClick={() => setImportando(true)}>Importar lote</Button>
+        <Button className={`${BTN} w-full sm:w-auto`} onClick={() => setImportando(true)}>Importar lote</Button>
       </div>
 
       {isLoading ? <div className="flex justify-center py-10"><Spinner /></div>
@@ -63,24 +67,24 @@ export function IdeiasVipAdmin({ clienteId, clienteNome }: { clienteId: string; 
               const r = resumo?.[l.id] ?? { total: 0, usadas: 0, pendentes: 0 };
               return (
                 <Card key={l.id} className="p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
-                      <button onClick={() => setAberto(l.id)} className="text-left text-base font-semibold text-white hover:underline">{l.title}</button>
-                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                      <button onClick={() => setAberto(l.id)} className="break-words text-left text-base font-semibold text-white hover:underline">{l.title}</button>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                        <Badge tone={l.status === 'publicado' ? 'green' : 'amber'}>{l.status === 'publicado' ? 'Publicado' : 'Rascunho'}</Badge>
+                        {r.pendentes > 0 && <Badge tone="red">{r.pendentes} para preencher</Badge>}
                         <span>{mesTexto(l.reference_month)}</span>
                         <span>{r.total} ideias</span>
                         {l.status === 'publicado' && <span>{r.usadas} usadas pelo cliente</span>}
-                        <Badge tone={l.status === 'publicado' ? 'green' : 'amber'}>{l.status === 'publicado' ? 'Publicado' : 'Rascunho'}</Badge>
-                        {r.pendentes > 0 && <Badge tone="red">{r.pendentes} para preencher</Badge>}
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="secondary" onClick={() => setAberto(l.id)}>Abrir</Button>
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                      <Button className={BTN} variant="secondary" onClick={() => setAberto(l.id)}>Abrir</Button>
                       {l.status === 'rascunho'
-                        ? <Button onClick={() => publicar(l)} disabled={!r.total}>Publicar</Button>
-                        : <Button variant="secondary" onClick={() => atualizar.mutate({ id: l.id, status: 'rascunho' })}>Voltar para rascunho</Button>}
-                      <Button variant="secondary" onClick={() => setDuplicando(l)}>Duplicar para outro cliente</Button>
-                      <Button variant="ghost" onClick={() => { if (window.confirm(`Excluir o lote "${l.title}" e todas as ideias dele?`)) excluir.mutate(l.id); }}>Excluir</Button>
+                        ? <Button className={BTN} onClick={() => publicar(l)} disabled={!r.total}>Publicar</Button>
+                        : <Button className={BTN} variant="secondary" onClick={() => atualizar.mutate({ id: l.id, status: 'rascunho' })}>Voltar para rascunho</Button>}
+                      <Button className={BTN} variant="secondary" onClick={() => setDuplicando(l)}>Duplicar</Button>
+                      <Button className={BTN} variant="ghost" onClick={() => { if (window.confirm(`Excluir o lote "${l.title}" e todas as ideias dele?`)) excluir.mutate(l.id); }}>Excluir</Button>
                     </div>
                   </div>
                 </Card>
@@ -127,27 +131,28 @@ function ImportarModal({ clienteId, onClose }: { clienteId: string; onClose: (no
   return (
     <Modal
       open onClose={() => onClose()} title="Importar lote de ideias" size="xl" fecharSoPorBotao
-      footer={<>
-        <Button variant="secondary" onClick={() => onClose()}>Cancelar</Button>
-        <Button onClick={() => void salvar()} disabled={!validas.length || criar.isPending}>
-          {criar.isPending ? 'Salvando' : `Salvar ${validas.length} ideias como rascunho`}
+      footer={<div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+        <Button className={BTN} variant="secondary" onClick={() => onClose()}>Cancelar</Button>
+        <Button className={BTN} onClick={() => void salvar()} disabled={!validas.length || criar.isPending}>
+          {criar.isPending ? 'Salvando' : `Salvar (${validas.length})`}
         </Button>
-      </>}
+      </div>}
     >
       <div className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          <Input label="Título do lote" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Novembro 2026" />
-          <Input label="Mês de referência" type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
+          <Input className={CAMPO} label="Título do lote" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Novembro 2026" />
+          <Input className={CAMPO} label="Mês de referência" type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="inline-flex cursor-pointer items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-white/10">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <label className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-white/10">
             Enviar arquivo CSV
             <input type="file" accept=".csv,.txt,text/csv" className="hidden" onChange={(e) => void lerArquivo(e.target.files?.[0])} />
           </label>
-          <Button variant="ghost" onClick={baixarModelo}>Baixar modelo de planilha</Button>
+          <Button className={BTN} variant="secondary" onClick={baixarModelo}>Baixar modelo de planilha</Button>
           <span className="text-xs text-slate-400">Colunas: data, horario, tipo, tema, titulo, texto, midia</span>
         </div>
         <Textarea
+          className="!text-base sm:!text-sm"
           label="Ou cole a tabela aqui (copiada do Excel, Google Sheets ou documento)"
           value={texto} onChange={(e) => setTexto(e.target.value)} rows={6} semLinks
           placeholder="A primeira linha precisa ter os nomes das colunas"
@@ -158,7 +163,22 @@ function ImportarModal({ clienteId, onClose }: { clienteId: string; onClose: (no
             <p className="text-sm text-slate-300">
               {validas.length} linhas prontas{comErro.length > 0 && <>, <span className="text-red-300">{comErro.length} com erro (não serão importadas)</span></>}.
             </p>
-            <div className="max-h-72 overflow-auto rounded-xl border border-white/10">
+
+            <ul className="max-h-80 space-y-2 overflow-auto sm:hidden">
+              {analise.linhas.map((l) => (
+                <li key={l.linha} className={`rounded-xl border p-3 text-sm ${l.erros.length ? 'border-red-400/30 bg-red-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                    <span>Linha {l.linha}</span>
+                    <Badge tone={tipoInfo(l.dados.type).tone}>{tipoInfo(l.dados.type).label}</Badge>
+                    {l.dados.suggested_date && <span>{formatarDia(l.dados.suggested_date, true)} {l.dados.suggested_time ?? ''}</span>}
+                  </div>
+                  <p className="mt-1 line-clamp-3 text-slate-100">{l.dados.body || 'Sem texto'}</p>
+                  <p className={`mt-1 text-xs ${l.erros.length ? 'text-red-300' : 'text-emerald-300'}`}>{l.erros.length ? l.erros.join('; ') : 'Ok'}</p>
+                </li>
+              ))}
+            </ul>
+
+            <div className="hidden max-h-72 overflow-auto rounded-xl border border-white/10 sm:block">
               <table className="w-full text-left text-xs">
                 <thead className="sticky top-0 bg-slate-900 text-slate-400">
                   <tr><th className="p-2">Linha</th><th className="p-2">Data</th><th className="p-2">Tipo</th><th className="p-2">Texto</th><th className="p-2">Situação</th></tr>
@@ -167,7 +187,7 @@ function ImportarModal({ clienteId, onClose }: { clienteId: string; onClose: (no
                   {analise.linhas.map((l) => (
                     <tr key={l.linha} className={`border-t border-white/5 ${l.erros.length ? 'bg-red-500/10' : ''}`}>
                       <td className="p-2 text-slate-400">{l.linha}</td>
-                      <td className="p-2 whitespace-nowrap text-slate-300">{l.dados.suggested_date ? formatarDia(l.dados.suggested_date, true) : ''} {l.dados.suggested_time ?? ''}</td>
+                      <td className="whitespace-nowrap p-2 text-slate-300">{l.dados.suggested_date ? formatarDia(l.dados.suggested_date, true) : ''} {l.dados.suggested_time ?? ''}</td>
                       <td className="p-2 text-slate-300">{tipoInfo(l.dados.type).label}</td>
                       <td className="max-w-[260px] truncate p-2 text-slate-200">{l.dados.body}</td>
                       <td className="p-2">{l.erros.length ? <span className="text-red-300">{l.erros.join('; ')}</span> : <span className="text-emerald-300">Ok</span>}</td>
@@ -195,20 +215,20 @@ function DuplicarModal({ lote, clienteAtual, onClose }: { lote: IdeaBatch; clien
   return (
     <Modal
       open onClose={onClose} title="Duplicar lote para outros clientes"
-      footer={feito ? <Button onClick={onClose}>Fechar</Button> : <>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button disabled={!sel.length || !ideias || duplicar.isPending} onClick={async () => { await duplicar.mutateAsync({ lote, ideias: ideias ?? [], clientIds: sel }); setFeito(true); }}>
-          {duplicar.isPending ? 'Copiando' : `Copiar para ${sel.length} cliente(s)`}
+      footer={feito ? <Button className={BTN} onClick={onClose}>Fechar</Button> : <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+        <Button className={BTN} variant="secondary" onClick={onClose}>Cancelar</Button>
+        <Button className={BTN} disabled={!sel.length || !ideias || duplicar.isPending} onClick={async () => { await duplicar.mutateAsync({ lote, ideias: ideias ?? [], clientIds: sel }); setFeito(true); }}>
+          {duplicar.isPending ? 'Copiando' : `Copiar (${sel.length})`}
         </Button>
-      </>}
+      </div>}
     >
       {feito ? <p className="text-sm text-slate-200">Pronto. As cópias estão como rascunho em cada cliente, para você trocar os dados entre colchetes.</p> : (
         <div className="space-y-2">
           <p className="text-sm text-slate-400">As cópias entram como rascunho.</p>
           <div className="max-h-72 space-y-1 overflow-auto">
             {opcoes.map((c) => (
-              <label key={c.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-200 hover:bg-white/5">
-                <input type="checkbox" checked={sel.includes(c.id)} onChange={(e) => setSel(e.target.checked ? [...sel, c.id] : sel.filter((x) => x !== c.id))} />
+              <label key={c.id} className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg px-2 text-base text-slate-200 hover:bg-white/5 sm:text-sm">
+                <input type="checkbox" className="h-5 w-5" checked={sel.includes(c.id)} onChange={(e) => setSel(e.target.checked ? [...sel, c.id] : sel.filter((x) => x !== c.id))} />
                 {c.nome}
               </label>
             ))}
@@ -232,42 +252,40 @@ function EditorLote({ lote, onVoltar, onPublicar }: { lote: IdeaBatch; onVoltar:
 
   return (
     <div className="space-y-4">
-      <Button variant="ghost" onClick={onVoltar}>Voltar para os lotes</Button>
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-[220px] flex-1">
-          <Input label="Título do lote" value={titulo} onChange={(e) => setTitulo(e.target.value)} onBlur={() => titulo.trim() && titulo !== lote.title && atualizar.mutate({ id: lote.id, title: titulo.trim() })} />
+      <Button className={BTN} variant="ghost" onClick={onVoltar}>Voltar para os lotes</Button>
+      <div className="space-y-3">
+        <Input className={CAMPO} label="Título do lote" value={titulo} onChange={(e) => setTitulo(e.target.value)} onBlur={() => titulo.trim() && titulo !== lote.title && atualizar.mutate({ id: lote.id, title: titulo.trim() })} />
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone={lote.status === 'publicado' ? 'green' : 'amber'}>{lote.status === 'publicado' ? 'Publicado' : 'Rascunho'}</Badge>
+          <div className="grid w-full grid-cols-2 gap-2 sm:ml-auto sm:flex sm:w-auto">
+            {lote.status === 'rascunho'
+              ? <Button className={BTN} onClick={onPublicar} disabled={!ideias?.length}>Publicar</Button>
+              : <Button className={BTN} variant="secondary" onClick={() => atualizar.mutate({ id: lote.id, status: 'rascunho' })}>Voltar para rascunho</Button>}
+            <Button className={BTN} variant="secondary" onClick={() => setForm({ dados: ideaVazia() })}>Nova ideia</Button>
+          </div>
         </div>
-        <Badge tone={lote.status === 'publicado' ? 'green' : 'amber'}>{lote.status === 'publicado' ? 'Publicado' : 'Rascunho'}</Badge>
-        {lote.status === 'rascunho'
-          ? <Button onClick={onPublicar} disabled={!ideias?.length}>Publicar</Button>
-          : <Button variant="secondary" onClick={() => atualizar.mutate({ id: lote.id, status: 'rascunho' })}>Voltar para rascunho</Button>}
-        <Button variant="secondary" onClick={() => setForm({ dados: ideaVazia() })}>Nova ideia</Button>
       </div>
-      {pendentes > 0 && <p className="text-sm text-amber-300">{pendentes} ideia(s) com campos entre colchetes para preencher antes de publicar.</p>}
+      {pendentes > 0 && <p className="rounded-xl bg-amber-500/10 px-3 py-2 text-sm text-amber-300">{pendentes} ideia(s) com campos entre colchetes para preencher antes de publicar.</p>}
 
       {isLoading ? <div className="flex justify-center py-10"><Spinner /></div>
         : !ideias?.length ? <Card><EmptyState message="Este lote não tem ideias." /></Card>
         : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {ideias.map((i, n) => (
-              <Card key={i.id} className="p-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                      <Badge tone={tipoInfo(i.type).tone}>{tipoInfo(i.type).label}</Badge>
-                      {i.suggested_date && <span>{formatarDia(i.suggested_date, true)}</span>}
-                      {i.suggested_time && <span>{i.suggested_time}</span>}
-                      {temPendencia(i.body) && <Badge tone="red">Preencher {pendencias(i.body).join(' ')}</Badge>}
-                    </div>
-                    {i.title && <div className="mt-1 text-sm font-semibold text-white">{i.title}</div>}
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-slate-200">{i.body}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Button variant="ghost" disabled={n === 0} onClick={() => reordenar.mutate({ a: i, b: ideias[n - 1] })} aria-label="Subir">Subir</Button>
-                    <Button variant="ghost" disabled={n === ideias.length - 1} onClick={() => reordenar.mutate({ a: i, b: ideias[n + 1] })} aria-label="Descer">Descer</Button>
-                    <Button variant="secondary" onClick={() => setForm({ id: i.id, dados: dadosDe(i) })}>Editar</Button>
-                    <Button variant="ghost" onClick={() => { if (window.confirm('Excluir esta ideia?')) excluir.mutate(i.id); }}>Excluir</Button>
-                  </div>
+              <Card key={i.id} className="p-3 sm:p-4">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                  <Badge tone={tipoInfo(i.type).tone}>{tipoInfo(i.type).label}</Badge>
+                  {i.suggested_date && <span className="capitalize">{formatarDia(i.suggested_date, true)}</span>}
+                  {i.suggested_time && <span>{i.suggested_time}</span>}
+                  {temPendencia(i.body) && <Badge tone="red">Preencher {pendencias(i.body).join(' ')}</Badge>}
+                </div>
+                {i.title && <div className="mt-2 text-sm font-semibold text-white">{i.title}</div>}
+                <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-200">{i.body}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                  <Button className={BTN} variant="secondary" onClick={() => setForm({ id: i.id, dados: dadosDe(i) })}>Editar</Button>
+                  <Button className={BTN} variant="ghost" onClick={() => { if (window.confirm('Excluir esta ideia?')) excluir.mutate(i.id); }}>Excluir</Button>
+                  <Button className={BTN} variant="ghost" disabled={n === 0} onClick={() => reordenar.mutate({ a: i, b: ideias[n - 1] })}>Subir</Button>
+                  <Button className={BTN} variant="ghost" disabled={n === ideias.length - 1} onClick={() => reordenar.mutate({ a: i, b: ideias[n + 1] })}>Descer</Button>
                 </div>
               </Card>
             ))}
@@ -297,21 +315,21 @@ function FormIdeia({ dados, salvando, onClose, onSalvar }: { dados: IdeaDraft; s
   return (
     <Modal
       open onClose={onClose} title="Ideia" size="lg" fecharSoPorBotao
-      footer={<>
-        <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-        <Button disabled={!d.body.trim() || salvando} onClick={() => void onSalvar({ ...d, body: d.body.trim() })}>Salvar</Button>
-      </>}
+      footer={<div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+        <Button className={BTN} variant="secondary" onClick={onClose}>Cancelar</Button>
+        <Button className={BTN} disabled={!d.body.trim() || salvando} onClick={() => void onSalvar({ ...d, body: d.body.trim() })}>Salvar</Button>
+      </div>}
     >
       <div className="space-y-3">
         <div className="grid gap-3 sm:grid-cols-3">
-          <Select label="Tipo" value={d.type} onChange={(e) => setD({ ...d, type: e.target.value as IdeaType })} options={IDEA_TYPES.map((t) => ({ value: t.value, label: t.label }))} />
-          <Input label="Data sugerida" type="date" value={d.suggested_date ?? ''} onChange={(e) => setD({ ...d, suggested_date: nulo(e.target.value) })} />
-          <Input label="Horário" type="time" value={d.suggested_time ?? ''} onChange={(e) => setD({ ...d, suggested_time: nulo(e.target.value) })} />
+          <Select className={CAMPO} label="Tipo" value={d.type} onChange={(e) => setD({ ...d, type: e.target.value as IdeaType })} options={IDEA_TYPES.map((t) => ({ value: t.value, label: t.label }))} />
+          <Input className={CAMPO} label="Data sugerida" type="date" value={d.suggested_date ?? ''} onChange={(e) => setD({ ...d, suggested_date: nulo(e.target.value) })} />
+          <Input className={CAMPO} label="Horário" type="time" value={d.suggested_time ?? ''} onChange={(e) => setD({ ...d, suggested_time: nulo(e.target.value) })} />
         </div>
-        <Input label="Título (opcional)" value={d.title ?? ''} onChange={(e) => setD({ ...d, title: nulo(e.target.value) })} />
-        <Input label="Tema do dia" value={d.theme ?? ''} onChange={(e) => setD({ ...d, theme: nulo(e.target.value) })} />
-        <Textarea label="Texto pronto para copiar" value={d.body} onChange={(e) => setD({ ...d, body: e.target.value })} rows={6} semLinks />
-        <Input label="Sugestão de mídia" value={d.media_suggestion ?? ''} onChange={(e) => setD({ ...d, media_suggestion: nulo(e.target.value) })} placeholder="Foto, vídeo ou áudio que acompanha" />
+        <Input className={CAMPO} label="Título (opcional)" value={d.title ?? ''} onChange={(e) => setD({ ...d, title: nulo(e.target.value) })} />
+        <Input className={CAMPO} label="Tema do dia" value={d.theme ?? ''} onChange={(e) => setD({ ...d, theme: nulo(e.target.value) })} />
+        <Textarea className="!text-base sm:!text-sm" label="Texto pronto para copiar" value={d.body} onChange={(e) => setD({ ...d, body: e.target.value })} rows={6} semLinks />
+        <Input className={CAMPO} label="Sugestão de mídia" value={d.media_suggestion ?? ''} onChange={(e) => setD({ ...d, media_suggestion: nulo(e.target.value) })} placeholder="Foto, vídeo ou áudio que acompanha" />
       </div>
     </Modal>
   );
