@@ -75,7 +75,7 @@ export function IdeiasVipAdmin({ clienteId, clienteNome }: { clienteId: string; 
                         {r.pendentes > 0 && <Badge tone="red">{r.pendentes} para preencher</Badge>}
                         <span>{mesTexto(l.reference_month)}</span>
                         <span>{r.total} ideias</span>
-                        {l.status === 'publicado' && <span>{r.usadas} usadas pelo cliente</span>}
+                        {l.status === 'publicado' && <span>{r.usadas} feitas pelo cliente</span>}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">

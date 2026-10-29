@@ -93,7 +93,7 @@ export function IdeiasVipCliente({ clientId }: { clientId: string }) {
   return (
     <div className="space-y-5">
       <p className="rounded-xl bg-white/5 px-4 py-3 text-sm text-slate-300">
-        Toque em <strong className="text-white">Copiar texto</strong> e cole no seu grupo VIP. Depois marque como usada para saber o que já postou.
+        Toque em <strong className="text-white">Copiar texto</strong> e cole no seu grupo VIP. Depois toque em <strong className="text-white">Marcar como feito</strong> para saber o que já postou.
       </p>
 
       <div className="space-y-3">
@@ -107,7 +107,12 @@ export function IdeiasVipCliente({ clientId }: { clientId: string }) {
         ) : (
           <h2 className="text-lg font-semibold text-white">{data.lotes[0].title}</h2>
         )}
-        <p className="text-sm text-slate-400">{doLote.length} ideias, {usadasNoLote} já usadas</p>
+        <div>
+          <p className="text-sm text-slate-300"><strong className="text-white">{usadasNoLote} de {doLote.length}</strong> ideias feitas</p>
+          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-valuemin={0} aria-valuemax={doLote.length} aria-valuenow={usadasNoLote}>
+            <div className="h-full rounded-full bg-emerald-400 transition-all" style={{ width: `${doLote.length ? (usadasNoLote / doLote.length) * 100 : 0}%` }} />
+          </div>
+        </div>
         <input
           className={CAMPO} type="search" value={busca} onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar por palavra" aria-label="Buscar ideias"
@@ -124,7 +129,7 @@ export function IdeiasVipCliente({ clientId }: { clientId: string }) {
         <button
           onClick={() => setOcultarUsadas(!ocultarUsadas)} aria-pressed={ocultarUsadas}
           className={`min-h-[40px] shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-semibold ${ocultarUsadas ? 'bg-emerald-500/25 text-emerald-200 ring-1 ring-emerald-400/40' : 'border border-dashed border-white/20 text-slate-300'}`}
-        >Ocultar usadas</button>
+        >Ocultar feitas</button>
       </div>
 
       {paraHoje.length > 0 && (
@@ -173,10 +178,10 @@ function CartaoIdeia({ ideia, estado, copiada, onCopiar, onStatus }: {
   const status = estado?.status ?? 'nova';
   const usada = status === 'usada';
   return (
-    <article className={`glass p-4 ${usada ? 'opacity-70' : ''}`}>
+    <article className={`glass p-4 ${usada ? 'border-emerald-400/50 bg-emerald-500/5' : ''}`}>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
         <Badge tone={t.tone}>{t.label}</Badge>
-        {usada && <Badge tone="green">Usada</Badge>}
+        {usada && <Badge tone="green">✓ Feito</Badge>}
         {status === 'salva' && <Badge tone="amber">Salva</Badge>}
         {(ideia.suggested_date || ideia.suggested_time) && (
           <span className="ml-auto text-sm font-medium text-slate-200">
@@ -197,18 +202,16 @@ function CartaoIdeia({ ideia, estado, copiada, onCopiar, onStatus }: {
         <Button className={`min-h-[48px] w-full text-base ${copiada ? '!bg-emerald-500 !bg-none' : ''}`} onClick={onCopiar}>
           {copiada ? 'Texto copiado' : 'Copiar texto'}
         </Button>
-        <div className="grid grid-cols-2 gap-2">
-          {usada ? (
-            <Button variant="secondary" className="col-span-2 min-h-[44px]" onClick={() => onStatus('nova')}>Desfazer, não usei</Button>
-          ) : (
-            <>
-              <Button variant="secondary" className="min-h-[44px]" onClick={() => onStatus(status === 'salva' ? 'nova' : 'salva')}>
-                {status === 'salva' ? 'Tirar dos salvos' : 'Salvar'}
-              </Button>
-              <Button variant="secondary" className="min-h-[44px]" onClick={() => onStatus('usada')}>Já usei</Button>
-            </>
-          )}
-        </div>
+        {usada ? (
+          <Button variant="secondary" className="min-h-[44px] w-full" onClick={() => onStatus('nova')}>Desfazer, ainda não fiz</Button>
+        ) : (
+          <div className="grid grid-cols-[1fr,auto] gap-2">
+            <Button className="min-h-[44px] !bg-emerald-600 !bg-none hover:!bg-emerald-500" onClick={() => onStatus('usada')}>✓ Marcar como feito</Button>
+            <Button variant="secondary" className="min-h-[44px]" onClick={() => onStatus(status === 'salva' ? 'nova' : 'salva')}>
+              {status === 'salva' ? 'Salva' : 'Salvar'}
+            </Button>
+          </div>
+        )}
       </div>
     </article>
   );
