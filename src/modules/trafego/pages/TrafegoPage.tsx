@@ -7,12 +7,14 @@ import { MetaAdsGestorPage } from '@/modules/meta-ads/pages/MetaAdsGestorPage';
 import { AbaChecklist } from '../components/AbaChecklist';
 import { AbaOtimizacoes } from '../components/AbaOtimizacoes';
 import { AbaSaldo } from '../components/AbaSaldo';
+import { AbaPainelGestor } from '../components/AbaPainelGestor';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
-type Aba = 'meta' | 'checklist' | 'otimizacoes' | 'saldo';
+type Aba = 'meta' | 'gestor' | 'checklist' | 'otimizacoes' | 'saldo';
 
 const ABAS: Array<{ id: Aba; label: string; icone: string }> = [
   { id: 'meta',        label: 'Meta Ads',    icone: '🎯' },
+  { id: 'gestor',      label: 'Painel do Gestor', icone: '📊' },
   { id: 'checklist',   label: 'Checklist',   icone: '📋' },
   { id: 'otimizacoes', label: 'Otimizações', icone: '📈' },
   { id: 'saldo',       label: 'Saldo diário', icone: '💰' },
@@ -20,6 +22,16 @@ const ABAS: Array<{ id: Aba; label: string; icone: string }> = [
 
 export function TrafegoPage() {
   const [aba, setAba] = useState<Aba>('meta');
+
+  // O Painel do Gestor ocupa a tela toda (tem o próprio cabeçalho e menu).
+  if (aba === 'gestor') {
+    return (
+      <div>
+        <NavAbas aba={aba} setAba={setAba} />
+        <AbaPainelGestor />
+      </div>
+    );
+  }
 
   // Meta Ads já tem PageHeader próprio; nas outras abas o PageHeader vive aqui.
   if (aba === 'meta') {
@@ -48,7 +60,7 @@ export function TrafegoPage() {
 
 function NavAbas({ aba, setAba }: { aba: Aba; setAba: (a: Aba) => void }) {
   return (
-    <nav className={`flex gap-1 border-b border-white/10 ${aba === 'meta' ? 'px-4 pt-4' : ''}`}>
+    <nav className={`flex gap-1 border-b border-white/10 ${aba === 'meta' || aba === 'gestor' ? 'px-4 pt-4' : ''}`}>
       {ABAS.map((a) => (
         <button
           key={a.id}
