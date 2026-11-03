@@ -10,6 +10,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { uploadArquivo, urlDoArquivo, removerArquivo } from '@/shared/lib/storage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function ModelosContrato() {
   const { data: templates, isLoading } = useContractTemplates();
@@ -47,7 +48,7 @@ export function ModelosContrato() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="text-sm font-semibold text-slate-100">{t.nome}</div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-xs text-slate-400">
                     {glassify(t.arquivo_nome ? `📎 ${t.arquivo_nome}` : t.body_text ? `📝 corpo em texto (${t.body_text.length} chars)` : 'vazio')}
                   </div>
                 </div>
@@ -59,7 +60,7 @@ export function ModelosContrato() {
                 <Button variant="secondary" onClick={() => setEditando(t)}>Editar</Button>
                 <button
                   onClick={async () => {
-                    if (!confirm(`Apagar modelo "${t.nome}"?`)) return;
+                    if (!(await confirmar(`Apagar modelo "${t.nome}"?`))) return;
                     if (t.arquivo_path) { try { await removerArquivo('anexos-internos', t.arquivo_path); } catch {} }
                     apagar.mutate(t.id);
                   }}
@@ -160,7 +161,7 @@ function TemplateForm({ template, onClose, onSalvar }: FormProps) {
               />
             </label>
           )}
-          {erro && <div className="mt-1 text-[11px] text-red-400">{erro}</div>}
+          {erro && <div className="mt-1 text-xs text-red-400">{erro}</div>}
         </div>
 
         <Textarea

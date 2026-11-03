@@ -46,7 +46,7 @@ export function NotifBar() {
               <p className="mb-1">Precisamos da sua permissão pra mostrar avisos.</p>
               <button
                 onClick={habilitar}
-                className="rounded bg-amber-500 px-2 py-1 text-[11px] font-semibold text-slate-900 hover:bg-amber-400"
+                className="rounded bg-amber-500 px-2 py-1 text-xs font-semibold text-slate-900 hover:bg-amber-400"
               >Permitir agora</button>
             </div>
           )}
@@ -67,7 +67,7 @@ export function NotifBar() {
               onChange={(e) => salvar.mutate({ titulo_badge: e.target.checked })} />
           </label>
 
-          <div className="mt-2 border-t border-white/10 pt-2 text-[11px] text-slate-400">Quais mensagens:</div>
+          <div className="mt-2 border-t border-white/10 pt-2 text-xs text-slate-400">Quais mensagens:</div>
           <label className="flex items-center justify-between gap-2 py-1 text-slate-200">
             <span>Minhas conversas</span>
             <input type="checkbox" checked={config.novas_atribuidas}

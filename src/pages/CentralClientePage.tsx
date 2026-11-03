@@ -105,7 +105,7 @@ export function CentralClientePage() {
               <span><GlassIcon emoji={a.icone} /></span>
               <span>{a.label}</span>
               {a.badge && a.badge > 0 && (
-                <span className={`rounded-full px-1.5 text-[10px] font-semibold ${
+                <span className={`rounded-full px-1.5 text-xs font-semibold ${
                   aba === a.id ? 'bg-white/20 text-white' : 'bg-brand-500/30 text-brand-200'
                 }`}>{a.badge}</span>
               )}
@@ -123,7 +123,7 @@ export function CentralClientePage() {
         {aba === 'persona' && <AbaPersona p={dados.persona} />}
       </main>
 
-      <footer className="mt-10 text-center text-[11px] text-slate-500">
+      <footer className="mt-10 text-center text-xs text-slate-400">
         Startip · Cliente desde {new Date(c.data_entrada).toLocaleDateString('pt-BR')}
       </footer>
     </div>
@@ -160,13 +160,13 @@ function AbaEntregas({ itens, semana }: { itens: Dados['entregas_semana']; seman
           <GlassIcon name="archive" /> Conteúdos entregues · <span className="font-normal text-slate-400">{fmtSemana(semana)}</span>
         </h2>
       </Card>
-      {itens.length === 0 ? <Card className="p-6 text-center text-sm text-slate-500">Nenhuma entrega registrada nesta semana.</Card> : (
+      {itens.length === 0 ? <Card className="p-6 text-center text-sm text-slate-400">Nenhuma entrega registrada nesta semana.</Card> : (
         <div className="grid gap-3 sm:grid-cols-2">
           {itens.map((e) => (
             <Card key={e.id} className="p-4">
               <div className="mb-2 flex items-center gap-2">
                 <Badge tone="blue">{e.tipo}</Badge>
-                <span className="text-[11px] text-slate-500">{fmtDia(e.entregue_em)}</span>
+                <span className="text-xs text-slate-400">{fmtDia(e.entregue_em)}</span>
               </div>
               <div className="text-sm font-medium text-slate-100">{e.titulo}</div>
               {e.descricao && <p className="mt-1 text-xs text-slate-400">{e.descricao}</p>}
@@ -181,7 +181,7 @@ function AbaEntregas({ itens, semana }: { itens: Dados['entregas_semana']; seman
 
 function AbaOtimizacoes({ itens }: { itens: Dados['otimizacoes'] }) {
   return itens.length === 0
-    ? <Card className="p-6 text-center text-sm text-slate-500">Nenhuma otimização registrada ainda.</Card>
+    ? <Card className="p-6 text-center text-sm text-slate-400">Nenhuma otimização registrada ainda.</Card>
     : (
       <ul className="space-y-2">
         {itens.map((o) => (
@@ -189,7 +189,7 @@ function AbaOtimizacoes({ itens }: { itens: Dados['otimizacoes'] }) {
             <Card className="p-4">
               <div className="mb-1 flex items-center gap-2">
                 <span className="text-xs font-medium uppercase tracking-wider text-amber-300"><GlassIcon name="zap" /> {o.plataforma}</span>
-                <span className="text-[11px] text-slate-500">{new Date(o.criada_em).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="text-xs text-slate-400">{new Date(o.criada_em).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
               </div>
               <div className="text-sm font-medium text-slate-100">{o.titulo}</div>
               {o.descricao && <p className="mt-1 whitespace-pre-line text-xs text-slate-400"><Linkify texto={o.descricao} /></p>}
@@ -202,19 +202,19 @@ function AbaOtimizacoes({ itens }: { itens: Dados['otimizacoes'] }) {
 
 function AbaInvestimento({ itens }: { itens: Dados['investimento'] }) {
   return itens.length === 0
-    ? <Card className="p-6 text-center text-sm text-slate-500">Sem registros de investimento ainda.</Card>
+    ? <Card className="p-6 text-center text-sm text-slate-400">Sem registros de investimento ainda.</Card>
     : (
       <div className="space-y-3">
         {itens.map((s) => (
           <Card key={s.id} className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-500">Semana</div>
+                <div className="text-xs uppercase tracking-wider text-slate-400">Semana</div>
                 <div className="text-sm font-medium text-slate-100">{fmtSemana(s.semana_inicio)}</div>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-semibold text-emerald-300">{fmtMoney(Number(s.investimento_total))}</div>
-                <div className="text-[11px] text-slate-500">média diária: {fmtMoney(Number(s.media_diaria))}</div>
+                <div className="text-xs text-slate-400">média diária: {fmtMoney(Number(s.media_diaria))}</div>
               </div>
             </div>
             {s.observacoes && <p className="mt-2 whitespace-pre-line text-xs text-slate-400"><Linkify texto={s.observacoes} /></p>}
@@ -226,7 +226,7 @@ function AbaInvestimento({ itens }: { itens: Dados['investimento'] }) {
 
 function AbaAvisos({ itens }: { itens: Dados['avisos'] }) {
   return itens.length === 0
-    ? <Card className="p-6 text-center text-sm text-slate-500">Nenhum aviso ainda.</Card>
+    ? <Card className="p-6 text-center text-sm text-slate-400">Nenhum aviso ainda.</Card>
     : (
       <ul className="space-y-2">
         {itens.map((a) => (
@@ -234,7 +234,7 @@ function AbaAvisos({ itens }: { itens: Dados['avisos'] }) {
             <Card className="p-4">
               <div className="mb-1 flex items-center gap-2">
                 <span className="text-xs font-semibold text-amber-300"><GlassIcon name="pin" /> AVISO</span>
-                <span className="text-[11px] text-slate-500">{new Date(a.criado_em).toLocaleDateString('pt-BR')}</span>
+                <span className="text-xs text-slate-400">{new Date(a.criado_em).toLocaleDateString('pt-BR')}</span>
               </div>
               <div className="text-sm font-semibold text-slate-100">{a.titulo}</div>
               <p className="mt-1 whitespace-pre-line text-xs text-slate-300"><Linkify texto={a.conteudo} /></p>
@@ -246,7 +246,7 @@ function AbaAvisos({ itens }: { itens: Dados['avisos'] }) {
 }
 
 function AbaPersona({ p }: { p: Dados['persona'] }) {
-  if (!p) return <Card className="p-6 text-center text-sm text-slate-500">Persona ainda não foi mapeada.</Card>;
+  if (!p) return <Card className="p-6 text-center text-sm text-slate-400">Persona ainda não foi mapeada.</Card>;
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {p.persona && <Card className="p-4"><h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-300"><GlassIcon name="target" /> Persona</h3><p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={p.persona} /></p></Card>}

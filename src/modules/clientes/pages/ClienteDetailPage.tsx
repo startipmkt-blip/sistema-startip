@@ -12,6 +12,7 @@ import { IdeiasVipAdmin } from '@/modules/ideias-vip/components/IdeiasVipAdmin';
 import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Card } from '@/shared/ui/Card';
+import { Tabs } from '@/shared/ui/Tabs';
 import { Spinner } from '@/shared/ui/Spinner';
 
 export function ClienteDetailPage() {
@@ -62,19 +63,11 @@ export function ClienteDetailPage() {
         cliente={cliente}
       />
 
-      <div role="tablist" className="flex gap-2">
-        {([['geral', 'Visão geral'], ['ideias', 'Ideias']] as const).map(([id, label]) => (
-          <button
-            key={id}
-            role="tab"
-            aria-selected={aba === id}
-            onClick={() => setAba(id)}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${aba === id ? 'bg-gradient-brand text-white shadow-glow' : 'border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        tabs={[{ id: 'geral', label: 'Visão geral' }, { id: 'ideias', label: 'Ideias' }] as const}
+        value={aba}
+        onChange={setAba}
+      />
 
       {aba === 'ideias' ? (
         <IdeiasVipAdmin clienteId={cliente.id} clienteNome={cliente.nome} />

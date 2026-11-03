@@ -22,6 +22,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 type Filtro = 'todas' | 'proximas' | 'historico' | 'reprovadas';
 
@@ -72,8 +73,8 @@ export function DatasComemorativasPage() {
     reprovadas: ocorrencias.filter((o) => aprovacoes.get(o.key)?.status === 'reprovada').length,
   };
 
-  function removerData(o: Ocorrencia) {
-    if (!confirm(`Remover "${o.base.nome}" do calendário de ${clienteAtual?.nome}? (continua na Base Mãe)`)) return;
+  async function removerData(o: Ocorrencia) {
+    if (!(await confirmar(`Remover "${o.base.nome}" do calendário de ${clienteAtual?.nome}? (continua na Base Mãe)`))) return;
     remover.mutate(o.item.id);
   }
 
@@ -93,7 +94,7 @@ export function DatasComemorativasPage() {
 
       <div className="flex min-h-[60vh] flex-col gap-3 md:flex-row">
         <aside className="flex shrink-0 flex-col rounded-lg border border-white/10 bg-white/[0.02] md:w-64">
-          <div className="border-b border-white/5 p-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="border-b border-white/5 p-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Clientes ativos ({clientes.length})
           </div>
           <ul className="max-h-60 overflow-y-auto md:max-h-none md:flex-1">
@@ -108,13 +109,13 @@ export function DatasComemorativasPage() {
                 >
                   {c.logo_url
                     ? <LogoCliente src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
+                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-xs"><GlassIcon name="building" /></span>}
                   <span className="truncate">{c.nome}</span>
                 </button>
               </li>
             ))}
             {!clientesQ.isLoading && clientes.length === 0 && (
-              <li className="p-4 text-center text-xs text-slate-500">Nenhum cliente ativo com Social Mídia.</li>
+              <li className="p-4 text-center text-xs text-slate-400">Nenhum cliente ativo com Social Mídia.</li>
             )}
           </ul>
         </aside>
@@ -144,10 +145,10 @@ export function DatasComemorativasPage() {
                   </button>
                 ))}
                 {contagem.planejamento > 0 && (
-                  <span className="text-[11px] text-amber-300"><GlassIcon name="hourglass" /> {contagem.planejamento} em planejamento agora</span>
+                  <span className="text-xs text-amber-300"><GlassIcon name="hourglass" /> {contagem.planejamento} em planejamento agora</span>
                 )}
                 {contagem.aprovadas > 0 && (
-                  <span className="text-[11px] text-emerald-300"><GlassIcon name="check-circle" /> {contagem.aprovadas} aprovada(s) pelo cliente</span>
+                  <span className="text-xs text-emerald-300"><GlassIcon name="check-circle" /> {contagem.aprovadas} aprovada(s) pelo cliente</span>
                 )}
               </div>
 
@@ -165,7 +166,7 @@ export function DatasComemorativasPage() {
                     <section key={g.chave}>
                       <div className="mb-2 flex items-center gap-2">
                         <span className="rounded-full border border-brand-400/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-200">{g.titulo}</span>
-                        <span className="text-[10px] text-slate-500">{g.itens.length} data(s)</span>
+                        <span className="text-xs text-slate-400">{g.itens.length} data(s)</span>
                         <div className="h-px flex-1 bg-white/5" />
                       </div>
                       <div className="grid gap-3 xl:grid-cols-2">
@@ -186,7 +187,7 @@ export function DatasComemorativasPage() {
                               <>
                                 <button onClick={() => setParaDesigner(o)} className="text-xs font-medium text-emerald-300 hover:underline"><GlassIcon name="palette" /> Enviar ao designer</button>
                                 <button onClick={() => setEditando(o.item)} className="text-xs font-medium text-brand-300 hover:underline"><GlassIcon name="pencil" /> Ajustar</button>
-                                <button onClick={() => removerData(o)} className="text-xs text-slate-500 hover:text-red-300">Remover</button>
+                                <button onClick={() => removerData(o)} className="text-xs text-slate-400 hover:text-red-300">Remover</button>
                               </>
                             }
                           />

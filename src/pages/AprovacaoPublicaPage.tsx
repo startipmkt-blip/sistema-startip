@@ -11,6 +11,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Ideia {
   id: string;
@@ -97,7 +98,7 @@ export function AprovacaoPublicaPage({ tipo }: { tipo?: 'criativos' } = {}) {
   const mesRef = useRef<string | null>(null);
   mesRef.current = mes;
   useEffect(() => {
-    const recarregar = () => {
+    const recarregar = async () => {
       if (document.visibilityState === 'visible') void carregar(mesRef.current ?? mesDoLink);
     };
     const t = window.setInterval(recarregar, 60_000);
@@ -126,7 +127,7 @@ export function AprovacaoPublicaPage({ tipo }: { tipo?: 'criativos' } = {}) {
 
   async function desfazer(i: Ideia) {
     const oQue = i.status === 'pendente' ? 'o seu voto' : i.status === 'aprovado' ? 'a aprovação' : 'a reprovação';
-    if (!confirm(`Voltar atrás ${oQue} de "${i.titulo}"?\n\nEle volta para "Aguardando" e você pode decidir de novo.`)) return;
+    if (!(await confirmar(`Voltar atrás ${oQue} de "${i.titulo}"?\n\nEle volta para "Aguardando" e você pode decidir de novo.`))) return;
     setSalvando(true);
     try {
       const r = await fetch(FN_URL, {
@@ -294,7 +295,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                             : 'Reprovado'}
                         </Badge>
                         {i.dia_postagem && (
-                          <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                          <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-300">
                             <GlassIcon name="calendar" /> postar em {new Date(`${i.dia_postagem}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
                           </span>
                         )}
@@ -342,7 +343,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
                             return (
                               <span
                                 key={a.id}
-                                className={`rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${
+                                className={`rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
                                   aprovou ? 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30'
                                     : 'bg-amber-500/10 text-amber-300 ring-amber-500/30'}`}
                               >
@@ -401,7 +402,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
           })}
         </div>
 
-        <footer className="pt-6 text-center text-[11px] text-slate-500">
+        <footer className="pt-6 text-center text-xs text-slate-400">
           Suas decisões são registradas na nossa plataforma. Dúvidas? Fale com seu gerente.
         </footer>
       </div>

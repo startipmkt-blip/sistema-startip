@@ -53,7 +53,7 @@ export function LinkPreviewCard({ texto, mensagemId, linkPreviewCache }: Props) 
       )}
       <div className="p-2">
         {preview.site_name && (
-          <p className="mb-0.5 text-[10px] uppercase tracking-wide text-slate-500">{preview.site_name}</p>
+          <p className="mb-0.5 text-xs uppercase tracking-wide text-slate-400">{preview.site_name}</p>
         )}
         {preview.title && <p className="line-clamp-2 font-semibold text-slate-100">{preview.title}</p>}
         {preview.description && <p className="mt-1 line-clamp-2 text-slate-400">{preview.description}</p>}

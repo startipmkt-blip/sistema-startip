@@ -197,12 +197,12 @@ function CardAnotacao({ a, onEditar, onToggle }: CardProps) {
             <Linkify texto={a.texto} />
           </p>
           {textoLongo && (
-            <button onClick={() => setExpandido((v) => !v)} className="mt-0.5 text-[11px] text-brand-300 hover:underline">
+            <button onClick={() => setExpandido((v) => !v)} className="mt-0.5 text-xs text-brand-300 hover:underline">
               {expandido ? 'ver menos' : 'ver mais'}
             </button>
           )}
 
-          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]">
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
             <Badge tone="slate"><GlassIcon name="building" /> {a.cliente_nome ?? 'Geral'}</Badge>
             {a.autor_nome && <Badge tone="slate"><GlassIcon name="user" /> {a.autor_nome}</Badge>}
             {a.prioridade !== 'normal' && <Badge tone={PRIORIDADE_TONE[a.prioridade]}>{PRIORIDADE_LABEL[a.prioridade]}</Badge>}
@@ -217,7 +217,7 @@ function CardAnotacao({ a, onEditar, onToggle }: CardProps) {
           </div>
 
           <div className="mt-2 flex justify-end">
-            <button onClick={onEditar} className="text-[11px] font-medium text-brand-300 hover:underline">
+            <button onClick={onEditar} className="text-xs font-medium text-brand-300 hover:underline">
               <GlassIcon name="pencil" /> Editar
             </button>
           </div>

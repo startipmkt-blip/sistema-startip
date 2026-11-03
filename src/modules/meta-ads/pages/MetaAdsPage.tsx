@@ -14,6 +14,7 @@ import {
   type ContaMetaComCliente,
 } from '../api/metaAdsApi';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function MetaAdsPage() {
   const contas = useContasMeta();
@@ -89,14 +90,14 @@ export function MetaAdsPage() {
                 </Badge>
               </div>
 
-              <dl className="mt-3 grid grid-cols-2 gap-y-1 text-[11px] text-slate-400">
+              <dl className="mt-3 grid grid-cols-2 gap-y-1 text-xs text-slate-400">
                 <dt>Moeda</dt><dd className="text-right text-slate-300">{c.moeda ?? 'BRL'}</dd>
                 <dt>Token</dt><dd className="text-right text-slate-300">{glassify(c.tem_token ? '••• salvo' : '⚠ ausente')}</dd>
                 <dt>Última sync</dt><dd className="text-right text-slate-300">{c.ultima_sync_at ? formatDate(c.ultima_sync_at) : '—'}</dd>
               </dl>
 
               {c.ultimo_erro_sync && (
-                <p className="mt-2 rounded bg-red-500/10 p-2 text-[11px] text-red-300"><GlassIcon name="alert" /> {c.ultimo_erro_sync}</p>
+                <p className="mt-2 rounded bg-red-500/10 p-2 text-xs text-red-300"><GlassIcon name="alert" /> {c.ultimo_erro_sync}</p>
               )}
 
               <div className="mt-3 flex gap-2">
@@ -109,8 +110,8 @@ export function MetaAdsPage() {
                 <Button
                   variant="secondary"
                   className="text-red-300 hover:bg-red-500/10"
-                  onClick={() => {
-                    if (confirm(`Excluir integração de ${c.cliente_nome}?`)) excluir.mutate(c.id);
+                  onClick={async () => {
+                    if ((await confirmar(`Excluir integração de ${c.cliente_nome}?`))) excluir.mutate(c.id);
                   }}
                 ><GlassIcon name="trash" /></Button>
               </div>
@@ -248,7 +249,7 @@ function ContaModal({ open, onClose, conta, clientes }: ModalProps) {
             onChange={(e) => setToken(e.target.value)}
             className="glass-field mt-1 w-full rounded-md px-3 py-2 font-mono text-xs text-slate-100"
           />
-          <p className="mt-1 text-[11px] text-slate-500">
+          <p className="mt-1 text-xs text-slate-400">
             No Business Manager &rarr; Configurações do negócio &rarr; Usuários do sistema &rarr; Gerar token
             (permissões: <code>ads_read</code>, <code>read_insights</code>, <code>business_management</code>).
             Prefira token de longa duração.

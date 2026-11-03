@@ -18,6 +18,7 @@ import {
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { opcoesDeSemana } from '../lib/periodo';
 import { RENOVACAO_OPTIONS, type Renovacao } from '@/modules/demandas/lib/renovacao';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -78,7 +79,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const criativo = categoria === 'criativo';
   const tiposDisponiveis = criativo ? TIPOS_CRIATIVO : (Object.keys(TIPO_LABEL) as DesignerTipo[]);
 
-  function trocarCategoria(c: DesignerCategoria) {
+  async function trocarCategoria(c: DesignerCategoria) {
     setCategoria(c);
     // Criativo só tem imagem, vídeo e carrossel.
     if (c === 'criativo' && !TIPOS_CRIATIVO.includes(tipo)) setTipo('post');
@@ -135,7 +136,7 @@ ${r.cronometroErro}`);
 
   async function handleExcluir() {
     if (!demanda?.id) return;
-    if (!confirm(`Excluir "${demanda.titulo}"?`)) return;
+    if (!(await confirmar(`Excluir "${demanda.titulo}"?`))) return;
     try {
       await excluir.mutateAsync(demanda.id);
       for (const a of demanda.anexos ?? []) void descartarAnexo(a.path);
@@ -183,7 +184,7 @@ ${r.cronometroErro}`);
           ]}
         />
         {criativo && (
-          <p className="-mt-1 text-[11px] text-orange-300">
+          <p className="-mt-1 text-xs text-orange-300">
             Ao ficar pronto, esta demanda aparece na aba <strong>Criativos</strong> da Gestão de Conteúdo, com link de aprovação próprio.
           </p>
         )}
@@ -221,7 +222,7 @@ ${r.cronometroErro}`);
           <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100">
             <p className="mb-1 font-semibold">↩ Reprovado pelo cliente — o que precisa ser refeito</p>
             <p className="whitespace-pre-line">{demanda.reprovado_justificativa || '(sem justificativa)'}</p>
-            <p className="mt-1 text-[11px] text-red-300">
+            <p className="mt-1 text-xs text-red-300">
               em {new Date(demanda.reprovado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
             </p>
           </div>
@@ -285,7 +286,7 @@ ${r.cronometroErro}`);
           onChange={(e) => setSemanaRef(e.target.value)}
           options={opcoesSemana}
         />
-        <p className="-mt-1 text-[11px] text-slate-400">
+        <p className="-mt-1 text-xs text-slate-400">
           Define em qual semana do quadro a demanda aparece, sem precisar de prazo.
         </p>
 
@@ -297,7 +298,7 @@ ${r.cronometroErro}`);
           options={RENOVACAO_OPTIONS}
         />
         {renovacao !== 'nenhuma' && (
-          <p className="-mt-1 text-[11px] text-slate-400">
+          <p className="-mt-1 text-xs text-slate-400">
             Ao concluir, o sistema cria a próxima demanda em A fazer, {renovacao === 'semanal' ? 'na semana seguinte' : 'no mês seguinte'}.
           </p>
         )}

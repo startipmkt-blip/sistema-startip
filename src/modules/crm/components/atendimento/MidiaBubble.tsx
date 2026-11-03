@@ -63,7 +63,7 @@ export function MidiaBubble({ msg }: Props) {
             </a>
           </div>
         ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500"><GlassIcon name="camera" /> …</div>
+          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-400"><GlassIcon name="camera" /> …</div>
         )}
         {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm"><Linkify texto={msg.texto} /></div>}
       </div>
@@ -130,7 +130,7 @@ export function MidiaBubble({ msg }: Props) {
             </a>
           </div>
         ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-500"><GlassIcon name="clapperboard" /> …</div>
+          <div className="flex h-48 w-full items-center justify-center rounded-md bg-slate-800 text-slate-400"><GlassIcon name="clapperboard" /> …</div>
         )}
         {msg.texto && <div className="mt-1 whitespace-pre-wrap break-words text-sm"><Linkify texto={msg.texto} /></div>}
       </div>

@@ -22,7 +22,7 @@ interface Props {
 function Campo({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{rotulo}</p>
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{rotulo}</p>
       <div className="mt-1 text-sm text-slate-200">{children}</div>
     </div>
   );
@@ -115,7 +115,7 @@ export function CriativoDetalheModal({ open, onClose, criativo, onEditar }: Prop
 
         <Campo rotulo={`Anexos (${criativo.anexos.length})`}>
           {criativo.anexos.length === 0 ? (
-            <span className="text-slate-500">Nenhum anexo.</span>
+            <span className="text-slate-400">Nenhum anexo.</span>
           ) : (
             <ul className="space-y-2">
               {criativo.anexos.map((a) => (
@@ -125,7 +125,7 @@ export function CriativoDetalheModal({ open, onClose, criativo, onEditar }: Prop
                   </button>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-slate-100">{a.name}</p>
-                    <p className="text-[11px] text-slate-500">{formatarTamanho(a.size)}</p>
+                    <p className="text-xs text-slate-400">{formatarTamanho(a.size)}</p>
                   </div>
                   <Button variant="secondary" className="!px-3 !py-1.5 text-xs" onClick={() => void abrirAnexo(a)}>Ver</Button>
                   <Button variant="secondary" className="!px-3 !py-1.5 text-xs" onClick={() => void abrirAnexo(a, true)}>Baixar</Button>

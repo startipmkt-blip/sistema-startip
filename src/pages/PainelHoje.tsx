@@ -92,7 +92,7 @@ export function PainelHoje() {
       <Card className="p-4">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-200"><GlassIcon name="calendar" /> Agenda de hoje</h3>
-          <Link to="/agenda" className="text-[11px] text-brand-300 hover:underline">Abrir agenda</Link>
+          <Link to="/agenda" className="text-xs text-brand-300 hover:underline">Abrir agenda</Link>
         </div>
         {!agenda ? <div className="h-10" /> : agenda.length === 0 ? (
           <EmptyState message="Sem compromissos hoje." />
@@ -118,7 +118,7 @@ export function PainelHoje() {
       <Card className="p-4">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-200"><GlassIcon name="bot" /> Solicitações pendentes</h3>
-          <Link to="/crm?tab=solicitacoes" className="text-[11px] text-brand-300 hover:underline">Ver todas</Link>
+          <Link to="/crm?tab=solicitacoes" className="text-xs text-brand-300 hover:underline">Ver todas</Link>
         </div>
         {!solicitacoes ? <div className="h-10" /> : solicitacoes.length === 0 ? (
           <EmptyState message="Nenhuma solicitação pendente." />
@@ -128,7 +128,7 @@ export function PainelHoje() {
               <li key={s.id} className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-xs">
                 <div className="mb-0.5 flex items-center gap-2">
                   <span className="min-w-0 flex-1 truncate font-medium text-slate-100">{s.crm_leads?.nome ?? '—'}</span>
-                  <span className="shrink-0 text-[10px] text-amber-300">há {tempoAtras(s.origem_em)}</span>
+                  <span className="shrink-0 text-xs text-amber-300">há {tempoAtras(s.origem_em)}</span>
                 </div>
                 <div className="line-clamp-2 text-slate-300">{s.texto}</div>
               </li>
@@ -141,7 +141,7 @@ export function PainelHoje() {
       <Card className="p-4">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-slate-200"><GlassIcon name="clipboard" /> Contratos expirando (30d)</h3>
-          <Link to="/contratos" className="text-[11px] text-brand-300 hover:underline">Ver contratos</Link>
+          <Link to="/contratos" className="text-xs text-brand-300 hover:underline">Ver contratos</Link>
         </div>
         {!contratos ? <div className="h-10" /> : contratos.length === 0 ? (
           <EmptyState message="Nenhum contrato vence nos próximos 30 dias." />
@@ -150,7 +150,7 @@ export function PainelHoje() {
             {contratos.map((k) => (
               <li key={k.id} className="rounded-md border border-white/5 bg-white/[0.02] p-2 text-xs">
                 <div className="truncate font-medium text-slate-100">{k.razao_social || k.titulo}</div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-xs text-slate-400">
                   Termina em {new Date(k.end_date).toLocaleDateString('pt-BR')}
                 </div>
               </li>

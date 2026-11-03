@@ -127,7 +127,7 @@ export function CsPublicoPage() {
         {dados.perguntas.map((p) => (
           <div key={p.id} className="space-y-1.5">
             <label htmlFor={`cs-${p.id}`} className="block text-sm font-medium text-slate-100">{p.label}</label>
-            {p.ajuda && <p className="text-xs text-slate-500">{p.ajuda}</p>}
+            {p.ajuda && <p className="text-xs text-slate-400">{p.ajuda}</p>}
             <textarea
               id={`cs-${p.id}`}
               value={respostas[p.id] ?? ''}
@@ -144,7 +144,7 @@ export function CsPublicoPage() {
         <Button type="submit" disabled={!temResposta || enviando} className="w-full py-3 text-base">
           {enviando ? 'Enviando…' : 'Enviar respostas'}
         </Button>
-        <p className="text-center text-[11px] text-slate-500">Suas respostas vão direto para a equipe Startip.</p>
+        <p className="text-center text-xs text-slate-400">Suas respostas vão direto para a equipe Startip.</p>
       </form>
     </div>
   );

@@ -28,7 +28,7 @@ export function CriativosDoClienteCard({ clienteId }: { clienteId: string }) {
                 <span className="min-w-0 flex-1 truncate text-slate-100">{i.titulo}</span>
                 {i.formato && <Badge tone="amber">{FORMATO_LABEL[i.formato]}</Badge>}
                 <Badge tone={STATUS_TONE[i.status]}>{STATUS_LABEL[i.status]}</Badge>
-                <span className="text-xs text-slate-500">{formatarData(i.data_ideia)}</span>
+                <span className="text-xs text-slate-400">{formatarData(i.data_ideia)}</span>
               </Link>
             </li>
           ))}

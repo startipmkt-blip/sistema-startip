@@ -11,6 +11,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function TurboAiPage() {
   const { data: modulos, isLoading } = useAiModulos();
@@ -100,7 +101,7 @@ function PromptsPanel({ moduleKey }: { moduleKey: AiModuleKey }) {
 
       {/* Histórico */}
       <Card className="w-72 shrink-0 overflow-y-auto p-3">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Histórico</h3>
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Histórico</h3>
         {isLoading ? <Spinner /> : !versoes || versoes.length === 0 ? (
           <EmptyState message="Nenhuma versão salva ainda." />
         ) : (
@@ -111,12 +112,12 @@ function PromptsPanel({ moduleKey }: { moduleKey: AiModuleKey }) {
                   <span className="text-slate-300">{new Date(v.created_at).toLocaleString('pt-BR')}</span>
                   {v.is_active && <Badge tone="green">ativa</Badge>}
                 </div>
-                <div className="mb-2 text-[11px] text-slate-400">{v.tag ?? '—'}</div>
-                <div className="line-clamp-3 text-[11px] text-slate-300">{v.prompt_body}</div>
+                <div className="mb-2 text-xs text-slate-400">{v.tag ?? '—'}</div>
+                <div className="line-clamp-3 text-xs text-slate-300">{v.prompt_body}</div>
                 <div className="mt-2 flex justify-end gap-1">
-                  <button onClick={() => setTexto(v.prompt_body)} className="rounded px-1.5 text-[11px] text-brand-300 hover:bg-white/5">carregar</button>
-                  {!v.is_active && <button onClick={() => ativar.mutate({ moduleKey, versionId: v.id })} className="rounded px-1.5 text-[11px] text-emerald-300 hover:bg-white/5">ativar</button>}
-                  <button onClick={() => { if (confirm('Apagar esta versão?')) apagar.mutate({ moduleKey, versionId: v.id }); }} className="rounded px-1.5 text-[11px] text-red-300 hover:bg-white/5">apagar</button>
+                  <button onClick={() => setTexto(v.prompt_body)} className="rounded px-1.5 text-xs text-brand-300 hover:bg-white/5">carregar</button>
+                  {!v.is_active && <button onClick={() => ativar.mutate({ moduleKey, versionId: v.id })} className="rounded px-1.5 text-xs text-emerald-300 hover:bg-white/5">ativar</button>}
+                  <button onClick={async () => { if ((await confirmar('Apagar esta versão?'))) apagar.mutate({ moduleKey, versionId: v.id }); }} className="rounded px-1.5 text-xs text-red-300 hover:bg-white/5">apagar</button>
                 </div>
               </li>
             ))}
@@ -202,7 +203,7 @@ function TemplatesPanel({ moduleKey }: { moduleKey: AiModuleKey }) {
                         </div>
                         <div className="flex gap-1">
                           <button onClick={() => { setEditandoId(t.id); setEditNome(t.nome); setEditBody(t.body_text); }} className="rounded px-2 text-xs text-slate-400 hover:bg-white/5">editar</button>
-                          <button onClick={() => { if (confirm('Apagar modelo?')) apagar.mutate({ moduleKey, id: t.id }); }} className="rounded px-2 text-xs text-red-300 hover:bg-white/5">apagar</button>
+                          <button onClick={async () => { if ((await confirmar('Apagar modelo?'))) apagar.mutate({ moduleKey, id: t.id }); }} className="rounded px-2 text-xs text-red-300 hover:bg-white/5">apagar</button>
                         </div>
                       </div>
                     )}

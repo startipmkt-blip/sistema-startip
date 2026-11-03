@@ -84,7 +84,7 @@ export function AgendaPage() {
               <Card key={i} className={`flex min-h-[220px] flex-col p-2 ${hoje ? 'border-brand-400/40' : ''}`}>
                 <div className="mb-2 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
+                    <div className="text-xs uppercase tracking-wider text-slate-400">{label}</div>
                     <div className="text-sm font-semibold text-slate-100">{ddmm(d)}</div>
                   </div>
                   <div className="flex gap-1">
@@ -95,21 +95,21 @@ export function AgendaPage() {
                   </div>
                 </div>
                 {lista.length === 0 ? (
-                  <p className="mt-4 text-center text-[11px] text-slate-600">vazio</p>
+                  <p className="mt-4 text-center text-xs text-slate-400">vazio</p>
                 ) : (
                   <ul className="space-y-1">
                     {lista.map((e) => (
                       <li key={e.id}>
                         <button
                           onClick={() => setNovoOpen({ open: true, evento: e })}
-                          className="w-full rounded-md border border-white/10 bg-white/5 px-2 py-1 text-left text-[11px] text-slate-200 hover:bg-white/10"
+                          className="w-full rounded-md border border-white/10 bg-white/5 px-2 py-1 text-left text-xs text-slate-200 hover:bg-white/10"
                         >
                           <div className="flex items-center gap-1">
                             <span className="font-mono text-slate-400">{e.hora.slice(0, 5)}</span>
                             <span className="truncate font-medium">{e.titulo}</span>
                           </div>
                           {e.clientes.length > 0 && (
-                            <div className="mt-0.5 truncate text-[10px] text-slate-500">
+                            <div className="mt-0.5 truncate text-xs text-slate-400">
                               {e.clientes.map((id) => nomeCliente.get(id) ?? '—').join(', ')}
                             </div>
                           )}

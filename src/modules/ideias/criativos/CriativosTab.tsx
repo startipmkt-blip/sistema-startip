@@ -148,7 +148,7 @@ export function CriativosTab({ pills }: { pills: ReactNode }) {
                     <div className="relative shrink-0">
                       <MiniaturaAnexo anexo={capa} className="h-16 w-16" />
                       {c.anexos.length > 1 && (
-                        <span className="absolute -right-1 -top-1 rounded-full bg-brand-500 px-1.5 text-[10px] font-semibold text-white">
+                        <span className="absolute -right-1 -top-1 rounded-full bg-brand-500 px-1.5 text-xs font-semibold text-white">
                           {c.anexos.length}
                         </span>
                       )}

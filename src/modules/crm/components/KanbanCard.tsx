@@ -48,7 +48,7 @@ export function KanbanCard({ lead, onEtiquetaInfo, onAbrirConversa, onEditar, on
       <div className="flex items-start justify-between gap-2">
         <button onClick={onEditar} className="min-w-0 text-left">
           <div className="truncate text-sm font-semibold text-slate-100">
-            {lead.nome || <span className="italic text-slate-500">sem nome</span>}
+            {lead.nome || <span className="italic text-slate-400">sem nome</span>}
           </div>
           {lead.empresa && (
             <div className="truncate text-xs text-slate-400">{lead.empresa}</div>
@@ -57,7 +57,7 @@ export function KanbanCard({ lead, onEtiquetaInfo, onAbrirConversa, onEditar, on
       </div>
 
       {/* Metadados */}
-      <div className="space-y-0.5 text-[11px] text-slate-400">
+      <div className="space-y-0.5 text-xs text-slate-400">
         {lead.created_at && (
           <div><GlassIcon name="clock" /> Entrou em {formatEntradaCurto(lead.created_at)}</div>
         )}
@@ -86,14 +86,14 @@ export function KanbanCard({ lead, onEtiquetaInfo, onAbrirConversa, onEditar, on
       <div className="mt-1 flex flex-wrap items-center gap-1.5 border-t border-white/5 pt-2">
         <button
           onClick={(e) => { e.stopPropagation(); onAbrirConversa(); }}
-          className="rounded-md bg-brand-500/15 px-2 py-1 text-[11px] font-medium text-brand-200 hover:bg-brand-500/25"
+          className="rounded-md bg-brand-500/15 px-2 py-1 text-xs font-medium text-brand-200 hover:bg-brand-500/25"
           title="Abrir conversa na aba Atendimento"
         >
           <GlassIcon name="message" /> Conversa
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onConverterCliente(); }}
-          className="rounded-md bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-200 hover:bg-white/10"
+          className="rounded-md bg-white/5 px-2 py-1 text-xs font-medium text-slate-200 hover:bg-white/10"
           title="Cadastrar este contato como cliente da agência"
         >
           <GlassIcon name="plus" /> Virar cliente

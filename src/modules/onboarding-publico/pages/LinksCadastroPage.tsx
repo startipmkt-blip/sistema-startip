@@ -114,7 +114,7 @@ export function LinksCadastroPage() {
       ) : (
         <>
           <section className="space-y-2">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Ativos</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ativos</h2>
             <Card className="p-0">
               <table className="w-full text-sm">
                 <thead className="border-b border-white/5 text-left text-xs text-slate-400">
@@ -136,7 +136,7 @@ export function LinksCadastroPage() {
                       <tr key={l.id} className="border-t border-white/5 hover:bg-white/[0.02]">
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            <code className="rounded bg-white/5 px-2 py-1 text-[11px] text-brand-200">{url}</code>
+                            <code className="rounded bg-white/5 px-2 py-1 text-xs text-brand-200">{url}</code>
                             <button
                               onClick={() => copiar(l)}
                               className="rounded-md px-1.5 py-0.5 text-xs text-slate-300 hover:bg-white/10"
@@ -178,7 +178,7 @@ export function LinksCadastroPage() {
 
           {linksArquivados.length > 0 && (
             <section className="space-y-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Arquivados ({linksArquivados.length})</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Arquivados ({linksArquivados.length})</h2>
               <Card className="p-0">
                 <table className="w-full text-sm">
                   <thead className="border-b border-white/5 text-left text-xs text-slate-400">
@@ -197,11 +197,11 @@ export function LinksCadastroPage() {
                         <tr key={l.id} className="border-t border-white/5 opacity-70 hover:bg-white/[0.02] hover:opacity-100">
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              <code className="rounded bg-white/5 px-2 py-1 text-[11px] text-slate-400 line-through">{url}</code>
+                              <code className="rounded bg-white/5 px-2 py-1 text-xs text-slate-400 line-through">{url}</code>
                             </div>
-                            {razao && <div className="mt-1 text-xs text-slate-500">Preenchido por: <span className="text-slate-300">{razao}</span></div>}
+                            {razao && <div className="mt-1 text-xs text-slate-400">Preenchido por: <span className="text-slate-300">{razao}</span></div>}
                           </td>
-                          <td className="p-3 text-xs text-slate-500">{new Date(l.criado_em).toLocaleDateString('pt-BR')}</td>
+                          <td className="p-3 text-xs text-slate-400">{new Date(l.criado_em).toLocaleDateString('pt-BR')}</td>
                           <td className="p-3">
                             <div className="flex justify-end gap-1">
                               <Button
@@ -247,7 +247,7 @@ export function LinksCadastroPage() {
               {Object.entries((revisando.dados as Record<string, string>) ?? {}).map(([k, v]) => (
                 v ? (
                   <div key={k} className="rounded-md border border-white/5 bg-white/[0.02] p-2">
-                    <dt className="text-[10px] uppercase tracking-wide text-slate-500">{k}</dt>
+                    <dt className="text-xs uppercase tracking-wide text-slate-400">{k}</dt>
                     <dd className="text-slate-200">{String(v)}</dd>
                   </div>
                 ) : null

@@ -24,6 +24,7 @@ import { PostCard } from './PostCard';
 import { AprovadoresModal } from './AprovadoresModal';
 import { PostFormModal } from './PostFormModal';
 import { PreviaDrive } from './PreviaDrive';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   /** Clientes ativos (qualquer serviço); a aba filtra os que têm Tráfego pago. */
@@ -93,7 +94,7 @@ export function CriativosAba({ clientes, mes, clienteId, onCliente }: Props) {
               className={`rounded-xl border p-3 text-left transition-colors ${
                 ativo ? 'border-brand-400/70 bg-brand-500/15' : 'border-white/10 bg-white/[0.03] hover:border-white/25'}`}
             >
-              <div className="text-[11px] text-slate-400"><GlassIcon emoji={e.emoji} /> {e.label}</div>
+              <div className="text-xs text-slate-400"><GlassIcon emoji={e.emoji} /> {e.label}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{totais[e.id]}</div>
             </button>
           );
@@ -145,7 +146,7 @@ export function CriativosAba({ clientes, mes, clienteId, onCliente }: Props) {
                       : <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5"><GlassIcon name="building" /></span>}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-slate-100">{c.nome}</p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-xs text-slate-400">
                         {meus.length} {meus.length === 1 ? 'criativo' : 'criativos'} no mês
                       </p>
                     </div>
@@ -163,11 +164,11 @@ export function CriativosAba({ clientes, mes, clienteId, onCliente }: Props) {
                     {ETAPAS.filter((e) => n[e.id] > 0).map((e) => (
                       <Badge key={e.id} tone={e.tone}><GlassIcon emoji={e.emoji} /> {n[e.id]} {e.label.toLowerCase()}</Badge>
                     ))}
-                    {meus.length === 0 && <span className="text-[11px] text-slate-500">Nenhum criativo no mês.</span>}
+                    {meus.length === 0 && <span className="text-xs text-slate-400">Nenhum criativo no mês.</span>}
                   </div>
-                  {tempo && <p className="mt-2 text-[11px] text-slate-400"><GlassIcon name="timer" /> Responde em média em {tempo}</p>}
+                  {tempo && <p className="mt-2 text-xs text-slate-400"><GlassIcon name="timer" /> Responde em média em {tempo}</p>}
                   {alertas.length > 0 && (
-                    <ul className="mt-2 space-y-0.5 text-[11px]">
+                    <ul className="mt-2 space-y-0.5 text-xs">
                       {alertas.map((a) => (
                         <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
                       ))}
@@ -251,8 +252,8 @@ function DetalheCriativos({ cliente, mes, posts, etapaFiltro }: DetalheProps) {
     );
   }
 
-  function lembrarAgora() {
-    if (!confirm(`Reenviar o link de aprovação dos criativos para ${cliente.nome} (${aguardando.length} aguardando)?`)) return;
+  async function lembrarAgora() {
+    if (!(await confirmar(`Reenviar o link de aprovação dos criativos para ${cliente.nome} (${aguardando.length} aguardando)?`))) return;
     setAviso(null);
     lembrar.mutate(
       {
@@ -282,7 +283,7 @@ function DetalheCriativos({ cliente, mes, posts, etapaFiltro }: DetalheProps) {
       onEtapa={(etapa) => mudarEtapa.mutate({ id: p.id, etapa, anterior: p.etapa })}
       onPrevia={() => setPrevia(p)}
       onEditar={() => { setEditando(p); setFormAberto(true); }}
-      onExcluir={() => { if (confirm(`Excluir "${p.titulo}"?`)) excluir.mutate(p.id); }}
+      onExcluir={async () => { if (await confirmar(`Excluir "${p.titulo}"?`)) excluir.mutate(p.id); }}
       aprovacoes={aprovadoresAtivos.length >= 2 ? {
         total: aprovadoresAtivos.length,
         feitos: aprovadoresAtivos.filter((a) => (votosQ.data ?? []).some(
@@ -345,7 +346,7 @@ function DetalheCriativos({ cliente, mes, posts, etapaFiltro }: DetalheProps) {
         </p>
       )}
       {alertas.length > 0 && (
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
           {alertas.map((a) => (
             <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
           ))}
@@ -372,11 +373,11 @@ function DetalheCriativos({ cliente, mes, posts, etapaFiltro }: DetalheProps) {
             <section key={e.id} className="w-64 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] p-2">
               <div className="mb-2 flex items-center justify-between px-1 text-sm font-semibold text-slate-100">
                 <span><GlassIcon emoji={e.emoji} /> {e.label}</span>
-                <span className="text-[11px] text-slate-400">{coluna.length}</span>
+                <span className="text-xs text-slate-400">{coluna.length}</span>
               </div>
               <div className="space-y-2">
                 {coluna.map(renderCard)}
-                {coluna.length === 0 && <p className="px-1 py-3 text-[11px] text-slate-600">Nenhum criativo.</p>}
+                {coluna.length === 0 && <p className="px-1 py-3 text-xs text-slate-400">Nenhum criativo.</p>}
               </div>
             </section>
           );
@@ -403,7 +404,7 @@ function DetalheCriativos({ cliente, mes, posts, etapaFiltro }: DetalheProps) {
             value={mensagemEnvio ?? ''}
             onChange={(e) => setMensagemEnvio(e.target.value)}
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-400">
             Edite à vontade. Mantenha o link — é por ele que o cliente aprova os criativos.
             <button
               type="button"

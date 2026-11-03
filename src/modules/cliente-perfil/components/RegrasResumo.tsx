@@ -22,16 +22,16 @@ export function RegrasResumo({ clienteId, clienteNome }: { clienteId: string; cl
       >
         <span className="text-xs font-semibold text-amber-100">
           Regras{clienteNome ? ` · ${clienteNome}` : ' do cliente'}
-          <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-normal text-slate-300">
+          <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-xs font-normal text-slate-300">
             {lista.length}{criticas > 0 ? ` · ${criticas} crítica${criticas > 1 ? 's' : ''}` : ''}
           </span>
         </span>
-        <span className="text-[11px] text-slate-400">{aberto ? 'Recolher ▲' : 'Ver ▼'}</span>
+        <span className="text-xs text-slate-400">{aberto ? 'Recolher ▲' : 'Ver ▼'}</span>
       </button>
 
       {aberto && (
         lista.length === 0 ? (
-          <p className="mt-2 text-[11px] text-slate-400">
+          <p className="mt-2 text-xs text-slate-400">
             Nenhuma regra cadastrada para este cliente.{' '}
             <Link to={`/clientes/${clienteId}`} className="text-brand-300 hover:underline">Cadastrar na aba do cliente</Link>
           </p>
@@ -42,7 +42,7 @@ export function RegrasResumo({ clienteId, clienteNome }: { clienteId: string; cl
               if (itens.length === 0) return null;
               return (
                 <div key={t.id}>
-                  <p className="text-[11px] font-semibold text-slate-300">{glassify(t.emoji)} {t.label}</p>
+                  <p className="text-xs font-semibold text-slate-300">{glassify(t.emoji)} {t.label}</p>
                   <ul className="ml-4 list-disc space-y-0.5 text-xs">
                     {itens.map((r) => (
                       <li key={r.id} className={r.critica ? 'font-semibold text-amber-200' : 'text-slate-200'}>

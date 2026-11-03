@@ -7,6 +7,7 @@ import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { useAtualizarLogoCliente } from '@/modules/clientes/api/clientesApi';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function ClienteHeader({ cliente }: { cliente: Cliente }) {
   const iniciais = cliente.nome.slice(0, 2).toUpperCase();
@@ -32,7 +33,7 @@ export function ClienteHeader({ cliente }: { cliente: Cliente }) {
   }
 
   async function removerLogo() {
-    if (!confirm(`Remover a logo de "${cliente.nome}"?`)) return;
+    if (!(await confirmar(`Remover a logo de "${cliente.nome}"?`))) return;
     setErroLogo(null);
     try { await atualizarLogo.mutateAsync({ id: cliente.id, logo_url: null }); }
     catch (e) { setErroLogo((e as Error).message || 'Falha ao remover a logo.'); }
@@ -72,12 +73,12 @@ export function ClienteHeader({ cliente }: { cliente: Cliente }) {
           type="button"
           onClick={() => inputLogo.current?.click()}
           disabled={enviando}
-          className="whitespace-nowrap text-[11px] font-medium text-brand-300 hover:underline"
+          className="whitespace-nowrap text-xs font-medium text-brand-300 hover:underline"
         >
           {enviando ? 'Enviando…' : cliente.logo_url ? 'Trocar logo' : 'Adicionar logotipo'}
         </button>
         {cliente.logo_url && !enviando && (
-          <button type="button" onClick={removerLogo} className="text-[11px] text-slate-400 hover:text-red-300">
+          <button type="button" onClick={removerLogo} className="text-xs text-slate-400 hover:text-red-300">
             Remover
           </button>
         )}

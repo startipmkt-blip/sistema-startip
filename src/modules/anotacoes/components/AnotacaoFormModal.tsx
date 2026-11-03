@@ -10,6 +10,7 @@ import { Select } from '@/shared/ui/Select';
 import { Input } from '@/shared/ui/Input';
 import { Button } from '@/shared/ui/Button';
 import { AnexoUploader, type Anexo } from '@/shared/ui/AnexoUploader';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 // Lista de profiles da equipe (para o seletor "De quem é").
 function useProfilesEquipe() {
@@ -78,7 +79,7 @@ export function AnotacaoFormModal({ open, onClose, anotacao, clienteIdInicial }:
 
   async function handleExcluir() {
     if (!anotacao) return;
-    if (!confirm('Excluir essa anotação?')) return;
+    if (!(await confirmar('Excluir essa anotação?'))) return;
     await excluir.mutateAsync(anotacao.id);
     onClose();
   }
@@ -124,7 +125,7 @@ export function AnotacaoFormModal({ open, onClose, anotacao, clienteIdInicial }:
     >
       <div className="space-y-4" onKeyDown={onKeyDown}>
         <label className="block text-xs text-slate-300">
-          Anotação <span className="text-slate-500">(Ctrl+Enter salva)</span>
+          Anotação <span className="text-slate-400">(Ctrl+Enter salva)</span>
           <textarea
             ref={textareaRef}
             value={form.texto}

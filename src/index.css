@@ -19,15 +19,12 @@ html.light {
   color-scheme: light;
 }
 
-/* Fundo escuro com degradê azul da marca (#1E9BE0) + brilhos sutis. */
+/* Fundo escuro sólido (visual clean): sem degradês nem brilhos. */
 body {
   @apply font-sans text-slate-200 antialiased;
-  background-color: #05080f;
-  background-image:
-    radial-gradient(1100px 600px at 12% -10%, rgba(30, 155, 224, 0.3), transparent 60%),
-    radial-gradient(900px 520px at 110% 8%, rgba(64, 176, 233, 0.16), transparent 55%),
-    linear-gradient(180deg, #071019 0%, #05080f 100%);
-  background-attachment: fixed;
+  background-color: #0b1118;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* ====== MODO CLARO ======
@@ -35,17 +32,13 @@ body {
    fiel ao dark, mas dá uma leitura confortável em ambientes iluminados. */
 html.light body {
   color: #1e293b;
-  background-color: #f1f5f9;
-  background-image:
-    radial-gradient(1100px 600px at 12% -10%, rgba(30, 155, 224, 0.15), transparent 60%),
-    radial-gradient(900px 520px at 110% 8%, rgba(64, 176, 233, 0.08), transparent 55%),
-    linear-gradient(180deg, #eef2f7 0%, #f8fafc 100%);
+  background-color: #f4f6fa;
 }
 /* Blocos "vidro" viram fundo branco suave com borda cinza. */
 html.light .glass,
 html.light .glass-strong {
-  background-color: rgba(255, 255, 255, 0.72);
-  border-color: rgba(15, 23, 42, 0.08);
+  background-color: #ffffff;
+  border-color: rgba(15, 23, 42, 0.1);
   color: #1e293b;
 }
 /* Backgrounds slate escuros → cinza claro. */
@@ -66,6 +59,8 @@ html.light [class*="text-slate-400"],
 html.light [class*="text-slate-500"] { color: #64748b !important; }
 html.light [class*="text-white"]:not([class*="hover:text"]) { color: #0f172a !important; }
 /* Bordas brancas com alpha → cinza claro. */
+html.light [class*="border-white/[0.08]"],
+html.light [class*="border-white/[0.06]"],
 html.light [class*="border-white/5"],
 html.light [class*="border-white/10"],
 html.light [class*="border-white/15"] { border-color: rgba(15, 23, 42, 0.1) !important; }
@@ -75,7 +70,7 @@ html.light [class~="bg-brand-600"],
 html.light [class~="bg-brand-700"] { color: white !important; }
 
 /* Fundo do body claro em vez de escuro (regra específica que não é catch-all). */
-html.light body { background-color: #f1f5f9 !important; }
+html.light body { background-color: #f4f6fa !important; }
 /* Preservar semânticas coloridas (bg-red-*, bg-emerald-*, bg-amber-* etc). Só neutralizar slate/white. */
 
 /* Inputs, selects, textareas: fundo claro + texto escuro + borda visível. */
@@ -110,7 +105,7 @@ html.light header[class*="border-b"][class*="backdrop-blur"] {
 
 /* NavLink ativo (usa bg-gradient-brand) — cobre com azul sólido. */
 html.light a[class*="bg-gradient-brand"] {
-  background: linear-gradient(135deg, #1273ad 0%, #14669b 100%) !important;
+  background: linear-gradient(#1273ad, #1273ad) !important;
   color: white !important;
 }
 
@@ -465,9 +460,35 @@ html.light.light.light [class~="bg-blue-700"] { color: #fff !important; }
 
 /* Azul da marca em superfícies sólidas: versão mais escura para o texto branco passar de 4,5:1. */
 html.light [class~="bg-gradient-brand"] {
-  background-image: linear-gradient(135deg, #1273ad 0%, #14669b 100%) !important;
+  background-image: linear-gradient(#1273ad, #1273ad) !important;
 }
 html.light [class~="bg-brand-500"] { background-color: #1273ad !important; }
+
+/* Superfícies sólidas novas (card, modal, menu, topbar) no tema claro. */
+html.light [class*="bg-[#121a24]"],
+html.light [class*="bg-[#17212d]"],
+html.light [class*="bg-[#16212d]"],
+html.light [class*="bg-[#0e151d]"] { background-color: #ffffff !important; }
+html.light [class*="shadow-pop"] { box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18) !important; }
+html.light a[class*="bg-brand-500/15"] { background-color: rgba(18, 115, 173, 0.12) !important; color: #14669b !important; }
+
+/* Cards no claro: branco com borda cinza e sombra mínima (estilo Painel do Gestor). */
+html.light .glass,
+html.light .glass-strong { border-color: #e3e8ef; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05); }
+html.light [class*="shadow-glass"] { box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important; }
+html.light a[class*="hover:border-brand-400"]:hover { border-color: #1e9be0 !important; }
+
+/* Menu lateral: escuro também no tema claro (contraste com o conteúdo). */
+html.light aside.sidebar-dark.sidebar-dark { background-color: #0e151d !important; border-color: rgba(255, 255, 255, 0.08) !important; }
+html.light .sidebar-dark .brand-logo-dark { display: block !important; }
+html.light .sidebar-dark .brand-logo-light { display: none !important; }
+html.light .sidebar-dark [class*="border-white"] { border-color: rgba(255, 255, 255, 0.1) !important; }
+html.light .sidebar-dark [class*="text-slate"],
+html.light .sidebar-dark [class*="text-white"] { color: #cbd5e1 !important; }
+html.light .sidebar-dark .nav-dark a:hover { background-color: rgba(255, 255, 255, 0.07) !important; color: #fff !important; }
+html.light .sidebar-dark .nav-dark a.nav-ativo,
+html.light .sidebar-dark .nav-dark a.nav-ativo * { color: #fff !important; }
+html.light .sidebar-dark .nav-dark a.nav-ativo { background-color: rgba(30, 155, 224, 0.28) !important; }
 
 /* Títulos em Poppins. */
 h1, h2, h3, h4 {
@@ -475,18 +496,31 @@ h1, h2, h3, h4 {
 }
 
 @layer components {
+  /* Superfícies sólidas: o "vidro" virou card limpo com borda sutil. */
   .glass {
-    @apply rounded-2xl border border-white/10 bg-white/[0.055] shadow-glass backdrop-blur-xl;
+    @apply rounded-xl border border-white/[0.08] bg-[#121a24] shadow-glass;
   }
   .glass-strong {
-    @apply rounded-2xl border border-white/10 bg-white/[0.09] shadow-glass backdrop-blur-xl;
+    @apply rounded-xl border border-white/10 bg-[#17212d] shadow-glass;
   }
   .glass-field {
-    @apply rounded-xl border border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500;
+    @apply rounded-lg border border-white/10 bg-white/[0.04] text-slate-100 placeholder:text-slate-500;
   }
   .gradient-brand {
     @apply bg-gradient-brand text-white;
   }
+}
+
+/* Sem desfoque de fundo em nenhum lugar: mais leve e mais limpo. */
+[class*="backdrop-blur"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Foco visível e consistente para teclado. */
+:focus-visible {
+  outline: 2px solid rgba(64, 176, 233, 0.7);
+  outline-offset: 2px;
 }
 
 /* Scrollbar discreta. */

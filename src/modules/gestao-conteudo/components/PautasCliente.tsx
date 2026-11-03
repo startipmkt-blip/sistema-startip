@@ -9,6 +9,7 @@ import {
   useExcluirPauta, usePautas, useSalvarPauta, type Pauta, type PautaForm,
 } from '../api/pautasApi';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   clienteId: string;
@@ -91,7 +92,7 @@ export function PautasCliente({ clienteId, clienteNome }: Props) {
           {error && <p className="text-sm text-red-300">Erro ao carregar as pautas: {(error as Error).message}</p>}
 
           {!isLoading && !error && total === 0 && (
-            <p className="rounded-md border border-dashed border-white/10 px-3 py-4 text-center text-xs text-slate-500">
+            <p className="rounded-md border border-dashed border-white/10 px-3 py-4 text-center text-xs text-slate-400">
               Nenhuma pauta cadastrada para este cliente ainda.
             </p>
           )}
@@ -119,8 +120,8 @@ export function PautasCliente({ clienteId, clienteNome }: Props) {
                         <button className="font-medium text-brand-300 hover:underline" onClick={() => setEditando(p)}>Editar</button>
                         <button
                           className="font-medium text-red-400 hover:underline"
-                          onClick={() => {
-                            if (confirm(`Excluir a pauta "${p.titulo}"?`)) {
+                          onClick={async () => {
+                            if ((await confirmar(`Excluir a pauta "${p.titulo}"?`))) {
                               excluir.mutate(p.id, { onError: (e) => alert(`Não foi possível excluir: ${(e as Error).message}`) });
                             }
                           }}

@@ -9,6 +9,7 @@ import { Select } from '@/shared/ui/Select';
 import { Textarea } from '@/shared/ui/Textarea';
 import { Button } from '@/shared/ui/Button';
 import { AnexoUploader, type Anexo } from '@/shared/ui/AnexoUploader';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -27,7 +28,7 @@ export function IdeiaFormModal({ open, onClose, clienteIdInicial, mesInicial, id
 
   async function handleExcluir() {
     if (!ideia) return;
-    if (!confirm(`Excluir a ideia "${ideia.titulo}"?`)) return;
+    if (!(await confirmar(`Excluir a ideia "${ideia.titulo}"?`))) return;
     await excluir.mutateAsync(ideia.id);
     onClose();
   }

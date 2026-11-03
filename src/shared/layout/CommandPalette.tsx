@@ -148,7 +148,7 @@ export function CommandPalette() {
         className="w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-slate-900 shadow-2xl"
       >
         <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
-          <span className="text-slate-500"><GlassIcon name="search" /></span>
+          <span className="text-slate-400"><GlassIcon name="search" /></span>
           <input
             ref={inputRef}
             value={busca}
@@ -157,11 +157,11 @@ export function CommandPalette() {
             placeholder="Buscar módulo, cliente, lead ou ação…"
             className="flex-1 bg-transparent py-1 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
           />
-          <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-slate-400">ESC</kbd>
+          <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-xs text-slate-400">ESC</kbd>
         </div>
         <ul className="max-h-[60vh] overflow-y-auto py-1">
           {filtradas.length === 0 && (
-            <li className="p-6 text-center text-xs text-slate-500">Nada encontrado para "{busca}".</li>
+            <li className="p-6 text-center text-xs text-slate-400">Nada encontrado para "{busca}".</li>
           )}
           {filtradas.map((a, i) => {
             const cabecalho = a.grupo !== ultimoGrupo ? a.grupo : null;
@@ -169,7 +169,7 @@ export function CommandPalette() {
             return (
               <li key={a.id}>
                 {cabecalho && (
-                  <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
                     {cabecalho}
                   </div>
                 )}
@@ -182,13 +182,13 @@ export function CommandPalette() {
                 >
                   <span className="w-5 text-center"><GlassIcon emoji={a.icon} /></span>
                   <span className="flex-1 truncate">{a.label}</span>
-                  {a.hint && <span className="truncate text-xs text-slate-500">{a.hint}</span>}
+                  {a.hint && <span className="truncate text-xs text-slate-400">{a.hint}</span>}
                 </button>
               </li>
             );
           })}
         </ul>
-        <div className="flex items-center justify-between border-t border-white/10 px-3 py-1.5 text-[10px] text-slate-500">
+        <div className="flex items-center justify-between border-t border-white/10 px-3 py-1.5 text-xs text-slate-400">
           <span>↑↓ navegar · ↵ abrir</span>
           <span>Ctrl+K para alternar</span>
         </div>

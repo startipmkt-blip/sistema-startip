@@ -18,6 +18,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function TarefasRecorrentes() {
   const { data: tarefas, isLoading } = useRecorrentes();
@@ -51,16 +52,16 @@ export function TarefasRecorrentes() {
           {feitaHoje && <GlassIcon name="check" />}
         </button>
         <div className="min-w-0 flex-1">
-          <div className={`text-sm ${feitaHoje ? 'text-slate-500 line-through' : atrasada ? 'text-red-300' : 'text-slate-100'}`}>{t.titulo}</div>
+          <div className={`text-sm ${feitaHoje ? 'text-slate-400 line-through' : atrasada ? 'text-red-300' : 'text-slate-100'}`}>{t.titulo}</div>
           <div className={`text-xs ${atrasada ? 'text-red-400' : 'text-slate-400'}`}>
             {recorrenciaLabel(t)}{t.responsaveis.length > 0 ? ` · ${t.responsaveis.join(', ')}` : ''}
           </div>
-          {t.descricao && <div className="mt-0.5 whitespace-pre-line text-xs text-slate-500"><Linkify texto={t.descricao} /></div>}
+          {t.descricao && <div className="mt-0.5 whitespace-pre-line text-xs text-slate-400"><Linkify texto={t.descricao} /></div>}
         </div>
         {atrasada ? <Badge tone="red"><GlassIcon name="alarm" /> atrasada</Badge> : pend && <Badge tone="amber">hoje</Badge>}
         <button className="text-xs font-medium text-brand-300 hover:underline" onClick={() => abrirEditar(t)}>Editar</button>
-        <button className="text-xs font-medium text-red-400 hover:underline" onClick={() => {
-            if (confirm(`Excluir a tarefa recorrente "${t.titulo}"?`)) {
+        <button className="text-xs font-medium text-red-400 hover:underline" onClick={async () => {
+            if ((await confirmar(`Excluir a tarefa recorrente "${t.titulo}"?`))) {
               excluir.mutate(t.id, { onError: (e) => alert(`Não foi possível excluir: ${(e as Error).message}`) });
             }
           }}>Excluir</button>

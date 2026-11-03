@@ -72,7 +72,7 @@ export function OtimizacoesPublicaPage() {
           );
         })}
 
-        <p className="pt-6 text-center text-[10px] text-slate-600">
+        <p className="pt-6 text-center text-xs text-slate-400">
           Startip · atualizações lançadas dia a dia pelo gestor de tráfego
         </p>
       </main>
@@ -97,8 +97,8 @@ function BlocoPublico({ data, conteudo, anexos }: {
     <div className="flex gap-4 rounded-xl border border-white/10 bg-white/5 p-4">
       <div className="flex w-14 shrink-0 flex-col items-center rounded-lg bg-white/5 py-2">
         <span className="text-xl font-bold leading-none">{dia}</span>
-        <span className="text-[10px] uppercase tracking-wide text-slate-400">{mesAbrev}</span>
-        <span className="mt-1 text-[9px] text-slate-500">{diaSemana}</span>
+        <span className="text-xs uppercase tracking-wide text-slate-400">{mesAbrev}</span>
+        <span className="mt-1 text-xs text-slate-400">{diaSemana}</span>
       </div>
       <div className="min-w-0 flex-1">
         <pre className="whitespace-pre-wrap break-words font-sans text-sm text-slate-200">

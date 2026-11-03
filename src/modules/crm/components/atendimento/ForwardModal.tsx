@@ -83,12 +83,12 @@ export function ForwardModal({ open, onClose, leadIdOrigem, waMessageId }: Props
                 />
                 <span aria-hidden>{glassify(c.is_grupo ? '👥' : '👤')}</span>
                 <span className="min-w-0 flex-1 truncate">{c.nome}</span>
-                <span className="text-xs text-slate-500">{c.telefone}</span>
+                <span className="text-xs text-slate-400">{c.telefone}</span>
               </label>
             </li>
           ))}
           {filtradas.length === 0 && (
-            <li className="p-4 text-center text-xs text-slate-500">Nenhuma conversa encontrada.</li>
+            <li className="p-4 text-center text-xs text-slate-400">Nenhuma conversa encontrada.</li>
           )}
         </ul>
       </div>

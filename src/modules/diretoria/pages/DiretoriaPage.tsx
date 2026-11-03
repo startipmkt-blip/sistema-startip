@@ -186,7 +186,7 @@ function AbaVisao() {
         <Card className="p-5">
           <h3 className="mb-2 text-sm font-semibold text-slate-200">Saúde média da carteira</h3>
           <div className="text-4xl font-semibold text-slate-100">
-            {exec.saude_media_score ?? '—'}<span className="ml-1 text-sm text-slate-500">/100</span>
+            {exec.saude_media_score ?? '—'}<span className="ml-1 text-sm text-slate-400">/100</span>
           </div>
         </Card>
         <Card className="p-5">
@@ -240,7 +240,7 @@ function AbaCarteira() {
 
       <Card className="overflow-x-auto p-0">
         <table className="min-w-full text-xs">
-          <thead className="border-b border-white/10 text-left text-[10px] uppercase tracking-wider text-slate-500">
+          <thead className="border-b border-white/10 text-left text-xs uppercase tracking-wider text-slate-400">
             <tr>
               <th className="px-3 py-2">Cliente</th>
               <th className="px-3 py-2">Status</th>
@@ -271,15 +271,15 @@ function AbaCarteira() {
                 <td className="px-3 py-2 text-right text-slate-100">{formatMoney(Number(r.spend_30d ?? 0))}</td>
                 <td className="px-3 py-2 text-right text-slate-200">{Number(r.conversions_30d ?? 0).toFixed(0)}</td>
                 <td className="px-3 py-2 text-right text-slate-200">{r.cpa_30d > 0 ? formatMoney(Number(r.cpa_30d)) : '—'}</td>
-                <td className={`px-3 py-2 text-right font-semibold ${r.roas_30d >= 2 ? 'text-emerald-300' : r.roas_30d > 0 ? 'text-amber-300' : 'text-slate-500'}`}>
+                <td className={`px-3 py-2 text-right font-semibold ${r.roas_30d >= 2 ? 'text-emerald-300' : r.roas_30d > 0 ? 'text-amber-300' : 'text-slate-400'}`}>
                   {r.roas_30d > 0 ? `${Number(r.roas_30d).toFixed(2)}x` : '—'}
                 </td>
                 <td className="px-3 py-2 text-right text-slate-400">{r.ctr_30d > 0 ? `${Number(r.ctr_30d).toFixed(2)}%` : '—'}</td>
-                <td className="px-3 py-2 text-slate-500">{r.ultima_metrica_em ? formatDate(r.ultima_metrica_em) : '—'}</td>
+                <td className="px-3 py-2 text-slate-400">{r.ultima_metrica_em ? formatDate(r.ultima_metrica_em) : '—'}</td>
               </tr>
             ))}
             {linhas.length === 0 && (
-              <tr><td colSpan={10} className="px-3 py-8 text-center text-slate-500">Nenhum cliente encontrado.</td></tr>
+              <tr><td colSpan={10} className="px-3 py-8 text-center text-slate-400">Nenhum cliente encontrado.</td></tr>
             )}
           </tbody>
         </table>
@@ -317,7 +317,7 @@ function AbaTrafego() {
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold text-slate-200">Spend diário — últimos 30 dias</h3>
         {!(diario.data ?? []).length ? (
-          <p className="py-8 text-center text-sm text-slate-500">Sem dados. Rode uma sincronização em Meta Ads.</p>
+          <p className="py-8 text-center text-sm text-slate-400">Sem dados. Rode uma sincronização em Meta Ads.</p>
         ) : (
           <div className="flex h-40 items-end gap-1">
             {(diario.data ?? []).map((d) => {
@@ -325,7 +325,7 @@ function AbaTrafego() {
               return (
                 <div key={d.dia} className="group relative flex flex-1 flex-col items-center">
                   <div className="w-full rounded-t bg-brand-500/60 transition-colors hover:bg-brand-400" style={{ height: `${alt}%` }} />
-                  <div className="pointer-events-none absolute -top-8 hidden rounded bg-slate-900 px-2 py-1 text-[10px] text-slate-100 shadow-lg group-hover:block">
+                  <div className="pointer-events-none absolute -top-8 hidden rounded bg-slate-900 px-2 py-1 text-xs text-slate-100 shadow-lg group-hover:block">
                     {formatDate(d.dia)}<br />{formatMoney(Number(d.spend))}
                   </div>
                 </div>
@@ -338,7 +338,7 @@ function AbaTrafego() {
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold text-slate-200">Top clientes por spend (30d)</h3>
         {topClientes.length === 0 ? (
-          <p className="text-sm text-slate-500">Nenhum cliente com spend registrado nos últimos 30 dias.</p>
+          <p className="text-sm text-slate-400">Nenhum cliente com spend registrado nos últimos 30 dias.</p>
         ) : (
           <ul className="space-y-2">
             {topClientes.map((c) => {

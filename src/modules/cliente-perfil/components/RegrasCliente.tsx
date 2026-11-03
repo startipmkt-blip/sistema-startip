@@ -6,6 +6,7 @@ import {
   REGRA_TIPOS, useExcluirRegra, useRegras, useSalvarRegra,
   type RegraCliente, type RegraTipo,
 } from '../api/regrasApi';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const COR: Record<RegraTipo, string> = {
   gosta: 'border-emerald-500/30 bg-emerald-500/5',
@@ -41,7 +42,7 @@ function NovaRegra({ tipo, ajuda, clienteId }: { tipo: RegraTipo; ajuda: string;
         disabled={salvar.isPending}
         className="w-full rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
       />
-      <label className="flex cursor-pointer items-center gap-1.5 text-[11px] text-slate-400">
+      <label className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-400">
         <input type="checkbox" checked={critica} onChange={(e) => setCritica(e.target.checked)} />
         Regra crítica (não pode ser quebrada)
       </label>
@@ -96,8 +97,8 @@ function ItemRegra({ regra, clienteId }: { regra: RegraCliente; clienteId: strin
         <button
           title="Excluir"
           className="text-slate-400 hover:text-red-400"
-          onClick={() => {
-            if (confirm(`Excluir a regra "${regra.texto}"?`)) {
+          onClick={async () => {
+            if ((await confirmar(`Excluir a regra "${regra.texto}"?`))) {
               excluir.mutate(regra.id, { onError: (e) => alert(`Não foi possível excluir: ${(e as Error).message}`) });
             }
           }}
@@ -135,10 +136,10 @@ export function RegrasCliente({ clienteId }: { clienteId: string }) {
               <section key={t.id} className={`rounded-xl border p-3 ${COR[t.id]}`}>
                 <h3 className="text-xs font-semibold text-slate-100">
                   {glassify(t.emoji)} {t.label}
-                  <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-normal text-slate-300">{itens.length}</span>
+                  <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-xs font-normal text-slate-300">{itens.length}</span>
                 </h3>
                 {itens.length === 0 ? (
-                  <p className="mt-1.5 text-[11px] text-slate-500">Nada cadastrado.</p>
+                  <p className="mt-1.5 text-xs text-slate-400">Nada cadastrado.</p>
                 ) : (
                   <ul className="mt-2 space-y-1.5">
                     {itens.map((r) => <ItemRegra key={r.id} regra={r} clienteId={clienteId} />)}

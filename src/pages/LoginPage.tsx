@@ -101,7 +101,7 @@ export function LoginPage() {
               {googleEnviando ? 'Abrindo Google…' : 'Entrar com Google'}
             </button>
 
-            <div className="my-4 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-500">
+            <div className="my-4 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400">
               <span className="h-px flex-1 bg-white/10" />
               ou
               <span className="h-px flex-1 bg-white/10" />
@@ -141,7 +141,7 @@ export function LoginPage() {
         </form>
 
         {!IS_DEMO && (
-          <p className="mt-6 text-center text-xs text-slate-500">
+          <p className="mt-6 text-center text-xs text-slate-400">
             Sistema privado. Se você é novo por aqui, um administrador precisa
             liberar seu acesso antes de conseguir entrar.
           </p>

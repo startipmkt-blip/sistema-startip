@@ -105,7 +105,7 @@ export function SocialMediaPage() {
                   className={`w-full border-b border-white/5 p-2 text-left ${atual?.cliente_id === p.cliente_id ? 'bg-brand-500/10' : 'hover:bg-white/5'}`}
                 >
                   <div className="mb-1 text-sm font-medium text-slate-100">{p.nome}</div>
-                  <div className="flex flex-wrap gap-1 text-[10px]">
+                  <div className="flex flex-wrap gap-1 text-xs">
                     <Badge tone={p.posts_entregues >= p.meta_post ? 'green' : 'amber'}>
                       <GlassIcon name="palette" /> {p.posts_entregues}/{p.meta_post}
                     </Badge>
@@ -117,7 +117,7 @@ export function SocialMediaPage() {
               </li>
             ))}
             {filtradas.length === 0 && !isLoading && (
-              <li className="p-4 text-center text-xs text-slate-500">Nenhuma empresa nesse filtro.</li>
+              <li className="p-4 text-center text-xs text-slate-400">Nenhuma empresa nesse filtro.</li>
             )}
           </ul>
         </aside>
@@ -217,30 +217,30 @@ function DetalheEmpresa(props: {
         <Card className="p-4">
           <h3 className="mb-2 text-sm font-semibold text-slate-200"><GlassIcon name="palette" /> Posts</h3>
           <div className="text-3xl font-semibold text-slate-100">
-            {progresso.posts_entregues}<span className="text-sm text-slate-500"> / {progresso.meta_post}</span>
+            {progresso.posts_entregues}<span className="text-sm text-slate-400"> / {progresso.meta_post}</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/5">
             <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, (progresso.posts_entregues / Math.max(1, progresso.meta_post)) * 100)}%` }} />
           </div>
-          <div className="mt-2 text-[11px] text-slate-500">
+          <div className="mt-2 text-xs text-slate-400">
             Em andamento: {Math.max(0, progresso.posts_feitos - progresso.posts_entregues)} · Faltam: {progresso.faltam_posts}
           </div>
         </Card>
         <Card className="p-4">
           <h3 className="mb-2 text-sm font-semibold text-slate-200"><GlassIcon name="clapperboard" /> Vídeos</h3>
           <div className="text-3xl font-semibold text-slate-100">
-            {progresso.videos_entregues}<span className="text-sm text-slate-500"> / {progresso.meta_video}</span>
+            {progresso.videos_entregues}<span className="text-sm text-slate-400"> / {progresso.meta_video}</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/5">
             <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, (progresso.videos_entregues / Math.max(1, progresso.meta_video)) * 100)}%` }} />
           </div>
-          <div className="mt-2 text-[11px] text-slate-500">
+          <div className="mt-2 text-xs text-slate-400">
             Em andamento: {Math.max(0, progresso.videos_feitos - progresso.videos_entregues)} · Faltam: {progresso.faltam_videos}
           </div>
         </Card>
       </div>
 
-      <p className="mt-3 text-[11px] text-slate-500">
+      <p className="mt-3 text-xs text-slate-400">
         As tarefas em si são gerenciadas em <a href="/webdesigner" className="text-brand-300 hover:underline"><GlassIcon name="palette" /> Webdesigner</a>
         {' '}e <a href="/video-maker" className="text-brand-300 hover:underline"><GlassIcon name="clapperboard" /> Video Maker</a>. Aqui é o painel consolidado por empresa.
       </p>

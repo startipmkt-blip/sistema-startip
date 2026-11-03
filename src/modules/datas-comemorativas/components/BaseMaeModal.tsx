@@ -17,6 +17,7 @@ import {
   type DataBase, type Marco, type RegraRecorrencia,
 } from '@/modules/datas-comemorativas/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -50,7 +51,7 @@ export function BaseMaeModal({ open, onClose }: Props) {
   }, [base, busca, hoje, mapa]);
 
   async function remover(b: DataBase) {
-    if (!confirm(`Excluir "${b.nome}" da Base Mãe?`)) return;
+    if (!(await confirmar(`Excluir "${b.nome}" da Base Mãe?`))) return;
     try {
       await excluir.mutateAsync(b.id);
     } catch (e) {
@@ -88,17 +89,17 @@ export function BaseMaeModal({ open, onClose }: Props) {
                 <li key={b.id} className="flex flex-wrap items-center gap-3 px-3 py-2">
                   <div className="min-w-0 flex-1">
                     <div className="text-sm text-slate-100">{b.nome}</div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="text-xs text-slate-400">
                       {descreverRegra(b, mapa)}
                       {proxima && <> · próxima: {formatarData(proxima)}</>}
                     </div>
                   </div>
                   <Badge tone={PRIORIDADE_TONE[b.prioridade]}>{PRIORIDADE_LABEL[b.prioridade]}</Badge>
                   <button onClick={() => setEditando(b)} className="text-xs font-medium text-brand-300 hover:underline"><GlassIcon name="pencil" /> Editar</button>
-                  <button onClick={() => void remover(b)} className="text-xs text-slate-500 hover:text-red-300">Excluir</button>
+                  <button onClick={() => void remover(b)} className="text-xs text-slate-400 hover:text-red-300">Excluir</button>
                 </li>
               ))}
-              {lista.length === 0 && <li className="p-6 text-center text-xs text-slate-500">Nenhuma data encontrada.</li>}
+              {lista.length === 0 && <li className="p-6 text-center text-xs text-slate-400">Nenhuma data encontrada.</li>}
             </ul>
           )}
         </div>
@@ -229,7 +230,7 @@ function DataBaseEditor({ inicial, base, onDone }: { inicial?: DataBase; base: D
             <Input id="db-unica" label="Data" type="date" value={f.data_unica ?? ''} onChange={(e) => set('data_unica', e.target.value || null)} className="[color-scheme:dark]" />
           )}
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-400">
+        <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
           Prévia:
           {previa.map((p) => (
             <span key={p.ano} className="rounded-full bg-white/5 px-2 py-0.5 text-slate-200">

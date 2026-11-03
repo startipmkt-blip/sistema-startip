@@ -16,6 +16,7 @@ import {
 import { formatarDia, interpretar, modeloCsv, pendencias, temPendencia } from '@/modules/ideias-vip/lib/importar';
 import { IDEA_TYPES, ideaVazia, tipoInfo } from '@/modules/ideias-vip/types';
 import type { Idea, IdeaBatch, IdeaDraft, IdeaType } from '@/modules/ideias-vip/types';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 // 16px no celular evita o zoom automático do iOS ao tocar nos campos.
 const CAMPO = '!text-base sm:!text-sm min-h-[44px]';
@@ -86,7 +87,7 @@ export function IdeiasVipAdmin({ clienteId, clienteNome }: { clienteId: string; 
                         ? <Button className={BTN} onClick={() => publicar(l)} disabled={!r.total}>Publicar</Button>
                         : <Button className={BTN} variant="secondary" onClick={() => atualizar.mutate({ id: l.id, status: 'rascunho' })}>Voltar para rascunho</Button>}
                       <Button className={BTN} variant="secondary" onClick={() => setDuplicando(l)}>Duplicar</Button>
-                      <Button className={BTN} variant="ghost" onClick={() => { if (window.confirm(`Excluir o lote "${l.title}" e todas as ideias dele?`)) excluir.mutate(l.id); }}>Excluir</Button>
+                      <Button className={BTN} variant="ghost" onClick={async () => { if ((await confirmar(`Excluir o lote "${l.title}" e todas as ideias dele?`))) excluir.mutate(l.id); }}>Excluir</Button>
                     </div>
                   </div>
                 </Card>
@@ -145,7 +146,7 @@ function CompartilharLink({ clienteId, clienteNome }: { clienteId: string; clien
             >Abrir como cliente</a>
             <Button
               className={BTN} variant="ghost" disabled={revogar.isPending}
-              onClick={() => { if (window.confirm('Desativar este link? Quem tiver o link antigo deixa de acessar.')) revogar.mutate(); }}
+              onClick={async () => { if ((await confirmar('Desativar este link? Quem tiver o link antigo deixa de acessar.'))) revogar.mutate(); }}
             >Desativar link</Button>
           </div>
         </div>
@@ -344,7 +345,7 @@ function EditorLote({ lote, onVoltar, onPublicar }: { lote: IdeaBatch; onVoltar:
                 <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-200">{i.body}</p>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                   <Button className={BTN} variant="secondary" onClick={() => setForm({ id: i.id, dados: dadosDe(i) })}>Editar</Button>
-                  <Button className={BTN} variant="ghost" onClick={() => { if (window.confirm('Excluir esta ideia?')) excluir.mutate(i.id); }}>Excluir</Button>
+                  <Button className={BTN} variant="ghost" onClick={async () => { if ((await confirmar('Excluir esta ideia?'))) excluir.mutate(i.id); }}>Excluir</Button>
                   <Button className={BTN} variant="ghost" disabled={n === 0} onClick={() => reordenar.mutate({ a: i, b: ideias[n - 1] })}>Subir</Button>
                   <Button className={BTN} variant="ghost" disabled={n === ideias.length - 1} onClick={() => reordenar.mutate({ a: i, b: ideias[n + 1] })}>Descer</Button>
                 </div>

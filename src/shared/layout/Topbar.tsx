@@ -12,7 +12,7 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
   const papelLabel = isCliente ? 'Cliente' : isAdmin ? 'Admin' : 'Funcionário';
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-white/10 bg-white/[0.03] px-3 backdrop-blur-xl sm:px-6">
+    <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0e151d] px-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
         {/* Botão hambúrguer — só no mobile e quando há sidebar */}
         <button
@@ -25,6 +25,15 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
+        </button>
+        <button
+          onClick={() => window.dispatchEvent(new Event('commandpalette:open'))}
+          className="hidden h-9 w-64 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-400 hover:bg-white/[0.07] md:flex lg:w-80"
+          title="Busca universal (Ctrl+K)"
+        >
+          <GlassIcon name="search" className="h-4 w-4" tone="slate" />
+          <span className="flex-1 text-left">Buscar…</span>
+          <kbd className="rounded border border-white/10 px-1.5 text-xs text-slate-400">Ctrl K</kbd>
         </button>
         <div className="hidden sm:block">
           <DemoUserSwitcher />
@@ -41,17 +50,8 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
             <Badge tone={isCliente ? 'blue' : isAdmin ? 'green' : 'slate'}>{papelLabel}</Badge>
           </div>
         </div>
-        <button
-          onClick={() => window.dispatchEvent(new Event('commandpalette:open'))}
-          className="hidden items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-slate-300 hover:bg-white/10 sm:flex"
-          title="Busca universal (Ctrl+K)"
-        >
-          <span><GlassIcon name="search" /></span>
-          <span className="hidden md:inline">Buscar…</span>
-          <kbd className="rounded border border-white/10 bg-white/5 px-1 text-[10px] text-slate-400">Ctrl K</kbd>
-        </button>
         <TemaToggle />
-        <Button variant="secondary" onClick={() => void signOut()} className="px-3">
+        <Button variant="ghost" size="sm" onClick={() => void signOut()}>
           <Icon name="logout" className="h-4 w-4" />
           <span className="hidden sm:inline">Sair</span>
         </Button>

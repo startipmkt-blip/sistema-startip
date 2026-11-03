@@ -21,7 +21,7 @@ export function AbaPainelGestor({ cheio = false }: { cheio?: boolean } = {}) {
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-2 px-4 py-2 text-[11px] text-slate-500">
+      <div className="flex items-center gap-2 px-4 py-2 text-xs text-slate-400">
         <span>Painel do Gestor · dados do Meta Ads em tempo real</span>
         <a
           href={`${PAINEL_URL}/`}
@@ -45,7 +45,7 @@ export function AbaPainelGestor({ cheio = false }: { cheio?: boolean } = {}) {
         className={`block min-h-[560px] w-full border-0 bg-transparent ${cheio ? 'h-[calc(100vh-130px)]' : 'h-[calc(100vh-150px)]'}`}
         allow="clipboard-write; fullscreen"
       />
-      <p className="px-4 py-2 text-[11px] text-slate-500">
+      <p className="px-4 py-2 text-xs text-slate-400">
         Se pedir login, entre com o seu acesso do Painel (só na primeira vez). Se a área ficar em branco, use “Abrir em nova aba”.
       </p>
     </div>

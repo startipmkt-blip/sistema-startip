@@ -8,9 +8,8 @@ import { PwaInstallHint } from '@/shared/layout/PwaInstallHint';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { AlertasAoVivo } from '@/modules/alertas/components/AlertasAoVivo';
 
-// Casca da aplicação interna (equipe). Menu lateral fixo no desktop e em
-// gaveta (drawer) no mobile. Na tela inicial, a sidebar some — a navegação
-// acontece pelos cards da própria página (estilo Central de Ferramentas).
+// Casca da aplicação interna (equipe). Menu lateral fixo no desktop (em todas
+// as telas, inclusive o Início) e em gaveta (drawer) no mobile.
 export function AppShell() {
   const { isCliente } = useAuth();
   const [menuAberto, setMenuAberto] = useState(false);
@@ -24,7 +23,7 @@ export function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onAbrirMenu={() => setMenuAberto(true)} ocultarHamburguer={semSidebar} />
         <DemoBanner />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

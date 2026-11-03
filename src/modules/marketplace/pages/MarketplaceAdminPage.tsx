@@ -8,6 +8,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function MarketplaceAdminPage() {
   const { data: perfis, isLoading } = useMpPerfis();
@@ -61,7 +62,7 @@ export function MarketplaceAdminPage() {
 
       <div className="grid gap-3 lg:grid-cols-[300px,1fr]">
         <Card className="p-2">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Empresas no marketplace</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Empresas no marketplace</div>
           {isLoading ? <Spinner /> : (perfis ?? []).length === 0 ? (
             <EmptyState message="Nenhum cliente cadastrado ainda." />
           ) : (
@@ -182,7 +183,7 @@ function ProdutosSection({ clienteId }: { clienteId: string }) {
       </div>
 
       {isLoading ? <Spinner /> : (produtos ?? []).length === 0 ? (
-        <p className="text-center text-xs text-slate-500">Nenhum produto ainda.</p>
+        <p className="text-center text-xs text-slate-400">Nenhum produto ainda.</p>
       ) : (
         <ul className="divide-y divide-white/5">
           {produtos!.map((p) => (
@@ -193,7 +194,7 @@ function ProdutosSection({ clienteId }: { clienteId: string }) {
                   {!p.ativo && <Badge tone="slate">inativo</Badge>}
                 </div>
                 {p.descricao && <div className="text-xs text-slate-400">{p.descricao}</div>}
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-slate-400">
                   {p.preco_brl != null && <>R$ {Number(p.preco_brl).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} · </>}
                   {p.desconto_texto}
                 </div>
@@ -205,7 +206,7 @@ function ProdutosSection({ clienteId }: { clienteId: string }) {
                 {p.ativo ? 'ocultar' : 'ativar'}
               </button>
               <button
-                onClick={() => { if (confirm('Apagar produto?')) apagar.mutate({ id: p.id, cliente_id: clienteId }); }}
+                onClick={async () => { if ((await confirmar('Apagar produto?'))) apagar.mutate({ id: p.id, cliente_id: clienteId }); }}
                 className="rounded-md px-2 text-xs text-red-300 hover:bg-red-500/10"
               >
                 <GlassIcon name="trash" />

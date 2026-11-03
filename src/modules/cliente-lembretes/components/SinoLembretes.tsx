@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   clienteId: string;
@@ -53,7 +54,7 @@ export function SinoLembretes({ clienteId, clienteNome }: Props) {
       >
         <GlassIcon name="bell" className="h-5 w-5" />
         {pendentes > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold leading-none text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold leading-none text-white">
             {pendentes}
           </span>
         )}
@@ -92,15 +93,15 @@ export function SinoLembretes({ clienteId, clienteNome }: Props) {
                       {!pend && <GlassIcon name="check" />}
                     </button>
                     <div className="min-w-0 flex-1">
-                      <div className={`text-sm ${pend ? 'text-slate-100' : 'text-slate-500 line-through'}`}>{l.titulo}</div>
+                      <div className={`text-sm ${pend ? 'text-slate-100' : 'text-slate-400 line-through'}`}>{l.titulo}</div>
                       <div className="text-xs text-slate-400">{FREQUENCIA_LABEL[l.frequencia]}</div>
                     </div>
                     {pend && <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" title="Pendente" />}
                     <button
                       type="button"
                       className="text-xs font-medium text-red-400 hover:underline"
-                      onClick={() => {
-                        if (confirm(`Excluir o lembrete "${l.titulo}"?`)) excluir.mutate(l.id);
+                      onClick={async () => {
+                        if ((await confirmar(`Excluir o lembrete "${l.titulo}"?`))) excluir.mutate(l.id);
                       }}
                     >
                       Excluir

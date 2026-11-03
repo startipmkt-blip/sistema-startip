@@ -80,7 +80,7 @@ export function HistoricoDesigner({ clienteId, responsavelId, q, periodo, client
                     >
                       <span className="min-w-0">
                         <span className="block truncate text-slate-100">{d.titulo}</span>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-400">
                           {TIPO_LABEL[d.tipo]}{d.cliente_nome ? ` · ${d.cliente_nome}` : ''}
                           {glassify(d.responsavel_nome ? ` · 👤 ${d.responsavel_nome}` : '')}
                         </span>

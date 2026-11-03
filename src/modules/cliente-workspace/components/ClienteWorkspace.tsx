@@ -112,7 +112,7 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
                       }`}
                     >
                       <span
-                        className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] ${
+                        className={`flex h-4 w-4 items-center justify-center rounded-full text-xs ${
                           ok ? 'bg-emerald-500/15 text-emerald-300' : 'border border-white/15 text-transparent'
                         }`}
                         title={ok ? 'Preenchido' : 'Em branco'}

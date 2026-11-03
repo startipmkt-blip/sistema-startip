@@ -156,7 +156,7 @@ function SeletorClientes({
             }`}>{c.cliente_nome.slice(0, 1).toUpperCase()}</div>
             <div className="min-w-0">
               <p className={`truncate text-sm font-semibold ${ativa ? 'text-white' : 'text-slate-100'}`}>{c.cliente_nome}</p>
-              <p className="truncate text-[11px] text-slate-400">act_{c.id_externo}</p>
+              <p className="truncate text-xs text-slate-400">act_{c.id_externo}</p>
             </div>
           </button>
         );
@@ -194,7 +194,7 @@ function FiltroPeriodo({
       {preset === 'custom' && (
         <>
           <input type="date" value={since} onChange={(e) => onSince(e.target.value)} className="glass-field rounded-md px-2 py-1 text-xs" />
-          <span className="text-xs text-slate-500">→</span>
+          <span className="text-xs text-slate-400">→</span>
           <input type="date" value={until} onChange={(e) => onUntil(e.target.value)} className="glass-field rounded-md px-2 py-1 text-xs" />
         </>
       )}
@@ -231,11 +231,11 @@ function AbaPainel({ contaId, periodo, moeda }: { contaId: string; periodo: Peri
         {tiles.map((t) => (
           <div key={t.label} className={`relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${t.tone} p-4`}>
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-white/80">{t.label}</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-white/80">{t.label}</span>
               <span className="text-lg"><GlassIcon emoji={t.icone} /></span>
             </div>
             <div className="text-2xl font-bold text-white">{t.valor}</div>
-            {t.hint && <div className="mt-1 text-[10px] text-white/60">{t.hint}</div>}
+            {t.hint && <div className="mt-1 text-xs text-white/60">{t.hint}</div>}
           </div>
         ))}
       </div>
@@ -246,7 +246,7 @@ function AbaPainel({ contaId, periodo, moeda }: { contaId: string; periodo: Peri
           <span className="text-xs text-slate-400">{dias.length} dia(s)</span>
         </div>
         {dias.length === 0 ? (
-          <p className="py-8 text-center text-sm text-slate-500">Sem dados no período selecionado.</p>
+          <p className="py-8 text-center text-sm text-slate-400">Sem dados no período selecionado.</p>
         ) : (
           <div className="flex h-48 items-end gap-1">
             {dias.map((d) => {
@@ -257,7 +257,7 @@ function AbaPainel({ contaId, periodo, moeda }: { contaId: string; periodo: Peri
                     className="w-full rounded-t bg-gradient-to-t from-brand-500 to-brand-300 transition-opacity group-hover:opacity-90"
                     style={{ height: `${h}%` }}
                   />
-                  <div className="pointer-events-none absolute -top-12 z-10 hidden rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-[10px] text-slate-100 shadow-lg group-hover:block whitespace-nowrap">
+                  <div className="pointer-events-none absolute -top-12 z-10 hidden rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-xs text-slate-100 shadow-lg group-hover:block whitespace-nowrap">
                     <p className="font-semibold">{new Date(d.dia).toLocaleDateString('pt-BR')}</p>
                     <p>{formatMoney(d.spend)}</p>
                     <p className="text-slate-400">{d.conversions} conv · ROAS {d.spend > 0 ? fmtDec(d.valor_conversao / d.spend) : '0.00'}x</p>
@@ -271,15 +271,15 @@ function AbaPainel({ contaId, periodo, moeda }: { contaId: string; periodo: Peri
 
       <div className="grid gap-3 md:grid-cols-3">
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-slate-500">Alcance</p>
+          <p className="text-xs uppercase tracking-wider text-slate-400">Alcance</p>
           <p className="mt-1 text-xl font-semibold text-slate-100">{fmtInt(k.reach)}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-slate-500">Frequência</p>
+          <p className="text-xs uppercase tracking-wider text-slate-400">Frequência</p>
           <p className="mt-1 text-xl font-semibold text-slate-100">{fmtDec(k.frequency)}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-slate-500">Valor de conversão</p>
+          <p className="text-xs uppercase tracking-wider text-slate-400">Valor de conversão</p>
           <p className="mt-1 text-xl font-semibold text-emerald-300">{formatMoney(k.valor_conversao)}</p>
         </Card>
       </div>
@@ -329,7 +329,7 @@ function AbaCampanhas({ contaId, periodo }: { contaId: string; periodo: Periodo 
       </Card>
 
       {linhas.length === 0 ? (
-        <Card className="p-8 text-center text-sm text-slate-500">Nenhuma campanha no filtro.</Card>
+        <Card className="p-8 text-center text-sm text-slate-400">Nenhuma campanha no filtro.</Card>
       ) : (
         <div className="space-y-2">
           {linhas.map((c) => (
@@ -367,9 +367,9 @@ function CardCampanha({ c, onPausar, onEditarOrcamento, alternando }: {
             <span className={`h-2 w-2 rounded-full ${ativa ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.7)]' : 'bg-slate-500'}`} />
             <h4 className="truncate text-sm font-semibold text-slate-100">{c.nome}</h4>
             <Badge tone={ativa ? 'green' : 'slate'}>{ativa ? 'Ativa' : c.status}</Badge>
-            <span className="text-[10px] uppercase tracking-wider text-slate-500">{c.objetivo}</span>
+            <span className="text-xs uppercase tracking-wider text-slate-400">{c.objetivo}</span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-500">
+          <p className="mt-1 text-xs text-slate-400">
             Orçamento diário: <span className="text-slate-300">{c.daily_budget != null ? formatMoney(c.daily_budget) : c.lifetime_budget != null ? `${formatMoney(c.lifetime_budget)} (total)` : '—'}</span>
           </p>
         </div>
@@ -403,7 +403,7 @@ function Metrica({ label, valor, destaque, tone }: { label: string; valor: strin
   const cor = tone === 'green' ? 'text-emerald-300' : tone === 'amber' ? 'text-amber-300' : destaque ? 'text-brand-200' : 'text-slate-100';
   return (
     <div className="rounded-lg bg-white/5 px-2.5 py-1.5">
-      <p className="text-[10px] uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-slate-400">{label}</p>
       <p className={`text-sm font-semibold ${cor}`}>{valor}</p>
     </div>
   );
@@ -494,24 +494,24 @@ function AbaAnuncios({ contaId, periodo }: { contaId: string; periodo: Periodo }
               {a.thumbnail ? (
                 <img src={a.thumbnail} alt="" className="h-40 w-full object-cover" />
               ) : (
-                <div className="grid h-40 w-full place-items-center bg-slate-800 text-4xl text-slate-600"><GlassIcon name="image" /></div>
+                <div className="grid h-40 w-full place-items-center bg-slate-800 text-4xl text-slate-400"><GlassIcon name="image" /></div>
               )}
               <div className="p-3">
                 <div className="mb-1 flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${ativa ? 'bg-emerald-400' : 'bg-slate-500'}`} />
                   <p className="truncate text-sm font-semibold text-slate-100">{a.nome}</p>
                 </div>
-                {a.titulo_criativo && <p className="line-clamp-1 text-[11px] font-medium text-slate-300">{a.titulo_criativo}</p>}
-                {a.texto_criativo && <p className="mt-1 line-clamp-2 text-[11px] text-slate-500">{a.texto_criativo}</p>}
-                <div className="mt-2 grid grid-cols-3 gap-1 text-[10px]">
+                {a.titulo_criativo && <p className="line-clamp-1 text-xs font-medium text-slate-300">{a.titulo_criativo}</p>}
+                {a.texto_criativo && <p className="mt-1 line-clamp-2 text-xs text-slate-400">{a.texto_criativo}</p>}
+                <div className="mt-2 grid grid-cols-3 gap-1 text-xs">
                   <div className="rounded bg-white/5 p-1.5 text-center">
-                    <p className="text-slate-500">Spend</p><p className="font-semibold text-slate-100">{formatMoney(a.spend)}</p>
+                    <p className="text-slate-400">Spend</p><p className="font-semibold text-slate-100">{formatMoney(a.spend)}</p>
                   </div>
                   <div className="rounded bg-white/5 p-1.5 text-center">
-                    <p className="text-slate-500">Conv</p><p className="font-semibold text-brand-200">{fmtInt(a.conversions)}</p>
+                    <p className="text-slate-400">Conv</p><p className="font-semibold text-brand-200">{fmtInt(a.conversions)}</p>
                   </div>
                   <div className="rounded bg-white/5 p-1.5 text-center">
-                    <p className="text-slate-500">ROAS</p><p className={`font-semibold ${a.roas >= 2 ? 'text-emerald-300' : a.roas > 0 ? 'text-amber-300' : 'text-slate-400'}`}>{fmtDec(a.roas)}x</p>
+                    <p className="text-slate-400">ROAS</p><p className={`font-semibold ${a.roas >= 2 ? 'text-emerald-300' : a.roas > 0 ? 'text-amber-300' : 'text-slate-400'}`}>{fmtDec(a.roas)}x</p>
                   </div>
                 </div>
                 <div className="mt-2 flex gap-2">
@@ -528,7 +528,7 @@ function AbaAnuncios({ contaId, periodo }: { contaId: string; periodo: Periodo }
       </div>
 
       {linhas.length === 0 && (
-        <Card className="p-8 text-center text-sm text-slate-500">Nenhum anúncio no período.</Card>
+        <Card className="p-8 text-center text-sm text-slate-400">Nenhum anúncio no período.</Card>
       )}
     </div>
   );

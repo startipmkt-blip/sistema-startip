@@ -54,14 +54,14 @@ function TempoBadge({ tempo }: { tempo?: TempoDemanda }) {
   const aberto = tempo?.aberto;
   if (aberto) {
     return (
-      <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+      <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-300">
         <GlassIcon name="timer" /> {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
       </div>
     );
   }
   if (total > 0) {
     return (
-      <div className="mt-1 text-[11px] text-slate-300" title="Tempo gasto">
+      <div className="mt-1 text-xs text-slate-300" title="Tempo gasto">
         <GlassIcon name="timer" /> {formatarDuracao(total)}
       </div>
     );
@@ -208,23 +208,23 @@ export function DemandasPage() {
               {d.privada && <span title="Privada"><GlassIcon name="lock" /> </span>}
               {d.titulo}
               {!!d.anexos?.length && (
-                <span className="ml-1 text-[11px] text-slate-400" title="Anexos"><GlassIcon name="paperclip" /> {d.anexos.length}</span>
+                <span className="ml-1 text-xs text-slate-400" title="Anexos"><GlassIcon name="paperclip" /> {d.anexos.length}</span>
               )}
             </span>
-            <Badge tone={PRIORIDADE_TONE[d.prioridade]} className="shrink-0 !px-2 !py-0 text-[10px]">{PRIORIDADE_LABEL[d.prioridade]}</Badge>
+            <Badge tone={PRIORIDADE_TONE[d.prioridade]} className="shrink-0 !px-2 !py-0 text-xs">{PRIORIDADE_LABEL[d.prioridade]}</Badge>
           </div>
           {d.descricao && (
-            <p className="mt-0.5 line-clamp-2 whitespace-pre-wrap text-[11px] leading-snug text-slate-300"><Linkify texto={d.descricao} /></p>
+            <p className="mt-0.5 line-clamp-2 whitespace-pre-wrap text-xs leading-snug text-slate-300"><Linkify texto={d.descricao} /></p>
           )}
-          <div className="text-[11px] text-slate-400">{d.cliente_nome}</div>
+          <div className="text-xs text-slate-400">{d.cliente_nome}</div>
           <TempoBadge tempo={tempos?.[d.id]} />
-          <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
             <span><GlassIcon name="user" /> {d.responsavel || '—'}</span>
             <span className={atrasada ? 'font-semibold text-red-400' : venceHoje ? 'font-semibold text-amber-300' : ''}>
               {glassify(atrasada ? '⚠ ' : '📅 ')}{formatDate(d.prazo)}
             </span>
           </div>
-          <div className="mt-0.5 text-[10px] text-slate-500" title="Data em que a demanda foi criada">
+          <div className="mt-0.5 text-xs text-slate-400" title="Data em que a demanda foi criada">
             Criada em {formatDate(d.created_at)}
           </div>
         </button>
@@ -365,10 +365,10 @@ export function DemandasPage() {
                       <li key={d.id} className="flex items-center justify-between py-2 text-sm">
                         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
                           <div className="truncate text-slate-100 line-through opacity-70">{d.titulo}</div>
-                          <div className="text-xs text-slate-500">{d.cliente_nome} · <GlassIcon name="user" /> {d.responsavel || '—'} · criada em {formatDate(d.created_at)}</div>
+                          <div className="text-xs text-slate-400">{d.cliente_nome} · <GlassIcon name="user" /> {d.responsavel || '—'} · criada em {formatDate(d.created_at)}</div>
                           <TempoBadge tempo={tempos?.[d.id]} />
                         </button>
-                        <span className="text-xs text-slate-500"><GlassIcon name="calendar" /> {formatDate(d.prazo)}</span>
+                        <span className="text-xs text-slate-400"><GlassIcon name="calendar" /> {formatDate(d.prazo)}</span>
                         <button
                           type="button"
                           onClick={() => mover(d, 'aberta')}

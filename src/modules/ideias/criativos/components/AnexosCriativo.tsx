@@ -115,7 +115,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
         <span>{enviando ? 'Enviando…' : 'Arraste arquivos aqui ou toque para anexar'}</span>
         <span className="text-xs font-medium text-brand-200">Dica: tire o print e aperte Ctrl+V aqui na tela para colar</span>
         <span className="rounded-lg bg-brand-500/20 px-3 py-1 text-xs font-medium text-brand-100">Anexar arquivo</span>
-        <span className="text-[11px] text-slate-500">
+        <span className="text-xs text-slate-400">
           Imagens, PDF, DOC, XLS, PPT e TXT · até {MAX_ANEXO_MB} MB cada
         </span>
         <input
@@ -146,7 +146,7 @@ export function AnexosCriativo({ anexos, onChange, novos, onNovos }: Props) {
               </button>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium text-slate-100">{a.name}</p>
-                <p className="text-[11px] text-slate-500">{formatarTamanho(a.size)}</p>
+                <p className="text-xs text-slate-400">{formatarTamanho(a.size)}</p>
               </div>
               <button
                 type="button"

@@ -15,6 +15,7 @@ import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
 import { useBancoIdeias } from '@/modules/gestao-conteudo/api/bancoIdeiasApi';
 import { BancoIdeias } from './BancoIdeias';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   cliente: ClienteGestao;
@@ -60,8 +61,8 @@ function IdeiasDoMes({ cliente, mes, ideias }: Props) {
     setEditando(undefined); setSemanaNova(semana); setFormAberto(true);
   }
 
-  function enviarSelecionadas() {
-    if (!confirm(`Enviar ${selecionadas.length} ideia(s) para aprovação no WhatsApp de ${cliente.nome}?`)) return;
+  async function enviarSelecionadas() {
+    if (!(await confirmar(`Enviar ${selecionadas.length} ideia(s) para aprovação no WhatsApp de ${cliente.nome}?`))) return;
     setAviso(null);
     enviar.mutate(
       { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: selecionadas },
@@ -69,8 +70,8 @@ function IdeiasDoMes({ cliente, mes, ideias }: Props) {
     );
   }
 
-  function lembrarAgora() {
-    if (!confirm(`Reenviar o link das ideias para ${cliente.nome} (${aguardando.length} aguardando)?`)) return;
+  async function lembrarAgora() {
+    if (!(await confirmar(`Reenviar o link das ideias para ${cliente.nome} (${aguardando.length} aguardando)?`))) return;
     setAviso(null);
     lembrar.mutate(
       { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: aguardando.map((i) => i.id) },
@@ -154,9 +155,9 @@ function IdeiasDoMes({ cliente, mes, ideias }: Props) {
               <div className="mb-2 px-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-slate-100">Semana {s.numero}</span>
-                  <span className="text-[11px] text-slate-400">{daSemana.length}</span>
+                  <span className="text-xs text-slate-400">{daSemana.length}</span>
                 </div>
-                <p className="text-[11px] text-slate-400"><GlassIcon name="calendar" /> {s.periodo}</p>
+                <p className="text-xs text-slate-400"><GlassIcon name="calendar" /> {s.periodo}</p>
               </div>
               <div className="space-y-2">
                 {daSemana.map((i) => {
@@ -176,18 +177,18 @@ function IdeiasDoMes({ cliente, mes, ideias }: Props) {
                         )}
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-slate-100">{i.titulo}</p>
-                          <p className="text-[10px] text-slate-500">
+                          <p className="text-xs text-slate-400">
                             {FORMATO_LABEL[i.formato] ?? i.formato}
                             {i.dia_postagem && ` · postar ${new Date(`${i.dia_postagem}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`}
                           </p>
                           {i.descricao && (
-                            <p className="mt-1 line-clamp-3 whitespace-pre-line text-[11px] text-slate-300"><Linkify texto={i.descricao} /></p>
+                            <p className="mt-1 line-clamp-3 whitespace-pre-line text-xs text-slate-300"><Linkify texto={i.descricao} /></p>
                           )}
                         </div>
                       </div>
 
                       {i.status === 'reprovada' && i.justificativa && (
-                        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] text-red-300">
+                        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-xs text-red-300">
                           <strong>O cliente pediu:</strong> {i.justificativa}
                         </p>
                       )}
@@ -211,7 +212,7 @@ function IdeiasDoMes({ cliente, mes, ideias }: Props) {
                           <GlassIcon name="pencil" />
                         </button>
                         <button
-                          onClick={() => { if (confirm(`Excluir "${i.titulo}"?`)) excluir.mutate(i.id); }}
+                          onClick={async () => { if ((await confirmar(`Excluir "${i.titulo}"?`))) excluir.mutate(i.id); }}
                           className="rounded px-1.5 py-1 text-slate-400 hover:bg-red-500/10 hover:text-red-300" title="Excluir"
                         >
                           <GlassIcon name="trash" />

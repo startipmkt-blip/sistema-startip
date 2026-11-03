@@ -15,6 +15,7 @@ import { Select } from '@/shared/ui/Select';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const LIMITE_TV = 6;
 
@@ -186,20 +187,20 @@ function DemandasCard({ clientes }: { clientes: Array<{ id: string; nome: string
       {isLoading ? (
         <div className="flex justify-center p-6"><Spinner /></div>
       ) : (demandas ?? []).length === 0 ? (
-        <p className="p-4 text-center text-xs text-slate-500">Nenhuma demanda urgente. Adicione as da semana acima.</p>
+        <p className="p-4 text-center text-xs text-slate-400">Nenhuma demanda urgente. Adicione as da semana acima.</p>
       ) : (
         <ul className="space-y-2">
           {(demandas ?? []).map((d) => (
             <li key={d.id} className="flex items-start gap-2 rounded-lg border border-white/10 bg-white/[0.03] p-2">
               <div className="min-w-0 flex-1">
                 <div className="text-sm text-slate-100">{d.titulo}</div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-xs text-slate-400">
                   {[nomeCliente(d.cliente_id), d.responsavel, d.prazo && `prazo ${formatarData(d.prazo, { day: '2-digit', month: '2-digit' })}`].filter(Boolean).join(' · ') || '—'}
                 </div>
               </div>
-              <button onClick={() => concluir.mutate(d.id)} className="rounded-md bg-emerald-500/20 px-2 py-1 text-[11px] font-medium text-emerald-200 hover:bg-emerald-500/30"><GlassIcon name="check" /> Feita</button>
-              <button onClick={() => editar(d)} className="px-1 text-[11px] text-brand-300 hover:underline">Editar</button>
-              <button onClick={() => { if (confirm(`Excluir "${d.titulo}"?`)) excluir.mutate(d.id); }} className="px-1 text-[11px] text-slate-500 hover:text-red-300">Excluir</button>
+              <button onClick={() => concluir.mutate(d.id)} className="rounded-md bg-emerald-500/20 px-2 py-1 text-xs font-medium text-emerald-200 hover:bg-emerald-500/30"><GlassIcon name="check" /> Feita</button>
+              <button onClick={() => editar(d)} className="px-1 text-xs text-brand-300 hover:underline">Editar</button>
+              <button onClick={async () => { if ((await confirmar(`Excluir "${d.titulo}"?`))) excluir.mutate(d.id); }} className="px-1 text-xs text-slate-400 hover:text-red-300">Excluir</button>
             </li>
           ))}
         </ul>

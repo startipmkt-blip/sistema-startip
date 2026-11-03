@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Tabs } from '@/shared/ui/Tabs';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
@@ -52,19 +53,7 @@ export function DesignerPage() {
         subtitle="Demandas, produção e funções do designer."
       />
 
-      <nav className="flex gap-1 border-b border-white/10">
-        {ABAS.map((a) => (
-          <button
-            key={a.id}
-            onClick={() => setAba(a.id)}
-            className={`rounded-t-md px-4 py-2 text-sm font-medium transition-colors ${
-              aba === a.id
-                ? 'bg-white/5 text-white border-b-2 border-brand-400'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          ><GlassIcon emoji={a.icone} /> {a.label}</button>
-        ))}
-      </nav>
+      <Tabs tabs={ABAS.map((a) => ({ id: a.id, label: a.label, icon: <GlassIcon emoji={a.icone} /> }))} value={aba} onChange={setAba} />
 
       {aba === 'demandas'    && <AbaDemandas />}
       {aba === 'producao'    && <ConteudoPage />}

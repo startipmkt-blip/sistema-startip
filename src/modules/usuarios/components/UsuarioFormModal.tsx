@@ -116,7 +116,7 @@ export function UsuarioFormModal({ open, onClose, usuario }: Props) {
               <Input id="email" type="email" label="Email de login *" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="pessoa@startipmkt.com" />
               <Input id="senha" type="password" label="Senha inicial *" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="mín. 6 caracteres" />
             </div>
-            <p className="mt-2 text-[11px] text-slate-400">
+            <p className="mt-2 text-xs text-slate-400">
               A pessoa poderá logar com esses dados imediatamente e mudar a senha depois.
             </p>
           </div>

@@ -60,7 +60,7 @@ export function InboxLista({
             onChange={(e) => onBuscar(e.target.value)}
             className="w-full rounded-md border border-white/10 bg-white/5 px-8 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
           />
-          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"><GlassIcon name="search" /></span>
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"><GlassIcon name="search" /></span>
         </div>
       </div>
 
@@ -106,29 +106,29 @@ export function InboxLista({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-1.5">
-                          {c.fixado && <span className="text-[10px] text-amber-300" title="Fixada"><GlassIcon name="pin" /></span>}
+                          {c.fixado && <span className="text-xs text-amber-300" title="Fixada"><GlassIcon name="pin" /></span>}
                           <span className="truncate text-sm font-medium text-slate-100">{c.nome}</span>
                         </div>
-                        <span className="shrink-0 text-[11px] text-slate-500">{tempoRelativo(c.ultima_em)}</span>
+                        <span className="shrink-0 text-xs text-slate-400">{tempoRelativo(c.ultima_em)}</span>
                       </div>
                       <div className="mt-0.5 flex items-center justify-between gap-2">
                         <span className="truncate text-xs text-slate-400">
                           {c.ultima_direcao === 'enviada' && '↗ '}
-                          {c.ultima_mensagem ?? <span className="italic text-slate-500">sem mensagens</span>}
+                          {c.ultima_mensagem ?? <span className="italic text-slate-400">sem mensagens</span>}
                         </span>
                         {c.nao_lidas > 0 && (
-                          <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 text-[10px] font-semibold text-white">
+                          <span className="shrink-0 rounded-full bg-emerald-500 px-1.5 text-xs font-semibold text-white">
                             {c.nao_lidas > 99 ? '99+' : c.nao_lidas}
                           </span>
                         )}
                       </div>
                       {c.atendente_nome && (
-                        <div className="mt-0.5 truncate text-[10px] text-slate-500"><GlassIcon name="user" /> {c.atendente_nome}</div>
+                        <div className="mt-0.5 truncate text-xs text-slate-400"><GlassIcon name="user" /> {c.atendente_nome}</div>
                       )}
                       {c.pilar && (() => {
                         const p = pillarInfo(c.pilar);
                         return (
-                          <div className="mt-0.5 inline-flex items-center gap-1 text-[10px] text-slate-500">
+                          <div className="mt-0.5 inline-flex items-center gap-1 text-xs text-slate-400">
                             <span aria-hidden><GlassIcon emoji={p.icone} /></span>
                             <span>{p.label}</span>
                           </div>
@@ -138,7 +138,7 @@ export function InboxLista({
                         const dias = precisaFollowUp(c);
                         if (!dias) return null;
                         return (
-                          <div className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-300">
+                          <div className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-300">
                             <GlassIcon name="alarm" /> Follow-up {dias}d
                           </div>
                         );

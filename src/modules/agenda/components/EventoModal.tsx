@@ -6,6 +6,7 @@ import { useSalvarEvento, useApagarEvento, useAgendaTemplates, type AgendaEvent,
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { PILLAR_KEYS, pillarInfo, type PillarKey } from '@/shared/lib/pillars';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -86,7 +87,7 @@ export function EventoModal({ open, onClose, evento, dataDefault }: Props) {
 
   async function handleApagar() {
     if (!evento?.id) return;
-    if (!confirm('Apagar agendamento?')) return;
+    if (!(await confirmar('Apagar agendamento?'))) return;
     await apagar.mutateAsync(evento.id);
     onClose();
   }

@@ -16,6 +16,7 @@ import { Textarea } from '@/shared/ui/Textarea';
 import { Button } from '@/shared/ui/Button';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -42,7 +43,7 @@ export function RelatorioFormModal({ open, onClose, relatorio }: Props) {
 
   async function handleExcluir() {
     if (!relatorio) return;
-    if (!confirm('Excluir este relatório?')) return;
+    if (!(await confirmar('Excluir este relatório?'))) return;
     await excluir.mutateAsync(relatorio.id);
     onClose();
   }

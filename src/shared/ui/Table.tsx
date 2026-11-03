@@ -28,23 +28,23 @@ export function Table<T>({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-slate-400">
+          <tr className="border-b border-white/10 bg-white/[0.03] text-left text-xs font-medium text-slate-400">
             {columns.map((col) => (
-              <th key={col.header} className={`px-4 py-3 font-medium ${col.className ?? ''}`}>
+              <th key={col.header} className={`px-4 py-2.5 font-medium ${col.className ?? ''}`}>
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+        <tbody className="divide-y divide-white/[0.06]">
           {data.map((row) => (
             <tr
               key={keyOf(row)}
               onClick={() => onRowClick?.(row)}
-              className={onRowClick ? 'cursor-pointer transition-colors hover:bg-white/5' : ''}
+              className={onRowClick ? 'cursor-pointer transition-colors hover:bg-white/[0.04]' : ''}
             >
               {columns.map((col) => (
-                <td key={col.header} className={`px-4 py-3 text-slate-300 ${col.className ?? ''}`}>
+                <td key={col.header} className={`h-12 px-4 py-2 text-slate-300 ${col.className ?? ''}`}>
                   {col.render(row)}
                 </td>
               ))}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Tabs } from '@/shared/ui/Tabs';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Card } from '@/shared/ui/Card';
 import { Select } from '@/shared/ui/Select';
@@ -60,19 +61,12 @@ export function TrafegoPage() {
 
 function NavAbas({ aba, setAba }: { aba: Aba; setAba: (a: Aba) => void }) {
   return (
-    <nav className={`flex gap-1 border-b border-white/10 ${aba === 'meta' || aba === 'gestor' ? 'px-4 pt-4' : ''}`}>
-      {ABAS.map((a) => (
-        <button
-          key={a.id}
-          onClick={() => setAba(a.id)}
-          className={`rounded-t-md px-4 py-2 text-sm font-medium transition-colors ${
-            aba === a.id
-              ? 'bg-white/5 text-white border-b-2 border-brand-400'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        ><GlassIcon emoji={a.icone} /> {a.label}</button>
-      ))}
-    </nav>
+    <Tabs
+      className={aba === 'meta' || aba === 'gestor' ? 'mx-4 mt-4' : ''}
+      tabs={ABAS.map((a) => ({ id: a.id, label: a.label, icon: <GlassIcon emoji={a.icone} /> }))}
+      value={aba}
+      onChange={setAba}
+    />
   );
 }
 
@@ -85,7 +79,7 @@ function AbaChecklistStandalone() {
   return (
     <div className="space-y-3">
       <Card className="flex flex-wrap items-center gap-3 p-3">
-        <span className="text-xs uppercase tracking-wider text-slate-500">Cliente</span>
+        <span className="text-xs uppercase tracking-wider text-slate-400">Cliente</span>
         <Select
           id="cli"
           value={clienteId}
@@ -95,7 +89,7 @@ function AbaChecklistStandalone() {
             ...disponiveis.map((c) => ({ value: c.id, label: c.nome })),
           ]}
         />
-        <span className="ml-auto text-[11px] text-slate-500">
+        <span className="ml-auto text-xs text-slate-400">
           {disponiveis.length} cliente(s) com tráfego pago
         </span>
       </Card>

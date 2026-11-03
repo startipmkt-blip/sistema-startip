@@ -16,7 +16,7 @@ function Barra({ label, valor, ajuda }: { label: string; valor: number | null; a
       <div className="h-2 overflow-hidden rounded-full bg-white/5">
         <div className={`h-full ${cor} transition-all`} style={{ width: `${valor ?? 0}%` }} />
       </div>
-      <div className="mt-1 text-[10px] text-slate-500">{ajuda}</div>
+      <div className="mt-1 text-xs text-slate-400">{ajuda}</div>
     </div>
   );
 }
@@ -31,7 +31,7 @@ export function ScoreSaudeCard({ clienteId }: Props) {
         <h3 className="text-sm font-semibold text-slate-200">Score de saúde</h3>
         <Badge tone={cls.tone}>{cls.label}</Badge>
         <span className="ml-auto text-3xl font-semibold text-slate-100">
-          {saude?.score_saude ?? '—'}<span className="ml-1 text-sm text-slate-500">/100</span>
+          {saude?.score_saude ?? '—'}<span className="ml-1 text-sm text-slate-400">/100</span>
         </span>
       </div>
       {isLoading ? <Spinner /> : (
@@ -41,7 +41,7 @@ export function ScoreSaudeCard({ clienteId }: Props) {
           <Barra label="Suporte"    valor={saude?.score_suporte   ?? null} ajuda="100 − % de solicitações pendentes no CRM." />
         </div>
       )}
-      <p className="mt-3 text-[10px] text-slate-500">
+      <p className="mt-3 text-xs text-slate-400">
         Média simples dos componentes com dados. Barras sem dado ficam neutras e não impactam o score.
       </p>
     </Card>

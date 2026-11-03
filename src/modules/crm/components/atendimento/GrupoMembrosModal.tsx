@@ -81,7 +81,7 @@ export function GrupoMembrosModal({ open, onClose, leadId, nomeGrupo }: Props) {
                   {p.is_super_admin && <Badge tone="amber">Dono</Badge>}
                   {p.is_admin && !p.is_super_admin && <Badge tone="green">Admin</Badge>}
                 </div>
-                <div className="text-xs text-slate-500">{formatarTelefone(p.telefone)}</div>
+                <div className="text-xs text-slate-400">{formatarTelefone(p.telefone)}</div>
               </div>
             </li>
           ))}

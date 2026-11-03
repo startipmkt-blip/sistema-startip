@@ -18,6 +18,7 @@ import {
 import { FORMATO_OPCOES, mesLabel } from '@/modules/gestao-conteudo/types';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import { chaveMes, mesAnteriorProximo } from '@/modules/designer/lib/periodo';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const FORMATO_LABEL: Record<string, string> = Object.fromEntries(FORMATO_OPCOES.map((f) => [f.value, f.label]));
 const VAZIO: IdeiaBancoForm = { titulo: '', descricao: '', formato: 'estatico', anexos: [] };
@@ -144,8 +145,8 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
   const livres = ideias.filter((i) => !i.usada_em);
   const usadas = ideias.filter((i) => i.usada_em);
 
-  function remover(i: IdeiaBanco) {
-    if (!confirm(`Excluir "${i.titulo}"?`)) return;
+  async function remover(i: IdeiaBanco) {
+    if (!(await confirmar(`Excluir "${i.titulo}"?`))) return;
     excluir.mutate(i.id, { onSuccess: () => { for (const a of i.anexos ?? []) void descartarAnexo(a.path); } });
   }
 
@@ -153,13 +154,13 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
     <div key={i.id} className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs">
       <div>
         <p className="text-sm font-medium text-slate-100">{i.titulo}</p>
-        <p className="text-[10px] text-slate-500">{FORMATO_LABEL[i.formato] ?? i.formato}</p>
+        <p className="text-xs text-slate-400">{FORMATO_LABEL[i.formato] ?? i.formato}</p>
       </div>
-      {i.descricao && <p className="line-clamp-4 whitespace-pre-line text-[11px] text-slate-300"><Linkify texto={i.descricao} /></p>}
+      {i.descricao && <p className="line-clamp-4 whitespace-pre-line text-xs text-slate-300"><Linkify texto={i.descricao} /></p>}
       {(i.anexos ?? []).length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {i.anexos.slice(0, 4).map((a) => <MiniaturaAnexo key={a.path} anexo={a} className="h-12 w-12" />)}
-          {i.anexos.length > 4 && <span className="self-center text-[11px] text-slate-400">+{i.anexos.length - 4}</span>}
+          {i.anexos.length > 4 && <span className="self-center text-xs text-slate-400">+{i.anexos.length - 4}</span>}
         </div>
       )}
       <div className="flex items-center gap-1.5">

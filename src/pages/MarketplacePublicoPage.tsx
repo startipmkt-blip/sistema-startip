@@ -115,7 +115,7 @@ export function MarketplacePublicoPage() {
                 </div>
 
                 {e.produtos.length === 0 ? (
-                  <p className="text-xs text-slate-500">Nenhum produto cadastrado ainda.</p>
+                  <p className="text-xs text-slate-400">Nenhum produto cadastrado ainda.</p>
                 ) : (
                   <ul className="mb-3 space-y-2">
                     {e.produtos.map((p) => (
@@ -159,7 +159,7 @@ export function MarketplacePublicoPage() {
           </div>
         )}
 
-        <footer className="pt-6 text-center text-[11px] text-slate-500">Powered by Startip · Marketplace B2B</footer>
+        <footer className="pt-6 text-center text-xs text-slate-400">Powered by Startip · Marketplace B2B</footer>
       </div>
     </div>
   );

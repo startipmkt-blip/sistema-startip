@@ -5,6 +5,7 @@ import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { useClienteDocs, useSalvarClienteDoc } from '@/modules/cliente-workspace/api/clienteWorkspaceApi';
 import { removerArquivo, uploadArquivo, urlDoArquivo } from '@/shared/lib/storage';
 import { formatarTamanho, iconeAnexo, type CriativoAnexo } from '@/modules/ideias/criativos/types';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const CHAVE = 'dna';
 const BUCKET = 'materiais-cliente';
@@ -68,7 +69,7 @@ export function DnaCliente({ clienteId }: { clienteId: string }) {
   }
 
   async function excluir(a: CriativoAnexo) {
-    if (!confirm(`Excluir "${a.name}"?`)) return;
+    if (!(await confirmar(`Excluir "${a.name}"?`))) return;
     try {
       await gravar(anexos.filter((x) => x.path !== a.path));
       await removerArquivo(BUCKET, a.path).catch(() => undefined);
@@ -96,7 +97,7 @@ export function DnaCliente({ clienteId }: { clienteId: string }) {
       >
         <span className="text-xl"><GlassIcon name="paperclip" /></span>
         <span>{enviando ? 'Enviando…' : 'Arraste os arquivos aqui ou clique para anexar'}</span>
-        <span className="text-[11px] text-slate-500">PDF, Word, TXT e imagens · até {MAX_MB} MB cada</span>
+        <span className="text-xs text-slate-400">PDF, Word, TXT e imagens · até {MAX_MB} MB cada</span>
         <input
           type="file"
           multiple
@@ -111,7 +112,7 @@ export function DnaCliente({ clienteId }: { clienteId: string }) {
       {isLoading && <div className="flex justify-center py-4"><Spinner /></div>}
 
       {!isLoading && anexos.length === 0 && (
-        <p className="rounded-md border border-dashed border-white/10 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-md border border-dashed border-white/10 px-3 py-6 text-center text-xs text-slate-400">
           Nenhum arquivo ainda. Anexe o DNA deste cliente.
         </p>
       )}
@@ -123,7 +124,7 @@ export function DnaCliente({ clienteId }: { clienteId: string }) {
               <span className="text-xl">{glassify(iconeAnexo(a))}</span>
               <button type="button" className="min-w-0 flex-1 text-left" title="Ver" onClick={() => void abrir(a)}>
                 <p className="truncate text-sm font-medium text-slate-100">{a.name}</p>
-                {a.size > 0 && <p className="text-[11px] text-slate-500">{formatarTamanho(a.size)}</p>}
+                {a.size > 0 && <p className="text-xs text-slate-400">{formatarTamanho(a.size)}</p>}
               </button>
               <button className="text-xs text-slate-300 hover:underline" onClick={() => void abrir(a)}>Ver</button>
               <button className="text-xs text-red-400 hover:underline" onClick={() => void excluir(a)}>Excluir</button>

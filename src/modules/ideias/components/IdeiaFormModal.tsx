@@ -237,7 +237,7 @@ export function IdeiaFormModal({ open, onClose, ideia }: Props) {
                   className={`rounded-lg border px-3 py-1.5 text-left text-xs font-medium transition-all ${
                     importancia === imp.value
                       ? `${importanciaBorder[imp.value]} ${importanciaBg[imp.value]} text-slate-100`
-                      : 'border-white/10 bg-white/[0.03] text-slate-500 hover:text-slate-400'
+                      : 'border-white/10 bg-white/[0.03] text-slate-400 hover:text-slate-400'
                   }`}
                 >
                   {imp.label}

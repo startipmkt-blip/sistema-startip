@@ -31,7 +31,7 @@ export function PreviaDrive({
             allowFullScreen
             className="h-[70vh] w-full rounded-xl border border-white/10 bg-black"
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-400">
             Se a prévia não carregar, o arquivo precisa estar compartilhado como
             "Qualquer pessoa com o link" no Drive (vale para pastas também).
           </p>

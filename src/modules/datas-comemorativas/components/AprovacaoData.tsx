@@ -76,7 +76,7 @@ export function AprovacaoCliente({ slug, ocorrencia: o, aprovacao }: ClienteProp
         <AprovacaoStatus aprovacao={aprovacao} visao="cliente" />
         <button
           onClick={() => { setAlterando(true); setJustificativa(aprovacao.justificativa); }}
-          className="text-[11px] text-slate-400 hover:text-slate-200 hover:underline"
+          className="text-xs text-slate-400 hover:text-slate-200 hover:underline"
         >
           Alterar resposta
         </button>

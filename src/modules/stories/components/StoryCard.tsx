@@ -93,7 +93,7 @@ export function StoryCard({ titulo, onAbrir, inativa, ...resto }: CardProps) {
         <StoryView {...resto} />
       </div>
       <div className="px-0.5">
-        <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{etapa?.n}. {etapa?.label}</div>
+        <div className="text-xs font-bold uppercase tracking-widest text-slate-400">{etapa?.n}. {etapa?.label}</div>
         <h3 className="text-sm font-semibold text-slate-100">{titulo}</h3>
       </div>
     </div>

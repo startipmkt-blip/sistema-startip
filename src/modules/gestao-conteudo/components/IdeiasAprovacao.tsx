@@ -88,7 +88,7 @@ export function IdeiasAprovacao({ clientes, clienteId, mes, onCliente }: Props) 
                     {STATUS_IDEIA_ORDEM.map((s) => {
                       const n = dele.filter((i) => i.status === s).length;
                       return (
-                        <td key={s} className={`px-3 py-2 text-center ${n ? 'text-white' : 'text-slate-600'}`}>{n}</td>
+                        <td key={s} className={`px-3 py-2 text-center ${n ? 'text-white' : 'text-slate-400'}`}>{n}</td>
                       );
                     })}
                   </tr>

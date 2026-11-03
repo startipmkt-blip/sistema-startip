@@ -30,7 +30,7 @@ export function InboxSidebar({
     <aside className="hidden w-56 shrink-0 flex-col gap-6 border-r border-white/5 pr-3 sm:flex">
       {/* Categorias */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
           Categorias
         </h3>
         <ul className="space-y-0.5">
@@ -51,7 +51,7 @@ export function InboxSidebar({
                   </span>
                   {n > 0 && (
                     <span
-                      className={`min-w-5 rounded-full px-1.5 text-center text-[10px] font-semibold ${
+                      className={`min-w-5 rounded-full px-1.5 text-center text-xs font-semibold ${
                         f.id === 'nao_lidas'
                           ? 'bg-emerald-500/20 text-emerald-300'
                           : 'bg-white/10 text-slate-300'
@@ -69,7 +69,7 @@ export function InboxSidebar({
 
       {/* Atendente */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
           Atendente
         </h3>
         <ul className="space-y-0.5">
@@ -110,14 +110,14 @@ export function InboxSidebar({
 
       {/* Push desktop */}
       <div className="mt-auto">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
           Alertas
         </h3>
         {push.estado === 'nao-suportado' && (
-          <p className="text-[11px] text-slate-500">Este navegador não suporta notificações.</p>
+          <p className="text-xs text-slate-400">Este navegador não suporta notificações.</p>
         )}
         {push.estado === 'pedido-recusado' && (
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-400">
             Notificações bloqueadas nas permissões do navegador.
           </p>
         )}

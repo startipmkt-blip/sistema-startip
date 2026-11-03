@@ -23,13 +23,23 @@ export default {
         sans: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         display: ['Poppins', 'Montserrat', 'ui-sans-serif', 'sans-serif'],
       },
+      // Raios unificados: 8px em campos/botões, 12px em cards e modais.
+      borderRadius: {
+        DEFAULT: '6px',
+        md: '8px',
+        lg: '8px',
+        xl: '12px',
+        '2xl': '12px',
+      },
       boxShadow: {
-        glass: '0 8px 32px rgba(2, 6, 23, 0.45)',
-        glow: '0 0 24px rgba(30, 155, 224, 0.4)',
+        // Sombras discretas (visual clean): sem brilho, sem blur pesado.
+        glass: '0 1px 2px rgba(2, 6, 23, 0.18), 0 1px 1px rgba(2, 6, 23, 0.1)',
+        glow: '0 1px 2px rgba(2, 6, 23, 0.25)',
+        pop: '0 12px 32px rgba(2, 6, 23, 0.35)',
       },
       backgroundImage: {
-        // Degradê azul da marca.
-        'gradient-brand': 'linear-gradient(135deg, #1580bf 0%, #1e9be0 55%, #40b0e9 100%)',
+        // Cor sólida da marca (nome mantido por compatibilidade com as telas).
+        'gradient-brand': 'linear-gradient(#1b8fd1, #1b8fd1)',
       },
     },
   },

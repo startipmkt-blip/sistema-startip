@@ -69,7 +69,7 @@ export function NotificacoesTab() {
           )}
         </div>
         {msg && <p className="text-sm text-amber-300">{msg}</p>}
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           O som e o cartão de aviso aparecem nos mesmos prazos dos alertas
           ({cfg ? `${cfg.nivel1_min}, ${cfg.nivel2_min} e ${cfg.nivel3_min} minutos` : 'níveis configurados'}), uma vez por cliente e por nível.
           A aba do navegador precisa estar aberta e o navegador só libera o som depois de um clique na página
@@ -90,7 +90,7 @@ export function NotificacoesTab() {
                   <div className="max-w-xl truncate text-sm text-slate-400">
                     {a.pendencia.ultima_msg_texto || '[mídia]'}
                   </div>
-                  <div className="text-xs text-slate-500">Desde {formatarHora(a.pendencia.iniciada_em)}</div>
+                  <div className="text-xs text-slate-400">Desde {formatarHora(a.pendencia.iniciada_em)}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge tone={TOM[a.nivel as 1 | 2 | 3]}>Nível {a.nivel}</Badge>

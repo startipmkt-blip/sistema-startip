@@ -26,6 +26,7 @@ import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { formatDate } from '@/shared/lib/format';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 type Aba = 'andamento' | 'concluidos' | 'templates';
 
@@ -162,7 +163,7 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                   <span className="min-w-0 flex-1">
                     <span className={e.concluida ? 'text-slate-400 line-through' : 'text-slate-200'}>{e.etapa}</span>
                     {e.interno && (
-                      <span className="ml-2 rounded bg-slate-500/20 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                      <span className="ml-2 rounded bg-slate-500/20 px-1.5 py-0.5 text-xs font-medium uppercase tracking-wide text-slate-300">
                         só equipe
                       </span>
                     )}
@@ -201,7 +202,7 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                           className="flex min-w-0 flex-1 items-start gap-2 text-left text-xs"
                         >
                           <span
-                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
+                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-xs ${
                               feito
                                 ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-200'
                                 : 'border-white/20 bg-white/5 text-transparent'
@@ -209,10 +210,10 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
                           >
                             {feito ? '✓' : ''}
                           </span>
-                          <span className={feito ? 'text-slate-500 line-through' : interno ? 'text-slate-400' : 'text-slate-300'}>
+                          <span className={feito ? 'text-slate-400 line-through' : interno ? 'text-slate-400' : 'text-slate-300'}>
                             {it}
                             {interno && (
-                              <span className="ml-2 rounded bg-slate-500/20 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                              <span className="ml-2 rounded bg-slate-500/20 px-1.5 py-0.5 text-xs font-medium uppercase tracking-wide text-slate-300">
                                 só equipe
                               </span>
                             )}
@@ -264,8 +265,8 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
           <Button
             variant="ghost"
             className="text-red-300"
-            onClick={() => {
-              if (confirm(`Excluir o onboarding de ${a.cliente_nome}? As etapas e o link do cliente deixam de existir.`)) {
+            onClick={async () => {
+              if ((await confirmar(`Excluir o onboarding de ${a.cliente_nome}? As etapas e o link do cliente deixam de existir.`))) {
                 excluir.mutate(a.cliente_id);
               }
             }}
@@ -275,15 +276,15 @@ function CardAndamento({ a, concluido }: { a: OnboardingAndamento; concluido: bo
           {concluido ? (
             <Button
               variant="secondary"
-              onClick={() => { if (confirm(`Reabrir onboarding de ${a.cliente_nome}?`)) reabrir.mutate(a.cliente_id); }}
+              onClick={async () => { if ((await confirmar(`Reabrir onboarding de ${a.cliente_nome}?`))) reabrir.mutate(a.cliente_id); }}
             >
               ↩️ Reabrir
             </Button>
           ) : (
             <Button
-              onClick={() => {
+              onClick={async () => {
                 const aviso = feitas < total ? ` Ainda há ${total - feitas} etapa(s) em aberto.` : '';
-                if (confirm(`Concluir onboarding de ${a.cliente_nome}?${aviso}`)) {
+                if ((await confirmar(`Concluir onboarding de ${a.cliente_nome}?${aviso}`))) {
                   concluir.mutate({ cliente_id: a.cliente_id });
                 }
               }}
@@ -364,7 +365,7 @@ function Templates({ onAplicar, onEditar, onDuplicar }: {
               <Button
                 variant="ghost"
                 className="text-red-300"
-                onClick={() => { if (confirm(`Excluir o modelo "${t.nome}"? Onboardings já iniciados não são afetados.`)) excluir.mutate(t.id); }}
+                onClick={async () => { if ((await confirmar(`Excluir o modelo "${t.nome}"? Onboardings já iniciados não são afetados.`))) excluir.mutate(t.id); }}
               >
                 Excluir
               </Button>

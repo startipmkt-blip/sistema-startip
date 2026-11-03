@@ -9,6 +9,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 type Status = 'enviada' | 'aprovada' | 'reprovada';
 
@@ -88,10 +89,10 @@ export function AprovacaoIdeiasPublicaPage() {
     }
   }
 
-  function aprovarTodas() {
+  async function aprovarTodas() {
     if (!dados) return;
     const n = dados.ideias.filter((i) => i.status === 'enviada').length;
-    if (!confirm(`Aprovar todas as ${n} ideias pendentes deste mês?\n\nSe alguma precisar de ajuste, use "Não aprovar" nela antes.`)) return;
+    if (!(await confirmar(`Aprovar todas as ${n} ideias pendentes deste mês?\n\nSe alguma precisar de ajuste, use "Não aprovar" nela antes.`))) return;
     void enviar({ mes: dados.mes, acao: 'aprovar_todos' });
   }
 
@@ -168,7 +169,7 @@ export function AprovacaoIdeiasPublicaPage() {
                           {i.status === 'enviada' ? 'Aguardando' : i.status === 'aprovada' ? 'Aprovada' : 'Não aprovada'}
                         </Badge>
                         {i.dia_postagem && (
-                          <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                          <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-300">
                             <GlassIcon name="calendar" /> postar em {new Date(`${i.dia_postagem}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
                           </span>
                         )}
@@ -203,7 +204,7 @@ export function AprovacaoIdeiasPublicaPage() {
           })}
         </div>
 
-        <footer className="pt-6 text-center text-[11px] text-slate-500">
+        <footer className="pt-6 text-center text-xs text-slate-400">
           Suas decisões são registradas na nossa plataforma. Dúvidas? Fale com seu gerente.
         </footer>
       </div>

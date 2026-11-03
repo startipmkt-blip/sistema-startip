@@ -15,6 +15,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -86,11 +87,11 @@ export function AprovacaoConteudoPage() {
         </Button>
         <Button
           variant="secondary"
-          onClick={() => {
+          onClick={async () => {
             if (idsDoMes.length === 0) return;
             const rascunhos = idsDoMes.filter((i) => i.visivel_cliente === false).length;
             if (rascunhos === 0) { alert('Todas as ideias deste mês já estão publicadas.'); return; }
-            if (!confirm(`Publicar ${rascunhos} ideia(s) rascunho de ${MESES[mesIdx]}/${ano} para ${clienteAtual?.nome} ver?`)) return;
+            if (!(await confirmar(`Publicar ${rascunhos} ideia(s) rascunho de ${MESES[mesIdx]}/${ano} para ${clienteAtual?.nome} ver?`))) return;
             publicarMes.mutate({ clienteId, mes });
           }}
           disabled={!clienteId || publicarMes.isPending}
@@ -106,7 +107,7 @@ export function AprovacaoConteudoPage() {
       <div className="flex min-h-[60vh] gap-3">
         {/* Sidebar de clientes */}
         <aside className="flex w-64 shrink-0 flex-col rounded-lg border border-white/10 bg-white/[0.02]">
-          <div className="border-b border-white/5 p-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="border-b border-white/5 p-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Clientes ativos ({clientes.length})
           </div>
           <ul className="flex-1 overflow-y-auto">
@@ -121,13 +122,13 @@ export function AprovacaoConteudoPage() {
                 >
                   {c.logo_url
                     ? <LogoCliente src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
+                    : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-xs"><GlassIcon name="building" /></span>}
                   <span className="truncate">{c.nome}</span>
                 </button>
               </li>
             ))}
             {!clientesQ.isLoading && clientes.length === 0 && (
-              <li className="p-4 text-center text-xs text-slate-500">Cadastre clientes ativos primeiro.</li>
+              <li className="p-4 text-center text-xs text-slate-400">Cadastre clientes ativos primeiro.</li>
             )}
           </ul>
         </aside>
@@ -150,7 +151,7 @@ export function AprovacaoConteudoPage() {
                 >
                   <span>{nome}</span>
                   {info && info.total > 0 && (
-                    <span className={`rounded-full px-1.5 text-[9px] font-semibold ${
+                    <span className={`rounded-full px-1.5 text-xs font-semibold ${
                       info.pendentes > 0 ? 'bg-amber-500/30 text-amber-200' : 'bg-emerald-500/30 text-emerald-200'
                     }`}>
                       {info.total}
@@ -194,7 +195,7 @@ export function AprovacaoConteudoPage() {
                       <span className="rounded-full border border-brand-400/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-200">
                         Semana {semana}
                       </span>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-xs text-slate-400">
                         {daSemana.length} conteúdo{daSemana.length > 1 ? 's' : ''}
                         {pendSem > 0 && ` · ${pendSem} pendente${pendSem > 1 ? 's' : ''}`}
                       </span>
@@ -217,27 +218,27 @@ export function AprovacaoConteudoPage() {
                             <Badge tone={APROVACAO_TONE[i.status]}>{APROVACAO_LABEL[i.status]}</Badge>
                             {rascunho && <Badge tone="amber"><GlassIcon name="pencil" /> Rascunho interno</Badge>}
                             {i.dia_postagem && (
-                              <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                              <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-300">
                                 <GlassIcon name="calendar" /> {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                               </span>
                             )}
                             {(i.anexos?.length ?? 0) > 0 && (
-                              <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+                              <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-300">
                                 <GlassIcon name="paperclip" /> {i.anexos!.length}
                               </span>
                             )}
                           </div>
                           <h3 className="mb-1 text-sm font-semibold text-slate-100">{i.titulo}</h3>
-                          <p className="whitespace-pre-line text-xs leading-relaxed text-slate-300">{i.descricao ? <Linkify texto={i.descricao} /> : <span className="italic text-slate-500">Sem descrição — clique em editar.</span>}</p>
+                          <p className="whitespace-pre-line text-xs leading-relaxed text-slate-300">{i.descricao ? <Linkify texto={i.descricao} /> : <span className="italic text-slate-400">Sem descrição — clique em editar.</span>}</p>
                           {i.status === 'reprovado' && i.justificativa && (
-                            <div className="mt-2 rounded-md border border-red-500/20 bg-red-500/5 p-2 text-[11px] text-red-300">
+                            <div className="mt-2 rounded-md border border-red-500/20 bg-red-500/5 p-2 text-xs text-red-300">
                               <strong>Motivo:</strong> {i.justificativa}
                             </div>
                           )}
                           <div className="mt-3 flex items-center justify-between gap-2">
                             <button
                               onClick={() => toggleVisivel.mutate({ id: i.id, visivel: rascunho })}
-                              className={`rounded-md px-2 py-1 text-[11px] font-medium ${
+                              className={`rounded-md px-2 py-1 text-xs font-medium ${
                                 rascunho
                                   ? 'bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30'
                                   : 'bg-white/5 text-slate-400 hover:bg-white/10'
@@ -297,12 +298,12 @@ export function AprovacaoConteudoPage() {
               >
                 <span className="text-3xl font-bold text-brand-300">{n * 4}</span>
                 <span className="text-sm font-medium text-slate-100">{n} por semana</span>
-                <span className="text-[11px] text-slate-500">= {n * 4} conteúdos no mês</span>
+                <span className="text-xs text-slate-400">= {n * 4} conteúdos no mês</span>
               </button>
             ))}
           </div>
           {idsDoMes.length > 0 && (
-            <div className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-[11px] text-amber-300">
+            <div className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-xs text-amber-300">
               <GlassIcon name="alert" /> Este mês já tem {idsDoMes.length} ideia(s). Os novos cards serão adicionados aos existentes.
             </div>
           )}

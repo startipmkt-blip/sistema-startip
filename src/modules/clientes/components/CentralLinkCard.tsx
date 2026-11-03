@@ -4,6 +4,7 @@ import { supabase } from '@/shared/lib/supabaseClient';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
 import { glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props { clienteId: string; }
 
@@ -87,7 +88,7 @@ export function CentralLinkCard({ clienteId }: Props) {
               Abrir
             </a>
             <button
-              onClick={() => { if (confirm('Revogar link? A URL atual deixa de funcionar.')) revogar.mutate(); }}
+              onClick={async () => { if ((await confirmar('Revogar link? A URL atual deixa de funcionar.'))) revogar.mutate(); }}
               className="rounded-md px-3 py-1 text-xs text-red-300 hover:bg-red-500/10"
             >
               Revogar

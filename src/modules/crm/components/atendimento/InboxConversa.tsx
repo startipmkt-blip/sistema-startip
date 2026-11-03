@@ -307,7 +307,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
         </div>
       )}
       {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length > 0 && (
-        <div className="border-b border-white/10 bg-white/5 px-4 py-1.5 text-[11px] text-slate-400">
+        <div className="border-b border-white/10 bg-white/5 px-4 py-1.5 text-xs text-slate-400">
           <GlassIcon name="eye" /> {(presencas ?? []).filter((p) => p.user_id !== profile?.id).map((p) => p.user_nome ?? 'alguém').join(', ')} {(presencas ?? []).filter((p) => p.user_id !== profile?.id).length === 1 ? 'está vendo essa conversa' : 'estão vendo essa conversa'}
         </div>
       )}
@@ -325,7 +325,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               return (
                 <div key={`n-${n.id}`} className="my-2 flex justify-center">
                   <div className="max-w-[85%] rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                    <div className="mb-0.5 flex items-center gap-2 text-[10px] uppercase tracking-wide text-amber-300/80">
+                    <div className="mb-0.5 flex items-center gap-2 text-xs uppercase tracking-wide text-amber-300/80">
                       <span><GlassIcon name="note" /> nota interna</span>
                       <span>·</span>
                       <span>{n.autor_nome ?? 'anônimo'}</span>
@@ -437,12 +437,12 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                   >
                     {/* Nome do remetente em grupo */}
                     {conversa.is_grupo && !enviada && m.nome_remetente && (
-                      <div className="mb-0.5 text-[10px] font-medium text-brand-300">{m.nome_remetente}</div>
+                      <div className="mb-0.5 text-xs font-medium text-brand-300">{m.nome_remetente}</div>
                     )}
 
                     {/* Quote (respondendo a) */}
                     {quote && (
-                      <div className="mb-1 rounded-md border-l-2 border-brand-300 bg-black/20 px-2 py-1 text-[11px] text-slate-300">
+                      <div className="mb-1 rounded-md border-l-2 border-brand-300 bg-black/20 px-2 py-1 text-xs text-slate-300">
                         <div className="font-medium text-brand-200">
                           {quote.direcao === 'enviada' ? 'Você' : (quote.nome_remetente || 'Contato')}
                         </div>
@@ -465,7 +465,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                     )}
 
                     {/* Hora + editada + favorita */}
-                    <div className={`mt-0.5 flex items-center gap-1 text-[10px] ${enviada ? 'text-brand-100/70' : 'text-slate-500'}`}>
+                    <div className={`mt-0.5 flex items-center gap-1 text-xs ${enviada ? 'text-brand-100/70' : 'text-slate-400'}`}>
                       {m.favorita_ids && m.favorita_ids.length > 0 && (
                         <span title="Favoritada"><GlassIcon name="star" /></span>
                       )}
@@ -649,7 +649,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           if (sugeridos.length === 0) return null;
           return (
             <div className="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-md border border-white/10 bg-slate-900 text-sm shadow-2xl">
-              <div className="border-b border-white/5 px-3 py-1 text-[10px] uppercase tracking-wide text-slate-500">
+              <div className="border-b border-white/5 px-3 py-1 text-xs uppercase tracking-wide text-slate-400">
                 Respostas rápidas
               </div>
               {sugeridos.map((r) => (
@@ -658,7 +658,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                   onClick={() => setTexto(r.texto)}
                   className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-white/5"
                 >
-                  <span className="mt-0.5 shrink-0 rounded bg-brand-500/20 px-1.5 py-0.5 font-mono text-[11px] text-brand-200">/{r.atalho}</span>
+                  <span className="mt-0.5 shrink-0 rounded bg-brand-500/20 px-1.5 py-0.5 font-mono text-xs text-brand-200">/{r.atalho}</span>
                   <span className="text-slate-200 line-clamp-2">{r.texto}</span>
                 </button>
               ))}
@@ -776,12 +776,12 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               <button onClick={() => setDadosMsg(null)} className="text-slate-400 hover:text-white"><GlassIcon name="x" /></button>
             </div>
             <dl className="space-y-2 text-xs text-slate-300">
-              <div><dt className="text-slate-500">Enviada em</dt><dd>{new Date(dadosMsg.hora).toLocaleString('pt-BR')}</dd></div>
-              <div><dt className="text-slate-500">Direção</dt><dd>{dadosMsg.direcao === 'enviada' ? 'Enviada por nós' : 'Recebida'}</dd></div>
-              <div><dt className="text-slate-500">Tipo</dt><dd>{dadosMsg.tipo || 'texto'}</dd></div>
-              {dadosMsg.editada_em && <div><dt className="text-slate-500">Editada em</dt><dd>{new Date(dadosMsg.editada_em).toLocaleString('pt-BR')}</dd></div>}
-              {dadosMsg.wa_message_id && <div><dt className="text-slate-500">ID no WhatsApp</dt><dd className="break-all font-mono text-[10px]">{dadosMsg.wa_message_id}</dd></div>}
-              <div><dt className="text-slate-500">Favoritada por</dt><dd>{dadosMsg.favorita_ids?.length || 0} atendente(s)</dd></div>
+              <div><dt className="text-slate-400">Enviada em</dt><dd>{new Date(dadosMsg.hora).toLocaleString('pt-BR')}</dd></div>
+              <div><dt className="text-slate-400">Direção</dt><dd>{dadosMsg.direcao === 'enviada' ? 'Enviada por nós' : 'Recebida'}</dd></div>
+              <div><dt className="text-slate-400">Tipo</dt><dd>{dadosMsg.tipo || 'texto'}</dd></div>
+              {dadosMsg.editada_em && <div><dt className="text-slate-400">Editada em</dt><dd>{new Date(dadosMsg.editada_em).toLocaleString('pt-BR')}</dd></div>}
+              {dadosMsg.wa_message_id && <div><dt className="text-slate-400">ID no WhatsApp</dt><dd className="break-all font-mono text-xs">{dadosMsg.wa_message_id}</dd></div>}
+              <div><dt className="text-slate-400">Favoritada por</dt><dd>{dadosMsg.favorita_ids?.length || 0} atendente(s)</dd></div>
             </dl>
           </div>
         </div>
@@ -798,7 +798,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               rows={4}
               className="w-full resize-none rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 focus:border-brand-400 focus:outline-none"
             />
-            <p className="mt-2 text-[11px] text-slate-500">
+            <p className="mt-2 text-xs text-slate-400">
               O WhatsApp só permite editar mensagens de texto enviadas nos últimos 15 minutos.
             </p>
             <div className="mt-3 flex justify-end gap-2">
@@ -854,9 +854,9 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               >
                 Apagar só pra mim
               </Button>
-              <button onClick={() => setApagarMsg(null)} className="text-xs text-slate-500 hover:text-slate-300">Cancelar</button>
+              <button onClick={() => setApagarMsg(null)} className="text-xs text-slate-400 hover:text-slate-300">Cancelar</button>
             </div>
-            <p className="mt-3 text-[10px] text-slate-500">
+            <p className="mt-3 text-xs text-slate-400">
               "Apagar para todos" só funciona nos ~7 minutos após o envio, é uma limitação do WhatsApp.
             </p>
           </div>

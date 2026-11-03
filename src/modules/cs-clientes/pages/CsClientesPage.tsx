@@ -125,7 +125,7 @@ export function CsClientesPage() {
                   onRespostas={() => setRespostasDe(c)}
                 />
               ))}
-              {clientes.length === 0 && <li className="p-6 text-center text-sm text-slate-500">Nenhum cliente ativo.</li>}
+              {clientes.length === 0 && <li className="p-6 text-center text-sm text-slate-400">Nenhum cliente ativo.</li>}
             </ul>
           </>
         )}
@@ -139,7 +139,7 @@ export function CsClientesPage() {
               {sugestoes.map((s) => (
                 <li key={s.cliente.id} className="flex items-center gap-3 px-3 py-2 text-sm">
                   <span className="w-1/2 truncate text-slate-100">{s.cliente.nome}</span>
-                  <span className="text-slate-500">→</span>
+                  <span className="text-slate-400">→</span>
                   <span className="w-1/2 truncate text-brand-200">{s.grupo.nome}</span>
                 </li>
               ))}
@@ -225,7 +225,7 @@ function LinhaCliente({
       <div className="flex w-52 items-center gap-2">
         {cliente.logo_url
           ? <LogoCliente src={cliente.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
-          : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px]"><GlassIcon name="building" /></span>}
+          : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-xs"><GlassIcon name="building" /></span>}
         <span className="truncate text-sm text-slate-100">{cliente.nome}</span>
       </div>
 
@@ -269,7 +269,7 @@ function LinhaCliente({
           : <Badge tone="amber">Sem grupo</Badge>}
 
       {compartilhadoCom.length > 0 && (
-        <span className="text-[11px] text-amber-300" title="Outro cliente usa o mesmo grupo">
+        <span className="text-xs text-amber-300" title="Outro cliente usa o mesmo grupo">
           mesmo grupo de {compartilhadoCom.join(', ')}
         </span>
       )}

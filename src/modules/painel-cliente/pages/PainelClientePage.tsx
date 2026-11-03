@@ -18,6 +18,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 type Aba = 'entregas' | 'otimizacoes' | 'investimento' | 'avisos' | 'persona';
 
@@ -134,13 +135,13 @@ function SecaoEntregas({ clienteId }: { clienteId: string }) {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <Badge tone="blue">{e.tipo}</Badge>
-                    <span className="text-[11px] text-slate-500">{new Date(e.entregue_em).toLocaleDateString('pt-BR')}</span>
+                    <span className="text-xs text-slate-400">{new Date(e.entregue_em).toLocaleDateString('pt-BR')}</span>
                   </div>
                   <div className="mt-1 text-sm font-medium text-slate-100">{e.titulo}</div>
                   {e.descricao && <p className="text-xs text-slate-400">{e.descricao}</p>}
                   {e.url && <a href={e.url} target="_blank" rel="noopener" className="text-xs text-brand-300 hover:underline"><GlassIcon name="link" /> {e.url}</a>}
                 </div>
-                <button onClick={() => { if (confirm('Excluir?')) excluir.mutate(e.id); }} className="text-xs text-red-400 hover:underline">Excluir</button>
+                <button onClick={async () => { if ((await confirmar('Excluir?'))) excluir.mutate(e.id); }} className="text-xs text-red-400 hover:underline">Excluir</button>
               </Card>
             </li>
           ))}
@@ -184,12 +185,12 @@ function SecaoOtimizacoes({ clienteId }: { clienteId: string }) {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-xs">
                     <span className="font-semibold uppercase text-amber-300"><GlassIcon name="zap" /> {o.plataforma}</span>
-                    <span className="text-slate-500">{new Date(o.criada_em).toLocaleString('pt-BR')}</span>
+                    <span className="text-slate-400">{new Date(o.criada_em).toLocaleString('pt-BR')}</span>
                   </div>
                   <div className="mt-1 text-sm font-medium text-slate-100">{o.titulo}</div>
                   {o.descricao && <p className="whitespace-pre-line text-xs text-slate-400"><Linkify texto={o.descricao} /></p>}
                 </div>
-                <button onClick={() => { if (confirm('Excluir?')) excluir.mutate(o.id); }} className="text-xs text-red-400 hover:underline">Excluir</button>
+                <button onClick={async () => { if ((await confirmar('Excluir?'))) excluir.mutate(o.id); }} className="text-xs text-red-400 hover:underline">Excluir</button>
               </Card>
             </li>
           ))}
@@ -228,7 +229,7 @@ function SecaoInvestimento({ clienteId }: { clienteId: string }) {
             <li key={i.id}>
               <Card className="flex items-center justify-between p-3">
                 <div>
-                  <div className="text-xs text-slate-500">Semana de {new Date(i.semana_inicio).toLocaleDateString('pt-BR')}</div>
+                  <div className="text-xs text-slate-400">Semana de {new Date(i.semana_inicio).toLocaleDateString('pt-BR')}</div>
                   <div className="text-sm font-medium text-slate-100">
                     Total {Number(i.investimento_total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     <span className="ml-2 text-xs text-slate-400">· média {Number(i.media_diaria).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}/dia</span>
@@ -286,7 +287,7 @@ function SecaoAvisos({ clienteId }: { clienteId: string }) {
             <li key={a.id}>
               <Card className="flex items-start justify-between gap-3 p-3">
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider text-amber-300"><GlassIcon name="pin" /> {new Date(a.criado_em).toLocaleDateString('pt-BR')}</div>
+                  <div className="text-xs uppercase tracking-wider text-amber-300"><GlassIcon name="pin" /> {new Date(a.criado_em).toLocaleDateString('pt-BR')}</div>
                   <div className="text-sm font-semibold text-slate-100">{a.titulo}</div>
                   <p className="whitespace-pre-line text-xs text-slate-300"><Linkify texto={a.conteudo} /></p>
                 </div>
@@ -296,7 +297,7 @@ function SecaoAvisos({ clienteId }: { clienteId: string }) {
                     disabled={enviandoWa === a.id}
                     className="rounded-md bg-emerald-500/20 px-2 py-1 text-emerald-200 hover:bg-emerald-500/30 disabled:opacity-50"
                   >{glassify(enviandoWa === a.id ? '⏳' : '📢 WhatsApp')}</button>
-                  <button onClick={() => { if (confirm('Excluir?')) excluir.mutate(a.id); }} className="rounded-md px-2 py-1 text-red-400 hover:bg-red-500/10">Excluir</button>
+                  <button onClick={async () => { if ((await confirmar('Excluir?'))) excluir.mutate(a.id); }} className="rounded-md px-2 py-1 text-red-400 hover:bg-red-500/10">Excluir</button>
                 </div>
               </Card>
             </li>

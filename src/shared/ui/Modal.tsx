@@ -32,11 +32,11 @@ export function Modal({ open, onClose, title, children, footer, size = 'md', fec
   // relativo ao cartão e o modal sai da tela (rodapé com os botões fica cortado).
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${semBlur ? 'bg-slate-950/90' : 'bg-slate-950/60 backdrop-blur-sm'}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${semBlur ? 'bg-slate-950/90' : 'bg-slate-950/70'}`}
       onClick={fecharSoPorBotao ? undefined : onClose}
     >
       <div
-        className={`flex max-h-[92vh] w-full flex-col ${SIZES[size]} overflow-hidden rounded-2xl border border-white/10 shadow-glass ${semBlur ? 'bg-slate-900' : 'bg-slate-900/80 backdrop-blur-2xl'}`}
+        className={`flex max-h-[92vh] w-full flex-col ${SIZES[size]} overflow-hidden rounded-xl border border-white/10 bg-[#121a24] shadow-pop`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-3">

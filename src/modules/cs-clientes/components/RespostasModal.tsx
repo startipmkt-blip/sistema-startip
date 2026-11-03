@@ -16,7 +16,7 @@ export function RespostasModal({ clienteNome, respostas, onClose }: Props) {
   return (
     <Modal open onClose={onClose} title={`Respostas de ${clienteNome}`} size="lg">
       {respostas.length === 0 ? (
-        <p className="p-6 text-center text-sm text-slate-500">Este cliente ainda não respondeu nenhum CS.</p>
+        <p className="p-6 text-center text-sm text-slate-400">Este cliente ainda não respondeu nenhum CS.</p>
       ) : (
         <ul className="max-h-[65vh] space-y-3 overflow-y-auto">
           {respostas.map((r) => (
@@ -29,7 +29,7 @@ export function RespostasModal({ clienteNome, respostas, onClose }: Props) {
               <dl className="space-y-2">
                 {r.respostas.map((i) => (
                   <div key={i.pergunta}>
-                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{i.pergunta}</dt>
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">{i.pergunta}</dt>
                     <dd className="whitespace-pre-line text-sm text-slate-100"><Linkify texto={i.resposta} /></dd>
                   </div>
                 ))}

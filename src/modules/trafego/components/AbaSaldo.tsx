@@ -14,6 +14,7 @@ import {
   type SaldoConfig,
 } from '../api/trafegoApi';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 export function AbaSaldo() {
   const cfgQ = useSaldoConfig();
@@ -47,7 +48,7 @@ export function AbaSaldo() {
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <div>
             <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="dollar" /> Saldo hoje</h3>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-xs text-slate-400">
               {total} conta(s) · {glassify(precisam > 0 ? <span className="text-amber-300"><GlassIcon name="alert" /> {precisam} precisam atenção</span> : '✅ tudo ok')}
             </p>
           </div>
@@ -57,7 +58,7 @@ export function AbaSaldo() {
         </div>
         {resposta && <p className="border-b border-white/10 bg-white/5 px-4 py-2 text-xs text-brand-100">{resposta}</p>}
         <table className="min-w-full text-xs">
-          <thead className="border-b border-white/10 text-[10px] uppercase tracking-wider text-slate-500">
+          <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
             <tr>
               <th className="px-3 py-2 text-left">Empresa</th>
               <th className="px-3 py-2 text-right">Disponível</th>
@@ -79,7 +80,7 @@ export function AbaSaldo() {
               </tr>
             ))}
             {(snap.data ?? []).length === 0 && (
-              <tr><td colSpan={5} className="px-3 py-8 text-center text-slate-500">Sem snapshot hoje. Clique "<GlassIcon name="refresh" /> Rodar agora".</td></tr>
+              <tr><td colSpan={5} className="px-3 py-8 text-center text-slate-400">Sem snapshot hoje. Clique "<GlassIcon name="refresh" /> Rodar agora".</td></tr>
             )}
           </tbody>
         </table>
@@ -140,25 +141,25 @@ function ContatosLista({ contatos }: { contatos: NonNullable<ReturnType<typeof u
   return (
     <div className="space-y-2 text-xs">
       <ul className="space-y-1.5">
-        {contatos.length === 0 && <li className="text-slate-500">Nenhum contato cadastrado ainda.</li>}
+        {contatos.length === 0 && <li className="text-slate-400">Nenhum contato cadastrado ainda.</li>}
         {contatos.map((c) => (
           <li key={c.id} className="flex items-center gap-2 rounded border border-white/10 bg-white/5 p-2">
             <input type="checkbox" checked={c.ativo}
               onChange={(e) => salvar.mutate({ id: c.id, nome_grupo: c.nome_grupo, zapi_chat_id: c.zapi_chat_id, ativo: e.target.checked })} />
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-slate-100">{c.nome_grupo}</p>
-              <p className="truncate text-[10px] text-slate-500">
+              <p className="truncate text-xs text-slate-400">
                 {c.cliente_nome ? `${c.cliente_nome} · ` : '(todas empresas) · '}{c.zapi_chat_id}
               </p>
             </div>
-            <button onClick={() => { if (confirm(`Excluir ${c.nome_grupo}?`)) excluir.mutate(c.id); }}
+            <button onClick={async () => { if ((await confirmar(`Excluir ${c.nome_grupo}?`))) excluir.mutate(c.id); }}
               className="text-slate-400 hover:text-red-400" title="Excluir"><GlassIcon name="trash" /></button>
           </li>
         ))}
       </ul>
 
       <div className="mt-3 space-y-2 rounded border border-dashed border-white/10 p-2">
-        <p className="text-[10px] uppercase tracking-wider text-slate-500">Adicionar contato</p>
+        <p className="text-xs uppercase tracking-wider text-slate-400">Adicionar contato</p>
         <Select id="c" value={novo.cliente_id} onChange={(e) => setNovo({ ...novo, cliente_id: e.target.value })}
           options={[{ value: '', label: 'todas as empresas' }, ...((clientes ?? []).map((c) => ({ value: c.id, label: c.nome })))]} />
         <Input id="n" placeholder="Nome do grupo/contato" value={novo.nome_grupo} onChange={(e) => setNovo({ ...novo, nome_grupo: e.target.value })} />

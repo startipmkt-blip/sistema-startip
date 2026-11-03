@@ -14,6 +14,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { Table, type Column } from '@/shared/ui/Table';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const MODULO_LABEL = Object.fromEntries(MODULOS.map((m) => [m.key, m.label]));
 
@@ -92,8 +93,8 @@ export function UsuariosPage() {
           </button>
           <button
             className="text-xs font-medium text-red-400 hover:underline"
-            onClick={() => {
-              if (confirm(`Excluir o usuário "${u.nome}"?`)) excluir.mutate(u.id);
+            onClick={async () => {
+              if ((await confirmar(`Excluir o usuário "${u.nome}"?`))) excluir.mutate(u.id);
             }}
           >
             Excluir

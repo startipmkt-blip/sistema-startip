@@ -20,8 +20,8 @@ function AudioItem({ anexo, onRemover }: { anexo: CriativoAnexo; onRemover: () =
     <li className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-2">
       <span className="text-lg"><GlassIcon name="mic" /></span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] text-slate-400">{anexo.name}</p>
-        {url ? <audio controls src={url} className="h-8 w-full" /> : <p className="text-[11px] text-slate-500">carregando…</p>}
+        <p className="truncate text-xs text-slate-400">{anexo.name}</p>
+        {url ? <audio controls src={url} className="h-8 w-full" /> : <p className="text-xs text-slate-400">carregando…</p>}
       </div>
       <button
         type="button"

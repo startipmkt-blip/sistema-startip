@@ -8,6 +8,7 @@ import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props { tipo: ProducaoTipo; }
 
@@ -153,19 +154,19 @@ export function ProducaoPage({ tipo }: Props) {
                 {(porFase[f] ?? []).map((t) => (
                   <li key={t.id} className="rounded-md border border-white/10 bg-white/5 p-2 text-xs">
                     <div className="mb-1 truncate font-medium text-slate-100">{t.titulo || 'Sem título'}</div>
-                    <div className="mb-2 truncate text-[10px] text-slate-400">{nomeCli.get(t.cliente_id) ?? '—'}</div>
+                    <div className="mb-2 truncate text-xs text-slate-400">{nomeCli.get(t.cliente_id) ?? '—'}</div>
                     <div className="flex items-center gap-1">
                       {proximaFase(f) && (
                         <button
                           onClick={() => mudarFase.mutate({ id: t.id, fase: proximaFase(f) as ProducaoFase })}
-                          className="rounded-md bg-brand-500/15 px-1.5 py-0.5 text-[10px] text-brand-200 hover:bg-brand-500/30"
+                          className="rounded-md bg-brand-500/15 px-1.5 py-0.5 text-xs text-brand-200 hover:bg-brand-500/30"
                         >
                           → {FASE_LABEL[proximaFase(f) as ProducaoFase]}
                         </button>
                       )}
                       <button
-                        onClick={() => { if (confirm('Apagar?')) apagar.mutate(t.id); }}
-                        className="ml-auto rounded-md px-1 text-[10px] text-red-300 hover:bg-red-500/10"
+                        onClick={async () => { if ((await confirmar('Apagar?'))) apagar.mutate(t.id); }}
+                        className="ml-auto rounded-md px-1 text-xs text-red-300 hover:bg-red-500/10"
                         title="Apagar"
                       >
                         <GlassIcon name="trash" />
@@ -174,7 +175,7 @@ export function ProducaoPage({ tipo }: Props) {
                   </li>
                 ))}
                 {(porFase[f] ?? []).length === 0 && (
-                  <li className="text-center text-[11px] text-slate-600">vazio</li>
+                  <li className="text-center text-xs text-slate-400">vazio</li>
                 )}
               </ul>
             </Card>

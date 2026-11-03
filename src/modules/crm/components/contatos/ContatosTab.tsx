@@ -58,7 +58,7 @@ export function ContatosTab({
             onChange={(e) => setBusca(e.target.value)}
             className="w-full rounded-md border border-white/10 bg-white/5 px-8 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
           />
-          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500"><GlassIcon name="search" /></span>
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"><GlassIcon name="search" /></span>
         </div>
 
         <div className="flex gap-1 rounded-md border border-white/10 bg-white/5 p-0.5 text-xs">
@@ -117,14 +117,14 @@ export function ContatosTab({
                       onClick={() => onEditarLead(l)}
                       className="text-left text-slate-100 hover:text-brand-300"
                     >
-                      {l.nome || <span className="italic text-slate-500">sem nome</span>}
+                      {l.nome || <span className="italic text-slate-400">sem nome</span>}
                     </button>
                   </td>
                   <td className="px-4 py-2 text-slate-300">{l.telefone || '—'}</td>
                   <td className="px-4 py-2 text-slate-400">{l.empresa || '—'}</td>
                   <td className="px-4 py-2">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                         (l.origem ?? '').toLowerCase().includes('whatsapp')
                           ? 'bg-emerald-500/15 text-emerald-300'
                           : 'bg-white/10 text-slate-300'
@@ -141,13 +141,13 @@ export function ContatosTab({
                     <div className="flex justify-end gap-1">
                       <button
                         onClick={() => onAbrirConversa(l.id)}
-                        className="rounded-md bg-brand-500/15 px-2 py-1 text-[11px] font-medium text-brand-200 hover:bg-brand-500/25"
+                        className="rounded-md bg-brand-500/15 px-2 py-1 text-xs font-medium text-brand-200 hover:bg-brand-500/25"
                       >
                         <GlassIcon name="message" /> Conversa
                       </button>
                       <button
                         onClick={() => onConverterCliente(l)}
-                        className="rounded-md bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-200 hover:bg-white/10"
+                        className="rounded-md bg-white/5 px-2 py-1 text-xs font-medium text-slate-200 hover:bg-white/10"
                         title="Cadastrar este contato como cliente da agência"
                       >
                         <GlassIcon name="plus" /> Virar cliente

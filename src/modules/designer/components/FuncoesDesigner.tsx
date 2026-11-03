@@ -14,6 +14,7 @@ import {
   type DesignerFuncao, type FuncaoForm, type FuncaoFrequencia,
 } from '../api/funcoesApi';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const MAX_CHIPS = 8;
 
@@ -132,7 +133,7 @@ function FuncaoModal({ funcao, onClose }: { funcao?: DesignerFuncao; onClose: ()
               </div>
               <Input id="f-busca" placeholder="Buscar cliente…" value={busca} onChange={(e) => setBusca(e.target.value)} />
               <div className="flex max-h-48 flex-wrap gap-1.5 overflow-y-auto rounded-lg border border-white/10 p-2">
-                {visiveis.length === 0 && <span className="text-xs text-slate-500">Nenhum cliente encontrado.</span>}
+                {visiveis.length === 0 && <span className="text-xs text-slate-400">Nenhum cliente encontrado.</span>}
                 {visiveis.map((c) => {
                   const ativo = form.cliente_ids.includes(c.id);
                   return (
@@ -147,7 +148,7 @@ function FuncaoModal({ funcao, onClose }: { funcao?: DesignerFuncao; onClose: ()
                   );
                 })}
               </div>
-              <p className="text-[11px] text-slate-500">{form.cliente_ids.length} cliente(s) selecionado(s)</p>
+              <p className="text-xs text-slate-400">{form.cliente_ids.length} cliente(s) selecionado(s)</p>
             </>
           )}
         </div>
@@ -205,7 +206,7 @@ export function FuncoesDesigner() {
                   {f.todos_clientes ? (
                     <Badge tone="green">Todos os clientes</Badge>
                   ) : nomes.length === 0 ? (
-                    <span className="text-[11px] text-slate-500">Sem clientes definidos</span>
+                    <span className="text-xs text-slate-400">Sem clientes definidos</span>
                   ) : (
                     <>
                       {nomes.slice(0, MAX_CHIPS).map((n) => <Badge key={n} tone="slate">{n}</Badge>)}
@@ -217,8 +218,8 @@ export function FuncoesDesigner() {
                   <button className="font-medium text-brand-300 hover:underline" onClick={() => abrir(f)}>Editar</button>
                   <button
                     className="font-medium text-red-400 hover:underline"
-                    onClick={() => {
-                      if (confirm(`Excluir a função "${f.titulo}"?`)) {
+                    onClick={async () => {
+                      if ((await confirmar(`Excluir a função "${f.titulo}"?`))) {
                         excluir.mutate(f.id, { onError: (e) => alert(`Não foi possível excluir: ${(e as Error).message}`) });
                       }
                     }}

@@ -64,20 +64,20 @@ export function GruposTab() {
         {g.nome_grupo ?? g.chat_id} {g.tipo === 'contato' && <Badge tone="blue">Contato</Badge>}
       </span>
     ) },
-    { header: 'Cliente', render: (g) => g.cliente_nome ?? <span className="text-slate-500">Não definido</span> },
+    { header: 'Cliente', render: (g) => g.cliente_nome ?? <span className="text-slate-400">Não definido</span> },
     { header: 'Prazo', render: (g) => (g.prazo_min ? `${g.prazo_min} min` : `Padrão (${cfgQ.data?.nivel1_min ?? 10} min)`) },
     { header: 'Última msg do cliente', render: (g) => (
       g.ultima_msg_cliente_em ? (
         <div className="max-w-xs">
           <div className="truncate">{g.ultima_msg_cliente_texto}</div>
-          <div className="text-xs text-slate-500">{formatarHora(g.ultima_msg_cliente_em)}</div>
+          <div className="text-xs text-slate-400">{formatarHora(g.ultima_msg_cliente_em)}</div>
         </div>
-      ) : <span className="text-slate-500">—</span>
+      ) : <span className="text-slate-400">—</span>
     ) },
     { header: 'Última resposta', render: (g) => (
       g.ultima_resposta_em
         ? <span>{formatarHora(g.ultima_resposta_em)}{g.ultima_resposta_por ? ` · ${g.ultima_resposta_por}` : ''}</span>
-        : <span className="text-slate-500">—</span>
+        : <span className="text-slate-400">—</span>
     ) },
   ];
 
@@ -91,7 +91,7 @@ export function GruposTab() {
         <Button variant="secondary" onClick={() => setNovoContato(true)}>Adicionar contato</Button>
       </div>
       {aviso && <p className="text-sm text-slate-300">{aviso}</p>}
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-400">
         Grupos novos entram desativados. Só os ativos são monitorados — e só mensagens recebidas depois da ativação são registradas.
       </p>
 
@@ -258,7 +258,7 @@ function NovoContato({ onClose }: { onClose: () => void }) {
         <Input label="WhatsApp com DDD" value={telefone} onChange={(e) => setTelefone(e.target.value)} />
         <Input label="Nome do cliente/empresa (opcional)" value={cliente} onChange={(e) => setCliente(e.target.value)} />
         <Input label="Prazo em minutos (vazio = padrão)" type="number" min={1} max={1440} value={prazo} onChange={(e) => setPrazo(e.target.value)} />
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Conversas privadas de números que não estão cadastrados aqui nunca são registradas.
           A resposta da equipe é a enviada pelo número conectado (celular ou inbox do Startip OS).
         </p>

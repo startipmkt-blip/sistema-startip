@@ -23,7 +23,7 @@ const TIPO_ETIQUETA: Record<string, string> = {
   web: 'bg-emerald-600 text-emerald-50',
   extra: 'bg-slate-500 text-slate-50',
 };
-const ETIQUETA = 'rounded px-1.5 py-0.5 text-[10px] font-semibold leading-4';
+const ETIQUETA = 'rounded px-1.5 py-0.5 text-xs font-semibold leading-4';
 
 const diaMes = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 
@@ -106,7 +106,7 @@ ${d.briefing ?? ''}`;
 
       <p className="text-sm leading-snug text-slate-100 line-clamp-3">{d.titulo}</p>
       {d.cliente_nome && (
-        <p className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
           {d.cliente_logo && <LogoCliente src={d.cliente_logo} alt="" className="h-4 w-4 shrink-0 rounded-full object-cover" />}
           <span className="truncate">{d.cliente_nome}</span>
         </p>
@@ -116,7 +116,7 @@ ${d.briefing ?? ''}`;
           {material.map((m) => (
             <span
               key={m.chave}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-500/30"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-xs font-medium text-emerald-300 ring-1 ring-emerald-500/30"
             >
               <GlassIcon name={m.icone} /> {m.texto}
             </span>
@@ -124,31 +124,31 @@ ${d.briefing ?? ''}`;
         </div>
       )}
       {emRevisao && obsAlteracao && (
-        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200 line-clamp-4">
+        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-xs leading-snug text-red-200 line-clamp-4">
           <strong>Alterar:</strong> {obsAlteracao}
         </p>
       )}
       {faltaDescrever && (
-        <p className="mt-1.5 rounded border border-dashed border-red-500/60 bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200">
+        <p className="mt-1.5 rounded border border-dashed border-red-500/60 bg-red-500/10 p-1.5 text-xs leading-snug text-red-200">
           <strong>Alteração:</strong> clique e descreva o que precisa mudar.
         </p>
       )}
       {reprovada && d.reprovado_justificativa && (
-        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] leading-snug text-red-200 line-clamp-4">
+        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-xs leading-snug text-red-200 line-clamp-4">
           <strong>Refazer:</strong> {d.reprovado_justificativa}
         </p>
       )}
       {d.carregada && d.prazo && (
-        <p className="mt-0.5 text-[11px] text-red-300">↪ veio de {labelMes(mesDaSemana(d.prazo.slice(0, 10)))}</p>
+        <p className="mt-0.5 text-xs text-red-300">↪ veio de {labelMes(mesDaSemana(d.prazo.slice(0, 10)))}</p>
       )}
 
       {aberto && (
-        <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+        <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-300">
           <GlassIcon name="timer" /> {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
         </div>
       )}
 
-      <div className="mt-2 flex min-h-6 items-center gap-2.5 text-[11px] text-slate-400">
+      <div className="mt-2 flex min-h-6 items-center gap-2.5 text-xs text-slate-400">
         {prazo && (
           <span className={`inline-flex items-center gap-1 rounded px-1 py-0.5 ${prazo.cls}`} title="Prazo">
             <GlassIcon name="clock" /> {prazo.texto}
@@ -158,7 +158,7 @@ ${d.briefing ?? ''}`;
         {d.responsavel_nome && (
           <span
             title={d.responsavel_nome}
-            className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/30 text-[10px] font-bold text-brand-100"
+            className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/30 text-xs font-bold text-brand-100"
           >
             {iniciais(d.responsavel_nome)}
           </span>

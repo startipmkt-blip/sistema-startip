@@ -7,6 +7,7 @@ import { Card } from '@/shared/ui/Card';
 import { Input } from '@/shared/ui/Input';
 import { Spinner } from '@/shared/ui/Spinner';
 import { Table, type Column } from '@/shared/ui/Table';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 function digitos(t: string) { return t.replace(/\D/g, ''); }
 // Mesma regra do banco: DDD + número (10 ou 11 dígitos), com ou sem +55.
@@ -46,7 +47,7 @@ export function EquipeTab() {
     { header: '', className: 'text-right', render: (m) => (
       <div className="flex justify-end gap-2">
         <Button variant="ghost" onClick={() => salvar.mutate({ ...m, ativo: !m.ativo })}>{m.ativo ? 'Desativar' : 'Ativar'}</Button>
-        <Button variant="ghost" onClick={() => { if (window.confirm(`Remover ${m.nome} da equipe monitorada?`)) excluir.mutate(m.id); }}>Remover</Button>
+        <Button variant="ghost" onClick={async () => { if ((await confirmar(`Remover ${m.nome} da equipe monitorada?`))) excluir.mutate(m.id); }}>Remover</Button>
       </div>
     ) },
   ];
@@ -62,7 +63,7 @@ export function EquipeTab() {
           <Button onClick={adicionar} disabled={salvar.isPending}>Adicionar</Button>
         </div>
         {erro && <p className="text-sm text-red-300">{erro}</p>}
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Mensagens enviadas por estes números nos grupos contam como resposta da equipe, mesmo que não sejam o número conectado à Z-API.
           O número conectado também é tratado como equipe quando a mensagem é enviada manualmente pelo celular ou pelo inbox do Startip OS.
         </p>

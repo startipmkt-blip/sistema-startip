@@ -34,7 +34,7 @@ export function RespostasRapidasModal({ open, onClose }: Props) {
         </p>
 
         <ul className="max-h-64 space-y-2 overflow-y-auto rounded-md border border-white/10 bg-white/[0.02] p-2">
-          {lista.length === 0 && <li className="p-4 text-center text-xs text-slate-500">Nenhuma resposta cadastrada.</li>}
+          {lista.length === 0 && <li className="p-4 text-center text-xs text-slate-400">Nenhuma resposta cadastrada.</li>}
           {lista.map((r) => (
             <li key={r.id} className="rounded-md border border-white/5 bg-white/[0.03] px-3 py-2">
               <div className="flex items-start gap-3">

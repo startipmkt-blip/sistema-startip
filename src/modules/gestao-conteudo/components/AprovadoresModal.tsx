@@ -6,6 +6,7 @@ import { Badge } from '@/shared/ui/Badge';
 import {
   useAprovadores, useExcluirAprovador, useSalvarAprovador,
 } from '@/modules/gestao-conteudo/api/aprovadoresApi';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -67,14 +68,14 @@ export function AprovadoresModal({ open, onClose, clienteId, clienteNome }: Prop
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => { if (confirm(`Remover ${a.nome}? Os votos dele nos conteúdos pendentes também são apagados.`)) excluir.mutate(a.id); }}
+                onClick={async () => { if ((await confirmar(`Remover ${a.nome}? Os votos dele nos conteúdos pendentes também são apagados.`))) excluir.mutate(a.id); }}
               >
                 Remover
               </Button>
             </li>
           ))}
         </ul>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Na página de aprovação, cada sócio escolhe o próprio nome e aprova por si. Conteúdos que já estão aguardando
           continuam pendentes e passam a exigir todos os aprovadores ativos.
         </p>

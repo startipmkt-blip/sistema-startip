@@ -94,7 +94,7 @@ export function ClientesMultiSelect({ value, geral, onChange, onGeralChange }: P
                 <div className="fixed inset-0 z-10" onClick={() => setAberto(false)} />
                 <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-white/10 bg-slate-900 py-1 shadow-glass">
                   {filtrados.length === 0 && (
-                    <li className="px-3 py-2 text-xs text-slate-500">Nenhum cliente encontrado.</li>
+                    <li className="px-3 py-2 text-xs text-slate-400">Nenhum cliente encontrado.</li>
                   )}
                   {filtrados.map((c) => {
                     const marcado = value.includes(c.id);
@@ -105,7 +105,7 @@ export function ClientesMultiSelect({ value, geral, onChange, onGeralChange }: P
                           onClick={() => alternar(c.id)}
                           className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/5"
                         >
-                          <span className={`grid h-4 w-4 place-items-center rounded border text-[10px] ${marcado ? 'border-brand-400 bg-brand-500 text-white' : 'border-white/20'}`}>
+                          <span className={`grid h-4 w-4 place-items-center rounded border text-xs ${marcado ? 'border-brand-400 bg-brand-500 text-white' : 'border-white/20'}`}>
                             {glassify(marcado ? '✓' : '')}
                           </span>
                           {c.nome}

@@ -180,7 +180,7 @@ function Painel({ dados, offline }: { dados: PainelTvDados; offline: boolean }) 
         <footer className="rounded-[1.6rem] border border-white/10 bg-white/[0.03] px-[1.2rem] py-[0.9rem]">
           <div className="mb-[0.6rem] flex items-center justify-between text-[0.95rem] uppercase tracking-[0.2em] text-slate-400">
             <span>Todos os clientes</span>
-            <span className={`normal-case tracking-normal ${offline ? 'text-amber-300' : 'text-slate-500'}`}>
+            <span className={`normal-case tracking-normal ${offline ? 'text-amber-300' : 'text-slate-400'}`}>
               {glassify(offline ? `⚠ Sem conexão — dados de ${atualizado}` : `Atualizado às ${atualizado}`)}
             </span>
           </div>
@@ -285,7 +285,7 @@ function BotaoTelaCheia() {
   return (
     <button
       onClick={() => void document.documentElement.requestFullscreen?.()}
-      className="absolute bottom-[0.6rem] right-[0.8rem] rounded-full bg-white/5 px-[0.8rem] py-[0.3rem] text-[0.8rem] text-slate-500 opacity-40 hover:opacity-100"
+      className="absolute bottom-[0.6rem] right-[0.8rem] rounded-full bg-white/5 px-[0.8rem] py-[0.3rem] text-[0.8rem] text-slate-400 opacity-40 hover:opacity-100"
     >
       <GlassIcon name="maximize" /> Tela cheia
     </button>

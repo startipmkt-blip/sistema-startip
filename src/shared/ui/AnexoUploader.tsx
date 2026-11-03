@@ -91,7 +91,7 @@ export function AnexoUploader({
         />
       </label>
 
-      {erro && <div className="text-[11px] text-red-400">{erro}</div>}
+      {erro && <div className="text-xs text-red-400">{erro}</div>}
 
       {anexos.length > 0 && (
         <ul className="space-y-1">

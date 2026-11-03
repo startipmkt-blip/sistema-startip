@@ -9,6 +9,7 @@ import { formatDate } from '@/shared/lib/format';
 import { AnexoLink } from '@/shared/ui/AnexoLink';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   clienteId: string;
@@ -102,7 +103,7 @@ export function ReunioesPanel({ clienteId, somenteLeitura = false }: Props) {
                           </span>
                         )}
                         <button className="text-xs font-medium text-slate-300 hover:underline" onClick={() => { setEditando(r); setFormOpen(true); }}>Editar</button>
-                        <button className="text-xs font-medium text-red-400 hover:underline" onClick={() => { if (confirm('Excluir esta reunião?')) excluir.mutate(r.id); }}>Excluir</button>
+                        <button className="text-xs font-medium text-red-400 hover:underline" onClick={async () => { if ((await confirmar('Excluir esta reunião?'))) excluir.mutate(r.id); }}>Excluir</button>
                       </>
                     )}
                   </div>

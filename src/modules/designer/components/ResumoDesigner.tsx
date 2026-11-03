@@ -61,19 +61,19 @@ export function ResumoDesigner() {
       <div className="grid gap-2 text-center sm:grid-cols-4">
         <div className="rounded-lg bg-blue-500/10 p-2">
           <div className="text-lg font-bold text-blue-300">{r.fazendo.length}</div>
-          <div className="text-[11px] text-slate-400"><GlassIcon name="palette" /> fazendo agora</div>
+          <div className="text-xs text-slate-400"><GlassIcon name="palette" /> fazendo agora</div>
         </div>
         <div className="rounded-lg bg-white/5 p-2">
           <div className="text-lg font-bold text-slate-100">{r.fila.length}</div>
-          <div className="text-[11px] text-slate-400"><GlassIcon name="inbox" /> na fila</div>
+          <div className="text-xs text-slate-400"><GlassIcon name="inbox" /> na fila</div>
         </div>
         <div className="rounded-lg bg-amber-500/10 p-2">
           <div className="text-lg font-bold text-amber-300">{r.aprovacao}</div>
-          <div className="text-[11px] text-slate-400"><GlassIcon name="eye" /> aguardando aprovação</div>
+          <div className="text-xs text-slate-400"><GlassIcon name="eye" /> aguardando aprovação</div>
         </div>
         <div className="rounded-lg bg-emerald-500/10 p-2">
           <div className="text-lg font-bold text-emerald-300">{r.feitasSemana}</div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-xs text-slate-400">
             <GlassIcon name="check-circle" /> feitas na semana{r.segSemana > 0 && ` · ${formatarDuracao(r.segSemana)}`}
           </div>
         </div>

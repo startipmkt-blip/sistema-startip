@@ -47,13 +47,13 @@ export function AbaOtimizacoes() {
               <li key={l.cliente_id} className="flex items-center gap-2 rounded border border-white/10 bg-white/5 p-2 text-xs">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-slate-100">{l.cliente_nome}</p>
-                  {l.justificativa && <p className="mt-0.5 truncate text-[10px] text-slate-400"><GlassIcon name="note" /> {l.justificativa}</p>}
+                  {l.justificativa && <p className="mt-0.5 truncate text-xs text-slate-400"><GlassIcon name="note" /> {l.justificativa}</p>}
                 </div>
                 <Button variant="secondary" onClick={() => setEditando(l)}>Editar</Button>
               </li>
             ))}
             {visiveis.filter((l) => !l.tem_otimizacao).length === 0 && (
-              <li className="text-xs text-slate-500">Todos justificados/otimizados <GlassIcon name="sparkles" /></li>
+              <li className="text-xs text-slate-400">Todos justificados/otimizados <GlassIcon name="sparkles" /></li>
             )}
           </ul>
         </Card>
@@ -65,14 +65,14 @@ export function AbaOtimizacoes() {
               <li key={l.cliente_id} className="flex items-center gap-2 rounded border border-white/10 bg-white/5 p-2 text-xs">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-slate-100">{l.cliente_nome}</p>
-                  {l.resumo && <p className="mt-0.5 line-clamp-1 text-[10px] text-slate-400">{l.resumo}</p>}
+                  {l.resumo && <p className="mt-0.5 line-clamp-1 text-xs text-slate-400">{l.resumo}</p>}
                 </div>
                 <Badge tone="green">otimizada</Badge>
                 <Button variant="secondary" onClick={() => setEditando(l)}>Editar</Button>
               </li>
             ))}
             {visiveis.filter((l) => l.tem_otimizacao).length === 0 && (
-              <li className="text-xs text-slate-500">Nada marcado como otimizado nessa semana.</li>
+              <li className="text-xs text-slate-400">Nada marcado como otimizado nessa semana.</li>
             )}
           </ul>
         </Card>

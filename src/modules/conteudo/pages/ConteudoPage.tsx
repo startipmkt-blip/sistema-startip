@@ -69,13 +69,13 @@ export function ConteudoPage() {
                 <Badge tone="blue">Sem {i.semana}</Badge>
                 <Badge tone="slate">{TIPO_LABEL[i.formato]}</Badge>
                 {i.dia_postagem && (
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-xs text-slate-400">
                     <GlassIcon name="calendar" /> {new Date(i.dia_postagem).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                   </span>
                 )}
               </div>
               <div className="font-medium text-slate-100">{i.titulo}</div>
-              <div className="mt-0.5 text-[11px] text-slate-400">{nomeCliente.get(i.cliente_id) ?? '—'}</div>
+              <div className="mt-0.5 text-xs text-slate-400">{nomeCliente.get(i.cliente_id) ?? '—'}</div>
               {i.descricao && (
                 <p className="mt-1 line-clamp-2 text-xs text-slate-400">{i.descricao}</p>
               )}

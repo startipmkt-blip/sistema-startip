@@ -55,7 +55,7 @@ export function PainelTab() {
     { header: 'Mensagem', render: (p) => (
       <div className="max-w-xs">
         <div className="truncate">{p.ultima_msg_texto || `[${TIPO_LABEL[p.ultima_msg_tipo ?? 'texto'] ?? 'Mídia'}]`}</div>
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-slate-400">
           {TIPO_LABEL[p.ultima_msg_tipo ?? 'texto']}{p.qtd_msgs > 1 ? ` · ${p.qtd_msgs} mensagens` : ''}
         </div>
       </div>
@@ -69,7 +69,7 @@ export function PainelTab() {
     { header: 'Último alerta', render: (p) => (
       p.ultimo_alerta_nivel
         ? <span>Nível {p.ultimo_alerta_nivel} · {formatarHora(p.ultimo_alerta_em)}</span>
-        : <span className="text-slate-500">Nenhum</span>
+        : <span className="text-slate-400">Nenhum</span>
     ) },
   ];
 
@@ -123,7 +123,7 @@ export function PainelTab() {
           />
         )}
       </Card>
-      <p className="text-xs text-slate-500">Atualiza automaticamente a cada 15 segundos. Horários em Brasília.</p>
+      <p className="text-xs text-slate-400">Atualiza automaticamente a cada 15 segundos. Horários em Brasília.</p>
 
       <DetalheModal pendencia={detalhe} onClose={() => setDetalhe(null)} />
     </div>

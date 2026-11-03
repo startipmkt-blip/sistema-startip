@@ -9,6 +9,7 @@ import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
 import { uploadArquivo } from '@/shared/lib/storage';
 import { glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -28,7 +29,7 @@ export function ClienteFormModal({ open, onClose, cliente, preencher }: Props) {
 
   async function handleExcluir() {
     if (!cliente) return;
-    if (!confirm(`Excluir o cliente "${cliente.nome}"? Isso remove o cadastro central dele.`)) return;
+    if (!(await confirmar(`Excluir o cliente "${cliente.nome}"? Isso remove o cadastro central dele.`))) return;
     await excluir.mutateAsync(cliente.id);
     onClose();
     navigate('/clientes');

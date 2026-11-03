@@ -62,7 +62,7 @@ export function ConfigTab() {
           options={[{ value: '', label: '— selecione —' },
             ...(gruposQ.data ?? []).map((g) => ({ value: g.chat_id, label: g.nome_grupo ?? g.chat_id }))]}
         />
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Se o grupo não aparecer, busque os grupos na aba “Grupos monitorados”. O grupo escolhido deixa de ser monitorado como cliente.
         </p>
         <Button variant="secondary" onClick={enviarTeste} disabled={testar.isPending || !cfgQ.data?.grupo_interno_id}>
@@ -79,7 +79,7 @@ export function ConfigTab() {
         </div>
         <Input label="Meta de atendimento nos relatórios (minutos)" type="number" min={1} value={f.sla_min}
           onChange={(e) => set('sla_min', num(e.target.value))} />
-        <p className="text-xs text-slate-500">Cada nível é enviado uma única vez por pendência. Quando a equipe responde, os próximos são cancelados.</p>
+        <p className="text-xs text-slate-400">Cada nível é enviado uma única vez por pendência. Quando a equipe responde, os próximos são cancelados.</p>
       </Card>
 
       <Card className="space-y-4 p-4">
@@ -120,7 +120,7 @@ export function ConfigTab() {
           <Input label="Guardar histórico por (dias — LGPD)" type="number" min={30} value={f.retencao_dias}
             onChange={(e) => set('retencao_dias', num(e.target.value))} />
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Mensagens guardam apenas os primeiros 500 caracteres e são apagadas após o período de retenção. Credenciais da Z-API ficam só no servidor.
         </p>
       </Card>

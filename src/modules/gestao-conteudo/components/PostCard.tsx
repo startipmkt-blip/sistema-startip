@@ -38,9 +38,9 @@ export function PostCard({
           <input type="checkbox" checked={selecionado} onChange={onSelecionar} className="mt-0.5" aria-label="Selecionar" />
         )}
         <div className="min-w-0 flex-1">
-          {clienteNome && <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-brand-300">{clienteNome}</p>}
+          {clienteNome && <p className="truncate text-xs font-semibold uppercase tracking-wide text-brand-300">{clienteNome}</p>}
           <p className="font-medium text-slate-100">{post.titulo}</p>
-          <p className="text-[10px] text-slate-500">
+          <p className="text-xs text-slate-400">
             {post.formato}
             {post.dia_postagem && ` · ${new Date(post.dia_postagem + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`}
             {post.lembretes_enviados > 0 && ` · lembrete ${post.lembretes_enviados}x`}
@@ -49,7 +49,7 @@ export function PostCard({
         {capa && (
           <button onClick={onPrevia} className="relative shrink-0" title="Ver carrossel">
             <img src={miniaturaDrive(capa.id, 200)} alt="" className="h-12 w-12 rounded-md object-cover" loading="lazy" />
-            <span className="absolute -bottom-1 -right-1 rounded bg-black/70 px-1 text-[9px] text-white">{pasta.data?.length}</span>
+            <span className="absolute -bottom-1 -right-1 rounded bg-black/70 px-1 text-xs text-white">{pasta.data?.length}</span>
           </button>
         )}
         {info.tipo === 'arquivo' && thumbOk && info.thumbUrl && (
@@ -61,7 +61,7 @@ export function PostCard({
       </div>
 
       {post.etapa === 'reprovado' && post.justificativa && (
-        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-[11px] text-red-300">
+        <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-xs text-red-300">
           <strong>Alteração pedida:</strong> {post.justificativa}
         </p>
       )}
@@ -71,7 +71,7 @@ export function PostCard({
           value={post.etapa}
           onChange={(e) => onEtapa(e.target.value as Etapa)}
           aria-label="Etapa"
-          className="glass-field min-w-0 flex-1 px-1.5 py-1 text-[11px] [&>option]:bg-slate-900 [&>option]:text-slate-100"
+          className="glass-field min-w-0 flex-1 px-1.5 py-1 text-xs [&>option]:bg-slate-900 [&>option]:text-slate-100"
         >
           {ETAPAS.map((e) => <option key={e.id} value={e.id}>{e.label}</option>)}
         </select>
@@ -87,7 +87,7 @@ export function PostCard({
       </div>
       {aprovacoes && aprovacoes.total >= 2 && post.etapa === 'enviado' && (
         <p
-          className="mt-1.5 rounded bg-amber-500/10 p-1.5 text-[11px] text-amber-200"
+          className="mt-1.5 rounded bg-amber-500/10 p-1.5 text-xs text-amber-200"
           title={aprovacoes.faltam.length ? `Faltam: ${aprovacoes.faltam.join(', ')}` : undefined}
         >
           Aprovações: <strong>{aprovacoes.feitos}/{aprovacoes.total}</strong>

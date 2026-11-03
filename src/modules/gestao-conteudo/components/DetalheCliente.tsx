@@ -22,6 +22,7 @@ import { useAprovadores, useVotosDoCliente } from '@/modules/gestao-conteudo/api
 import { PostFormModal } from './PostFormModal';
 import { PreviaDrive } from './PreviaDrive';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 type Agrupar = 'semanas' | 'etapas';
 
@@ -109,8 +110,8 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
     );
   }
 
-  function lembrarAgora() {
-    if (!confirm(`Reenviar o link de aprovação para ${cliente.nome} (${aguardando.length} aguardando)?`)) return;
+  async function lembrarAgora() {
+    if (!(await confirmar(`Reenviar o link de aprovação para ${cliente.nome} (${aguardando.length} aguardando)?`))) return;
     setAviso(null);
     lembrar.mutate(
       { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: aguardando.map((p) => p.id) },
@@ -131,7 +132,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
     );
   }
 
-  function copiarMesAnterior() {
+  async function copiarMesAnterior() {
     const origem = deslocarMes(mes, -1);
     if (!confirm(
       `Copiar o planejamento de ${mesLabel(origem)} para ${mesLabel(mes)}?\n\n` +
@@ -180,7 +181,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
       onEtapa={(etapa) => mudarEtapa.mutate({ id: p.id, etapa, anterior: p.etapa })}
       onPrevia={() => setPrevia(p)}
       onEditar={() => { setEditando(p); setFormAberto(true); }}
-      onExcluir={() => { if (confirm(`Excluir "${p.titulo}"?`)) excluir.mutate(p.id); }}
+      onExcluir={async () => { if (await confirmar(`Excluir "${p.titulo}"?`)) excluir.mutate(p.id); }}
       aprovacoes={aprovadoresAtivos.length >= 2 ? {
         total: aprovadoresAtivos.length,
         feitos: aprovadoresAtivos.filter((a) => (votosQ.data ?? []).some(
@@ -255,7 +256,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
         </p>
       )}
       {alertas.length > 0 && (
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
           {alertas.map((a) => (
             <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
           ))}
@@ -319,9 +320,9 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
               <section key={semana} className="rounded-xl border border-white/10 bg-white/[0.02] p-2">
                 <div className="mb-2 flex items-center justify-between px-1">
                   <span className="text-sm font-semibold text-slate-100">
-                    Semana {semana} <span className="text-[11px] font-normal text-slate-400">· {sem.ini.slice(8)}/{sem.ini.slice(5, 7)} a {sem.fim.slice(8)}/{sem.fim.slice(5, 7)}</span>
+                    Semana {semana} <span className="text-xs font-normal text-slate-400">· {sem.ini.slice(8)}/{sem.ini.slice(5, 7)} a {sem.fim.slice(8)}/{sem.fim.slice(5, 7)}</span>
                   </span>
-                  <span className={`text-[11px] ${meta && total < meta ? 'text-amber-300' : 'text-slate-400'}`}>
+                  <span className={`text-xs ${meta && total < meta ? 'text-amber-300' : 'text-slate-400'}`}>
                     {total}{meta ? `/${meta}` : ''}
                   </span>
                 </div>
@@ -346,11 +347,11 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
               <section key={e.id} className="w-64 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] p-2">
                 <div className="mb-2 flex items-center justify-between px-1 text-sm font-semibold text-slate-100">
                   <span><GlassIcon emoji={e.emoji} /> {e.label}</span>
-                  <span className="text-[11px] text-slate-400">{coluna.length}</span>
+                  <span className="text-xs text-slate-400">{coluna.length}</span>
                 </div>
                 <div className="space-y-2">
                   {coluna.map(renderCard)}
-                  {coluna.length === 0 && <p className="px-1 py-3 text-[11px] text-slate-600">Nenhum conteúdo.</p>}
+                  {coluna.length === 0 && <p className="px-1 py-3 text-xs text-slate-400">Nenhum conteúdo.</p>}
                 </div>
               </section>
             );
@@ -378,7 +379,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             value={mensagemEnvio ?? ''}
             onChange={(e) => setMensagemEnvio(e.target.value)}
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-400">
             Edite à vontade. Mantenha o link — é por ele que o cliente aprova.
             <button
               type="button"
@@ -411,7 +412,7 @@ export function DetalheCliente({ cliente, mes, mesAtual, posts, etapaFiltro }: P
             options={Array.from({ length: 10 }, (_, i) => deslocarMes(mes, i - 3))
               .map((m) => ({ value: m, label: mesLabel(m) }))}
           />
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-400">
             Mantém link do Drive, etapa e status. O dia de postagem vai para o mesmo dia do novo mês e a semana é recalculada.
           </p>
         </div>

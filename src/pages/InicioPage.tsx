@@ -1,34 +1,33 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { podeAcessarModulo } from '@/shared/auth/permissions';
-import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { BrandMark } from '@/shared/ui/BrandMark';
 
 interface ModuloCard {
   numero: string;
   label: string;
-  emoji: string;
+  icone: string;
   to: string;
   modulo: string;
 }
 
 const OPERACIONAL: ModuloCard[] = [
-  { numero: '01', label: 'Gestão de Clientes', emoji: '👥', to: '/clientes',           modulo: 'clientes' },
-  { numero: '02', label: 'Gestor de Tráfego',  emoji: '🎯', to: '/trafego',            modulo: 'diretoria' },
-  { numero: '16', label: 'Painel do Gestor',   emoji: '📊', to: '/painel-gestor',      modulo: 'diretoria' },
-  { numero: '03', label: 'CRM · WhatsApp',     emoji: '💬', to: '/crm',                modulo: 'crm' },
-  { numero: '04', label: 'Designer',           emoji: '🎨', to: '/designer',           modulo: 'conteudo' },
-  { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
-  { numero: '07', label: 'Financeiro',         emoji: '💰', to: '/financeiro',         modulo: 'financeiro' },
-  { numero: '08', label: 'Otimizações',        emoji: '📈', to: '/otimizacoes',        modulo: 'otimizacoes' },
-  { numero: '10', label: 'Painel TV',          emoji: '📺', to: '/painel-tv',          modulo: 'painel-tv' },
-  { numero: '11', label: 'Ideias/Anotações',   emoji: '💡', to: '/ideias',            modulo: 'ideias' },
-  { numero: '12', label: 'Gestão de Conteúdo', emoji: '🗂️', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
-  { numero: '14', label: 'CS Clientes',        emoji: '💬', to: '/cs-clientes',        modulo: 'cs-clientes' },
+  { numero: '01', label: 'Gestão de Clientes', icone: '01_gestao_de_clientes', to: '/clientes',           modulo: 'clientes' },
+  { numero: '02', label: 'Gestor de Tráfego',  icone: '02_gestor_de_trafego', to: '/trafego',            modulo: 'diretoria' },
+  { numero: '16', label: 'Painel do Gestor',   icone: '16_painel_do_gestor', to: '/painel-gestor',      modulo: 'diretoria' },
+  { numero: '03', label: 'CRM · WhatsApp',     icone: '03_crm_whatsapp', to: '/crm',                modulo: 'crm' },
+  { numero: '04', label: 'Designer',           icone: '04_designer', to: '/designer',           modulo: 'conteudo' },
+  { numero: '05', label: 'Demandas',           icone: '05_demandas', to: '/demandas',           modulo: 'demandas' },
+  { numero: '07', label: 'Financeiro',         icone: '07_financeiro', to: '/financeiro',         modulo: 'financeiro' },
+  { numero: '08', label: 'Otimizações',        icone: '08_otimizacoes', to: '/otimizacoes',        modulo: 'otimizacoes' },
+  { numero: '10', label: 'Painel TV',          icone: '10_painel_tv', to: '/painel-tv',          modulo: 'painel-tv' },
+  { numero: '11', label: 'Ideias/Anotações',   icone: '11_ideias_anotacoes', to: '/ideias',            modulo: 'ideias' },
+  { numero: '12', label: 'Gestão de Conteúdo', icone: '12_gestao_de_conteudos', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
+  { numero: '14', label: 'CS Clientes',        icone: '14_cs_clientes', to: '/cs-clientes',        modulo: 'cs-clientes' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '15', label: 'Contratos',         emoji: '📄', to: '/contratos',          modulo: 'contratos' },
+  { numero: '15', label: 'Contratos',         icone: '15_contratos', to: '/contratos',          modulo: 'contratos' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {
@@ -47,7 +46,7 @@ function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCa
             to={m.to}
             className="group flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-400/40 hover:bg-brand-500/5"
           >
-            <GlassIcon emoji={m.emoji} plate className="h-11 w-11 text-xl transition-transform group-hover:scale-105" />
+            <img src={`/icones-inicio/${m.icone}.webp`} alt="" width={44} height={44} className="h-11 w-11 shrink-0 select-none object-contain transition-transform group-hover:scale-105" draggable={false} />
             <div className="min-w-0 flex-1">
               <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">
                 {m.numero} · ÁREA

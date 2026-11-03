@@ -24,7 +24,7 @@ export function ProtectedRoute() {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-3 px-6 text-center">
         <h1 className="text-lg font-semibold text-slate-800">Sem acesso</h1>
-        <p className="max-w-md text-sm text-slate-500">
+        <p className="max-w-md text-sm text-slate-400">
           Sua conta está autenticada mas ainda não tem um perfil liberado.
           Peça a um administrador da Startip para liberar seu acesso.
         </p>
@@ -37,7 +37,7 @@ export function ProtectedRoute() {
       <div className="flex h-screen flex-col items-center justify-center gap-3 px-6 text-center">
         <div className="text-3xl"><GlassIcon name="hourglass" /></div>
         <h1 className="text-lg font-semibold text-slate-800">Aguardando aprovação</h1>
-        <p className="max-w-md text-sm text-slate-500">
+        <p className="max-w-md text-sm text-slate-400">
           Sua conta foi criada e está pendente. Um administrador da agência
           precisa aprovar seu acesso e definir os módulos liberados.
         </p>

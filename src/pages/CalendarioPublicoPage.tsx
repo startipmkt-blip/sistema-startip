@@ -73,7 +73,7 @@ export function CalendarioPublicoPage() {
           <p className="mt-2 text-sm font-medium uppercase text-slate-200">
             {MESES[mesDe(periodo.de) - 1]} → {MESES[11]} {periodo.ano}
           </p>
-          <p className="text-xs text-slate-500">{formatarData(periodo.de)} → {formatarData(periodo.ate)}</p>
+          <p className="text-xs text-slate-400">{formatarData(periodo.de)} → {formatarData(periodo.ate)}</p>
         </header>
 
         <p className="mx-auto max-w-xl text-center text-xs leading-relaxed text-slate-400">
@@ -86,7 +86,7 @@ export function CalendarioPublicoPage() {
 
         {proxima && (
           <div className="rounded-2xl border border-brand-400/30 bg-brand-500/10 p-4 text-center">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-brand-200">Próxima data</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-brand-200">Próxima data</div>
             <div className="mt-1 text-base font-semibold text-white">{proxima.base.nome}</div>
             <div className="text-xs text-slate-300">
               {formatarData(proxima.data, { weekday: 'long', day: '2-digit', month: 'long' })} · {faltam(diasEntre(hoje, proxima.data))}
@@ -151,7 +151,7 @@ export function CalendarioPublicoPage() {
           </div>
         )}
 
-        <footer className="pt-6 text-center text-[11px] text-slate-500">
+        <footer className="pt-6 text-center text-xs text-slate-400">
           Calendário atualizado automaticamente pela equipe Startip. Dúvidas? Fale com seu gerente.
         </footer>
       </div>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useCrmLeads, useEtapasCrm, useMoverLeadEtapa } from '@/modules/crm/api/crmApi';
 import {
   CRM_ETIQUETAS,
@@ -17,6 +17,7 @@ import { KanbanCard } from '@/modules/crm/components/KanbanCard';
 import { exportarLeadsCsv, exportarPdf } from '@/modules/crm/lib/exportLeads';
 import { ClienteFormModal } from '@/modules/clientes/components/ClienteFormModal';
 import { Button } from '@/shared/ui/Button';
+import { Tabs } from '@/shared/ui/Tabs';
 import { Card } from '@/shared/ui/Card';
 import { Spinner } from '@/shared/ui/Spinner';
 import { StatCard } from '@/shared/ui/StatCard';
@@ -40,7 +41,6 @@ const ABAS: { id: Sub; label: string; icone: string }[] = [
 // espaço disponível para maximizar conversas/kanban.
 
 export function CrmPage() {
-  const navigate = useNavigate();
   const { data: leads, isLoading } = useCrmLeads('');
   const { data: etapas } = useEtapasCrm();
   const moverLead = useMoverLeadEtapa();
@@ -84,38 +84,21 @@ export function CrmPage() {
   const filtrados = etiqueta ? todos.filter((l) => l.etiquetas.includes(etiqueta)) : todos;
 
   return (
-    // -m-4 sm:-m-6 cancela o padding do <main> da AppShell → ocupa tela cheia.
-    // A altura calc(100vh - 4rem) descarta a altura do Topbar (h-16).
-    <div className="-m-4 flex h-[calc(100vh-4rem)] flex-col bg-slate-950/40 sm:-m-6">
-      {/* Barra superior compacta — voltar + abas + ações */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-white/10 bg-white/[0.02] px-4 py-2">
-        <button
-          onClick={() => navigate('/inicio')}
-          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-slate-300 hover:bg-white/5"
-          title="Voltar ao início"
-        >
-          ← Voltar
-        </button>
-        <span className="mr-2 text-sm font-semibold text-white">CRM da agência</span>
+    // As margens negativas cancelam o padding do <main> da AppShell → ocupa tela cheia.
+    // A altura calc(100vh - 3.5rem) descarta a altura do Topbar (h-14).
+    <div className="-m-4 flex h-[calc(100vh-3.5rem)] flex-col sm:-m-6 lg:-m-8">
+      {/* Barra superior compacta — título + abas + ações */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 pt-2">
+        <span className="text-base font-semibold text-white">CRM</span>
 
-        <nav className="flex flex-wrap gap-1">
-          {ABAS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setSub(t.id)}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                sub === t.id
-                  ? 'bg-brand-500/15 text-brand-200'
-                  : 'text-slate-300 hover:bg-white/5'
-              }`}
-            >
-              <span aria-hidden><GlassIcon emoji={t.icone} /></span>
-              {t.label}
-            </button>
-          ))}
-        </nav>
+        <Tabs
+          className="border-b-0"
+          tabs={ABAS.map((t) => ({ id: t.id, label: t.label, icon: <GlassIcon emoji={t.icone} /> }))}
+          value={sub}
+          onChange={(id) => setSub(id)}
+        />
 
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center gap-2 pb-2">
           {sub === 'leads' && (
             <>
               <Button variant="secondary" onClick={() => exportarLeadsCsv(todos)}>

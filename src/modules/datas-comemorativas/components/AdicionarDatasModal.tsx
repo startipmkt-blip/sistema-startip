@@ -62,14 +62,14 @@ export function AdicionarDatasModal({ open, onClose, clienteId, clienteNome, bas
                 <input type="checkbox" checked={sel.has(b.id)} onChange={() => alternar(b.id)} />
                 <div className="min-w-0 flex-1">
                   <div className="text-sm text-slate-100">{b.nome}</div>
-                  <div className="text-[11px] text-slate-500">{descreverRegra(b, mapa)} · {b.categoria}</div>
+                  <div className="text-xs text-slate-400">{descreverRegra(b, mapa)} · {b.categoria}</div>
                 </div>
                 <Badge tone={PRIORIDADE_TONE[b.prioridade]}>{PRIORIDADE_LABEL[b.prioridade]}</Badge>
               </label>
             </li>
           ))}
           {disponiveis.length === 0 && (
-            <li className="p-6 text-center text-xs text-slate-500">
+            <li className="p-6 text-center text-xs text-slate-400">
               {busca ? 'Nada encontrado.' : 'Este cliente já usa todas as datas da Base Mãe.'}
             </li>
           )}

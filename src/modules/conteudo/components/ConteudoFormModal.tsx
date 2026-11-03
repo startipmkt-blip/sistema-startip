@@ -15,6 +15,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -33,7 +34,7 @@ export function ConteudoFormModal({ open, onClose, conteudo }: Props) {
 
   async function handleExcluir() {
     if (!conteudo) return;
-    if (!confirm(`Excluir "${conteudo.titulo}"?`)) return;
+    if (!(await confirmar(`Excluir "${conteudo.titulo}"?`))) return;
     await excluir.mutateAsync(conteudo.id);
     onClose();
   }

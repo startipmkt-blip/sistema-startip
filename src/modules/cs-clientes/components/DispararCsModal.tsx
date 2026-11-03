@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/Button';
 import { Modal } from '@/shared/ui/Modal';
 import { Textarea } from '@/shared/ui/Textarea';
 import { Badge } from '@/shared/ui/Badge';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 // Pausa entre um grupo e outro: envios colados em sequência aumentam o
 // risco de o WhatsApp tratar o número como spam.
@@ -37,7 +38,7 @@ export function DispararCsModal({ clientes, links, ultimoEnvio, msgPadrao, nomeG
   const [estados, setEstados] = useState<Record<string, { estado: Estado; erro?: string }>>({});
   const [fase, setFase] = useState<'preparo' | 'enviando' | 'fim'>('preparo');
 
-  function alternar(id: string) {
+  async function alternar(id: string) {
     setMarcados((s) => {
       const n = new Set(s);
       if (n.has(id)) n.delete(id); else n.add(id);
@@ -47,7 +48,7 @@ export function DispararCsModal({ clientes, links, ultimoEnvio, msgPadrao, nomeG
 
   async function disparar() {
     const fila = aptos.filter((c) => marcados.has(c.id));
-    if (!confirm(`Enviar o CS de sexta agora para ${fila.length} grupo(s)?`)) return;
+    if (!(await confirmar(`Enviar o CS de sexta agora para ${fila.length} grupo(s)?`))) return;
     setFase('enviando');
     setEstados(Object.fromEntries(fila.map((c) => [c.id, { estado: 'aguardando' as Estado }])));
     for (const [i, c] of fila.entries()) {
@@ -116,7 +117,7 @@ export function DispararCsModal({ clientes, links, ultimoEnvio, msgPadrao, nomeG
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-slate-100">{c.nome}</div>
-                  <div className="truncate text-[11px] text-slate-500">
+                  <div className="truncate text-xs text-slate-400">
                     {nomeGrupo(c.whatsapp_chat_id) ?? c.whatsapp_chat_id}
                     {st?.erro && <span className="text-red-300"> · {st.erro}</span>}
                   </div>
@@ -131,11 +132,11 @@ export function DispararCsModal({ clientes, links, ultimoEnvio, msgPadrao, nomeG
               </li>
             );
           })}
-          {aptos.length === 0 && <li className="p-6 text-center text-xs text-slate-500">Nenhum cliente com grupo vinculado.</li>}
+          {aptos.length === 0 && <li className="p-6 text-center text-xs text-slate-400">Nenhum cliente com grupo vinculado.</li>}
         </ul>
 
         {fase === 'preparo' && semGrupo.length > 0 && (
-          <p className="text-[11px] text-amber-300">
+          <p className="text-xs text-amber-300">
             Sem grupo vinculado (não recebem): {semGrupo.map((c) => c.nome).join(', ')}.
           </p>
         )}

@@ -117,11 +117,11 @@ export function AtendimentoTab({ onIrParaFunil }: Props) {
               onIrParaFunil={() => onIrParaFunil(conversaAberta.id)}
             />
           ) : (
-            <div className="flex flex-1 items-center justify-center text-center text-sm text-slate-500">
+            <div className="flex flex-1 items-center justify-center text-center text-sm text-slate-400">
               <div>
                 <div className="mb-2 text-3xl"><GlassIcon name="message" /></div>
                 Selecione uma conversa à esquerda
-                <div className="mt-1 text-xs text-slate-600">
+                <div className="mt-1 text-xs text-slate-400">
                   Mensagens novas do WhatsApp aparecem aqui em tempo real
                 </div>
               </div>

@@ -61,7 +61,7 @@ export function AudioPlayer({ src, duracaoInicial }: Props) {
   // com áudio OGG do WhatsApp, por exemplo), oferece link direto de download.
   if (erro) {
     return (
-      <div className="flex min-w-[220px] items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-[11px] text-red-300">
+      <div className="flex min-w-[220px] items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-xs text-red-300">
         <span><GlassIcon name="music" /> áudio incompatível</span>
         <a href={src} download className="rounded-full bg-white/10 px-2 py-0.5 text-white hover:bg-white/20" target="_blank" rel="noopener">
           <GlassIcon name="download" /> baixar
@@ -89,10 +89,10 @@ export function AudioPlayer({ src, duracaoInicial }: Props) {
         className="h-1 flex-1 accent-white/70"
         style={{ background: `linear-gradient(90deg, rgba(255,255,255,0.6) ${progresso}%, rgba(255,255,255,0.2) ${progresso}%)` }}
       />
-      <span className="w-9 text-right font-mono text-[10px] text-white/80">{fmt(dur - tempo)}</span>
+      <span className="w-9 text-right font-mono text-xs text-white/80">{fmt(dur - tempo)}</span>
       <button
         onClick={proximaVelocidade}
-        className="rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-medium text-white hover:bg-white/25"
+        className="rounded-full bg-white/15 px-1.5 py-0.5 text-xs font-medium text-white hover:bg-white/25"
         title="Velocidade"
       >
         {velocidade}x

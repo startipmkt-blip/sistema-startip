@@ -75,12 +75,12 @@ export function ContatoModal({ open, onClose, leadId }: Props) {
                   >
                     <span aria-hidden><GlassIcon name="user" /></span>
                     <span className="min-w-0 flex-1 truncate">{c.nome}</span>
-                    <span className="text-xs text-slate-500">{c.telefone}</span>
+                    <span className="text-xs text-slate-400">{c.telefone}</span>
                   </button>
                 </li>
               ))}
               {filtradas.length === 0 && (
-                <li className="p-3 text-center text-xs text-slate-500">Nenhum contato encontrado.</li>
+                <li className="p-3 text-center text-xs text-slate-400">Nenhum contato encontrado.</li>
               )}
             </ul>
           </>

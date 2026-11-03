@@ -12,6 +12,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { StatCard } from '@/shared/ui/StatCard';
 import { formatMoney } from '@/shared/lib/format';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const TABS: { id: ContractStatus | 'todos'; label: string; tone: Parameters<typeof Badge>[0]['tone'] }[] = [
   { id: 'todos',      label: 'Todos',      tone: 'slate' },
@@ -133,11 +134,11 @@ export function ContratosPage() {
                 <tr key={c.id} className="border-t border-white/5 hover:bg-white/[0.02]">
                   <td className="p-3">
                     <div className="font-medium text-slate-100">{c.razao_social || c.titulo}</div>
-                    <div className="text-xs text-slate-500">{c.signer_name || c.signer_email || '—'}</div>
+                    <div className="text-xs text-slate-400">{c.signer_name || c.signer_email || '—'}</div>
                   </td>
                   <td className="p-3 text-xs text-slate-300">
                     {fmtData(c.start_date)} → {fmtData(c.end_date)}
-                    <div className="text-[10px] text-slate-500">{c.duration_months}m</div>
+                    <div className="text-xs text-slate-400">{c.duration_months}m</div>
                   </td>
                   <td className="p-3 text-slate-200">{formatMoney(Number(c.onboarding_value ?? 0))}</td>
                   <td className="p-3 text-slate-200">{formatMoney(Number(c.monthly_value ?? 0))}</td>
@@ -149,7 +150,7 @@ export function ContratosPage() {
                       <Button variant="secondary" onClick={() => baixarPdf(c)}><GlassIcon name="file" /> PDF</Button>
                       <Button variant="secondary" onClick={() => { setEditando(c); setNovoOpen(true); }}>Editar</Button>
                       <button
-                        onClick={() => { if (confirm('Apagar contrato?')) apagar.mutate(c.id); }}
+                        onClick={async () => { if ((await confirmar('Apagar contrato?'))) apagar.mutate(c.id); }}
                         className="rounded-md px-2 text-xs text-red-300 hover:bg-red-500/10"
                       >
                         <GlassIcon name="trash" />

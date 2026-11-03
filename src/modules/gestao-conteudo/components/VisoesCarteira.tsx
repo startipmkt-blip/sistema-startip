@@ -59,7 +59,7 @@ export function VisaoCarteira({ clientes, posts, mes, mesAtual, onAbrir }: BaseP
               <Logo c={c} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-slate-100">{c.nome}</p>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-xs text-slate-400">
                   {meus.length}{meta > 0 ? ` / ${meta}` : ''} posts no mês
                   {c.conteudos_por_semana > 0 && ` · meta ${c.conteudos_por_semana}/semana`}
                 </p>
@@ -78,13 +78,13 @@ export function VisaoCarteira({ clientes, posts, mes, mesAtual, onAbrir }: BaseP
               {ETAPAS.filter((e) => n[e.id] > 0).map((e) => (
                 <Badge key={e.id} tone={e.tone}><GlassIcon emoji={e.emoji} /> {n[e.id]} {e.label.toLowerCase()}</Badge>
               ))}
-              {meus.length === 0 && <span className="text-[11px] text-slate-500">Nenhum conteúdo planejado.</span>}
+              {meus.length === 0 && <span className="text-xs text-slate-400">Nenhum conteúdo planejado.</span>}
             </div>
 
-            {tempo && <p className="mt-2 text-[11px] text-slate-400"><GlassIcon name="timer" /> Responde em média em {tempo}</p>}
+            {tempo && <p className="mt-2 text-xs text-slate-400"><GlassIcon name="timer" /> Responde em média em {tempo}</p>}
 
             {alertas.length > 0 && (
-              <ul className="mt-2 space-y-0.5 text-[11px]">
+              <ul className="mt-2 space-y-0.5 text-xs">
                 {alertas.map((a) => (
                   <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
                 ))}
@@ -110,7 +110,7 @@ export function VisaoTabela({ clientes, posts, mesAtual, onAbrir }: BaseProps) {
   return (
     <Card className="overflow-x-auto p-0">
       <table className="min-w-full text-xs">
-        <thead className="border-b border-white/10 text-[10px] uppercase tracking-wider text-slate-500">
+        <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
           <tr>
             <th className="px-3 py-2 text-left">Cliente</th>
             <th className="px-2 py-2 text-center">Posts / meta</th>
@@ -134,12 +134,12 @@ export function VisaoTabela({ clientes, posts, mesAtual, onAbrir }: BaseProps) {
                   {meus.length}{meta ? ` / ${meta}` : ''}
                 </td>
                 {ETAPAS.map((e) => (
-                  <td key={e.id} className={`px-2 py-2 text-center ${n[e.id] ? 'font-semibold text-slate-100' : 'text-slate-600'}`}>
+                  <td key={e.id} className={`px-2 py-2 text-center ${n[e.id] ? 'font-semibold text-slate-100' : 'text-slate-400'}`}>
                     {n[e.id] || '·'}
                   </td>
                 ))}
                 <td className="px-2 py-2 text-center text-slate-300">{textoTempoMedio(meus) ?? '—'}</td>
-                <td className="px-3 py-2 text-[11px]">
+                <td className="px-3 py-2 text-xs">
                   {alertas.length === 0
                     ? <span className="text-emerald-400"><GlassIcon name="check" /></span>
                     : <span className={alertas.some((a) => a.gravidade === 'alta') ? 'text-red-300' : 'text-amber-300'}>
@@ -205,7 +205,7 @@ export function AgendaSemana({
             >
               <div className="mb-2 flex items-center justify-between px-1 text-xs">
                 <span className="font-semibold text-slate-100">{d.nome} {d.dia}</span>
-                <span className="text-slate-500">{d.posts.length || ''}</span>
+                <span className="text-slate-400">{d.posts.length || ''}</span>
               </div>
               <div className="space-y-2">
                 {d.posts.map((p) => (
@@ -218,13 +218,13 @@ export function AgendaSemana({
                     />
                   </div>
                 ))}
-                {d.posts.length === 0 && <p className="px-1 py-2 text-[11px] text-slate-600">—</p>}
+                {d.posts.length === 0 && <p className="px-1 py-2 text-xs text-slate-400">—</p>}
               </div>
             </section>
           ))}
         </div>
       )}
-      <p className="text-[11px] text-slate-500">
+      <p className="text-xs text-slate-400">
         Mostra os conteúdos com dia de postagem definido. Conteúdos sem data aparecem só na visão do cliente.
       </p>
 

@@ -69,7 +69,7 @@ export function EtapasTimeline({ etapas, comStatus = false }: { etapas: EtapaTim
                       return (
                         <li key={j} className="flex items-start gap-2 text-xs">
                           <span
-                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] ${
+                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-xs ${
                               feito
                                 ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-200'
                                 : 'border-white/20 bg-white/5 text-transparent'
@@ -78,7 +78,7 @@ export function EtapasTimeline({ etapas, comStatus = false }: { etapas: EtapaTim
                           >
                             {feito ? '✓' : ''}
                           </span>
-                          <span className={feito ? 'text-slate-500 line-through' : 'text-slate-300'}>{it}</span>
+                          <span className={feito ? 'text-slate-400 line-through' : 'text-slate-300'}>{it}</span>
                         </li>
                       );
                     })}

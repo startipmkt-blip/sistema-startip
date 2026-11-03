@@ -14,6 +14,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -32,7 +33,7 @@ export function IndicacaoFormModal({ open, onClose, indicacao }: Props) {
 
   async function handleExcluir() {
     if (!indicacao) return;
-    if (!confirm(`Excluir a indicação "${indicacao.nome_indicado}"?`)) return;
+    if (!(await confirmar(`Excluir a indicação "${indicacao.nome_indicado}"?`))) return;
     await excluir.mutateAsync(indicacao.id);
     onClose();
   }

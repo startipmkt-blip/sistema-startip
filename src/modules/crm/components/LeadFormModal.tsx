@@ -5,6 +5,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Button } from '@/shared/ui/Button';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -19,7 +20,7 @@ export function LeadFormModal({ open, onClose, lead }: Props) {
 
   async function handleExcluir() {
     if (!lead) return;
-    if (!confirm(`Excluir o lead "${lead.nome}"?`)) return;
+    if (!(await confirmar(`Excluir o lead "${lead.nome}"?`))) return;
     await excluir.mutateAsync(lead.id);
     onClose();
   }

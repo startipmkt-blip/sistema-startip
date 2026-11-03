@@ -97,7 +97,7 @@ export function ListaModal({ open, onClose, leadId }: Props) {
                 onChange={(e) => atualizar(i, 'description', e.target.value)}
                 placeholder="Descrição (opcional)"
                 maxLength={72}
-                className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 placeholder:text-slate-600 focus:border-brand-400 focus:outline-none"
+                className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
               />
             </div>
           ))}

@@ -90,7 +90,7 @@ export function LeadConversasModal({ open, onClose, lead, onEditar }: Props) {
             Enviar
           </Button>
         </div>
-        <p className="text-[11px] text-slate-400">
+        <p className="text-xs text-slate-400">
           As mensagens entram/saem pelo WhatsApp da agência via Z-API (a conectar
           pelo programador). No modo demo, a resposta fica só aqui.
         </p>

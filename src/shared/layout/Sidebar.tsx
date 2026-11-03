@@ -1,8 +1,7 @@
 import { NavLink } from 'react-router-dom';
-import { navItems, moduloKey } from '@/shared/layout/navigation';
+import { navGrupos, moduloKey, type NavItem } from '@/shared/layout/navigation';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { BrandMark } from '@/shared/ui/BrandMark';
-import { Badge } from '@/shared/ui/Badge';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 interface Props {
@@ -13,48 +12,45 @@ interface Props {
 export function Sidebar({ aberto, onFechar }: Props) {
   const { isEquipe, podeAcessar } = useAuth();
 
+  const visivel = (item: NavItem) =>
+    !(item.equipeOnly && !isEquipe) && (item.comingSoon || podeAcessar(moduloKey(item)));
+
   const nav = (
-    <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-      {navItems.map((item) => {
-        if (item.equipeOnly && !isEquipe) return null;
-        if (!item.comingSoon && !podeAcessar(moduloKey(item))) return null;
-
-        if (item.comingSoon) {
-          return (
-            <div
-              key={item.to}
-              className="flex cursor-not-allowed items-center justify-between rounded-xl px-3 py-2.5 text-sm text-slate-500"
-              title="Em breve"
-            >
-              <span className="flex items-center gap-3">
-                <GlassIcon name={item.icon} tone="slate" className="h-5 w-5" />
-                {item.label}
-              </span>
-              <Badge tone="slate">em breve</Badge>
-            </div>
-          );
-        }
-
+    <nav className="nav-dark flex-1 space-y-5 overflow-y-auto px-3 py-4">
+      {navGrupos.map((grupo) => {
+        const itens = grupo.itens.filter(visivel);
+        if (itens.length === 0) return null;
         return (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            onClick={onFechar}
-            className={({ isActive }) =>
-              `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-gradient-brand text-white shadow-glow'
-                  : 'text-slate-300 hover:bg-white/10 hover:text-white'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <GlassIcon name={item.icon} tone={isActive ? 'white' : undefined} className="h-5 w-5" />
-                <span className="truncate">{item.label}</span>
-              </>
+          <div key={grupo.titulo ?? 'topo'}>
+            {grupo.titulo && (
+              <div className="mb-1.5 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400/80">
+                {grupo.titulo}
+              </div>
             )}
-          </NavLink>
+            <div className="space-y-0.5">
+              {itens.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={onFechar}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'nav-ativo bg-brand-500/15 text-white'
+                        : 'text-slate-300 hover:bg-white/[0.06] hover:text-white'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <GlassIcon name={item.icon} tone={isActive ? 'brand' : 'slate'} className="h-[18px] w-[18px]" />
+                      <span className="truncate">{item.label}</span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
         );
       })}
     </nav>
@@ -63,8 +59,8 @@ export function Sidebar({ aberto, onFechar }: Props) {
   return (
     <>
       {/* Desktop: menu fixo */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-white/[0.03] backdrop-blur-xl lg:flex">
-        <div className="flex h-16 items-center border-b border-white/10 px-6">
+      <aside className="sidebar-dark hidden w-60 shrink-0 flex-col border-r border-white/[0.08] bg-[#0e151d] lg:flex">
+        <div className="flex h-14 items-center border-b border-white/[0.08] px-5">
           <BrandMark sub="OS" />
         </div>
         {nav}
@@ -73,9 +69,9 @@ export function Sidebar({ aberto, onFechar }: Props) {
       {/* Mobile: gaveta (só quando aberta) */}
       {aberto && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-slate-950/60" onClick={onFechar} aria-hidden />
-          <aside className="absolute inset-y-0 left-0 flex w-64 max-w-[80%] flex-col border-r border-white/10 bg-slate-950/95 backdrop-blur-xl">
-            <div className="flex h-16 items-center justify-between border-b border-white/10 px-6">
+          <div className="absolute inset-0 bg-slate-950/70" onClick={onFechar} aria-hidden />
+          <aside className="sidebar-dark absolute inset-y-0 left-0 flex w-64 max-w-[80%] flex-col border-r border-white/10 bg-[#0e151d]">
+            <div className="flex h-14 items-center justify-between border-b border-white/[0.08] px-5">
               <BrandMark sub="OS" />
               <button
                 onClick={onFechar}

@@ -24,6 +24,7 @@ import { Button } from '@/shared/ui/Button';
 import { AnexosCriativo } from '@/modules/ideias/criativos/components/AnexosCriativo';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 interface Props {
   open: boolean;
@@ -57,7 +58,7 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
 
   async function handleExcluir() {
     if (!demanda) return;
-    if (!confirm(`Excluir "${demanda.titulo}"?`)) return;
+    if (!(await confirmar(`Excluir "${demanda.titulo}"?`))) return;
     await excluir.mutateAsync(demanda.id);
     for (const a of demanda.anexos ?? []) void descartarAnexo(a.path);
     onClose();
@@ -247,7 +248,7 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
             onChange={(e) => set('renovacao', e.target.value as Renovacao)}
           />
           {form.renovacao !== 'nenhuma' && (
-            <p className="mt-1 text-[11px] text-slate-400">
+            <p className="mt-1 text-xs text-slate-400">
               Ao concluir, o sistema cria a próxima demanda sozinho, com o prazo {form.renovacao === 'semanal' ? '7 dias' : '1 mês'} depois.
             </p>
           )}

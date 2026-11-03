@@ -40,7 +40,7 @@ export function AbaChecklist({ clienteId, clienteNome }: Props) {
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-slate-100"><GlassIcon name="clipboard" /> Checklist diário — {clienteNome}</h3>
-          <p className="text-[11px] text-slate-500">Ciclo desde {new Date(local.data + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })} · zera seg/qua/sex · {marcados}/6 itens</p>
+          <p className="text-xs text-slate-400">Ciclo desde {new Date(local.data + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })} · zera seg/qua/sex · {marcados}/6 itens</p>
         </div>
         <div className="h-2 w-40 rounded-full bg-white/5">
           <div className="h-2 rounded-full bg-gradient-to-r from-brand-500 to-emerald-400 transition-all" style={{ width: `${(marcados/6)*100}%` }} />
@@ -55,7 +55,7 @@ export function AbaChecklist({ clienteId, clienteNome }: Props) {
             <li key={idx}>
               <label className="flex cursor-pointer items-start gap-3 rounded-md border border-white/10 bg-white/5 p-3 hover:bg-white/10">
                 <input type="checkbox" checked={checked} onChange={() => toggle(idx + 1)} className="mt-0.5" />
-                <span className={`flex-1 text-sm ${checked ? 'text-slate-500 line-through' : 'text-slate-100'}`}>{label}</span>
+                <span className={`flex-1 text-sm ${checked ? 'text-slate-400 line-through' : 'text-slate-100'}`}>{label}</span>
               </label>
             </li>
           );

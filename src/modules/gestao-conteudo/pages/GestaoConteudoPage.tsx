@@ -194,7 +194,7 @@ export function GestaoConteudoPage() {
               className={`rounded-xl border p-3 text-left transition-colors ${
                 ativo ? 'border-brand-400/70 bg-brand-500/15' : 'border-white/10 bg-white/[0.03] hover:border-white/25'}`}
             >
-              <div className="text-[11px] text-slate-400"><GlassIcon emoji={e.emoji} /> {e.label}</div>
+              <div className="text-xs text-slate-400"><GlassIcon emoji={e.emoji} /> {e.label}</div>
               <div className="mt-1 text-2xl font-semibold text-white">{totais[e.id]}</div>
             </button>
           );

@@ -77,7 +77,7 @@ export function OnboardingPublicoPage() {
               <EtapasTimeline etapas={data.etapas} comStatus />
             </section>
 
-            <p className="pt-2 text-center text-xs text-slate-500">
+            <p className="pt-2 text-center text-xs text-slate-400">
               Dúvidas sobre alguma etapa? Fale com a gente no grupo do WhatsApp.
             </p>
           </>

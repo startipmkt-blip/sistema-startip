@@ -13,6 +13,7 @@ import {
   useArquivosIdentidade, useEnviarIdentidade, useExcluirIdentidade,
   type ArquivoIdentidade,
 } from '../api/identidadeApi';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const CHAVE_NOTAS = 'identidade';
 
@@ -124,7 +125,7 @@ export function IdentidadeVisual({ clienteId }: { clienteId: string }) {
       >
         <span className="text-xl"><GlassIcon name="paperclip" /></span>
         <span>{enviando ? 'Enviando…' : 'Arraste arquivos aqui ou clique para anexar'}</span>
-        <span className="text-[11px] text-slate-500">
+        <span className="text-xs text-slate-400">
           Imagens, SVG, PDF, AI, EPS, PSD, fontes, ZIP e documentos · até {MAX_IDENTIDADE_MB} MB cada
         </span>
         <input
@@ -142,7 +143,7 @@ export function IdentidadeVisual({ clienteId }: { clienteId: string }) {
       {isLoading && <div className="flex justify-center py-4"><Spinner /></div>}
 
       {!isLoading && !error && (arquivos?.length ?? 0) === 0 && (
-        <p className="rounded-md border border-dashed border-white/10 px-3 py-6 text-center text-xs text-slate-500">
+        <p className="rounded-md border border-dashed border-white/10 px-3 py-6 text-center text-xs text-slate-400">
           Nenhum arquivo ainda. Anexe a identidade visual deste cliente.
         </p>
       )}
@@ -155,14 +156,14 @@ export function IdentidadeVisual({ clienteId }: { clienteId: string }) {
                 <Miniatura a={a} />
               </button>
               <p className="truncate text-xs font-medium text-slate-100" title={a.name}>{a.name}</p>
-              <p className="text-[11px] text-slate-500">{formatarTamanho(a.size)}</p>
-              <div className="flex gap-3 text-[11px]">
+              <p className="text-xs text-slate-400">{formatarTamanho(a.size)}</p>
+              <div className="flex gap-3 text-xs">
                 <button className="text-slate-300 hover:underline" onClick={() => void abrirAnexo(a).catch(falha)}>Ver</button>
                 <button className="text-slate-300 hover:underline" onClick={() => void abrirAnexo(a, true).catch(falha)}>Baixar</button>
                 <button
                   className="ml-auto text-red-400 hover:underline"
-                  onClick={() => {
-                    if (confirm(`Excluir "${a.name}"?`)) {
+                  onClick={async () => {
+                    if ((await confirmar(`Excluir "${a.name}"?`))) {
                       excluir.mutate(a, { onError: (e) => alert(`Não foi possível excluir: ${(e as Error).message}`) });
                     }
                   }}

@@ -56,7 +56,7 @@ export function EditarDataClienteModal({ item, base, onClose }: Props) {
         {usarAngulosProprios ? (
           <Textarea id="dc-ang" label="Ângulos (um por linha)" value={angulosTxt} onChange={(e) => setAngulosTxt(e.target.value)} />
         ) : (
-          <p className="text-[11px] text-slate-500">Usando os ângulos da Base Mãe{base.angulos.length ? `: ${base.angulos.join(', ')}` : ' (nenhum)'}.</p>
+          <p className="text-xs text-slate-400">Usando os ângulos da Base Mãe{base.angulos.length ? `: ${base.angulos.join(', ')}` : ' (nenhum)'}.</p>
         )}
         <label className="flex items-center gap-2 text-sm text-slate-300">
           <input type="checkbox" checked={visivel} onChange={(e) => setVisivel(e.target.checked)} />

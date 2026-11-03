@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { glassify } from '@/shared/ui/GlassIcon';
 
 type Tema = 'dark' | 'light';
-const CHAVE = 'startip-os:tema';
+const CHAVE = 'startip-os:tema-v2';
 
 function inicial(): Tema {
   try {
     const v = localStorage.getItem(CHAVE);
     if (v === 'light' || v === 'dark') return v;
   } catch { /* privado */ }
-  return 'dark';
+  return 'light';
 }
 
 function aplicar(t: Tema) {

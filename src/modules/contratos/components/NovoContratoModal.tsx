@@ -158,14 +158,14 @@ export function NovoContratoModal({ open, onClose, contrato }: Props) {
               onChange={(e) => setStart(e.target.value)}
               className="mt-1 w-full rounded-md border border-white/10 bg-slate-800 px-3 py-2 text-sm text-slate-100 [color-scheme:dark]"
             />
-            <span className="mt-1 block text-[10px] text-slate-500">Fim: {new Date(endDate).toLocaleDateString('pt-BR')}</span>
+            <span className="mt-1 block text-xs text-slate-400">Fim: {new Date(endDate).toLocaleDateString('pt-BR')}</span>
           </label>
 
           <div className="col-span-full">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-300">Corpo do contrato (editável)</span>
               {templateId && (
-                <button onClick={preencherDoTemplate} className="text-[11px] text-brand-300 hover:underline">
+                <button onClick={preencherDoTemplate} className="text-xs text-brand-300 hover:underline">
                   Preencher do modelo
                 </button>
               )}

@@ -25,6 +25,7 @@ import {
 import { MESES_PT, isoHoje, ultimosMeses, fmtDia } from '../utils';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 const rascunhoKey = (slug: string, data: string) => `otim_rascunho_${slug}_${data}`;
 
@@ -104,7 +105,7 @@ export function OtimizacoesClientePage() {
       >
         <Button variant="secondary" onClick={copiarComoTexto}><GlassIcon name="clipboard" /> Copiar como texto</Button>
         <Button variant="secondary" onClick={exportarPdf}><GlassIcon name="file" /> Exportar PDF</Button>
-        <Button variant="secondary" onClick={() => setMostraLink(true)}><GlassIcon name="link" /> Link do cliente</Button>
+        <Button variant="secondary" onClick={async () => setMostraLink(true)}><GlassIcon name="link" /> Link do cliente</Button>
         <Button onClick={abrirNova}>+ Nova otimização</Button>
       </PageHeader>
 
@@ -154,7 +155,7 @@ export function OtimizacoesClientePage() {
             setEditando(null);
           }}
           onApagar={async (data) => {
-            if (!confirm('Apagar a otimização deste dia?')) return;
+            if (!(await confirmar('Apagar a otimização deste dia?'))) return;
             await apagar.mutateAsync({ cliente_slug: slug, data });
             localStorage.removeItem(rascunhoKey(slug, data));
             setEditando(null);
@@ -177,7 +178,7 @@ export function OtimizacoesClientePage() {
                   <Button onClick={copiarLink}>Copiar link</Button>
                   <a href={linkUrl} target="_blank" rel="noreferrer"><Button variant="secondary">Abrir</Button></a>
                   <Button variant="ghost" onClick={async () => {
-                    if (!confirm('Isso invalida o link atual. Continuar?')) return;
+                    if (!(await confirmar('Isso invalida o link atual. Continuar?'))) return;
                     await gerarLink.mutateAsync({ cliente_slug: slug, rotacionar: true });
                   }}>Rotacionar (invalida o antigo)</Button>
                 </div>
@@ -217,13 +218,13 @@ function BlocoDia({ clienteNome, otim, onEditar }: { clienteNome: string; otim: 
     <Card className="flex gap-4 p-4">
       <div className="flex w-16 shrink-0 flex-col items-center rounded-lg bg-white/5 py-2">
         <span className="text-2xl font-bold text-white leading-none">{dia}</span>
-        <span className="text-[10px] uppercase tracking-wide text-slate-400">{mesAbrev}</span>
-        <span className="mt-1 text-[10px] text-slate-500">{diaSemana}</span>
+        <span className="text-xs uppercase tracking-wide text-slate-400">{mesAbrev}</span>
+        <span className="mt-1 text-xs text-slate-400">{diaSemana}</span>
       </div>
       <div className="min-w-0 flex-1">
         <div className="mb-1.5 flex items-center gap-2">
           <Badge tone="green">otimizada</Badge>
-          <span className="text-[10px] text-slate-500">
+          <span className="text-xs text-slate-400">
             atualizada {new Date(otim.updated_at).toLocaleString('pt-BR')}
           </span>
           <div className="ml-auto flex items-center gap-3">
@@ -295,7 +296,7 @@ function ModalEditar({
 
   const podeSalvar = c.trim().length > 0 && !uploading;
 
-  const escolherArquivos = () => fileRef.current?.click();
+  const escolherArquivos = async () => fileRef.current?.click();
   const enviarArquivos = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setUploading(true);
@@ -315,7 +316,7 @@ function ModalEditar({
   };
 
   const removerAnexo = async (a: Anexo) => {
-    if (!confirm(`Remover ${a.nome}?`)) return;
+    if (!(await confirmar(`Remover ${a.nome}?`))) return;
     try { await removerPrint(a); } catch { /* ignore, ainda tira da lista */ }
     setAnexosLocal((prev) => prev.filter((x) => x.url !== a.url));
   };
@@ -361,7 +362,7 @@ function ModalEditar({
             className="glass-field w-full px-3 py-2 text-sm text-white"
           />
           {existe && (
-            <p className="mt-1 text-[10px] text-slate-500">A data não muda numa edição — pra registrar outro dia, feche e crie uma nova.</p>
+            <p className="mt-1 text-xs text-slate-400">A data não muda numa edição — pra registrar outro dia, feche e crie uma nova.</p>
           )}
         </div>
 
@@ -373,7 +374,7 @@ function ModalEditar({
           onChange={(e) => setC(e.target.value)}
           placeholder="ex: pausei 3 anúncios do conjunto Interesses (CPL alto), escalei o carrossel Black em +30%, criei nova campanha de remarketing com o público 180d..."
         />
-        <p className="text-[10px] text-slate-500"><GlassIcon name="save" /> Rascunho salvo automaticamente enquanto você digita.</p>
+        <p className="text-xs text-slate-400"><GlassIcon name="save" /> Rascunho salvo automaticamente enquanto você digita.</p>
 
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-300">Prints das campanhas</label>

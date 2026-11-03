@@ -38,10 +38,10 @@ export function CarrosselPasta({ pastaId, titulo }: { pastaId: string; titulo: s
 
   return (
     <div className="max-h-[65vh] space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-black/40 p-3">
-      <p className="text-[11px] text-slate-400">{arquivos.length} imagem(ns) do carrossel</p>
+      <p className="text-xs text-slate-400">{arquivos.length} imagem(ns) do carrossel</p>
       {arquivos.map((a, i) => (
         <div key={a.id} className="space-y-1">
-          <span className="text-[11px] text-slate-500">{i + 1}/{arquivos.length}</span>
+          <span className="text-xs text-slate-400">{i + 1}/{arquivos.length}</span>
           <img
             src={miniaturaDrive(a.id)}
             alt={`${titulo} — imagem ${i + 1}`}

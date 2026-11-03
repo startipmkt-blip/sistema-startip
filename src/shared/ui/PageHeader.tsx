@@ -9,12 +9,12 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold text-white">{glassify(title)}</h1>
-        {subtitle && <p className="text-sm text-slate-400">{glassify(subtitle)}</p>}
+    <div className="flex flex-wrap items-end justify-between gap-4 pb-1">
+      <div className="min-w-0">
+        <h1 className="text-xl font-semibold tracking-tight text-white">{glassify(title)}</h1>
+        {subtitle && <p className="mt-0.5 text-sm text-slate-400">{glassify(subtitle)}</p>}
       </div>
-      {children && <div className="flex flex-wrap items-center gap-3">{children}</div>}
+      {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
     </div>
   );
 }

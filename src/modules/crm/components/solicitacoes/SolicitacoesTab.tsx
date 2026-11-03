@@ -96,7 +96,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
       {/* Ranking empresas pendentes */}
       {porEmpresa.length > 0 && (
         <section className="rounded-md border border-white/10 bg-white/[0.02] p-2">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Ranking · empresas com solicitações pendentes</h3>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Ranking · empresas com solicitações pendentes</h3>
           <ul className="flex flex-wrap gap-2">
             {porEmpresa.map((e) => {
               const p = pillarInfo(e.pilar);
@@ -109,7 +109,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                     <span aria-hidden><GlassIcon emoji={p.icone} /></span>
                     <span className="max-w-40 truncate font-medium">{e.nome}</span>
                     <span className="rounded-full bg-red-500/20 px-1.5 text-red-200">{e.n}</span>
-                    <span className="text-[10px] text-slate-500">pendente {tempoAtras(e.maisAntiga)}</span>
+                    <span className="text-xs text-slate-400">pendente {tempoAtras(e.maisAntiga)}</span>
                   </button>
                 </li>
               );
@@ -147,7 +147,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
                         <span aria-hidden><GlassIcon emoji={p.icone} /></span>
                         <span className="truncate font-medium">{s.lead_nome ?? '—'}</span>
                       </button>
-                      {s.pilar && <div className="text-[10px] text-slate-500">{p.label}</div>}
+                      {s.pilar && <div className="text-xs text-slate-400">{p.label}</div>}
                     </td>
                     <td className="p-2 align-top text-slate-200">
                       <div className="whitespace-pre-wrap break-words"><Linkify texto={s.texto} /></div>

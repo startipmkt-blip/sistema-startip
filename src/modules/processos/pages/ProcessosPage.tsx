@@ -21,6 +21,7 @@ import { urlDoArquivo } from '@/shared/lib/storage';
 import type { ProcessoAnexo } from '@/modules/processos/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { Linkify } from '@/shared/ui/Linkify';
+import { confirmar } from '@/shared/ui/ConfirmDialog';
 
 function AnexosList({ anexos }: { anexos: ProcessoAnexo[] }) {
   async function abrir(a: ProcessoAnexo) {
@@ -139,8 +140,8 @@ export function ProcessosPage() {
                     </Button>
                     <Button
                       variant="ghost"
-                      onClick={() => {
-                        if (confirm('Excluir este documento?')) {
+                      onClick={async () => {
+                        if ((await confirmar('Excluir este documento?'))) {
                           excluir.mutate(selecionado.id);
                           setSelecionadoId(null);
                         }

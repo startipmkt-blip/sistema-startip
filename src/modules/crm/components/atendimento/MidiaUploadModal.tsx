@@ -85,7 +85,7 @@ export function MidiaUploadModal({ open, onClose, leadId, tipo, arquivo }: Props
           />
         )}
 
-        <p className="text-[11px] text-slate-500">
+        <p className="text-xs text-slate-400">
           O arquivo é enviado com segurança pelo Supabase Storage antes de ir para o WhatsApp.
         </p>
       </div>
