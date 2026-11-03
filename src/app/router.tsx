@@ -26,6 +26,7 @@ import { UsuariosPage } from '@/modules/usuarios/pages/UsuariosPage';
 import { ContratosPage } from '@/modules/contratos/pages/ContratosPage';
 import { MetaAdsGestorPage } from '@/modules/meta-ads/pages/MetaAdsGestorPage';
 import { TrafegoPage } from '@/modules/trafego/pages/TrafegoPage';
+import { PainelGestorPage } from '@/modules/trafego/pages/PainelGestorPage';
 import { DesignerPage } from '@/modules/designer/pages/DesignerPage';
 import { Navigate } from 'react-router-dom';
 import { MarketplacePublicoPage } from '@/pages/MarketplacePublicoPage';
@@ -115,6 +116,7 @@ export const router = createBrowserRouter([
           { path: 'meta-ads',   element: <RequireModulo modulo="diretoria"><MetaAdsGestorPage /></RequireModulo> },
           { path: 'painel-cliente', element: <Navigate to="/area-cliente" replace /> },
           { path: 'trafego',    element: <RequireModulo modulo="diretoria"><TrafegoPage /></RequireModulo> },
+          { path: 'painel-gestor', element: <RequireModulo modulo="diretoria"><PainelGestorPage /></RequireModulo> },
           { path: 'alertas', element: <RequireModulo modulo="alertas"><AlertasPage /></RequireModulo> },
           { path: 'otimizacoes', element: <RequireModulo modulo="otimizacoes"><OtimizacoesListaPage /></RequireModulo> },
           { path: 'otimizacoes/:slug', element: <RequireModulo modulo="otimizacoes"><OtimizacoesClientePage /></RequireModulo> },

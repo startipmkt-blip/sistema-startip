@@ -1,14 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 // O Painel do Gestor é um sistema à parte (HTML estático + Supabase próprio). Aqui ele aparece embutido,
 // sem sair do OS. O painel só aceita ser embutido a partir deste domínio (ver public/.htaccess dele).
 const PAINEL_URL = (import.meta.env.VITE_PAINEL_URL as string | undefined) ?? 'https://painel.agenciastartip.com.br';
 
-export function AbaPainelGestor() {
+export function AbaPainelGestor({ cheio = false }: { cheio?: boolean } = {}) {
   const [carregou, setCarregou] = useState(false);
-  // ?theme=dark: o OS é sempre escuro; o painel respeita e esconde o botão de tema.
-  const src = `${PAINEL_URL}/?theme=dark#/visao`;
+  const frame = useRef<HTMLIFrameElement>(null);
+  const temaAtual = () => (document.documentElement.classList.contains('light') ? 'light' : 'dark');
+  // O tema do OS vai na URL (primeira carga) e por mensagem quando você troca no botão do OS.
+  const [src] = useState(() => `${PAINEL_URL}/?theme=${temaAtual()}#/visao`);
+
+  useEffect(() => {
+    const avisar = () => frame.current?.contentWindow?.postMessage({ type: 'dg-theme', theme: temaAtual() }, PAINEL_URL);
+    const obs = new MutationObserver(avisar);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
 
   return (
     <div className="relative">
@@ -30,9 +39,10 @@ export function AbaPainelGestor() {
       )}
       <iframe
         title="Painel do Gestor"
+        ref={frame}
         src={src}
         onLoad={() => setCarregou(true)}
-        className="block h-[calc(100vh-150px)] min-h-[560px] w-full border-0 bg-transparent"
+        className={`block min-h-[560px] w-full border-0 bg-transparent ${cheio ? 'h-[calc(100vh-130px)]' : 'h-[calc(100vh-150px)]'}`}
         allow="clipboard-write; fullscreen"
       />
       <p className="px-4 py-2 text-[11px] text-slate-500">

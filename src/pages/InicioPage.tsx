@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { podeAcessarModulo } from '@/shared/auth/permissions';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { BrandMark } from '@/shared/ui/BrandMark';
 
 interface ModuloCard {
   numero: string;
@@ -14,6 +15,7 @@ interface ModuloCard {
 const OPERACIONAL: ModuloCard[] = [
   { numero: '01', label: 'Gestão de Clientes', emoji: '👥', to: '/clientes',           modulo: 'clientes' },
   { numero: '02', label: 'Gestor de Tráfego',  emoji: '🎯', to: '/trafego',            modulo: 'diretoria' },
+  { numero: '16', label: 'Painel do Gestor',   emoji: '📊', to: '/painel-gestor',      modulo: 'diretoria' },
   { numero: '03', label: 'CRM · WhatsApp',     emoji: '💬', to: '/crm',                modulo: 'crm' },
   { numero: '04', label: 'Designer',           emoji: '🎨', to: '/designer',           modulo: 'conteudo' },
   { numero: '05', label: 'Demandas',           emoji: '📋', to: '/demandas',           modulo: 'demandas' },
@@ -71,9 +73,7 @@ export function InicioPage() {
       {/* Coluna esquerda — identidade */}
       <aside className="flex flex-col justify-between gap-6">
         <div>
-          <div className="mb-6 flex h-32 w-32 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
-            <span className="text-4xl"><GlassIcon name="rocket" /></span>
-          </div>
+          <BrandMark sub="" className="mb-6 [&_img]:h-16" />
           <span className="inline-flex rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
             Central de Ferramentas
           </span>
