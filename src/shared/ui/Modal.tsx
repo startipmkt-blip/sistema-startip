@@ -10,21 +10,23 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   size?: 'md' | 'lg' | 'xl' | '2xl' | 'full';
-  // Formulários longos: clique fora e Esc não fecham, só os botões.
+  // Mantido por compatibilidade: agora todo modal (exceto `compacto`) só fecha pelos botões.
   fecharSoPorBotao?: boolean;
+  // Diálogo curto (ex.: confirmação): tamanho de `size` e fecha ao clicar fora/Esc.
+  compacto?: boolean;
   // Sem backdrop-filter: vídeo/iframe dentro de elemento com blur renderiza controles duplicados no celular.
   semBlur?: boolean;
 }
 
 const SIZES = { md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl', '2xl': 'max-w-6xl', full: 'max-w-[95vw]' } as const;
 
-export function Modal({ open, onClose, title, children, footer, size = 'md', fecharSoPorBotao = false, semBlur = false }: ModalProps) {
+export function Modal({ open, onClose, title, children, footer, size = 'md', compacto = false, semBlur = false }: ModalProps) {
   useEffect(() => {
-    if (!open || fecharSoPorBotao) return;
+    if (!open || !compacto) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose, fecharSoPorBotao]);
+  }, [open, onClose, compacto]);
 
   if (!open) return null;
 
@@ -32,11 +34,11 @@ export function Modal({ open, onClose, title, children, footer, size = 'md', fec
   // relativo ao cartão e o modal sai da tela (rodapé com os botões fica cortado).
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${semBlur ? 'bg-slate-950/90' : 'bg-slate-950/70'}`}
-      onClick={fecharSoPorBotao ? undefined : onClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center ${compacto ? 'p-4' : 'p-2'} ${semBlur ? 'bg-slate-950/90' : 'bg-slate-950/70'}`}
+      onClick={compacto ? onClose : undefined}
     >
       <div
-        className={`flex max-h-[92vh] w-full flex-col ${SIZES[size]} overflow-hidden rounded-xl border border-white/10 bg-[#121a24] shadow-pop`}
+        className={`flex w-full flex-col ${compacto ? `max-h-[92vh] ${SIZES[size]}` : 'h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]'} overflow-hidden rounded-xl border border-white/10 bg-[#121a24] shadow-pop`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-3">
@@ -49,7 +51,7 @@ export function Modal({ open, onClose, title, children, footer, size = 'md', fec
             <GlassIcon name="x" />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4"><div className={compacto ? '' : 'mx-auto w-full max-w-[1400px]'}>{children}</div></div>
         {footer && (
           <div className="flex shrink-0 justify-end gap-2 border-t border-white/10 px-5 py-3">
             {footer}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { uploadArquivo, urlDoArquivo, removerArquivo, type BucketId } from '@/shared/lib/storage';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
@@ -39,7 +39,7 @@ export function AnexoUploader({
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function enviar(files: FileList | null) {
+  async function enviar(files: FileList | File[] | null) {
     if (!files || files.length === 0) return;
     setErro(null);
     setEnviando(true);
@@ -61,6 +61,24 @@ export function AnexoUploader({
     }
   }
 
+  // Ctrl+V com print/imagem copiada vira anexo, sem salvar no PC.
+  const enviarRef = useRef(enviar);
+  enviarRef.current = enviar;
+  useEffect(() => {
+    function aoColar(e: ClipboardEvent) {
+      const files = Array.from(e.clipboardData?.files ?? []);
+      if (files.length === 0) return;
+      e.preventDefault();
+      const stamp = new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', 'h');
+      const nomeados = files.map((f, i) => (f.type.startsWith('image/') && /^image\.\w+$/i.test(f.name)
+        ? new File([f], `print-${stamp}${files.length > 1 ? `-${i + 1}` : ''}.${f.type.split('/')[1]?.replace('jpeg', 'jpg') || 'png'}`, { type: f.type })
+        : f));
+      void enviarRef.current(nomeados);
+    }
+    document.addEventListener('paste', aoColar);
+    return () => document.removeEventListener('paste', aoColar);
+  }, []);
+
   async function abrir(a: Anexo) {
     try {
       const url = await urlDoArquivo(bucket, a.path);
@@ -80,7 +98,7 @@ export function AnexoUploader({
   return (
     <div className="space-y-2">
       <label className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-white/15 bg-white/[0.02] px-3 py-2 text-xs text-slate-300 hover:border-brand-400/50 hover:text-slate-100">
-        <span>{glassify(enviando ? '⏳ Enviando…' : '📎 Anexar arquivo (PDF, DOC, imagem)')}</span>
+        <span>{glassify(enviando ? '⏳ Enviando…' : '📎 Anexar arquivo (PDF, DOC, imagem) — ou cole o print com Ctrl+V')}</span>
         <input
           type="file"
           multiple

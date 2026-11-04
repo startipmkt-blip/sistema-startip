@@ -84,7 +84,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             ref={setRef}
             id={id}
             onScroll={aoRolar}
-            className={`glass-field min-h-[96px] px-3 py-2 text-sm transition-colors focus:border-brand-400/60 focus:outline-none focus:ring-1 focus:ring-brand-400/50 ${className}`}
+            className={`glass-field min-h-[200px] resize-y px-3 py-2 text-sm leading-relaxed transition-colors focus:border-brand-400/60 focus:outline-none focus:ring-1 focus:ring-brand-400/50 ${className}`}
             {...props}
           />
           {temLinks && (

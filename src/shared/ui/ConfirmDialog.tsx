@@ -28,7 +28,7 @@ export function ConfirmHost() {
 
   return (
     <Modal
-      open={!!pedido}
+      open={!!pedido} compacto
       onClose={() => responder(false)}
       title="Confirmar"
       footer={
