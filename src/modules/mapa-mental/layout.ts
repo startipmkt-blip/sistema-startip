@@ -39,7 +39,11 @@ export function temDetalhes(no: NoMapa) {
 }
 
 /** Árvore horizontal: raiz à esquerda, filhos empilhados à direita, cada pai centrado nos filhos. */
-export function calcularLayout(nos: NoMapa[]): { caixas: Caixa[]; largura: number; altura: number } {
+export function calcularLayout(
+  nos: NoMapa[],
+  /** Arraste em andamento: soma um deslocamento extra a um nó (e à subárvore dele) antes de gravar. */
+  extra?: { id: string; dx: number; dy: number } | null,
+): { caixas: Caixa[]; largura: number; altura: number; minX: number; minY: number } {
   const filhos = new Map<string | null, NoMapa[]>();
   for (const n of nos) {
     const l = filhos.get(n.pai) ?? [];
@@ -90,9 +94,30 @@ export function calcularLayout(nos: NoMapa[]): { caixas: Caixa[]; largura: numbe
     posicionar(raiz, 0, topo);
     topo += altSub.get(raiz.id)! + 60;
   }
+  // Posição manual: o deslocamento de cada nó vale para ele e para todos os descendentes.
+  const porId = new Map(nos.map((n) => [n.id, n]));
+  const acumulado = new Map<string, { dx: number; dy: number }>();
+  function deslocamento(n: NoMapa): { dx: number; dy: number } {
+    const salvo = acumulado.get(n.id);
+    if (salvo) return salvo;
+    const pai = n.pai ? porId.get(n.pai) : undefined;
+    const base = pai ? deslocamento(pai) : { dx: 0, dy: 0 };
+    const extraAqui = extra && extra.id === n.id ? extra : { dx: 0, dy: 0 };
+    const total = { dx: base.dx + (n.dx ?? 0) + extraAqui.dx, dy: base.dy + (n.dy ?? 0) + extraAqui.dy };
+    acumulado.set(n.id, total);
+    return total;
+  }
+  for (const c of caixas) {
+    const d = deslocamento(c.no);
+    c.x += d.dx;
+    c.y += d.dy;
+  }
+  // Arrastado para a esquerda/cima pode ficar negativo: minX/minY dão os limites reais do desenho.
+  const minX = Math.min(0, ...caixas.map((c) => c.x));
+  const minY = Math.min(0, ...caixas.map((c) => c.y));
   const largura = caixas.reduce((m, c) => Math.max(m, c.x + c.w), 0);
   const alturaTotal = caixas.reduce((m, c) => Math.max(m, c.y + c.h), 0);
-  return { caixas, largura, altura: alturaTotal };
+  return { caixas, largura, altura: alturaTotal, minX, minY };
 }
 
 export function descendentes(nos: NoMapa[], id: string): Set<string> {

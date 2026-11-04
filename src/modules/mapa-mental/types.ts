@@ -23,6 +23,9 @@ export interface NoMapa {
   vinculo: LinkNo | null;
   links: LinkNo[];
   recolhido: boolean;
+  /** Deslocamento manual (arrastar), em px do canvas, somado à posição automática. Os filhos acompanham. */
+  dx?: number;
+  dy?: number;
 }
 
 export interface DadosMapa {

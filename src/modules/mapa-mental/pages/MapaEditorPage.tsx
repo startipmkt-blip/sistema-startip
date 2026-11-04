@@ -54,7 +54,14 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
   const arraste = useRef<{ x: number; y: number; vx: number; vy: number } | null>(null);
   const primeiraVez = useRef(true);
 
-  const { caixas, largura, altura } = useMemo(() => calcularLayout(dados.nos), [dados.nos]);
+  // Arraste de um nó em andamento (px do canvas); só vira dado ao soltar.
+  const [arrasteNo, setArrasteNo] = useState<{ id: string; dx: number; dy: number } | null>(null);
+  const inicioArrasteNo = useRef<{ id: string; x: number; y: number; zoom: number; movido: boolean } | null>(null);
+  const { caixas, largura: maxX, altura: maxY, minX, minY } = useMemo(() => calcularLayout(dados.nos, arrasteNo), [dados.nos, arrasteNo]);
+  // Tamanho real do desenho (pode haver nós arrastados para coordenadas negativas).
+  const largura = maxX - minX;
+  const altura = maxY - minY;
+  const temPosicaoManual = dados.nos.some((n) => n.dx || n.dy);
   const porId = useMemo(() => new Map(caixas.map((c) => [c.no.id, c])), [caixas]);
   const filhosDe = useCallback((id: string) => dados.nos.filter((n) => n.pai === id), [dados.nos]);
 
@@ -141,8 +148,8 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
     if (!el || caixas.length === 0) return;
     const r = el.getBoundingClientRect();
     const zoom = Math.min(1.2, Math.max(ZOOM_MIN, Math.min((r.width - 120) / Math.max(largura, 1), (r.height - 140) / Math.max(altura, 1))));
-    setVista({ zoom, x: (r.width - largura * zoom) / 2, y: (r.height - altura * zoom) / 2 });
-  }, [caixas.length, largura, altura]);
+    setVista({ zoom, x: (r.width - largura * zoom) / 2 - minX * zoom, y: (r.height - altura * zoom) / 2 - minY * zoom });
+  }, [caixas.length, largura, altura, minX, minY]);
 
   useEffect(() => { ajustar(); // centraliza na abertura
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -180,6 +187,45 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
     el.addEventListener('wheel', rodar, { passive: false });
     return () => el.removeEventListener('wheel', rodar);
   }, []);
+
+  // ---------- Arrastar nós ----------
+  function comecarArrasteNo(e: React.PointerEvent, no: NoMapa) {
+    if (e.button !== 0 || editando === no.id) return;
+    if ((e.target as HTMLElement).closest('button, a, textarea, input')) return;
+    inicioArrasteNo.current = { id: no.id, x: e.clientX, y: e.clientY, zoom: vista.zoom, movido: false };
+  }
+
+  useEffect(() => {
+    function mover(e: PointerEvent) {
+      const a = inicioArrasteNo.current;
+      if (!a) return;
+      const dx = e.clientX - a.x, dy = e.clientY - a.y;
+      if (!a.movido && Math.hypot(dx, dy) < 4) return;
+      a.movido = true;
+      setArrasteNo({ id: a.id, dx: dx / a.zoom, dy: dy / a.zoom });
+    }
+    function soltar(e: PointerEvent) {
+      const a = inicioArrasteNo.current;
+      inicioArrasteNo.current = null;
+      if (!a || !a.movido) { setArrasteNo(null); return; }
+      const dx = (e.clientX - a.x) / a.zoom, dy = (e.clientY - a.y) / a.zoom;
+      mudar((d) => ({ nos: d.nos.map((n) => (n.id === a.id ? { ...n, dx: (n.dx ?? 0) + dx, dy: (n.dy ?? 0) + dy } : n)) }));
+      setArrasteNo(null);
+    }
+    window.addEventListener('pointermove', mover);
+    window.addEventListener('pointerup', soltar);
+    window.addEventListener('pointercancel', soltar);
+    return () => {
+      window.removeEventListener('pointermove', mover);
+      window.removeEventListener('pointerup', soltar);
+      window.removeEventListener('pointercancel', soltar);
+    };
+  }, [mudar]);
+
+  function reorganizar() {
+    mudar((d) => ({ nos: d.nos.map((n) => ({ ...n, dx: 0, dy: 0 })) }));
+    setTimeout(ajustar, 0);
+  }
 
   // ---------- Teclado ----------
   function teclado(e: React.KeyboardEvent) {
@@ -286,9 +332,9 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
               <div
                 key={n.id}
                 data-no
-                onPointerDown={(e) => { e.stopPropagation(); setSelecionado(n.id); area.current?.focus(); }}
+                onPointerDown={(e) => { e.stopPropagation(); setSelecionado(n.id); area.current?.focus(); comecarArrasteNo(e, n); }}
                 onDoubleClick={() => iniciarEdicao(n)}
-                className={`no-mapa absolute select-none border shadow-sm transition-shadow ${sel ? 'ring-2 ring-brand-400 ring-offset-1' : ''} ${achado ? 'ring-2 ring-amber-400' : ''}`}
+                className={`no-mapa absolute select-none border shadow-sm transition-shadow ${editando === n.id ? 'cursor-text' : arrasteNo?.id === n.id ? 'z-10 cursor-grabbing shadow-pop' : 'cursor-grab'} ${sel ? 'ring-2 ring-brand-400 ring-offset-1' : ''} ${achado ? 'ring-2 ring-amber-400' : ''}`}
                 style={{
                   left: c.x, top: c.y, width: c.w, minHeight: c.h, borderRadius: Math.min(RAIO[n.formato], c.h / 2),
                   backgroundColor: n.cor, borderColor: n.cor === '#ffffff' ? '#dbe3ea' : n.cor,
@@ -386,6 +432,9 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
               className="campo-form w-40 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs text-slate-100 focus:outline-none"
             />
           )}
+          <button type="button" onClick={reorganizar} disabled={!temPosicaoManual} className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 disabled:opacity-40" title="Reorganizar automaticamente (desfaz as posições arrastadas)" aria-label="Reorganizar automaticamente">
+            <GlassIcon name="refresh" className="h-4 w-4" />
+          </button>
           <span className="px-1.5 text-xs text-slate-400">{busca !== null && termo ? `${achados.length} achados` : `${totalNos} nós`}</span>
         </div>
 
@@ -408,13 +457,13 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
           onPointerDown={(e) => {
             e.stopPropagation();
             const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-            const mx = (e.clientX - r.left - 8) / escalaMini, my = (e.clientY - r.top - 8) / escalaMini;
+            const mx = (e.clientX - r.left - 8) / escalaMini + minX, my = (e.clientY - r.top - 8) / escalaMini + minY;
             setVista((v) => ({ ...v, x: tamArea.w / 2 - mx * v.zoom, y: tamArea.h / 2 - my * v.zoom }));
           }}
           title="Clique para ir até esse ponto"
         >
           <svg width={MINI_W} height={MINI_H}>
-            <g transform={`translate(8,8) scale(${escalaMini})`}>
+            <g transform={`translate(8,8) scale(${escalaMini}) translate(${-minX},${-minY})`}>
               {caixas.map((c) => (
                 <rect key={c.no.id} x={c.x} y={c.y} width={c.w} height={c.h} rx={8} fill={c.no.cor === '#ffffff' ? '#9ccbea' : c.no.cor} />
               ))}
@@ -443,7 +492,7 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
       </div>
 
       <p className="text-xs text-slate-400">
-        Atalhos: <kbd>Tab</kbd> novo filho · <kbd>Enter</kbd> novo irmão · <kbd>F2</kbd> ou duplo clique edita · <kbd>Del</kbd> exclui · <kbd>Ctrl+Z</kbd> desfaz · Ctrl + rolagem dá zoom, arraste o fundo para mover.
+        Atalhos: <kbd>Tab</kbd> novo filho · <kbd>Enter</kbd> novo irmão · <kbd>F2</kbd> ou duplo clique edita · <kbd>Del</kbd> exclui · <kbd>Ctrl+Z</kbd> desfaz · arraste um card para mudar ele de lugar (os filhos vão junto) · Ctrl + rolagem dá zoom, arraste o fundo para mover a tela.
       </p>
 
       {roteiroDe && (
