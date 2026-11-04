@@ -224,7 +224,7 @@ function LinhaCliente({
     <li className="flex flex-wrap items-center gap-2 py-2.5">
       <div className="flex w-52 items-center gap-2">
         {cliente.logo_url
-          ? <LogoCliente src={cliente.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
+          ? <LogoCliente src={cliente.logo_url} alt="" className="h-6 w-auto min-w-[1.5rem] max-w-[4rem] shrink-0 rounded-md border border-white/10 object-contain p-0.5" />
           : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-xs"><GlassIcon name="building" /></span>}
         <span className="truncate text-sm text-slate-100">{cliente.nome}</span>
       </div>

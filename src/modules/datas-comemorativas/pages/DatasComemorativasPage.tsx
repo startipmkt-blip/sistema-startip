@@ -108,7 +108,7 @@ export function DatasComemorativasPage() {
                   }`}
                 >
                   {c.logo_url
-                    ? <LogoCliente src={c.logo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover" />
+                    ? <LogoCliente src={c.logo_url} alt="" className="h-6 w-auto min-w-[1.5rem] max-w-[4rem] shrink-0 rounded-md border border-white/10 object-contain p-0.5" />
                     : <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-xs"><GlassIcon name="building" /></span>}
                   <span className="truncate">{c.nome}</span>
                 </button>

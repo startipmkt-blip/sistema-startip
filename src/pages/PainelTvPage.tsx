@@ -238,7 +238,7 @@ function CardUrgente({ posicao, nome, motivo, logo }: { posicao: number; nome: s
       </div>
       <div className="flex items-center gap-[1rem]">
         {logo
-          ? <LogoCliente src={logo} alt="" className="h-[4rem] w-[4rem] shrink-0 rounded-full border border-white/20 object-cover" />
+          ? <LogoCliente src={logo} alt="" className="h-[4rem] w-[4rem] shrink-0 rounded-xl border border-white/20 object-contain p-1" />
           : <span className="flex h-[4rem] w-[4rem] shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[1.5rem] font-bold">{iniciais(nome)}</span>}
         <h3 className="line-clamp-2 min-w-0 text-[1.85rem] font-bold leading-tight [overflow-wrap:anywhere]">{nome}</h3>
       </div>

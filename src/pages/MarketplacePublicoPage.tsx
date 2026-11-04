@@ -104,7 +104,7 @@ export function MarketplacePublicoPage() {
               <Card key={e.cliente_id} className="flex flex-col p-4">
                 <div className="mb-3 flex items-start gap-3">
                   {e.logo_url ? (
-                    <LogoCliente src={e.logo_url} alt="" className="h-12 w-12 rounded-lg border border-white/10 object-cover" />
+                    <LogoCliente src={e.logo_url} alt="" className="h-12 w-12 rounded-lg border border-white/10 object-contain p-1" />
                   ) : (
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-500/15 text-lg text-brand-300"><GlassIcon name="building" /></div>
                   )}

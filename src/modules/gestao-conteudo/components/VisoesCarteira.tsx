@@ -23,9 +23,9 @@ interface BaseProps {
   onAbrir: (clienteId: string) => void;
 }
 
-function Logo({ c, tam = 'h-9 w-9' }: { c: ClienteGestao; tam?: string }) {
+function Logo({ c, tam = 'h-10 w-auto min-w-[2.5rem] max-w-[6rem]' }: { c: ClienteGestao; tam?: string }) {
   return c.logo_url
-    ? <LogoCliente src={c.logo_url} alt="" className={`${tam} shrink-0 rounded-full object-cover`} />
+    ? <LogoCliente src={c.logo_url} alt="" className={`${tam} shrink-0 rounded-md border border-white/10 object-contain p-0.5`} />
     : <span className={`${tam} grid shrink-0 place-items-center rounded-full bg-white/5`}><GlassIcon name="building" /></span>;
 }
 

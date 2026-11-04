@@ -113,7 +113,7 @@ ${d.briefing ?? ''}`;
       <p className="text-sm leading-snug text-slate-100 line-clamp-3">{d.titulo}</p>
       {d.cliente_nome && (
         <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-          {d.cliente_logo && <LogoCliente src={d.cliente_logo} alt="" className="h-4 w-4 shrink-0 rounded-full object-cover" />}
+          {d.cliente_logo && <LogoCliente src={d.cliente_logo} alt="" className="h-4 w-4 shrink-0 rounded-sm object-contain" />}
           <span className="truncate">{d.cliente_nome}</span>
         </p>
       )}

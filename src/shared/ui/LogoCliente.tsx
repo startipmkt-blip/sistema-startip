@@ -60,6 +60,6 @@ function useFundoLogo(src: string | undefined): Fundo {
 /** Logo do cliente: logo clara ganha fundo preto, logo escura ganha fundo branco. */
 export function LogoCliente({ src, className = '', alt = '', ...props }: ImgHTMLAttributes<HTMLImageElement>) {
   const fundo = useFundoLogo(src);
-  const bg = fundo === 'preto' ? 'bg-black' : fundo === 'branco' ? 'bg-white' : '';
+  const bg = fundo === 'preto' ? 'bg-black' : 'bg-white';
   return <img src={src} alt={alt} className={`${className} ${bg}`} {...props} />;
 }

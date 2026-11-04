@@ -219,7 +219,7 @@ export function SemanaAtual({ clientes, onAbrir }: Props) {
                       <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(12rem,1fr)_minmax(0,2fr)_minmax(12rem,1fr)] lg:items-start">
                         <div className="flex min-w-0 items-center gap-3">
                           {c.logo_url
-                            ? <LogoCliente src={c.logo_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />
+                            ? <LogoCliente src={c.logo_url} alt="" className="h-9 w-auto min-w-[2.25rem] max-w-[5.5rem] shrink-0 rounded-md border border-white/10 object-contain p-0.5" />
                             : <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5"><GlassIcon name="building" /></span>}
                           <div className="min-w-0">
                             <p className="truncate text-sm font-semibold text-white">{c.nome}</p>

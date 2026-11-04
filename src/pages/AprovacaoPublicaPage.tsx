@@ -205,7 +205,7 @@ Se algum precisar de ajuste, use "Não aprovado" nele antes.`)) return;
     <div className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto max-w-4xl space-y-6">
         <header className="text-center">
-          {c.logo_url && <LogoCliente src={c.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-full border border-white/10 object-cover" />}
+          {c.logo_url && <LogoCliente src={c.logo_url} alt="" className="mx-auto mb-3 h-16 w-16 rounded-xl border border-white/10 object-contain p-1" />}
           <h1 className="text-2xl font-semibold text-white">{c.nome}</h1>
           <p className="mt-1 text-xs text-slate-400">{criativos ? 'Aprovação de Criativos · Tráfego pago · Startip' : 'Aprovação de Conteúdo · Startip'}</p>
         </header>
