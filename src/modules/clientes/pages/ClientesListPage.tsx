@@ -98,7 +98,7 @@ export function ClientesListPage() {
                   {cliente.logo_url ? (
                     <LogoCliente src={cliente.logo_url} alt="" className="h-11 w-11 rounded-xl border border-white/10 object-cover" />
                   ) : (
-                    <div className="logo-iniciais flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 font-display text-sm font-bold text-white">
+                    <div className="logo-iniciais flex h-11 w-11 items-center justify-center rounded-xl bg-[#0e1a24] font-display text-sm font-bold text-[#ffffff]">
                       {iniciais(cliente.nome)}
                     </div>
                   )}
