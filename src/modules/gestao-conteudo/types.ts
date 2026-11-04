@@ -69,7 +69,7 @@ export const CONFIG_PADRAO: ConfigGestao = {
 
 export type Visao = 'carteira' | 'tabela' | 'semana';
 
-export type AbaGestao = 'conteudos' | 'semana' | 'ideias' | 'datas' | 'criativos';
+export type AbaGestao = 'conteudos' | 'semana' | 'inspiracoes' | 'ideias' | 'roteiros' | 'datas' | 'criativos';
 
 // ---------- Ideias de conteúdo (aprovação antes da produção) ----------
 export type StatusIdeia = 'rascunho' | 'enviada' | 'aprovada' | 'reprovada';

@@ -20,6 +20,7 @@ import { CriativosAba } from '@/modules/gestao-conteudo/components/CriativosAba'
 import { ConfigModal } from '@/modules/gestao-conteudo/components/ConfigModal';
 import { AgendaSemana, VisaoCarteira, VisaoTabela } from '@/modules/gestao-conteudo/components/VisoesCarteira';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
+import { InspiracoesAba } from '@/modules/gestao-conteudo/inspiracoes/InspiracoesAba';
 
 const VISOES: { id: Visao; label: string }[] = [
   { id: 'carteira', label: '🗂️ Carteira' },
@@ -30,7 +31,9 @@ const VISOES: { id: Visao; label: string }[] = [
 const ABAS: { id: AbaGestao; label: string }[] = [
   { id: 'conteudos', label: '🎬 Conteúdos' },
   { id: 'semana',    label: '📌 Semana atual' },
-  { id: 'ideias',    label: '💡 Aprovação de ideias' },
+  { id: 'inspiracoes', label: '💡 Inspirações' },
+  { id: 'ideias',    label: '📅 Linha editorial' },
+  { id: 'roteiros',  label: '🎬 Roteiros' },
   { id: 'datas',     label: '🎉 Datas comemorativas' },
   { id: 'criativos', label: '🎯 Criativos (tráfego pago)' },
 ];
@@ -44,7 +47,8 @@ export function GestaoConteudoPage() {
   const visao = (params.get('visao') as Visao | null) ?? 'carteira';
   const etapaFiltro = (params.get('etapa') as Etapa | null) ?? '';
   const abaParam = params.get('aba');
-  const aba: AbaGestao = abaParam === 'ideias' || abaParam === 'datas' || abaParam === 'semana' || abaParam === 'criativos' ? abaParam : 'conteudos';
+  const ABAS_VALIDAS: AbaGestao[] = ['semana', 'inspiracoes', 'ideias', 'roteiros', 'datas', 'criativos'];
+  const aba: AbaGestao = ABAS_VALIDAS.includes(abaParam as AbaGestao) ? (abaParam as AbaGestao) : 'conteudos';
 
   function atualizar(mudancas: Record<string, string | null>) {
     const p = new URLSearchParams(params);
@@ -82,7 +86,7 @@ export function GestaoConteudoPage() {
         title="🗂️ Gestão de Conteúdo"
         subtitle="Acompanhe, por cliente e por mês, o que está em edição, em aprovação, aprovado e programado."
       >
-        {aba !== 'datas' && aba !== 'semana' && (
+        {aba !== 'datas' && aba !== 'semana' && aba !== 'inspiracoes' && (
           <div className="flex items-center gap-1">
             <Button variant="secondary" onClick={() => atualizar({ mes: deslocarMes(mes, -1) })}>←</Button>
             <span className="min-w-[10rem] text-center text-sm font-medium capitalize text-slate-100">{mesLabel(mes)}</span>
@@ -110,7 +114,7 @@ export function GestaoConteudoPage() {
         ))}
       </div>
 
-      {aba !== 'datas' && aba !== 'criativos' && (
+      {aba !== 'datas' && aba !== 'criativos' && aba !== 'inspiracoes' && aba !== 'roteiros' && (
         cliente ? (
           <PautasCliente key={cliente.id} clienteId={cliente.id} clienteNome={cliente.nome} />
         ) : (
@@ -121,6 +125,10 @@ export function GestaoConteudoPage() {
       )}
 
       {aba === 'datas' && <DatasComemorativasPage />}
+
+      {aba === 'inspiracoes' && (
+        <InspiracoesAba clientes={clientes} clienteId={clienteId} onCliente={(id) => atualizar({ cliente: id })} />
+      )}
 
       {aba === 'criativos' && (
         <CriativosAba
