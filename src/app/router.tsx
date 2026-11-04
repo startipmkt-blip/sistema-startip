@@ -17,6 +17,8 @@ import { CrmPage } from '@/modules/crm/pages/CrmPage';
 import { FinanceiroPage } from '@/modules/financeiro/pages/FinanceiroPage';
 import { AreaClientePage } from '@/modules/area-cliente/pages/AreaClientePage';
 import { ProcessosPage } from '@/modules/processos/pages/ProcessosPage';
+import { MapasPage } from '@/modules/mapa-mental/pages/MapasPage';
+import { MapaEditorPage } from '@/modules/mapa-mental/pages/MapaEditorPage';
 import { IndicacaoPage } from '@/modules/indicacao/pages/IndicacaoPage';
 import { OnboardingPage } from '@/modules/onboarding/pages/OnboardingPage';
 import { DemandasPage } from '@/modules/demandas/pages/DemandasPage';
@@ -101,6 +103,8 @@ export const router = criarRouter([
           { path: 'financeiro', element: <RequireModulo modulo="financeiro"><FinanceiroPage /></RequireModulo> },
           { path: 'area-cliente', element: <RequireModulo modulo="area-cliente"><AreaClientePage /></RequireModulo> },
           { path: 'processos', element: <RequireModulo modulo="processos"><ProcessosPage /></RequireModulo> },
+          { path: 'mapa-mental', element: <RequireModulo modulo="mapa-mental"><MapasPage /></RequireModulo> },
+          { path: 'mapa-mental/:id', element: <RequireModulo modulo="mapa-mental"><MapaEditorPage /></RequireModulo> },
           { path: 'indicacao', element: <RequireModulo modulo="indicacao"><IndicacaoPage /></RequireModulo> },
           { path: 'onboarding', element: <RequireModulo modulo="onboarding"><OnboardingPage /></RequireModulo> },
           { path: 'designer', element: <RequireModulo modulo="conteudo"><DesignerPage /></RequireModulo> },

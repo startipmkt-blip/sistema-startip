@@ -19,6 +19,7 @@ export const MODULOS: ModuloInfo[] = [
   { key: 'financeiro', label: 'Financeiro' },
   { key: 'area-cliente', label: 'Área do Cliente' },
   { key: 'processos', label: 'Processos' },
+  { key: 'mapa-mental', label: 'Mapa Mental' },
   { key: 'indicacao', label: 'Indicação' },
   { key: 'onboarding', label: 'Onboarding' },
   { key: 'conteudo', label: 'Conteúdo' },

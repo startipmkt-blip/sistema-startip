@@ -48,6 +48,7 @@ export const navGrupos: NavGrupo[] = [
       { label: 'Ideias/Anotações', to: '/ideias', icon: 'lightbulb', comingSoon: false },
       { label: 'Ideias de Stories', to: '/stories', icon: 'smartphone', comingSoon: false },
       { label: 'Processos', to: '/processos', icon: 'processos', comingSoon: false },
+      { label: 'Mapa Mental', to: '/mapa-mental', icon: 'mindmap', comingSoon: false },
     ],
   },
   {
