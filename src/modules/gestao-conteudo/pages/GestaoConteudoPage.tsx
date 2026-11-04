@@ -21,6 +21,7 @@ import { ConfigModal } from '@/modules/gestao-conteudo/components/ConfigModal';
 import { AgendaSemana, VisaoCarteira, VisaoTabela } from '@/modules/gestao-conteudo/components/VisoesCarteira';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 import { InspiracoesAba } from '@/modules/gestao-conteudo/inspiracoes/InspiracoesAba';
+import { RoteirosAba } from '@/modules/gestao-conteudo/roteiros/RoteirosAba';
 
 const VISOES: { id: Visao; label: string }[] = [
   { id: 'carteira', label: '🗂️ Carteira' },
@@ -125,6 +126,10 @@ export function GestaoConteudoPage() {
       )}
 
       {aba === 'datas' && <DatasComemorativasPage />}
+
+      {aba === 'roteiros' && (
+        <RoteirosAba clientes={clientes} clienteId={clienteId} mes={mes} onCliente={(id) => atualizar({ cliente: id })} />
+      )}
 
       {aba === 'inspiracoes' && (
         <InspiracoesAba clientes={clientes} clienteId={clienteId} onCliente={(id) => atualizar({ cliente: id })} />

@@ -201,10 +201,10 @@ export function LinhaEditorial({ cliente, mes, ideias }: Props) {
                       draggable
                       onDragStart={(e) => { setArrastando(i.id); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', i.id); }}
                       onDragEnd={() => { setArrastando(null); setAlvo(null); }}
-                      className={`item-editorial group cursor-grab rounded-xl border border-l-[3px] bg-white/[0.04] p-3 active:cursor-grabbing ${
+                      className={`item-editorial group relative cursor-grab overflow-hidden rounded-xl border bg-white/[0.04] p-3 pl-4 active:cursor-grabbing ${
                         marcada ? 'border-brand-400' : 'border-white/10'} ${arrastando === i.id ? 'opacity-40' : ''}`}
-                      style={{ borderLeftColor: pilar?.cor ?? '#94a3b8' }}
                     >
+                      <span className="absolute inset-y-0 left-0 w-[3px]" style={{ backgroundColor: pilar?.cor ?? '#94a3b8' }} aria-hidden />
                       <div className="flex items-start gap-1.5">
                         <span className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${formato.cls}`}>
                           <GlassIcon name={formato.icone} className="h-3 w-3" /> {formato.label}
