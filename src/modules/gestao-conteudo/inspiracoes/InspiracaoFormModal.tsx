@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { CapaUpload } from '@/shared/ui/form/CapaUpload';
-import { AreaTexto, Campo, Escolha, JanelaFormulario, Secao, Texto } from '@/shared/ui/form/FormKit';
+import { Campo, Escolha, JanelaFormulario, Secao, Texto } from '@/shared/ui/form/FormKit';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import {
   FORMATOS_INSPIRACAO, ORIGENS_INSPIRACAO, inspiracoes,
   type FormatoInspiracao, type Inspiracao, type OrigemInspiracao,
 } from './inspiracoesApi';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   onClose: () => void;
@@ -118,10 +119,10 @@ export function InspiracaoFormModal({ onClose, inspiracao, clientes, clienteInic
 
       <Secao icone="lightbulb" titulo="Contexto" subtitulo="Descreva e explique como aplicar">
         <Campo label="Descrição / Contexto">
-          <AreaTexto placeholder="O que é, por que é relevante..." value={form.descricao} onChange={(e) => set('descricao', e.target.value)} />
+          <EditorRico placeholder="O que é, por que é relevante..." value={form.descricao} onChange={(v) => set('descricao', v)} />
         </Campo>
         <Campo label="Insights / Como aplicar">
-          <AreaTexto placeholder="Como podemos adaptar isso para o cliente?" value={form.insights} onChange={(e) => set('insights', e.target.value)} />
+          <EditorRico placeholder="Como podemos adaptar isso para o cliente?" value={form.insights} onChange={(v) => set('insights', v)} />
         </Campo>
         <Campo label="Tags (separadas por vírgula)">
           <Texto placeholder="reels, transição, viral, autoridade..." value={form.tags} onChange={(e) => set('tags', e.target.value)} />

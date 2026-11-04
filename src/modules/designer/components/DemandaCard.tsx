@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 import { diasEntre, hojeLocal, labelMes, mesDaSemana } from '../lib/periodo';
 import {
   PRIORIDADES, TIPO_LABEL, TIPO_LABEL_CRIATIVO, formatarDuracao, segundosAberto,
@@ -78,7 +79,7 @@ ${d.briefing ?? ''}`;
   if (audios > 0) material.push({ chave: 'audio', texto: audios === 1 ? 'Áudio' : `${audios} áudios`, icone: 'mic' });
   if (arquivos > 0) material.push({ chave: 'arq', texto: arquivos === 1 ? '1 arquivo' : `${arquivos} arquivos`, icone: 'paperclip' });
   const reprovada = reprovadaPeloCliente(d);
-  const obsAlteracao = (d.alteracao_obs ?? '').trim();
+  const obsAlteracao = textoPuro(d.alteracao_obs).trim();
   const emRevisao = d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento';
   // Em Alteração sem nenhum texto (nem do cliente nem da equipe): a barra pede para descrever.
   const faltaDescrever = d.status === 'alteracao' && !obsAlteracao && !reprovada;

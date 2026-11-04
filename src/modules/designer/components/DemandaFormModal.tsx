@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  AreaTexto, Campo, Chips, Escolha, JanelaFormulario, OpcoesCartao, Rotulo, SeletorPrioridade, Texto,
+  Campo, Chips, Escolha, JanelaFormulario, OpcoesCartao, Rotulo, SeletorPrioridade, Texto,
 } from '@/shared/ui/form/FormKit';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
@@ -17,6 +17,7 @@ import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { opcoesDeSemana } from '../lib/periodo';
 import { RENOVACAO_OPTIONS, type Renovacao } from '@/modules/demandas/lib/renovacao';
 import { confirmar } from '@/shared/ui/ConfirmDialog';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   open: boolean;
@@ -209,11 +210,11 @@ ${r.cronometroErro}`);
 
       {(status === 'alteracao' || ((status === 'a_fazer' || status === 'em_andamento') && alteracaoObs.trim())) && (
         <Campo label="Alteração: o que precisa ser alterado" caixaAlta>
-          <AreaTexto
-            className="!border-red-500/50"
+          <EditorRico
+            linhas={3}
             placeholder="Descreva o que deve mudar neste conteúdo (texto, corte, música, cor…). O designer vê isso em vermelho no cartão."
             value={alteracaoObs}
-            onChange={(e) => setAlteracaoObs(e.target.value)}
+            onChange={setAlteracaoObs}
           />
         </Campo>
       )}
@@ -223,11 +224,11 @@ ${r.cronometroErro}`);
       </Campo>
 
       <Campo label="Descrição" caixaAlta>
-        <AreaTexto placeholder="O que é a demanda, em poucas linhas." value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+        <EditorRico linhas={3} placeholder="O que é a demanda, em poucas linhas." value={descricao} onChange={setDescricao} />
       </Campo>
 
       <Campo label="Briefing" caixaAlta>
-        <AreaTexto rows={4} placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar." value={briefing} onChange={(e) => setBriefing(e.target.value)} />
+        <EditorRico linhas={4} placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar." value={briefing} onChange={setBriefing} />
       </Campo>
 
       <Campo label="Cliente" caixaAlta>

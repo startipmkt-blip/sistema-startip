@@ -4,7 +4,6 @@ import { Button } from '@/shared/ui/Button';
 import { Badge } from '@/shared/ui/Badge';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
-import { Textarea } from '@/shared/ui/Textarea';
 import { Modal } from '@/shared/ui/Modal';
 import { Spinner } from '@/shared/ui/Spinner';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
@@ -19,6 +18,8 @@ import { FORMATO_OPCOES, mesLabel } from '@/modules/gestao-conteudo/types';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
 import { chaveMes, mesAnteriorProximo } from '@/modules/designer/lib/periodo';
 import { confirmar } from '@/shared/ui/ConfirmDialog';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 const FORMATO_LABEL: Record<string, string> = Object.fromEntries(FORMATO_OPCOES.map((f) => [f.value, f.label]));
 const VAZIO: IdeiaBancoForm = { titulo: '', descricao: '', formato: 'estatico', anexos: [] };
@@ -68,8 +69,10 @@ function FormIdeia({ clienteId, ideia, onClose }: { clienteId: string; ideia?: I
         {erro && <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{erro}</p>}
         <Input label="Título da ideia *" value={form.titulo} autoFocus
           onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} />
-        <Textarea label="Explique a ideia" rows={5} value={form.descricao}
-          onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))} />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-slate-300">Explique a ideia</span>
+          <EditorRico linhas={5} value={form.descricao} onChange={(v) => setForm((f) => ({ ...f, descricao: v }))} />
+        </div>
         <Select label="Formato" value={form.formato} options={FORMATO_OPCOES}
           onChange={(e) => setForm((f) => ({ ...f, formato: e.target.value as IdeiaBancoForm['formato'] }))} />
         <div>
@@ -162,7 +165,7 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
         <p className="text-sm font-medium text-slate-100">{i.titulo}</p>
         <p className="text-xs text-slate-400">{FORMATO_LABEL[i.formato] ?? i.formato}</p>
       </div>
-      {i.descricao && <p className="line-clamp-4 whitespace-pre-line text-xs text-slate-300"><Linkify texto={i.descricao} /></p>}
+      {i.descricao && <p className="line-clamp-4 whitespace-pre-line text-xs text-slate-300"><Linkify texto={textoPuro(i.descricao)} /></p>}
       {(i.anexos ?? []).length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {i.anexos.slice(0, 4).map((a) => <MiniaturaAnexo key={a.path} anexo={a} className="h-12 w-12" />)}

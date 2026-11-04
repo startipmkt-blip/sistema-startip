@@ -18,6 +18,8 @@ import { confirmar } from '@/shared/ui/ConfirmDialog';
 import { ImagemCapa } from '@/shared/ui/form/CapaUpload';
 import { JanelaFormulario, SubtituloForm } from '@/shared/ui/form/FormKit';
 import { GerenciarCategorias } from '@/shared/ui/form/GerenciarCategorias';
+import { TextoRico } from '@/shared/ui/texto-rico/TextoRico';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 const SEM_CATEGORIA = '__sem__';
 
@@ -75,7 +77,7 @@ function VisualizarPop({ doc, categoria, onClose, onEditar, onExcluir }: {
       {(doc.objetivo || doc.quando_utilizar || papeis.some(([, v]) => v)) && (
         <>
           <SubtituloForm icone="target" titulo="Objetivo e Contexto" />
-          {doc.objetivo && <p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={doc.objetivo} /></p>}
+          {doc.objetivo && <TextoRico texto={doc.objetivo} className="text-sm text-slate-200" />}
           <div className="grid gap-2 sm:grid-cols-3">
             {papeis.filter(([, v]) => v).map(([k, v]) => (
               <div key={k} className="secao-form rounded-xl border border-white/10 px-3 py-2">
@@ -91,7 +93,7 @@ function VisualizarPop({ doc, categoria, onClose, onEditar, onExcluir }: {
       {(doc.materiais || doc.video_url || (doc.anexos?.length ?? 0) > 0) && (
         <>
           <SubtituloForm icone="wrench" titulo="Recursos" />
-          {doc.materiais && <p className="whitespace-pre-line text-sm text-slate-200"><Linkify texto={doc.materiais} /></p>}
+          {doc.materiais && <TextoRico texto={doc.materiais} className="text-sm text-slate-200" />}
           {doc.video_url && (
             <a href={doc.video_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-300 hover:underline">
               <GlassIcon name="video" className="h-4 w-4" /> Assistir vídeo explicativo
@@ -109,7 +111,7 @@ function VisualizarPop({ doc, categoria, onClose, onEditar, onExcluir }: {
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-300">{i + 1}</span>
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-slate-100">{p.titulo}</div>
-                {p.descricao && <p className="mt-0.5 whitespace-pre-line text-sm text-slate-300"><Linkify texto={p.descricao} /></p>}
+                {p.descricao && <TextoRico texto={p.descricao} className="mt-0.5 text-sm text-slate-300" />}
               </div>
             </li>
           ))}
@@ -155,7 +157,7 @@ export function ProcessosPage() {
   const termo = busca.trim().toLowerCase();
   const visiveis = (docs ?? []).filter((d) =>
     (!filtroCat || (filtroCat === SEM_CATEGORIA ? !d.categoria_id || !catPorId.has(d.categoria_id) : d.categoria_id === filtroCat))
-    && (!termo || `${d.titulo} ${d.objetivo ?? ''} ${d.responsavel ?? ''}`.toLowerCase().includes(termo)));
+    && (!termo || `${d.titulo} ${textoPuro(d.objetivo)} ${d.responsavel ?? ''}`.toLowerCase().includes(termo)));
 
   const grupos = useMemo(() => {
     const lista: { id: string; nome: string; cor: string; docs: ProcessoDoc[] }[] = categorias.map((c) => ({ ...c, docs: [] }));
@@ -241,7 +243,7 @@ export function ProcessosPage() {
                           <span className={`h-1.5 w-1.5 rounded-full ${st.cor}`} /> {st.label} · v{d.versao ?? '1.0'}
                         </div>
                         <h3 className="line-clamp-2 text-sm font-bold text-slate-100">{d.titulo}</h3>
-                        {d.objetivo && <p className="line-clamp-2 text-xs text-slate-400">{d.objetivo}</p>}
+                        {d.objetivo && <p className="line-clamp-2 text-xs text-slate-400">{textoPuro(d.objetivo)}</p>}
                         <div className="mt-auto flex items-center justify-between pt-2 text-xs text-slate-400">
                           <span className="truncate">{d.responsavel || d.autor || 'Sem responsável'}</span>
                           <span className="shrink-0">{passos ? `${passos} passos` : `atualizada ${formatDate(d.updated_at)}`}</span>

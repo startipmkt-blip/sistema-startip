@@ -8,10 +8,12 @@ import type { ConteudoTipo } from '@/modules/conteudo/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { ImagemCapa } from '@/shared/ui/form/CapaUpload';
 import {
-  AreaTexto, Campo, Chips, EditorCenas, Escolha, FORMATOS_CONTEUDO, FUNIL, JanelaFormulario, OpcoesCartao,
+  Campo, Chips, EditorCenas, Escolha, FORMATOS_CONTEUDO, FUNIL, JanelaFormulario, OpcoesCartao,
   PLATAFORMAS, Rotulo, Secao, Texto,
 } from '@/shared/ui/form/FormKit';
 import { GerenciarPilares } from './GerenciarPilares';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
+import { paraHtml } from '@/shared/ui/texto-rico/regras';
 
 interface Props {
   open: boolean;
@@ -64,7 +66,8 @@ export function IdeiaFormModal({ open, onClose, clienteId, mes, ideia, semanaIni
       ...f,
       titulo: i.titulo,
       formato: formatoParaConteudo(i.formato),
-      descricao: [i.descricao, i.link ? `Referência: ${i.link}` : ''].filter(Boolean).join('\n\n'),
+      // Junta o texto (pode ser HTML do editor) com o link sem perder as quebras de linha.
+      descricao: paraHtml(i.descricao) + (i.link ? paraHtml(`Referência: ${i.link}`) : ''),
       como_aplicar: i.insights,
       inspiracao_id: i.id,
     }));
@@ -190,10 +193,10 @@ export function IdeiaFormModal({ open, onClose, clienteId, mes, ideia, semanaIni
 
             <Secao icone="lightbulb" titulo="Briefing" subtitulo="Contexto e orientações para a produção">
               <Campo label="Descrição / Contexto">
-                <AreaTexto placeholder="Breve contexto do item..." value={form.descricao} onChange={(e) => set('descricao', e.target.value)} />
+                <EditorRico placeholder="Breve contexto do item..." value={form.descricao} onChange={(v) => set('descricao', v)} />
               </Campo>
               <Campo label="Como aplicar">
-                <AreaTexto placeholder="Como adaptar / abordagem a usar (vira Ângulo/Abordagem no roteiro)..." value={form.como_aplicar ?? ''} onChange={(e) => set('como_aplicar', e.target.value)} />
+                <EditorRico placeholder="Como adaptar / abordagem a usar (vira Ângulo/Abordagem no roteiro)..." value={form.como_aplicar ?? ''} onChange={(v) => set('como_aplicar', v)} />
               </Campo>
             </Secao>
 

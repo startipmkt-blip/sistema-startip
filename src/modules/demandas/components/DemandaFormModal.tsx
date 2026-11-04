@@ -25,9 +25,10 @@ import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import { confirmar } from '@/shared/ui/ConfirmDialog';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import {
-  AreaTexto, Campo, Chips, Escolha, JanelaFormulario, ListaItens, ListaLinks, OpcoesCartao,
+  Campo, Chips, Escolha, JanelaFormulario, ListaItens, ListaLinks, OpcoesCartao,
   Rotulo, SeletorPrioridade, Texto,
 } from '@/shared/ui/form/FormKit';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   open: boolean;
@@ -283,10 +284,10 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       </Campo>
 
       <Campo label="Descrição" caixaAlta>
-        <AreaTexto
+        <EditorRico
           placeholder="Descreva o que precisa ser feito, contexto, critérios de conclusão..."
           value={form.descricao}
-          onChange={(e) => set('descricao', e.target.value)}
+          onChange={(v) => set('descricao', v)}
         />
       </Campo>
 

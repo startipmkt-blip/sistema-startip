@@ -688,3 +688,20 @@ html.light .janela-fundo.janela-fundo { background-color: rgba(14, 26, 36, 0.45)
 html.light select option,
 html.light select optgroup { background-color: #ffffff !important; color: #0e1a24 !important; }
 html.light select option:checked { background-color: #e6f4fc !important; color: #0b5d8c !important; }
+
+/* ---------- Texto rico (editor e exibição) ---------- */
+.texto-rico h1 { font-size: 1.25em; font-weight: 700; margin: .35em 0 .2em; }
+.texto-rico h2 { font-size: 1.12em; font-weight: 700; margin: .3em 0 .15em; }
+.texto-rico h3 { font-size: 1em; font-weight: 700; margin: .25em 0 .1em; }
+.texto-rico ul { list-style: disc; padding-left: 1.4em; margin: .25em 0; }
+.texto-rico ol { list-style: decimal; padding-left: 1.5em; margin: .25em 0; }
+.texto-rico blockquote { border-left: 3px solid #1e9be0; padding: .1em 0 .1em .75em; margin: .35em 0; opacity: .9; font-style: italic; }
+.texto-rico a { color: #1e9be0; text-decoration: underline; word-break: break-word; }
+.texto-rico b, .texto-rico strong { font-weight: 700; }
+.editor-area:empty::before { content: attr(data-placeholder); color: #64748b; pointer-events: none; }
+html.light .editor-rico { background-color: #ffffff !important; border-color: #dde3ea !important; }
+html.light .editor-rico .barra-editor { background-color: #f7f9fb; border-color: #e3e8ee !important; }
+html.light .editor-rico .editor-area { color: #0e1a24 !important; }
+html.light .editor-rico .barra-editor button[aria-pressed="false"],
+html.light .editor-rico .barra-editor button:not([aria-pressed]),
+html.light .editor-rico .barra-editor select { color: #2b3a47 !important; }

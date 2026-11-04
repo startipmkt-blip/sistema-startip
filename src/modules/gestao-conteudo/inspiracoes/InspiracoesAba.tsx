@@ -12,6 +12,7 @@ import {
   FORMATOS_INSPIRACAO, ORIGENS_INSPIRACAO, inspiracoes, rotuloFormato, rotuloOrigem, type Inspiracao,
 } from './inspiracoesApi';
 import { InspiracaoFormModal } from './InspiracaoFormModal';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 interface Props {
   clientes: ClienteGestao[];
@@ -43,7 +44,7 @@ export function InspiracoesAba({ clientes, clienteId, onCliente }: Props) {
     i.arquivada === (status === 'arquivadas')
     && (!formato || i.formato === formato)
     && (!origem || i.origem === origem)
-    && (!termo || `${i.titulo} ${i.descricao} ${i.insights} ${i.tags.join(' ')}`.toLowerCase().includes(termo)));
+    && (!termo || `${i.titulo} ${textoPuro(i.descricao)} ${textoPuro(i.insights)} ${i.tags.join(' ')}`.toLowerCase().includes(termo)));
   const qtdAtivas = doEscopo.filter((i) => !i.arquivada).length;
   const qtdArquivadas = doEscopo.length - qtdAtivas;
   const filtrando = Boolean(formato || origem || termo);
@@ -149,8 +150,8 @@ export function InspiracoesAba({ clientes, clienteId, onCliente }: Props) {
                   {!clienteId && <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[11px] font-semibold text-slate-300">{i.cliente_id ? nomeCliente.get(i.cliente_id) ?? 'Cliente' : 'Geral'}</span>}
                 </div>
                 <h3 className="text-sm font-bold text-slate-100">{i.titulo}</h3>
-                {i.descricao && <p className="line-clamp-2 text-xs text-slate-400">{i.descricao}</p>}
-                {i.insights && <p className="line-clamp-2 text-xs text-slate-300"><strong>Como aplicar:</strong> {i.insights}</p>}
+                {i.descricao && <p className="line-clamp-2 text-xs text-slate-400">{textoPuro(i.descricao)}</p>}
+                {i.insights && <p className="line-clamp-2 text-xs text-slate-300"><strong>Como aplicar:</strong> {textoPuro(i.insights)}</p>}
                 {i.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1">{i.tags.map((t) => <span key={t} className="text-[11px] text-brand-300">#{t}</span>)}</div>
                 )}

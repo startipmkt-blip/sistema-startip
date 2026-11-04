@@ -10,7 +10,7 @@ import {
   FORMATO_LABEL, OBJETIVO_LABEL, STATUS_LABEL, STATUS_TONE, formatarData, formatarTamanho,
   type Criativo,
 } from '@/modules/ideias/criativos/types';
-import { Linkify } from '@/shared/ui/Linkify';
+import { TextoRico } from '@/shared/ui/texto-rico/TextoRico';
 
 interface Props {
   open: boolean;
@@ -87,7 +87,7 @@ export function CriativoDetalheModal({ open, onClose, criativo, onEditar }: Prop
         </div>
 
         {criativo.descricao && (
-          <Campo rotulo="Descrição"><p className="whitespace-pre-wrap leading-relaxed"><Linkify texto={criativo.descricao} /></p></Campo>
+          <Campo rotulo="Descrição"><TextoRico texto={criativo.descricao} className="leading-relaxed" /></Campo>
         )}
 
         <Campo rotulo="Clientes">

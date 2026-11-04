@@ -1,5 +1,6 @@
 import { mesLabel } from '@/modules/gestao-conteudo/types';
 import type { Roteiro } from './roteirosApi';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 const AUDIO: Record<string, string> = {
   narracao: 'Narração', original: 'Áudio original', musica: 'Música', trend: 'Trend', sem: 'Sem áudio',
@@ -31,9 +32,9 @@ export async function baixarPdfRoteiros(p: {
     linha([p.nomeCliente(r.cliente_id), r.tipo === 'trafego' ? 'Tráfego pago' : 'Orgânico', p.nomePilar(r.pilar_id),
       r.semana === 6 ? 'Conteúdo extra' : `Semana ${r.semana}`, r.status === 'concluido' ? 'Concluído' : 'Pendente'].filter(Boolean).join(' · '), 9, false, true);
     if (r.gatilhos.length) linha(`Gatilhos: ${r.gatilhos.join(', ')}`, 9.5);
-    if (r.descricao) linha(r.descricao, 9.5);
-    if (r.como_aplicar) linha(`Como aplicar: ${r.como_aplicar}`, 9.5);
-    if (r.observacao) linha(`Observação: ${r.observacao}`, 9.5);
+    if (r.descricao) linha(textoPuro(r.descricao), 9.5);
+    if (r.como_aplicar) linha(`Como aplicar: ${textoPuro(r.como_aplicar)}`, 9.5);
+    if (r.observacao) linha(`Observação: ${textoPuro(r.observacao)}`, 9.5);
     r.cenas.forEach((c, i) => {
       linha(`Cena ${i + 1}: ${c.acontece}`, 9.5, true);
       if (c.fala) linha(`Fala: ${c.fala}`, 9.5);

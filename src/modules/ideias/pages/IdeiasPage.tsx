@@ -20,6 +20,7 @@ import type { Ideia, IdeiaImportancia } from '@/modules/ideias/types';
 import { CriativosTab } from '@/modules/ideias/criativos/CriativosTab';
 import { AnotacoesPage } from '@/modules/anotacoes/pages/AnotacoesPage';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 type Ordem = 'recentes' | 'antigas' | 'mais_importantes' | 'menos_importantes';
 
@@ -229,7 +230,7 @@ function BancoDeIdeiasTab({ pills }: { pills: ReactNode }) {
             >
               <h3 className="text-sm font-semibold text-slate-100 line-clamp-2">{ideia.titulo}</h3>
               {ideia.descricao && (
-                <p className="mt-1 text-xs leading-relaxed text-slate-400 line-clamp-2">{ideia.descricao}</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-400 line-clamp-2">{textoPuro(ideia.descricao)}</p>
               )}
               <div className="mt-3 flex flex-wrap gap-1.5">
                 <Badge tone={TIPO_TONE[ideia.tipo]}>{TIPO_LABEL[ideia.tipo]}</Badge>

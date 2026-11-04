@@ -18,6 +18,7 @@ import {
   type Criativo, type CriativoStatus,
 } from './types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 function opts<T extends string>(labels: Record<T, string>, todos: string) {
   return [{ value: '', label: todos }, ...(Object.keys(labels) as T[]).map((k) => ({ value: k, label: labels[k] }))];
@@ -142,7 +143,7 @@ export function CriativosTab({ pills }: { pills: ReactNode }) {
                 <div className="flex gap-3">
                   <div className="min-w-0 flex-1">
                     <h3 className="line-clamp-2 text-sm font-semibold text-slate-100">{c.titulo}</h3>
-                    {c.descricao && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-400">{c.descricao}</p>}
+                    {c.descricao && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-400">{textoPuro(c.descricao)}</p>}
                   </div>
                   {capa && (
                     <div className="relative shrink-0">

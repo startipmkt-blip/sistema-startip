@@ -8,7 +8,8 @@ import {
 } from '@/modules/demandas/recorrentesApi';
 import { RESPONSAVEIS, HORARIOS_FAIXA } from '@/modules/demandas/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
-import { AreaTexto, Campo, Chips, Escolha, JanelaFormulario, Texto } from '@/shared/ui/form/FormKit';
+import { Campo, Chips, Escolha, JanelaFormulario, Texto } from '@/shared/ui/form/FormKit';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   open: boolean;
@@ -78,7 +79,7 @@ export function TarefaRecorrenteModal({ open, onClose, tarefa }: Props) {
         <Texto placeholder="O que precisa ser feito sempre?" value={form.titulo} onChange={(e) => set('titulo', e.target.value)} autoFocus />
       </Campo>
       <Campo label="Descrição" caixaAlta>
-        <AreaTexto placeholder="Detalhes, passo a passo ou links da tarefa…" value={form.descricao} onChange={(e) => set('descricao', e.target.value)} />
+        <EditorRico placeholder="Detalhes, passo a passo ou links da tarefa…" value={form.descricao} onChange={(v) => set('descricao', v)} />
       </Campo>
       <Campo label="Responsáveis" caixaAlta dica="vários">
         <Chips opcoes={RESPONSAVEIS.map((r) => ({ id: r, label: r }))} valores={form.responsaveis} onChange={(v) => set('responsaveis', v)} />

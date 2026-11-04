@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '@/shared/ui/Modal';
 import { Input } from '@/shared/ui/Input';
-import { Textarea } from '@/shared/ui/Textarea';
 import { Button } from '@/shared/ui/Button';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useSalvarIdeia, useExcluirIdeia, hoje } from '@/modules/ideias/api/ideiasApi';
 import type { Ideia, IdeiaT, IdeiaImportancia, IdeiaAutor } from '@/modules/ideias/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   open: boolean;
@@ -138,13 +138,10 @@ export function IdeiaFormModal({ open, onClose, ideia }: Props) {
           autoFocus
         />
 
-        <Textarea
-          label="Descrição"
-          placeholder="Explique melhor a ideia..."
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          rows={3}
-        />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-slate-300">Descrição</span>
+          <EditorRico linhas={3} placeholder="Explique melhor a ideia..." value={descricao} onChange={setDescricao} />
+        </div>
 
         {/* Tipo */}
         <div>

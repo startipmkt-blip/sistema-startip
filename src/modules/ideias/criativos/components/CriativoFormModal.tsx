@@ -3,7 +3,6 @@ import { Modal } from '@/shared/ui/Modal';
 import { Button } from '@/shared/ui/Button';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
-import { Textarea } from '@/shared/ui/Textarea';
 import { IMPORTANCIA_LABEL, AUTOR_LABEL } from '@/modules/ideias/types';
 import type { IdeiaAutor, IdeiaImportancia } from '@/modules/ideias/types';
 import { ClientesMultiSelect } from './ClientesMultiSelect';
@@ -13,6 +12,7 @@ import {
   FORMATO_LABEL, OBJETIVO_LABEL, STATUS_LABEL, hojeISO,
   type Criativo, type CriativoAnexo, type CriativoFormato, type CriativoObjetivo, type CriativoStatus,
 } from '@/modules/ideias/criativos/types';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   open: boolean;
@@ -154,13 +154,10 @@ export function CriativoFormModal({ open, onClose, criativo }: Props) {
           autoFocus
         />
 
-        <Textarea
-          label="Descrição da ideia"
-          placeholder="Explique o conceito, o gancho, o roteiro, a referência..."
-          rows={4}
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-        />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-slate-300">Descrição da ideia</span>
+          <EditorRico linhas={4} placeholder="Explique o conceito, o gancho, o roteiro, a referência..." value={descricao} onChange={setDescricao} />
+        </div>
 
         <div className="space-y-1.5">
           <p className="text-sm font-medium text-slate-300">Para quais clientes? *</p>

@@ -14,6 +14,7 @@ import { IdeiaFormModal } from './IdeiaFormModal';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { confirmar } from '@/shared/ui/ConfirmDialog';
 import { PLATAFORMAS } from '@/shared/ui/form/FormKit';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 interface Props {
   cliente: ClienteGestao;
@@ -221,7 +222,7 @@ export function LinhaEditorial({ cliente, mes, ideias }: Props) {
                       <button type="button" onClick={() => setForm({ ideia: i, semana: i.semana })} className="mt-2 block w-full text-left text-sm font-semibold text-slate-100 hover:text-brand-300">
                         {i.titulo}
                       </button>
-                      {i.descricao && <p className="mt-0.5 line-clamp-2 text-xs text-slate-400">{i.descricao}</p>}
+                      {i.descricao && <p className="mt-0.5 line-clamp-2 text-xs text-slate-400">{textoPuro(i.descricao)}</p>}
                       {i.status === 'reprovada' && i.justificativa && (
                         <p className="mt-1.5 rounded-lg bg-red-500/10 p-1.5 text-xs text-red-300"><strong>O cliente pediu:</strong> {i.justificativa}</p>
                       )}

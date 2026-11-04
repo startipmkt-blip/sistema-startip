@@ -11,6 +11,7 @@ import { FaixaDestaque } from '@/modules/gestao-conteudo/components/FaixaDestaqu
 import { roteiros, TIPOS_ROTEIRO, type Roteiro, type TipoRoteiro } from './roteirosApi';
 import { RoteiroFormModal } from './RoteiroFormModal';
 import { baixarPdfRoteiros } from './pdfRoteiros';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 interface Props {
   clientes: { id: string; nome: string }[];
@@ -154,7 +155,7 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
                   </div>
                   <div className={`mt-1 text-sm font-semibold ${feito ? 'text-slate-400 line-through' : 'text-slate-100'}`}>{r.titulo}</div>
                   {!clienteId && <div className="text-xs text-slate-400">{nomeCliente.get(r.cliente_id) ?? 'Cliente'}</div>}
-                  {r.descricao && <p className="mt-1 line-clamp-2 text-xs text-slate-400">{r.descricao}</p>}
+                  {r.descricao && <p className="mt-1 line-clamp-2 text-xs text-slate-400">{textoPuro(r.descricao)}</p>}
                 </button>
                 <div className="flex shrink-0 items-center">
                   <button onClick={() => setForm({ roteiro: r })} className="rounded p-1.5 text-slate-400 hover:bg-white/10" aria-label="Editar" title="Editar"><GlassIcon name="pencil" className="h-4 w-4" /></button>

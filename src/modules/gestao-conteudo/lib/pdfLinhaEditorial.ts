@@ -1,5 +1,6 @@
 import type { Ideia } from '@/modules/gestao-conteudo/types';
 import { STATUS_IDEIA, mesLabel } from '@/modules/gestao-conteudo/types';
+import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
 interface Grupo { titulo: string; periodo?: string; itens: Ideia[] }
 
@@ -43,8 +44,8 @@ export async function baixarPdfLinhaEditorial(p: {
       const meta = [FORMATO[i.formato] ?? i.formato, p.pilarNome(i.pilar_id), i.funil ? `Funil: ${FUNIL[i.funil] ?? i.funil}` : '',
         (i.plataformas ?? []).join(', '), STATUS_IDEIA[i.status].label].filter(Boolean).join(' · ');
       texto(meta, 9, 'normal', [90, 104, 117]);
-      if (i.descricao) texto(i.descricao, 9.5);
-      if (i.como_aplicar) texto(`Como aplicar: ${i.como_aplicar}`, 9.5);
+      if (i.descricao) texto(textoPuro(i.descricao), 9.5);
+      if (i.como_aplicar) texto(`Como aplicar: ${textoPuro(i.como_aplicar)}`, 9.5);
       (i.cenas ?? []).forEach((c, k) => {
         texto(`Cena ${k + 1}: ${c.acontece}${c.fala ? ` — Fala: ${c.fala}` : ''}${c.foto_apoio ? ' (foto de apoio)' : ''}`, 9);
       });

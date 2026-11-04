@@ -14,6 +14,7 @@ import {
   PLATAFORMAS, Rotulo, Secao, Texto, type Cena,
 } from '@/shared/ui/form/FormKit';
 import { TIPOS_ROTEIRO, roteiros, type Roteiro, type TipoRoteiro } from './roteirosApi';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   onClose: () => void;
@@ -217,13 +218,13 @@ export function RoteiroFormModal({ onClose, mes, clientes, clienteId, roteiro, i
 
         <Secao icone="lightbulb" titulo="Briefing" subtitulo="Contexto e orientações para a produção">
           <Campo label="Descrição / Contexto">
-            <AreaTexto placeholder="Breve contexto do item..." value={form.descricao} onChange={(e) => set('descricao', e.target.value)} />
+            <EditorRico placeholder="Breve contexto do item..." value={form.descricao} onChange={(v) => set('descricao', v)} />
           </Campo>
           <Campo label="Como aplicar">
-            <AreaTexto placeholder="Como adaptar / abordagem a usar (vira Ângulo/Abordagem no roteiro)..." value={form.como_aplicar} onChange={(e) => set('como_aplicar', e.target.value)} />
+            <EditorRico placeholder="Como adaptar / abordagem a usar (vira Ângulo/Abordagem no roteiro)..." value={form.como_aplicar} onChange={(v) => set('como_aplicar', v)} />
           </Campo>
           <Campo label="Observação">
-            <AreaTexto rows={2} placeholder="Observações gerais sobre o roteiro..." value={form.observacao} onChange={(e) => set('observacao', e.target.value)} />
+            <EditorRico linhas={2} placeholder="Observações gerais sobre o roteiro..." value={form.observacao} onChange={(v) => set('observacao', v)} />
           </Campo>
         </Secao>
 

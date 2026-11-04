@@ -10,8 +10,9 @@ import { CapaUpload } from '@/shared/ui/form/CapaUpload';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import {
-  AreaTexto, BotaoTracejado, Campo, JanelaFormulario, SubtituloForm, Texto,
+  BotaoTracejado, Campo, JanelaFormulario, SubtituloForm, Texto,
 } from '@/shared/ui/form/FormKit';
+import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
 interface Props {
   open: boolean;
@@ -186,7 +187,7 @@ export function ProcessoFormModal({ open, onClose, doc, categoriaInicial }: Prop
 
       <SubtituloForm icone="target" titulo="Objetivo e Contexto" subtitulo="O que esta POP garante e quem está envolvido" />
       <Campo label="Objetivo">
-        <AreaTexto rows={2} placeholder="O que este processo garante? Ex: Padronizar a criação de legendas..." value={form.objetivo ?? ''} onChange={(e) => set('objetivo', e.target.value)} />
+        <EditorRico linhas={2} placeholder="O que este processo garante? Ex: Padronizar a criação de legendas..." value={form.objetivo ?? ''} onChange={(v) => set('objetivo', v)} />
       </Campo>
       <div className="grid gap-4 sm:grid-cols-3">
         <Campo label="Quem Executa">
@@ -205,7 +206,7 @@ export function ProcessoFormModal({ open, onClose, doc, categoriaInicial }: Prop
 
       <SubtituloForm icone="wrench" titulo="Recursos" subtitulo="Ferramentas e materiais necessários" />
       <Campo label="Materiais e Ferramentas">
-        <AreaTexto rows={2} placeholder="Ex: Notion, Figma, Tabela de referências..." value={form.materiais ?? ''} onChange={(e) => set('materiais', e.target.value)} />
+        <EditorRico linhas={2} placeholder="Ex: Notion, Figma, Tabela de referências..." value={form.materiais ?? ''} onChange={(v) => set('materiais', v)} />
       </Campo>
       <Campo label="Vídeo Explicativo (URL)">
         <Texto type="url" prefixoIcone="video" placeholder="https://..." value={form.video_url ?? ''} onChange={(e) => set('video_url', e.target.value)} />
@@ -232,7 +233,7 @@ export function ProcessoFormModal({ open, onClose, doc, categoriaInicial }: Prop
             </div>
           </div>
           <Texto placeholder="Título do passo" value={p.titulo} onChange={(e) => set('passos', passos.map((x, k) => (k === i ? { ...x, titulo: e.target.value } : x)))} />
-          <AreaTexto rows={2} placeholder="Como fazer, detalhes, cuidados..." value={p.descricao} onChange={(e) => set('passos', passos.map((x, k) => (k === i ? { ...x, descricao: e.target.value } : x)))} />
+          <EditorRico linhas={2} placeholder="Como fazer, detalhes, cuidados..." value={p.descricao} onChange={(v) => set('passos', passos.map((x, k) => (k === i ? { ...x, descricao: v } : x)))} />
         </div>
       ))}
       <BotaoTracejado onClick={() => set('passos', [...passos, { titulo: '', descricao: '' }])}>Adicionar passo</BotaoTracejado>
