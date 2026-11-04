@@ -90,9 +90,27 @@ export interface Ideia {
   lembrete_em: string | null;
   lembretes_enviados: number;
   created_at: string;
+  // Linha editorial (migration 0091).
+  pilar_id?: string | null;
+  plataformas?: string[];
+  funil?: string | null;
+  como_aplicar?: string;
+  cenas?: CenaIdeia[];
+  inspiracao_id?: string | null;
 }
 
-export type IdeiaForm = Pick<Ideia, 'titulo' | 'descricao' | 'formato' | 'semana' | 'dia_postagem'>;
+export interface CenaIdeia {
+  acontece: string;
+  fala: string;
+  audio: string;
+  foto_apoio: boolean;
+}
+
+/** Semana reservada para o quadro "Conteúdo extra" da linha editorial. */
+export const SEMANA_EXTRA = 6;
+
+export type IdeiaForm = Pick<Ideia, 'titulo' | 'descricao' | 'formato' | 'semana' | 'dia_postagem'>
+  & Partial<Pick<Ideia, 'pilar_id' | 'plataformas' | 'funil' | 'como_aplicar' | 'cenas' | 'inspiracao_id'>>;
 
 export const STATUS_IDEIA: Record<StatusIdeia, { label: string; emoji: string; tone: 'slate' | 'amber' | 'green' | 'red' }> = {
   rascunho:  { label: 'Rascunho',            emoji: '📝', tone: 'slate' },

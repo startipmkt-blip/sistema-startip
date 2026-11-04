@@ -11,6 +11,16 @@ const tabela = () => (supabase as any).from('ideias_conteudo');
 
 const TODOS = ['gestao-conteudo', 'ideias'] as const;
 
+// Modo Demonstração: ideias em memória, para a linha editorial funcionar sem banco.
+const demoIdeias: Ideia[] = [];
+function novaDemo(p: { clienteId: string; mes: string; dados: IdeiaForm }): Ideia {
+  return {
+    id: crypto.randomUUID(), cliente_id: p.clienteId, mes_referencia: p.mes, status: 'rascunho', justificativa: '',
+    enviado_em: null, decidido_em: null, lembrete_em: null, lembretes_enviados: 0, created_at: new Date().toISOString(),
+    ...p.dados,
+  };
+}
+
 export function linkAprovacaoIdeias(slug: string, mes: string): string {
   return `${window.location.origin}/aprovar-ideias/${slug}?mes=${mes}`;
 }
@@ -20,7 +30,7 @@ export function useIdeiasDoMes(mes: string) {
   return useQuery({
     queryKey: [...TODOS, 'mes', mes] as const,
     queryFn: async (): Promise<Ideia[]> => {
-      if (IS_DEMO) return [];
+      if (IS_DEMO) return demoIdeias.filter((i) => i.mes_referencia === mes).sort((a, b) => a.semana - b.semana || a.created_at.localeCompare(b.created_at));
       const { data, error } = await tabela()
         .select('*')
         .eq('mes_referencia', mes)
@@ -43,7 +53,12 @@ export function useSalvarIdeia() {
   const invalidar = useInvalidar();
   return useMutation({
     mutationFn: async (p: { id?: string; clienteId: string; mes: string; dados: IdeiaForm }) => {
-      if (IS_DEMO) return;
+      if (IS_DEMO) {
+        const atual = p.id ? demoIdeias.find((i) => i.id === p.id) : undefined;
+        if (atual) Object.assign(atual, p.dados);
+        else demoIdeias.push(novaDemo(p));
+        return;
+      }
       const payload = { ...p.dados, dia_postagem: p.dados.dia_postagem || null };
       if (p.id) {
         const { error } = await tabela().update(payload).eq('id', p.id);
@@ -63,7 +78,7 @@ export function useExcluirIdeia() {
   const invalidar = useInvalidar();
   return useMutation({
     mutationFn: async (id: string) => {
-      if (IS_DEMO) return;
+      if (IS_DEMO) { const k = demoIdeias.findIndex((i) => i.id === id); if (k >= 0) demoIdeias.splice(k, 1); return; }
       const { error } = await tabela().delete().eq('id', id);
       if (error) throw error;
     },
@@ -76,8 +91,21 @@ export function useRecolherIdeia() {
   const invalidar = useInvalidar();
   return useMutation({
     mutationFn: async (id: string) => {
-      if (IS_DEMO) return;
+      if (IS_DEMO) { const i = demoIdeias.find((x) => x.id === id); if (i) i.status = 'rascunho'; return; }
       const { error } = await tabela().update({ status: 'rascunho' }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: invalidar,
+  });
+}
+
+/** Arrastar um card para outra semana (ou para "Conteúdo extra"). */
+export function useMoverIdeia() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: async (p: { id: string; semana: number }) => {
+      if (IS_DEMO) { const i = demoIdeias.find((x) => x.id === p.id); if (i) i.semana = p.semana; return; }
+      const { error } = await tabela().update({ semana: p.semana }).eq('id', p.id);
       if (error) throw error;
     },
     onSuccess: invalidar,
@@ -102,6 +130,10 @@ export function useEnviarIdeias() {
   return useMutation({
     mutationFn: async (p: EnvioBase) => {
       if (p.ids.length === 0) throw new Error('Selecione ao menos uma ideia.');
+      if (IS_DEMO) {
+        for (const i of demoIdeias) if (p.ids.includes(i.id)) i.status = 'enviada';
+        return;
+      }
       if (!p.slug) {
         throw new Error('Este cliente ainda não tem link público. Gere o link na página do cliente.');
       }
