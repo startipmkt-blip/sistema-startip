@@ -682,3 +682,9 @@ html.light .botao-adicionar { background-color: #e6f4fc !important; color: #0b5d
 html.light .prioridade-form[aria-pressed="true"] { color: #fff !important; }
 html.light .prioridade-form[aria-pressed="false"] { background-color: #fff !important; }
 html.light .janela-fundo.janela-fundo { background-color: rgba(14, 26, 36, 0.45) !important; }
+
+/* Opções das listas (select) no tema claro: as telas usam [&>option]:bg-slate-900 para o
+   tema escuro, o que deixava a lista aberta escura com o texto ilegível no claro. */
+html.light select option,
+html.light select optgroup { background-color: #ffffff !important; color: #0e1a24 !important; }
+html.light select option:checked { background-color: #e6f4fc !important; color: #0b5d8c !important; }
