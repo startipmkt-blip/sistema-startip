@@ -12,8 +12,8 @@ import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   useSalvarDemanda, useExcluirDemanda,
-  TIPO_LABEL, TIPO_LABEL_CRIATIVO, TIPOS_CRIATIVO, STATUS_COLUNAS,
-  type DesignerDemanda, type DesignerTipo, type DesignerStatus, type DesignerCategoria,
+  PRIORIDADES, TIPO_LABEL, TIPO_LABEL_CRIATIVO, TIPOS_CRIATIVO, STATUS_COLUNAS,
+  type DesignerDemanda, type DesignerTipo, type DesignerStatus, type DesignerCategoria, type DesignerPrioridade,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { opcoesDeSemana } from '../lib/periodo';
@@ -45,6 +45,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
   const [tipo, setTipo] = useState<DesignerTipo>('post');
   const [categoria, setCategoria] = useState<DesignerCategoria>('organico');
   const [status, setStatus] = useState<DesignerStatus>('a_fazer');
+  const [prioridade, setPrioridade] = useState<DesignerPrioridade>('normal');
   const [responsavel, setResponsavel] = useState<string>('');
   const [prazo, setPrazo] = useState<string>('');
   const [linkConteudo, setLinkConteudo] = useState('');
@@ -65,6 +66,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     setTipo(demanda?.tipo ?? 'post');
     setCategoria(demanda?.categoria ?? categoriaInicial);
     setStatus(demanda?.status ?? statusInicial);
+    setPrioridade(demanda?.prioridade ?? 'normal');
     setResponsavel(demanda?.responsavel_id ?? '');
     setPrazo(demanda?.prazo ?? '');
     setAlteracaoObs(demanda?.alteracao_obs ?? '');
@@ -110,7 +112,7 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
         titulo: titulo.trim(),
         descricao: descricao.trim() || null,
         briefing: briefing.trim() || null,
-        tipo, categoria, status,
+        tipo, categoria, status, prioridade,
         responsavel_id: responsavel || null,
         prazo: prazo || null,
         anexos,
@@ -258,7 +260,14 @@ ${r.cronometroErro}`);
           onChange={(e) => setBriefing(e.target.value)}
         />
 
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-4">
+          <Select
+            id="prio"
+            label="Prioridade"
+            value={prioridade}
+            onChange={(e) => setPrioridade(e.target.value as DesignerPrioridade)}
+            options={PRIORIDADES.map((p) => ({ value: p.id, label: p.label }))}
+          />
           <Select
             id="st"
             label="Status"

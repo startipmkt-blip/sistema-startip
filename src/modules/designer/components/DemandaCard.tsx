@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { diasEntre, hojeLocal, labelMes, mesDaSemana } from '../lib/periodo';
 import {
-  TIPO_LABEL, TIPO_LABEL_CRIATIVO, formatarDuracao, segundosAberto,
+  PRIORIDADES, TIPO_LABEL, TIPO_LABEL_CRIATIVO, formatarDuracao, segundosAberto,
   type DesignerDemanda, type TempoDemanda,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
@@ -61,6 +61,8 @@ export const reprovadaPeloCliente = (d: DesignerDemanda) =>
 
 export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const prazo = prazoChip(d);
+  // Normal é o padrão: sem etiqueta para não poluir o cartão.
+  const prioridade = d.prioridade && d.prioridade !== 'normal' ? PRIORIDADES.find((p) => p.id === d.prioridade) : undefined;
   const total = useTempoTotal(tempo);
   const aberto = tempo?.aberto;
   const audios = d.anexos.filter((a) => a.type.startsWith('audio/')).length;
@@ -90,6 +92,9 @@ ${d.briefing ?? ''}`;
       }`}
     >
       <div className="mb-1.5 flex flex-wrap gap-1">
+        {prioridade && (
+          <span className={`${ETIQUETA} ${prioridade.cls}`}><GlassIcon emoji="🚩" /> {prioridade.label}</span>
+        )}
         {d.categoria === 'criativo' && (
           <span className={`${ETIQUETA} bg-orange-600 text-orange-50`}><GlassIcon emoji="🎯" /> Criativo de tráfego</span>
         )}

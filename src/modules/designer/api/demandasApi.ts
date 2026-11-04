@@ -66,6 +66,18 @@ export const STATUS_COLUNAS: Array<{ id: DesignerStatus; label: string; cor: str
   { id: 'concluido',    label: 'Concluído',      cor: 'green',   emoji: '✅' },
 ];
 
+export type DesignerPrioridade = 'urgente' | 'alta' | 'normal' | 'baixa';
+
+/** Do mais importante para o menos: `peso` ordena as colunas do quadro. */
+export const PRIORIDADES: Array<{ id: DesignerPrioridade; label: string; peso: number; cls: string }> = [
+  { id: 'urgente', label: 'Urgente', peso: 0, cls: 'bg-red-600 text-red-50' },
+  { id: 'alta',    label: 'Alta',    peso: 1, cls: 'bg-orange-500 text-orange-950' },
+  { id: 'normal',  label: 'Normal',  peso: 2, cls: 'bg-slate-600 text-slate-50' },
+  { id: 'baixa',   label: 'Baixa',   peso: 3, cls: 'bg-sky-700 text-sky-50' },
+];
+export const pesoPrioridade = (p?: DesignerPrioridade | null) =>
+  PRIORIDADES.find((x) => x.id === p)?.peso ?? 2;
+
 export const TIPO_LABEL: Record<DesignerTipo, string> = {
   post: 'Post',
   carrossel: 'Carrossel',
@@ -86,6 +98,7 @@ export interface DesignerDemanda {
   tipo: DesignerTipo;
   categoria?: DesignerCategoria;
   status: DesignerStatus;
+  prioridade?: DesignerPrioridade;
   responsavel_id: string | null;
   responsavel_nome?: string | null;
   prazo: string | null;
@@ -205,6 +218,7 @@ interface UpsertInput {
   tipo: DesignerTipo;
   categoria?: DesignerCategoria;
   status?: DesignerStatus;
+  prioridade?: DesignerPrioridade;
   responsavel_id?: string | null;
   prazo?: string | null;
   anexos?: CriativoAnexo[];
