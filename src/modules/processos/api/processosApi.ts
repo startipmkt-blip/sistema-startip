@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
-import type { ProcessoDoc } from '@/modules/processos/types';
+import type { ProcessoCategoriaItem, ProcessoDoc } from '@/modules/processos/types';
+import { criarCrud } from '@/shared/lib/crudTabela';
 
 const demoDocs: ProcessoDoc[] = [
   {
     id: 'doc1',
     categoria: 'trafego',
+    categoria_id: 'cat-trafego', status: 'ativo', versao: '1.2', responsavel: 'Gabriel',
     titulo: 'Como estruturar uma campanha no Meta Ads',
     autor: 'Iuri',
     updated_at: '2026-07-30T10:00:00Z',
@@ -21,6 +23,7 @@ const demoDocs: ProcessoDoc[] = [
   {
     id: 'doc2',
     categoria: 'atendimento',
+    categoria_id: 'cat-atendimento', status: 'ativo', versao: '1.0', responsavel: 'Iuri',
     titulo: 'Padrão de reunião mensal de resultados',
     autor: 'Iuri',
     updated_at: '2026-07-20T10:00:00Z',
@@ -34,6 +37,7 @@ const demoDocs: ProcessoDoc[] = [
   {
     id: 'doc3',
     categoria: 'onboarding',
+    categoria_id: 'cat-onboarding', status: 'rascunho', versao: '0.9', responsavel: 'Atendimento',
     titulo: 'Checklist de entrada de novo cliente',
     autor: 'Atendimento',
     updated_at: '2026-07-15T10:00:00Z',
@@ -59,10 +63,22 @@ async function fetchDocs(): Promise<ProcessoDoc[]> {
   return (data ?? []) as ProcessoDoc[];
 }
 
-export type ProcessoFormData = Pick<
-  ProcessoDoc,
-  'categoria' | 'titulo' | 'conteudo' | 'autor' | 'anexos'
->;
+export type ProcessoFormData = Pick<ProcessoDoc, 'categoria' | 'titulo' | 'conteudo' | 'autor' | 'anexos'> &
+  Partial<Pick<ProcessoDoc,
+    'categoria_id' | 'capa' | 'versao' | 'status' | 'responsavel' | 'objetivo' | 'quem_executa' | 'quem_aprova'
+    | 'quem_impactado' | 'quando_utilizar' | 'materiais' | 'video_url' | 'passos' | 'restricoes'>>;
+
+// ---------- Categorias (editáveis) ----------
+export const categoriasPop = criarCrud<ProcessoCategoriaItem>({
+  tabela: 'processo_categorias',
+  chave: ['processos', 'categorias'],
+  ordem: [{ coluna: 'ordem', asc: true }, { coluna: 'nome', asc: true }],
+  demo: [
+    { id: 'cat-trafego', nome: 'Tráfego', cor: '#ef4444', ordem: 1, created_at: '2026-06-01T10:00:00Z' },
+    { id: 'cat-atendimento', nome: 'Atendimento', cor: '#3b82f6', ordem: 2, created_at: '2026-06-01T10:00:00Z' },
+    { id: 'cat-onboarding', nome: 'Onboarding', cor: '#10b981', ordem: 3, created_at: '2026-06-01T10:00:00Z' },
+  ],
+});
 
 async function saveDoc(id: string | undefined, dados: ProcessoFormData): Promise<void> {
   if (IS_DEMO) {
