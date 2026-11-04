@@ -123,3 +123,46 @@ export function useAplicarIdeiaBanco() {
     },
   });
 }
+
+/** Marca como "já usada" (vai para a sub-aba de usadas) ou devolve para o banco. */
+export function useMarcarIdeiaUsada() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (p: { id: string; usada: boolean }) => {
+      if (IS_DEMO) return;
+      const { error } = await tabela()
+        .update({ usada_em: p.usada ? new Date().toISOString() : null, usada_semana: null })
+        .eq('id', p.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
+  });
+}
+
+/** Aplica a ideia direto nas ideias do mês (rascunho, pronta para enviar à aprovação do cliente). */
+export function useAplicarIdeiaNoMes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (p: { ideia: IdeiaBanco; mes: string; semana: number; semanaIni: string }) => {
+      if (IS_DEMO) return;
+      const { error } = await (supabase as any).from('ideias_conteudo').insert({ // eslint-disable-line @typescript-eslint/no-explicit-any
+        cliente_id: p.ideia.cliente_id,
+        mes_referencia: p.mes,
+        semana: p.semana,
+        titulo: p.ideia.titulo,
+        descricao: p.ideia.descricao,
+        formato: p.ideia.formato,
+        status: 'rascunho',
+      });
+      if (error) throw error;
+      const { error: eUp } = await tabela()
+        .update({ usada_em: new Date().toISOString(), usada_semana: p.semanaIni })
+        .eq('id', p.ideia.id);
+      if (eUp) throw eUp;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEY });
+      qc.invalidateQueries({ queryKey: ['gestao-conteudo', 'ideias'] });
+    },
+  });
+}

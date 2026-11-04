@@ -61,7 +61,7 @@ export function PautasCliente({ clienteId, clienteNome }: Props) {
   const { data: pautas, isLoading, error } = usePautas(clienteId);
   const salvar = useSalvarPauta(clienteId);
   const excluir = useExcluirPauta(clienteId);
-  const [aberto, setAberto] = useState(true);
+  const [aberto, setAberto] = useState(false);
   const [editando, setEditando] = useState<Pauta | null>(null);
 
   const total = pautas?.length ?? 0;

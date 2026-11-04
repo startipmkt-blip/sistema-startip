@@ -12,7 +12,7 @@ import { Linkify } from '@/shared/ui/Linkify';
 import { AnexosCriativo, MiniaturaAnexo } from '@/modules/ideias/criativos/components/AnexosCriativo';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import {
-  useAplicarIdeiaBanco, useExcluirIdeiaBanco, useSalvarIdeiaBanco,
+  useAplicarIdeiaBanco, useAplicarIdeiaNoMes, useExcluirIdeiaBanco, useMarcarIdeiaUsada, useSalvarIdeiaBanco,
   type IdeiaBanco, type IdeiaBancoForm,
 } from '@/modules/gestao-conteudo/api/bancoIdeiasApi';
 import { FORMATO_OPCOES, mesLabel } from '@/modules/gestao-conteudo/types';
@@ -85,8 +85,12 @@ function FormIdeia({ clienteId, ideia, onClose }: { clienteId: string; ideia?: I
   );
 }
 
-function AplicarModal({ ideia, mesPadrao, onClose }: { ideia: IdeiaBanco; mesPadrao: string; onClose: () => void }) {
-  const aplicar = useAplicarIdeiaBanco();
+function AplicarModal({ ideia, mesPadrao, destino, onClose }: {
+  ideia: IdeiaBanco; mesPadrao: string; destino: 'designer' | 'mes'; onClose: () => void;
+}) {
+  const aplicarDesigner = useAplicarIdeiaBanco();
+  const aplicarMes = useAplicarIdeiaNoMes();
+  const aplicar = destino === 'mes' ? aplicarMes : aplicarDesigner;
   const meses = useMemo(() => {
     const base = chaveMes(new Date());
     return Array.from({ length: 14 }, (_, i) => mesAnteriorProximo(base, i - 1));
@@ -100,27 +104,28 @@ function AplicarModal({ ideia, mesPadrao, onClose }: { ideia: IdeiaBanco; mesPad
 
   function confirmar() {
     setErro(null);
-    aplicar.mutate(
-      { ideia, semanaIni: escolhida.ini },
-      { onSuccess: onClose, onError: (e) => setErro((e as Error).message) },
-    );
+    const opts = { onSuccess: onClose, onError: (e: unknown) => setErro((e as Error).message) };
+    if (destino === 'mes') aplicarMes.mutate({ ideia, mes, semana: escolhida.numero, semanaIni: escolhida.ini }, opts);
+    else aplicarDesigner.mutate({ ideia, semanaIni: escolhida.ini }, opts);
   }
 
   return (
     <Modal
-      open onClose={onClose} title="Aplicar ideia em uma semana"
+      open onClose={onClose} title={destino === 'mes' ? 'Aplicar nas ideias do mês' : 'Aplicar ideia em uma semana'}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Cancelar</Button>
           <Button onClick={confirmar} disabled={aplicar.isPending}>
-            {aplicar.isPending ? 'Enviando…' : 'Subir para o Designer'}
+            {aplicar.isPending ? 'Enviando…' : destino === 'mes' ? 'Adicionar nas ideias do mês' : 'Subir para o Designer'}
           </Button>
         </>
       }
     >
       <div className="space-y-4">
         <p className="text-sm text-slate-200">
-          <strong>{ideia.titulo}</strong> vira uma demanda <em>A fazer</em> no Designer, na semana escolhida.
+          {destino === 'mes'
+            ? <><strong>{ideia.titulo}</strong> entra como rascunho nas ideias do mês, na semana escolhida, pronta para enviar ao cliente aprovar.</>
+            : <><strong>{ideia.titulo}</strong> vira uma demanda <em>A fazer</em> no Designer, na semana escolhida.</>}
         </p>
         {erro && <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{erro}</p>}
         <div className="grid grid-cols-2 gap-3">
@@ -139,8 +144,9 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
 }) {
   const excluir = useExcluirIdeiaBanco();
   const [form, setForm] = useState<{ ideia?: IdeiaBanco } | null>(null);
-  const [aplicando, setAplicando] = useState<IdeiaBanco | null>(null);
-  const [verUsadas, setVerUsadas] = useState(false);
+  const [aplicando, setAplicando] = useState<{ ideia: IdeiaBanco; destino: 'designer' | 'mes' } | null>(null);
+  const [sub, setSub] = useState<'livres' | 'usadas'>('livres');
+  const marcar = useMarcarIdeiaUsada();
 
   const livres = ideias.filter((i) => !i.usada_em);
   const usadas = ideias.filter((i) => i.usada_em);
@@ -163,10 +169,21 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
           {i.anexos.length > 4 && <span className="self-center text-xs text-slate-400">+{i.anexos.length - 4}</span>}
         </div>
       )}
-      <div className="flex items-center gap-1.5">
-        {i.usada_em
-          ? <Badge tone="green">Usada · semana de {new Date(`${i.usada_semana}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</Badge>
-          : <Button onClick={() => setAplicando(i)}>Aplicar em uma semana</Button>}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {i.usada_em ? (
+          <>
+            <Badge tone="green">
+              Usada{i.usada_semana ? ` · semana de ${new Date(`${i.usada_semana}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : ''}
+            </Badge>
+            <Button variant="secondary" onClick={() => marcar.mutate({ id: i.id, usada: false })}>Voltar ao banco</Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={() => setAplicando({ ideia: i, destino: 'designer' })}>Aplicar em uma semana</Button>
+            <Button variant="secondary" onClick={() => setAplicando({ ideia: i, destino: 'mes' })}>Aplicar nas ideias do mês</Button>
+            <Button variant="secondary" onClick={() => marcar.mutate({ id: i.id, usada: true })}>Já usado</Button>
+          </>
+        )}
         <span className="ml-auto" />
         <button onClick={() => setForm({ ideia: i })} className="rounded px-1.5 py-1 text-slate-300 hover:bg-white/10" title="Editar">
           <GlassIcon name="pencil" />
@@ -187,27 +204,32 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
         <Button className="ml-auto" onClick={() => setForm({})}>+ Nova ideia geral</Button>
       </div>
 
+      <div className="flex gap-1 border-b border-white/10">
+        {([['livres', `Ideias (${livres.length})`], ['usadas', `Já usadas (${usadas.length})`]] as const).map(([id, txt]) => (
+          <button
+            key={id} type="button" onClick={() => setSub(id)}
+            className={`-mb-px border-b-2 px-3 py-1 text-xs font-medium ${
+              sub === id ? 'border-brand-400 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+          >
+            {txt}
+          </button>
+        ))}
+      </div>
+
       {carregando && <div className="flex justify-center py-10"><Spinner /></div>}
 
-      {!carregando && livres.length === 0 && (
+      {!carregando && (sub === 'livres' ? livres : usadas).length === 0 && (
         <Card className="p-6 text-center text-sm text-slate-400">
-          Nenhuma ideia guardada. Use <strong>+ Nova ideia geral</strong> para anotar ideias que ainda não têm semana.
+          {sub === 'livres'
+            ? <>Nenhuma ideia guardada. Use <strong>+ Nova ideia geral</strong> para anotar ideias que ainda não têm semana.</>
+            : 'Nenhuma ideia usada ainda. As ideias marcadas como "Já usado" ficam aqui para serem reaproveitadas no futuro.'}
         </Card>
       )}
 
-      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">{livres.map(cartao)}</div>
-
-      {usadas.length > 0 && (
-        <div className="space-y-2">
-          <button className="text-xs text-brand-300 hover:underline" onClick={() => setVerUsadas((v) => !v)}>
-            {verUsadas ? 'Esconder' : 'Ver'} ideias já usadas ({usadas.length})
-          </button>
-          {verUsadas && <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">{usadas.map(cartao)}</div>}
-        </div>
-      )}
+      <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">{(sub === 'livres' ? livres : usadas).map(cartao)}</div>
 
       {form && <FormIdeia clienteId={clienteId} ideia={form.ideia} onClose={() => setForm(null)} />}
-      {aplicando && <AplicarModal ideia={aplicando} mesPadrao={mes} onClose={() => setAplicando(null)} />}
+      {aplicando && <AplicarModal ideia={aplicando.ideia} destino={aplicando.destino} mesPadrao={mes} onClose={() => setAplicando(null)} />}
     </div>
   );
 }
