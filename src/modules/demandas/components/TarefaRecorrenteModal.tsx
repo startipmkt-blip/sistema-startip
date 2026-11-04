@@ -7,11 +7,8 @@ import {
   type RecorrenciaTipo,
 } from '@/modules/demandas/recorrentesApi';
 import { RESPONSAVEIS, HORARIOS_FAIXA } from '@/modules/demandas/types';
-import { Modal } from '@/shared/ui/Modal';
-import { Input } from '@/shared/ui/Input';
-import { Select } from '@/shared/ui/Select';
-import { Textarea } from '@/shared/ui/Textarea';
-import { Button } from '@/shared/ui/Button';
+import { GlassIcon } from '@/shared/ui/GlassIcon';
+import { AreaTexto, Campo, Chips, Escolha, JanelaFormulario, Texto } from '@/shared/ui/form/FormKit';
 
 interface Props {
   open: boolean;
@@ -19,45 +16,15 @@ interface Props {
   tarefa?: TarefaRecorrente;
 }
 
-interface ChipsProps<T extends string | number> {
-  label: string;
-  opcoes: { value: T; label: string }[];
-  selecionados: T[];
-  onToggle: (v: T) => void;
-}
-
-function Chips<T extends string | number>({ label, opcoes, selecionados, onToggle }: ChipsProps<T>) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-sm font-medium text-slate-300">{label}</span>
-      <div className="flex flex-wrap gap-1.5">
-        {opcoes.map((o) => {
-          const ativo = selecionados.includes(o.value);
-          return (
-            <button
-              key={String(o.value)}
-              type="button"
-              aria-pressed={ativo}
-              onClick={() => onToggle(o.value)}
-              className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                ativo ? 'border-brand-400 bg-brand-500/20 text-white' : 'border-white/10 text-slate-300 hover:bg-white/5'
-              }`}
-            >
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function alternar<T>(lista: T[], v: T): T[] {
-  return lista.includes(v) ? lista.filter((x) => x !== v) : [...lista, v];
-}
+const TIPOS: { id: RecorrenciaTipo; titulo: string; descricao: string }[] = [
+  { id: 'diaria', titulo: 'Todo dia', descricao: 'Aparece em todos os dias' },
+  { id: 'semanal', titulo: 'Toda semana', descricao: 'Em dias fixos da semana' },
+  { id: 'mensal', titulo: 'Todo mês', descricao: 'Em um dia fixo do mês' },
+];
 
 export function TarefaRecorrenteModal({ open, onClose, tarefa }: Props) {
   const salvar = useSalvarRecorrente();
+  const [erro, setErro] = useState('');
   const [form, setForm] = useState<RecorrenteForm>({
     titulo: tarefa?.titulo ?? '',
     descricao: tarefa?.descricao ?? '',
@@ -75,88 +42,88 @@ export function TarefaRecorrenteModal({ open, onClose, tarefa }: Props) {
 
   async function handleSalvar() {
     if (invalido) return;
-    await salvar.mutateAsync({
-      id: tarefa?.id,
-      dados: { ...form, titulo: form.titulo.trim(), descricao: form.descricao.trim() },
-    });
-    onClose();
+    setErro('');
+    try {
+      await salvar.mutateAsync({
+        id: tarefa?.id,
+        dados: { ...form, titulo: form.titulo.trim(), descricao: form.descricao.trim() },
+      });
+      onClose();
+    } catch (e) {
+      setErro((e as Error).message);
+    }
   }
 
   return (
-    <Modal
+    <JanelaFormulario
       open={open}
       onClose={onClose}
-      title={tarefa ? 'Editar tarefa recorrente' : 'Nova tarefa recorrente'}
-      footer={
-        <>
-          <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-          <Button onClick={handleSalvar} disabled={salvar.isPending || invalido}>
-            {salvar.isPending ? 'Salvando…' : 'Salvar'}
-          </Button>
-        </>
+      titulo={tarefa ? 'Editar Tarefa Recorrente' : 'Nova Tarefa Recorrente'}
+      rodape={
+        <div className="flex w-full flex-col gap-2">
+          {erro && <p role="alert" className="text-center text-xs text-red-400">{erro}</p>}
+          <button
+            type="button"
+            onClick={handleSalvar}
+            disabled={salvar.isPending || invalido}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-brand py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            <GlassIcon name="check" className="h-4 w-4" />
+            {salvar.isPending ? 'Salvando…' : tarefa ? 'Salvar alterações' : 'Criar Tarefa Recorrente'}
+          </button>
+        </div>
       }
     >
-      <div className="space-y-4">
-        <Input id="titulo" label="Tarefa" value={form.titulo} onChange={(e) => set('titulo', e.target.value)} />
-        <Textarea
-          id="descricao"
-          label="Descrição (opcional)"
-          placeholder="Detalhes, passo a passo ou links da tarefa…"
-          value={form.descricao}
-          onChange={(e) => set('descricao', e.target.value)}
-        />
-        <Chips
-          label="Responsáveis"
-          opcoes={RESPONSAVEIS.map((r) => ({ value: r as string, label: r }))}
-          selecionados={form.responsaveis}
-          onToggle={(r) => set('responsaveis', alternar(form.responsaveis, r))}
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <Select
-            id="tipo"
-            label="Recorrência"
-            options={[
-              { value: 'diaria', label: 'Todo dia' },
-              { value: 'semanal', label: 'Toda semana (dias fixos)' },
-              { value: 'mensal', label: 'Todo mês (um dia fixo)' },
-            ]}
-            value={form.tipo}
-            onChange={(e) => set('tipo', e.target.value as RecorrenciaTipo)}
-          />
-          <Select
-            id="hora"
-            label="Horário (opcional)"
-            options={[{ value: '', label: 'Livre' }, ...HORARIOS_FAIXA.filter(Boolean).map((h) => ({ value: h, label: h }))]}
-            value={form.horario}
-            onChange={(e) => set('horario', e.target.value)}
-          />
+      <Campo label="Tarefa" obrigatorio caixaAlta>
+        <Texto placeholder="O que precisa ser feito sempre?" value={form.titulo} onChange={(e) => set('titulo', e.target.value)} autoFocus />
+      </Campo>
+      <Campo label="Descrição" caixaAlta>
+        <AreaTexto placeholder="Detalhes, passo a passo ou links da tarefa…" value={form.descricao} onChange={(e) => set('descricao', e.target.value)} />
+      </Campo>
+      <Campo label="Responsáveis" caixaAlta dica="vários">
+        <Chips opcoes={RESPONSAVEIS.map((r) => ({ id: r, label: r }))} valores={form.responsaveis} onChange={(v) => set('responsaveis', v)} />
+      </Campo>
+      <Campo label="Recorrência" caixaAlta icone="repeat">
+        <div className="grid gap-2 sm:grid-cols-3">
+          {TIPOS.map((t) => {
+            const ativo = form.tipo === t.id;
+            return (
+              <button key={t.id} type="button" aria-pressed={ativo} onClick={() => set('tipo', t.id)}
+                className={`opcao-cartao rounded-xl border px-3 py-2.5 text-left transition-colors ${ativo ? 'opcao-ativa border-brand-400 bg-brand-500/10' : 'border-white/10 hover:border-white/25'}`}>
+                <div className="text-sm font-semibold text-slate-100">{t.titulo}</div>
+                <div className="text-xs text-slate-400">{t.descricao}</div>
+              </button>
+            );
+          })}
         </div>
-        {form.tipo === 'mensal' && (
-          <div className="space-y-1">
-            <Select
-              id="dia_mes"
-              label="Dia do mês"
-              options={Array.from({ length: 31 }, (_, i) => ({ value: String(i + 1), label: `Dia ${i + 1}` }))}
-              value={String(form.dia_mes ?? '')}
-              onChange={(e) => set('dia_mes', Number(e.target.value))}
-            />
-            {(form.dia_mes ?? 0) > 28 && (
-              <p className="text-xs text-slate-400">Em meses com menos dias, a tarefa cai no último dia do mês.</p>
-            )}
-          </div>
-        )}
-        {form.tipo === 'semanal' && (
-          <div className="space-y-1">
-            <Chips
-              label="Dias da semana"
-              opcoes={DIAS.map((d, i) => ({ value: i, label: d }))}
-              selecionados={form.dias_semana}
-              onToggle={(d) => set('dias_semana', alternar(form.dias_semana, d).sort((a, b) => a - b))}
-            />
-            {semDia && <p className="text-xs text-red-300">Selecione ao menos um dia.</p>}
-          </div>
-        )}
-      </div>
-    </Modal>
+      </Campo>
+      {form.tipo === 'semanal' && (
+        <Campo label="Dias da semana" caixaAlta>
+          <Chips
+            opcoes={DIAS.map((d, i) => ({ id: String(i), label: d }))}
+            valores={form.dias_semana.map(String)}
+            onChange={(v) => set('dias_semana', v.map(Number).sort((a, b) => a - b))}
+          />
+          {semDia && <p className="text-xs text-red-400">Selecione ao menos um dia.</p>}
+        </Campo>
+      )}
+      {form.tipo === 'mensal' && (
+        <Campo label="Dia do mês" caixaAlta>
+          <Escolha
+            opcoes={Array.from({ length: 31 }, (_, i) => ({ value: String(i + 1), label: `Dia ${i + 1}` }))}
+            value={String(form.dia_mes ?? '')}
+            onChange={(e) => set('dia_mes', Number(e.target.value))}
+          />
+          {(form.dia_mes ?? 0) > 28 && <p className="text-xs text-slate-400">Em meses com menos dias, a tarefa cai no último dia do mês.</p>}
+        </Campo>
+      )}
+      <Campo label="Horário" caixaAlta dica="opcional" icone="clock">
+        <Escolha
+          opcoes={[{ value: '', label: 'Livre' }, ...HORARIOS_FAIXA.filter(Boolean).map((h) => ({ value: h, label: h }))]}
+          value={form.horario}
+          onChange={(e) => set('horario', e.target.value)}
+        />
+      </Campo>
+    </JanelaFormulario>
   );
 }
