@@ -637,3 +637,32 @@ html.light .chip-icone[class*="bg-brand-500/10"] { background-color: #e6f4fc !im
 html.light .chip-icone[class*="bg-emerald-500/10"] { background-color: #e8f7ee !important; }
 html.light .chip-icone[class*="bg-red-500/10"] { background-color: #fdecec !important; }
 html.light .chip-icone[class*="bg-amber-500/10"] { background-color: #fdf3e3 !important; }
+
+/* ---------- Rodada 2: mais perto do App Level ---------- */
+/* Ícones de traço fino: sem preenchimento de vidro, sem brilho, sem sombra. */
+svg[style*="drop-shadow"] { filter: none !important; }
+svg path[stroke="url(#sgg)"] { display: none; }
+svg path[fill^="url(#sgf-"] { fill: none !important; }
+/* No menu, ícones na cor do texto (monocromáticos). */
+.nav-dark svg path { stroke: currentColor !important; }
+.nav-dark svg { opacity: .9; }
+
+/* Barra do topo some no fundo: sem cor própria e sem borda. */
+html.light header.topbar-clean { background-color: #f7f9fb !important; border-color: transparent !important; }
+html.light header.topbar-clean .busca-topo { background-color: #ffffff !important; border-color: #e3e8ee !important; color: #8a97a3 !important; }
+html.light header.topbar-clean button[aria-label] { color: #5a6875 !important; }
+html.light header.topbar-clean button[aria-label]:hover { background-color: #eef2f6 !important; color: #0e1a24 !important; }
+html.light .demo-faixa { background: transparent !important; }
+
+/* Títulos um pouco mais compactos, como no App Level. */
+html.light h1 { letter-spacing: -0.025em; }
+/* Ícone dentro do quadradinho: traço sólido na cor do tom. */
+.chip-icone svg path { stroke-width: 1.9; }
+.chip-icone[class*="bg-brand-500/10"] svg path { stroke: #1580bf !important; }
+.chip-icone[class*="bg-emerald-500/10"] svg path { stroke: #16a34a !important; }
+.chip-icone[class*="bg-red-500/10"] svg path { stroke: #dc2626 !important; }
+.chip-icone[class*="bg-amber-500/10"] svg path { stroke: #d97706 !important; }
+/* Itens que só deveriam ter fundo no hover: as regras antigas do tema claro casavam
+   "hover:bg-white/..." por substring e pintavam o item parado de cinza. */
+html.light [class*="hover:bg-white/"]:not(:is([class~="bg-white/5"],[class~="bg-white/[0.02]"],[class~="bg-white/[0.03]"],[class~="bg-white/[0.04]"],[class~="bg-white/[0.055]"],[class~="bg-white/[0.06]"],[class~="bg-white/[0.09]"],[class~="bg-white/10"],[class*="bg-brand"],[class*="bg-emerald"],[class*="bg-amber"],[class*="bg-red"],[class*="bg-slate"],.glass,.glass-strong)) { background-color: transparent !important; }
+html.light [class*="hover:bg-white/"]:not(.nav-dark *):hover { background-color: #f1f5f8 !important; }

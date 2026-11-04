@@ -1,18 +1,14 @@
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { DemoUserSwitcher } from '@/shared/layout/DemoUserSwitcher';
-import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/shared/ui/Badge';
 import { Icon } from '@/shared/ui/Icon';
 import { TemaToggle } from '@/shared/layout/TemaToggle';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 
 export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu: () => void; ocultarHamburguer?: boolean }) {
-  const { profile, session, isAdmin, isCliente, signOut } = useAuth();
-
-  const papelLabel = isCliente ? 'Cliente' : isAdmin ? 'Admin' : 'Funcionário';
+  const { signOut } = useAuth();
 
   return (
-    <header className="topbar-clean flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0e151d] px-3 sm:px-6">
+    <header className="topbar-clean flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0e151d] px-3 sm:px-8">
       <div className="flex min-w-0 items-center gap-2">
         {/* Botão hambúrguer — só no mobile e quando há sidebar */}
         <button
@@ -28,7 +24,7 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
         </button>
         <button
           onClick={() => window.dispatchEvent(new Event('commandpalette:open'))}
-          className="hidden h-9 w-64 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-400 hover:bg-white/[0.07] md:flex lg:w-80"
+          className="busca-topo hidden h-9 w-64 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-400 hover:bg-white/[0.07] md:flex lg:w-72"
           title="Busca universal (Ctrl+K)"
         >
           <GlassIcon name="search" className="h-4 w-4" tone="slate" />
@@ -40,21 +36,16 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
-        <div className="hidden text-right sm:block">
-          <div className="max-w-[140px] truncate text-sm font-medium text-slate-100">
-            {profile?.nome || session?.user.email}
-          </div>
-          <div className="flex items-center justify-end gap-1">
-            {profile?.cargo && <span className="hidden text-xs text-slate-400 md:inline">{profile.cargo}</span>}
-            <Badge tone={isCliente ? 'blue' : isAdmin ? 'green' : 'slate'}>{papelLabel}</Badge>
-          </div>
-        </div>
+      <div className="flex items-center gap-1">
         <TemaToggle />
-        <Button variant="ghost" size="sm" onClick={() => void signOut()}>
-          <Icon name="logout" className="h-4 w-4" />
-          <span className="hidden sm:inline">Sair</span>
-        </Button>
+        <button
+          onClick={() => void signOut()}
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-white"
+          title="Sair"
+          aria-label="Sair"
+        >
+          <Icon name="logout" className="h-[18px] w-[18px]" />
+        </button>
       </div>
     </header>
   );

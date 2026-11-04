@@ -5,9 +5,12 @@ import { IS_DEMO } from '@/shared/lib/env';
 export function DemoBanner() {
   if (!IS_DEMO) return null;
   return (
-    <div className="border-b border-amber-500/20 bg-amber-500/10 px-6 py-2 text-center text-xs font-medium text-amber-300">
-      Modo demonstração — dados de exemplo em memória. Configure as chaves do
-      Supabase (.env.local) para usar dados reais.
+    <div className="demo-faixa px-8 pt-1 text-xs text-slate-400">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 font-semibold text-amber-300">
+        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+        Modo demonstração
+      </span>
+      <span className="ml-2 hidden sm:inline">Dados de exemplo, nada é salvo no banco.</span>
     </div>
   );
 }
