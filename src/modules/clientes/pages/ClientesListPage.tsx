@@ -92,24 +92,28 @@ export function ClientesListPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visiveis.map((cliente) => (
-            <Card key={cliente.id} className="group flex flex-col p-5 transition-colors hover:border-brand-400">
-              <div className="flex items-start justify-between gap-2">
-                <Link to={`/clientes/${cliente.id}`} className="shrink-0" aria-label={`Abrir ${cliente.nome}`}>
-                  {cliente.logo_url ? (
-                    <LogoCliente src={cliente.logo_url} alt="" className="h-11 w-11 rounded-xl border border-white/10 object-cover" />
-                  ) : (
-                    <div className="logo-iniciais flex h-11 w-11 items-center justify-center rounded-xl bg-[#0e1a24] font-display text-sm font-bold text-[#ffffff]">
-                      {iniciais(cliente.nome)}
-                    </div>
-                  )}
-                </Link>
-                <StatusBadge status={cliente.status} />
-              </div>
-
-              <Link to={`/clientes/${cliente.id}`} className="mt-4 min-w-0">
-                <h3 className="truncate text-[15px] font-bold text-slate-100">{cliente.nome}</h3>
-                <p className="text-xs text-slate-400">{TIPO_NEGOCIO_LABEL[cliente.tipo_negocio]}</p>
+            <Card key={cliente.id} className="group flex flex-col p-4 transition-colors hover:border-brand-400">
+              {/* Logo em destaque: área grande, logo inteira (sem cortar). Fundo branco fixo, como as logos vêm. */}
+              <Link
+                to={`/clientes/${cliente.id}`}
+                aria-label={`Abrir ${cliente.nome}`}
+                className="relative flex h-32 items-center justify-center overflow-hidden rounded-xl border border-white/10"
+                style={{ backgroundColor: cliente.logo_url ? '#ffffff' : '#0e1a24' }}
+              >
+                {cliente.logo_url ? (
+                  <LogoCliente src={cliente.logo_url} alt={`Logo ${cliente.nome}`} loading="lazy" className="h-full w-full object-contain p-2 transition-transform group-hover:scale-105" />
+                ) : (
+                  <span className="font-display text-3xl font-bold" style={{ color: '#ffffff' }}>{iniciais(cliente.nome)}</span>
+                )}
               </Link>
+
+              <div className="mt-3 flex items-start justify-between gap-2">
+                <Link to={`/clientes/${cliente.id}`} className="min-w-0">
+                  <h3 className="truncate text-[15px] font-bold text-slate-100">{cliente.nome}</h3>
+                  <p className="text-xs text-slate-400">{TIPO_NEGOCIO_LABEL[cliente.tipo_negocio]}</p>
+                </Link>
+                <span className="shrink-0"><StatusBadge status={cliente.status} /></span>
+              </div>
 
               <div className="mt-3 flex min-h-[22px] flex-wrap gap-1.5">
                 {SERVICOS_BADGE.filter((s) => cliente.servicos?.includes(s.id)).map((s) => (
