@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal } from '@/shared/ui/Modal';
-import { Button } from '@/shared/ui/Button';
-import { Input } from '@/shared/ui/Input';
-import { Select } from '@/shared/ui/Select';
-import { TextareaExpansivel } from '@/shared/ui/TextareaExpansivel';
+import {
+  AreaTexto, Campo, Chips, Escolha, JanelaFormulario, OpcoesCartao, Rotulo, SeletorPrioridade, Texto,
+} from '@/shared/ui/form/FormKit';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
 import { AnexosDemanda } from './AnexosDemanda';
@@ -12,7 +10,7 @@ import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
   useSalvarDemanda, useExcluirDemanda,
-  PRIORIDADES, TIPO_LABEL, TIPO_LABEL_CRIATIVO, TIPOS_CRIATIVO, STATUS_COLUNAS,
+  TIPO_LABEL, TIPO_LABEL_CRIATIVO, TIPOS_CRIATIVO, STATUS_COLUNAS,
   type DesignerDemanda, type DesignerTipo, type DesignerStatus, type DesignerCategoria, type DesignerPrioridade,
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
@@ -95,8 +93,8 @@ export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fa
     [demanda, semanaSugerida],
   );
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(e?: React.FormEvent) {
+    e?.preventDefault();
     setErro(null);
     if (!titulo.trim()) { setErro('Título é obrigatório.'); return; }
     const link = linkConteudo.trim();
@@ -153,178 +151,155 @@ ${r.cronometroErro}`);
     onClose();
   }
 
+  const tiposOpcoes = tiposDisponiveis.map((t) => ({
+    id: t, label: (criativo ? TIPO_LABEL_CRIATIVO[t] : undefined) ?? TIPO_LABEL[t],
+  }));
+
   return (
-    <Modal
+    <JanelaFormulario
       open={open}
       onClose={fechar}
-      title={demanda ? 'Editar demanda' : 'Nova demanda'}
-      size="lg"
-      fecharSoPorBotao
-      footer={
-        <>
+      titulo={demanda ? 'Editar Tarefa' : 'Nova Tarefa'}
+      subtitulo={criativo ? 'Criativo de tráfego pago' : 'Conteúdo orgânico (redes sociais)'}
+      rodape={
+        <div className="flex w-full flex-col gap-2">
+          {erro && <p role="alert" className="text-sm text-red-400">{erro}</p>}
+          <button
+            type="button"
+            onClick={() => void submit()}
+            disabled={salvar.isPending || !titulo.trim()}
+            className="botao-principal flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-brand py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            <GlassIcon name="check" className="h-4 w-4" />
+            {salvar.isPending ? 'Salvando…' : demanda ? 'Salvar alterações' : 'Criar Tarefa'}
+          </button>
           {demanda && (
-            <Button variant="secondary" className="mr-auto text-red-300 hover:bg-red-500/10" onClick={handleExcluir}>
-              <GlassIcon name="trash" /> Excluir
-            </Button>
+            <button type="button" onClick={handleExcluir} className="text-center text-xs font-semibold text-red-400 hover:underline">
+              Excluir tarefa
+            </button>
           )}
-          <Button variant="secondary" onClick={fechar}>Cancelar</Button>
-          <Button onClick={submit} disabled={salvar.isPending}>
-            {salvar.isPending ? 'Salvando…' : 'Salvar'}
-          </Button>
-        </>
+        </div>
       }
     >
-      <form onSubmit={submit} className="space-y-3">
-        <Select
-          id="cat"
-          label="Tipo de trabalho"
-          value={categoria}
-          onChange={(e) => trocarCategoria(e.target.value as DesignerCategoria)}
-          options={[
-            { value: 'organico', label: 'Conteúdo orgânico (redes sociais)' },
-            { value: 'criativo', label: '🎯 Criativo de tráfego pago' },
+      <Campo label="Tipo de trabalho" caixaAlta>
+        <OpcoesCartao
+          opcoes={[
+            { id: 'organico', titulo: 'Orgânico', descricao: 'Conteúdo para redes sociais' },
+            { id: 'criativo', titulo: 'Tráfego pago', descricao: 'Criativo com aprovação própria' },
           ]}
+          valor={categoria}
+          onChange={(v) => void trocarCategoria((v ?? 'organico') as DesignerCategoria)}
         />
-        {criativo && (
-          <p className="-mt-1 text-xs text-orange-300">
-            Ao ficar pronto, esta demanda aparece na aba <strong>Criativos</strong> da Gestão de Conteúdo, com link de aprovação próprio.
+      </Campo>
+      {criativo && (
+        <p className="-mt-2 text-xs text-orange-300">
+          Ao ficar pronto, esta demanda aparece na aba <strong>Criativos</strong> da Gestão de Conteúdo, com link de aprovação próprio.
+        </p>
+      )}
+
+      {demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'alteracao' || demanda.status === 'em_andamento') && (
+        <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100">
+          <p className="mb-1 font-semibold">Reprovado pelo cliente: o que precisa ser refeito</p>
+          <p className="whitespace-pre-line">{demanda.reprovado_justificativa || '(sem justificativa)'}</p>
+          <p className="mt-1 text-xs text-red-300">
+            em {new Date(demanda.reprovado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
           </p>
-        )}
-
-        <div className="grid gap-3 md:grid-cols-2">
-          <Select
-            id="cli"
-            label="Cliente"
-            value={clienteId}
-            onChange={(e) => setClienteId(e.target.value)}
-            options={[
-              { value: '', label: '— sem cliente —' },
-              ...((clientes ?? []).map((c) => ({ value: c.id, label: c.nome }))),
-            ]}
-          />
-          <Select
-            id="tipo"
-            label={criativo ? 'Formato do criativo' : 'Tipo'}
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value as DesignerTipo)}
-            options={tiposDisponiveis.map((t) => ({
-              value: t, label: (criativo ? TIPO_LABEL_CRIATIVO[t] : undefined) ?? TIPO_LABEL[t],
-            }))}
-          />
         </div>
+      )}
 
-        {clienteId && (
-          <RegrasResumo
-            clienteId={clienteId}
-            clienteNome={(clientes ?? []).find((c) => c.id === clienteId)?.nome}
+      {(status === 'alteracao' || ((status === 'a_fazer' || status === 'em_andamento') && alteracaoObs.trim())) && (
+        <Campo label="Alteração: o que precisa ser alterado" caixaAlta>
+          <AreaTexto
+            className="!border-red-500/50"
+            placeholder="Descreva o que deve mudar neste conteúdo (texto, corte, música, cor…). O designer vê isso em vermelho no cartão."
+            value={alteracaoObs}
+            onChange={(e) => setAlteracaoObs(e.target.value)}
           />
-        )}
+        </Campo>
+      )}
 
-        {demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'alteracao' || demanda.status === 'em_andamento') && (
-          <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100">
-            <p className="mb-1 font-semibold">↩ Reprovado pelo cliente — o que precisa ser refeito</p>
-            <p className="whitespace-pre-line">{demanda.reprovado_justificativa || '(sem justificativa)'}</p>
-            <p className="mt-1 text-xs text-red-300">
-              em {new Date(demanda.reprovado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
-            </p>
-          </div>
-        )}
+      <Campo label="Título" obrigatorio caixaAlta>
+        <Texto placeholder="O que precisa ser feito?" value={titulo} onChange={(e) => setTitulo(e.target.value)} autoFocus />
+      </Campo>
 
-        {(status === 'alteracao' || ((status === 'a_fazer' || status === 'em_andamento') && alteracaoObs.trim())) && (
-          <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3">
-            <TextareaExpansivel
-              id="alt"
-              label="Alteração — o que precisa ser alterado"
-              placeholder="Descreva o que deve mudar neste conteúdo (texto, corte, música, cor…). O designer vê isso em vermelho no cartão."
-              value={alteracaoObs}
-              onChange={(e) => setAlteracaoObs(e.target.value)}
-            />
-          </div>
-        )}
+      <Campo label="Descrição" caixaAlta>
+        <AreaTexto placeholder="O que é a demanda, em poucas linhas." value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+      </Campo>
 
-        <Input id="tit" label="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+      <Campo label="Briefing" caixaAlta>
+        <AreaTexto rows={4} placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar." value={briefing} onChange={(e) => setBriefing(e.target.value)} />
+      </Campo>
 
-        <TextareaExpansivel
-          id="desc"
-          label="Descrição"
-          placeholder="O que é a demanda, em poucas linhas."
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
+      <Campo label="Cliente" caixaAlta>
+        <Escolha
+          value={clienteId}
+          onChange={(e) => setClienteId(e.target.value)}
+          opcoes={[{ value: '', label: '— sem cliente —' }, ...((clientes ?? []).map((c) => ({ value: c.id, label: c.nome })))]}
         />
+      </Campo>
+      {clienteId && (
+        <RegrasResumo clienteId={clienteId} clienteNome={(clientes ?? []).find((c) => c.id === clienteId)?.nome} />
+      )}
 
-        <TextareaExpansivel
-          id="brief"
-          label="Briefing"
-          placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar."
-          value={briefing}
-          onChange={(e) => setBriefing(e.target.value)}
+      <Campo label={criativo ? 'Formato do criativo' : 'Tipo'} caixaAlta>
+        <Chips multi={false} opcoes={tiposOpcoes} valores={[tipo]} onChange={(v) => { if (v[0]) setTipo(v[0] as DesignerTipo); }} />
+      </Campo>
+
+      <Campo label="Prioridade" caixaAlta>
+        <SeletorPrioridade
+          valor={prioridade === 'normal' ? 'media' : prioridade}
+          onChange={(v) => setPrioridade((v === 'media' ? 'normal' : v) as DesignerPrioridade)}
         />
+      </Campo>
 
-        <div className="grid gap-3 md:grid-cols-4">
-          <Select
-            id="prio"
-            label="Prioridade"
-            value={prioridade}
-            onChange={(e) => setPrioridade(e.target.value as DesignerPrioridade)}
-            options={PRIORIDADES.map((p) => ({ value: p.id, label: p.label }))}
-          />
-          <Select
-            id="st"
-            label="Status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as DesignerStatus)}
-            options={STATUS_COLUNAS.map((c) => ({ value: c.id, label: c.label }))}
-          />
-          <Select
-            id="resp"
-            label="Responsável"
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Campo label="Responsável" caixaAlta>
+          <Escolha
             value={responsavel}
             onChange={(e) => setResponsavel(e.target.value)}
-            options={[
-              { value: '', label: 'ninguém' },
-              ...((operadores ?? []).map((op) => ({ value: op.id, label: op.nome }))),
-            ]}
+            opcoes={[{ value: '', label: 'ninguém' }, ...((operadores ?? []).map((op) => ({ value: op.id, label: op.nome })))]}
           />
-          <Input id="pz" type="date" label="Prazo (opcional)" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
-        </div>
+        </Campo>
+        <Campo label="Status" caixaAlta>
+          <Escolha
+            value={status}
+            onChange={(e) => setStatus(e.target.value as DesignerStatus)}
+            opcoes={STATUS_COLUNAS.map((c) => ({ value: c.id, label: c.label }))}
+          />
+        </Campo>
+      </div>
 
-        <Select
-          id="sem"
-          label="Semana da demanda"
-          value={semanaRef}
-          onChange={(e) => setSemanaRef(e.target.value)}
-          options={opcoesSemana}
-        />
-        <p className="-mt-1 text-xs text-slate-400">
-          Define em qual semana do quadro a demanda aparece, sem precisar de prazo.
-        </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Campo label="Prazo" caixaAlta dica="opcional">
+          <Texto type="date" prefixoIcone="calendar" value={prazo} onChange={(e) => setPrazo(e.target.value)} />
+        </Campo>
+        <Campo label="Semana da demanda" caixaAlta>
+          <Escolha value={semanaRef} onChange={(e) => setSemanaRef(e.target.value)} opcoes={opcoesSemana} />
+        </Campo>
+      </div>
 
-        <Select
-          id="renov"
-          label="Renovação"
-          value={renovacao}
-          onChange={(e) => setRenovacao(e.target.value as Renovacao)}
-          options={RENOVACAO_OPTIONS}
-        />
+      <Campo label="Recorrência" caixaAlta icone="repeat">
+        <Escolha value={renovacao} onChange={(e) => setRenovacao(e.target.value as Renovacao)} opcoes={RENOVACAO_OPTIONS} />
         {renovacao !== 'nenhuma' && (
-          <p className="-mt-1 text-xs text-slate-400">
+          <p className="text-xs text-slate-400">
             Ao concluir, o sistema cria a próxima demanda em A fazer, {renovacao === 'semanal' ? 'na semana seguinte' : 'no mês seguinte'}.
           </p>
         )}
+      </Campo>
 
-        <Input
-          id="lnk"
-          type="url"
-          label="Link do conteúdo pronto (Drive)"
-          placeholder="Cole aqui o link depois de subir o arquivo. Vai junto para a Gestão de Conteúdo."
+      <Campo label="Link do conteúdo pronto (Drive)" caixaAlta>
+        <Texto
+          type="url" prefixoIcone="link"
+          placeholder="Cole o link depois de subir o arquivo. Vai junto para a Gestão de Conteúdo."
           value={linkConteudo}
           onChange={(e) => setLinkConteudo(e.target.value)}
         />
+      </Campo>
 
+      <div className="flex flex-col gap-1.5">
+        <Rotulo caixaAlta dica="vários">Arquivos</Rotulo>
         <AnexosDemanda anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />
-
-        {erro && <p role="alert" className="text-sm text-red-400">{erro}</p>}
-      </form>
-    </Modal>
+      </div>
+    </JanelaFormulario>
   );
 }

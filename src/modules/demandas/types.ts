@@ -2,7 +2,13 @@ import type { Renovacao } from '@/modules/demandas/lib/renovacao';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 
 export type DemandaStatus = 'aberta' | 'iuri' | 'domini' | 'fazendo' | 'concluida';
-export type DemandaPrioridade = 'baixa' | 'media' | 'alta';
+export type DemandaPrioridade = 'baixa' | 'media' | 'alta' | 'urgente';
+export type DemandaQuem = 'agencia' | 'cliente';
+
+export interface Subtarefa {
+  texto: string;
+  feita: boolean;
+}
 export type DemandaSetor = 'socios' | 'trafego' | 'design' | 'geral';
 
 export interface Demanda {
@@ -20,8 +26,23 @@ export interface Demanda {
   renovacao?: Renovacao;
   /** Prints/imagens/PDFs anexados (bucket anexos-internos). */
   anexos?: CriativoAnexo[];
+  /** Tarefa interna da equipe ou pendência do cliente. */
+  quem_responsavel?: DemandaQuem;
+  responsaveis_secundarios?: string[];
+  categoria?: string | null;
+  tempo_estimado_min?: number | null;
+  links?: string[];
+  subtarefas?: Subtarefa[];
   created_at: string;
 }
+
+export const DEMANDA_CATEGORIAS: { id: string; label: string; icone: string }[] = [
+  { id: 'aprovacao', label: 'Aprovação', icone: 'check-circle' },
+  { id: 'conteudo', label: 'Conteúdo', icone: 'file-text' },
+  { id: 'planilha', label: 'Planilha', icone: 'grid' },
+  { id: 'reuniao', label: 'Reunião', icone: 'users' },
+  { id: 'outro', label: 'Outro', icone: 'map-pin' },
+];
 
 export const DEMANDA_SETORES: { id: DemandaSetor; label: string; adminOnly?: boolean }[] = [
   { id: 'socios', label: 'Sócios', adminOnly: true },
@@ -42,12 +63,14 @@ export const DEMANDA_COLUNAS: { id: DemandaStatus; label: string; socios_only?: 
 ];
 
 export const PRIORIDADE_TONE: Record<DemandaPrioridade, 'red' | 'amber' | 'slate'> = {
+  urgente: 'red',
   alta: 'red',
   media: 'amber',
   baixa: 'slate',
 };
 
 export const PRIORIDADE_LABEL: Record<DemandaPrioridade, string> = {
+  urgente: 'Urgente',
   alta: 'Alta',
   media: 'Média',
   baixa: 'Baixa',

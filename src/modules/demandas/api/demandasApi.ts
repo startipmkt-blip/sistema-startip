@@ -48,7 +48,7 @@ export function useDemandas(clienteId: string) {
 export type DemandaFormData = Pick<
   Demanda,
   'cliente_id' | 'setor' | 'privada' | 'titulo' | 'descricao' | 'responsavel' | 'prioridade' | 'status' | 'prazo' | 'renovacao'
-> & Partial<Pick<Demanda, 'anexos'>>;
+> & Partial<Pick<Demanda, 'anexos' | 'quem_responsavel' | 'responsaveis_secundarios' | 'categoria' | 'tempo_estimado_min' | 'links' | 'subtarefas'>>;
 
 async function saveDemanda(id: string | undefined, dados: DemandaFormData): Promise<string> {
   if (IS_DEMO) {
@@ -124,6 +124,9 @@ async function renovarDemanda(id: string): Promise<void> {
     cliente_id: d.cliente_id, setor: d.setor, privada: d.privada, titulo: d.titulo, descricao: d.descricao,
     responsavel: d.responsavel, prioridade: d.prioridade, status: 'aberta',
     prazo: proximaData(d.prazo || hojeStr(), d.renovacao), renovacao: d.renovacao,
+    quem_responsavel: d.quem_responsavel ?? 'agencia', responsaveis_secundarios: d.responsaveis_secundarios ?? [],
+    categoria: d.categoria ?? null, tempo_estimado_min: d.tempo_estimado_min ?? null, links: d.links ?? [],
+    subtarefas: (d.subtarefas ?? []).map((t) => ({ ...t, feita: false })),
   } as never);
   if (errIns) throw errIns;
   const { error: errUpd } = await supabase.from('demandas').update({ renovacao: 'nenhuma' } as never).eq('id', id);

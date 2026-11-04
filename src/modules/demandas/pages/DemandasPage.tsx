@@ -284,6 +284,7 @@ export function DemandasPage() {
             <Select
               options={[
                 { value: '', label: 'Toda importância' },
+                { value: 'urgente', label: 'Urgente' },
                 { value: 'alta', label: 'Importância alta' },
                 { value: 'media', label: 'Importância média' },
                 { value: 'baixa', label: 'Importância baixa' },
