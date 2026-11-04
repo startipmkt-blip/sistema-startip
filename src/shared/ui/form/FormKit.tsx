@@ -28,7 +28,7 @@ const LARGURAS = { md: 'max-w-[560px]', lg: 'max-w-[660px]', xl: 'max-w-[880px]'
 export function JanelaFormulario({ open, onClose, titulo, subtitulo, icone, largura = 'md', topo, rodape, children }: JanelaProps) {
   if (!open) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3">
+    <div className="janela-fundo fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3">
       <div className={`janela-form flex max-h-[94vh] w-full ${LARGURAS[largura]} flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#121a24] shadow-pop`}>
         <div className="flex shrink-0 items-start justify-between gap-3 px-6 pb-3 pt-5">
           <div className="min-w-0">

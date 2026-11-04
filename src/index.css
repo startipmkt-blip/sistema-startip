@@ -666,3 +666,19 @@ html.light h1 { letter-spacing: -0.025em; }
    "hover:bg-white/..." por substring e pintavam o item parado de cinza. */
 html.light [class*="hover:bg-white/"]:not(:is([class~="bg-white/5"],[class~="bg-white/[0.02]"],[class~="bg-white/[0.03]"],[class~="bg-white/[0.04]"],[class~="bg-white/[0.055]"],[class~="bg-white/[0.06]"],[class~="bg-white/[0.09]"],[class~="bg-white/10"],[class*="bg-brand"],[class*="bg-emerald"],[class*="bg-amber"],[class*="bg-red"],[class*="bg-slate"],.glass,.glass-strong)) { background-color: transparent !important; }
 html.light [class*="hover:bg-white/"]:not(.nav-dark *):hover { background-color: #f1f5f8 !important; }
+
+/* ---------- Kit de formulários (FormKit) no tema claro ---------- */
+html.light .janela-form { background-color: #f8fafb !important; border-color: #e3e8ee !important; }
+html.light .janela-form .secao-form,
+html.light .janela-form .cena-form { background-color: #ffffff !important; border-color: #e3e8ee !important; }
+html.light .janela-form .campo-form { background-color: #ffffff !important; border-color: #dde3ea !important; color: #0e1a24 !important; }
+html.light .opcao-cartao:not(.opcao-ativa),
+html.light .chip-form:not(.chip-ativo),
+html.light .pessoa-form:not([aria-pressed="true"]) { background-color: #ffffff !important; border-color: #dde3ea !important; }
+html.light .opcao-ativa { background-color: #eef7fd !important; border-color: #1e9be0 !important; box-shadow: 0 0 0 1px #1e9be0 inset; }
+html.light .chip-ativo { background-color: #eef7fd !important; border-color: #1e9be0 !important; color: #0b5d8c !important; }
+html.light .botao-tracejado { background-color: transparent !important; border-color: #cfd8e1 !important; }
+html.light .botao-adicionar { background-color: #e6f4fc !important; color: #0b5d8c !important; }
+html.light .prioridade-form[aria-pressed="true"] { color: #fff !important; }
+html.light .prioridade-form[aria-pressed="false"] { background-color: #fff !important; }
+html.light .janela-fundo.janela-fundo { background-color: rgba(14, 26, 36, 0.45) !important; }
