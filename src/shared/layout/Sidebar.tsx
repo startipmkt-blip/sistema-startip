@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function Sidebar({ aberto, onFechar }: Props) {
-  const { isEquipe, podeAcessar } = useAuth();
+  const { isEquipe, podeAcessar, profile, isAdmin } = useAuth();
 
   const visivel = (item: NavItem) =>
     !(item.equipeOnly && !isEquipe) && (item.comingSoon || podeAcessar(moduloKey(item)));
@@ -23,7 +23,7 @@ export function Sidebar({ aberto, onFechar }: Props) {
         return (
           <div key={grupo.titulo ?? 'topo'}>
             {grupo.titulo && (
-              <div className="mb-1.5 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400/80">
+              <div className="nav-grupo mb-1.5 px-3 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-slate-400/80">
                 {grupo.titulo}
               </div>
             )}
@@ -56,14 +56,29 @@ export function Sidebar({ aberto, onFechar }: Props) {
     </nav>
   );
 
+  const nome = profile?.nome ?? 'Equipe Startip';
+  const iniciais = nome.replace(/\(.*?\)/g, '').trim().split(/\s+/).map((p) => p[0]).slice(0, 2).join('').toUpperCase();
+  const rodape = (
+    <div className="side-user flex items-center gap-3 border-t border-white/[0.08] px-4 py-3.5">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#12324a] font-display text-xs font-bold">
+        {iniciais}
+      </div>
+      <div className="min-w-0">
+        <div className="truncate text-sm font-semibold">{nome}</div>
+        <div className="side-user-sub truncate text-xs">{profile?.cargo ?? (isAdmin ? 'Admin' : 'Equipe')}</div>
+      </div>
+    </div>
+  );
+
   return (
     <>
       {/* Desktop: menu fixo */}
-      <aside className="sidebar-dark hidden w-60 shrink-0 flex-col border-r border-white/[0.08] bg-[#0e151d] lg:flex">
-        <div className="flex h-14 items-center border-b border-white/[0.08] px-5">
+      <aside className="sidebar-dark hidden w-64 shrink-0 flex-col border-r border-white/[0.08] bg-[#0e151d] lg:flex">
+        <div className="flex h-16 items-center px-5">
           <BrandMark sub="OS" />
         </div>
         {nav}
+        {rodape}
       </aside>
 
       {/* Mobile: gaveta (só quando aberta) */}
@@ -82,6 +97,7 @@ export function Sidebar({ aberto, onFechar }: Props) {
               </button>
             </div>
             {nav}
+            {rodape}
           </aside>
         </div>
       )}

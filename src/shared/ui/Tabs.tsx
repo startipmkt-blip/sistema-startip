@@ -14,10 +14,10 @@ interface TabsProps<T extends string> {
   className?: string;
 }
 
-// Único estilo de abas do sistema: texto + sublinhado azul na ativa.
+// Único estilo de abas do sistema: controle segmentado (pílula clara na ativa).
 export function Tabs<T extends string>({ tabs, value, onChange, className = '' }: TabsProps<T>) {
   return (
-    <div role="tablist" className={`flex flex-wrap gap-x-1 border-b border-white/10 ${className}`}>
+    <div role="tablist" className={`tabs-clean inline-flex max-w-full flex-wrap gap-1 self-start rounded-xl border border-white/10 bg-white/[0.03] p-1 ${className}`}>
       {tabs.map((t) => {
         const ativa = t.id === value;
         return (
@@ -26,10 +26,10 @@ export function Tabs<T extends string>({ tabs, value, onChange, className = '' }
             role="tab"
             aria-selected={ativa}
             onClick={() => onChange(t.id)}
-            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
               ativa
-                ? 'border-brand-400 text-white'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'tab-ativa bg-white/10 text-white'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             {t.icon}

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, createHashRouter } from 'react-router-dom';
 import { AppShell } from '@/shared/layout/AppShell';
 import { ProtectedRoute } from '@/shared/auth/ProtectedRoute';
 import { RequireModulo } from '@/shared/auth/RequireModulo';
@@ -53,7 +53,10 @@ import { OnboardingPublicoPage } from '@/pages/OnboardingPublicoPage';
 
 // Padrão para módulos futuros: envolva a page em <RequireModulo modulo="chave">
 // para respeitar a permissão do cargo.
-export const router = createBrowserRouter([
+// Build de prévia (página estática publicada como link) usa rotas por # porque não há servidor para reescrever caminhos.
+const criarRouter = import.meta.env.VITE_PREVIEW_HASH === '1' ? createHashRouter : createBrowserRouter;
+
+export const router = criarRouter([
   { path: '/login', element: <LoginPage /> },
   // Rota pública de auto-cadastro do cliente (sem auth).
   { path: '/cadastro/:slug', element: <CadastroPublicoPage /> },

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { Sidebar } from '@/shared/layout/Sidebar';
 import { Topbar } from '@/shared/layout/Topbar';
 import { DemoBanner } from '@/shared/layout/DemoBanner';
@@ -13,8 +13,7 @@ import { AlertasAoVivo } from '@/modules/alertas/components/AlertasAoVivo';
 export function AppShell() {
   const { isCliente } = useAuth();
   const [menuAberto, setMenuAberto] = useState(false);
-  const { pathname } = useLocation();
-  const semSidebar = pathname === '/inicio' || pathname === '/';
+  const semSidebar = false;
   if (isCliente) return <Navigate to="/portal" replace />;
 
   return (

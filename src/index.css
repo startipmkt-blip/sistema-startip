@@ -541,3 +541,99 @@ h1, h2, h3, h4 {
 *::-webkit-scrollbar-thumb:hover {
   background-color: rgba(148, 163, 184, 0.4);
 }
+
+/* =====================================================================
+   VISUAL CLEAN (prévia inspirada no App Level, identidade Startip)
+   Canvas off-white frio, cards brancos com borda 1px e sem sombra, menu
+   quase preto com item ativo em azul sólido, selos em pílula suave.
+   Fica no fim do arquivo para vencer as regras do tema claro acima.
+   ===================================================================== */
+html.light body,
+html.light body.light { background-color: #f7f9fb !important; color: #0e1a24; }
+
+/* Cards */
+html.light .glass,
+html.light .glass-strong {
+  background-color: #ffffff !important;
+  border: 1px solid #e3e8ee !important;
+  box-shadow: none !important;
+  border-radius: 12px;
+}
+html.light [class*="shadow-glass"] { box-shadow: none !important; }
+html.light [class*="shadow-sm"]:not(.nav-dark *) { box-shadow: none !important; }
+html.light [class*="border-white/[0.08]"],
+html.light [class*="border-white/[0.06]"],
+html.light [class*="border-white/5"],
+html.light [class*="border-white/10"],
+html.light [class*="border-white/15"] { border-color: #e3e8ee !important; }
+html.light [class*="divide-white"] > * + * { border-color: #e9edf2 !important; }
+
+/* Texto */
+html.light [class*="text-slate-100"],
+html.light [class*="text-slate-200"],
+html.light [class~="text-white"] { color: #0e1a24 !important; }
+html.light [class~="text-slate-300"] { color: #2b3a47 !important; }
+html.light [class~="text-slate-400"],
+html.light [class~="text-slate-500"] { color: #5a6875 !important; }
+
+/* Menu lateral quase preto, item ativo em azul sólido */
+html.light aside.sidebar-dark.sidebar-dark,
+aside.sidebar-dark { background-color: #0b131a !important; border-color: #16222c !important; }
+html.light .sidebar-dark .nav-dark a.nav-ativo,
+.sidebar-dark .nav-dark a.nav-ativo { background-color: #1e9be0 !important; }
+html.light .sidebar-dark .nav-dark a.nav-ativo,
+html.light .sidebar-dark .nav-dark a.nav-ativo * { color: #fff !important; font-weight: 600; }
+html.light .sidebar-dark .nav-dark a:not(.nav-ativo) { color: #b9c5cf !important; }
+html.light .sidebar-dark .nav-dark.nav-dark a:not(.nav-ativo):hover { background-color: #131e27 !important; color: #fff !important; }
+html.light .sidebar-dark .nav-grupo { color: #6f7f8c !important; }
+html.light .sidebar-dark .side-user,
+html.light .sidebar-dark .side-user * { color: #fff !important; }
+html.light .sidebar-dark .side-user .side-user-sub { color: #6f7f8c !important; }
+
+/* Topbar branca e leve */
+html.light header.topbar-clean { background-color: #ffffff !important; border-color: #e3e8ee !important; }
+
+/* Botões */
+html.light button[class*="bg-white/[0.04]"][class*="border"] ,
+html.light a[class*="bg-white/[0.04]"][class*="border"] {
+  background-color: #ffffff !important; border-color: #dde3ea !important; color: #0e1a24 !important; font-weight: 600;
+}
+html.light button[class*="bg-white/[0.04]"][class*="border"]:hover { border-color: #9aa8b4 !important; }
+html.light [class~="bg-gradient-brand"] { background-image: linear-gradient(#1e9be0, #1e9be0) !important; font-weight: 600; }
+html.light [class~="bg-gradient-brand"]:hover { background-image: linear-gradient(#1580bf, #1580bf) !important; filter: none; }
+html.light [class~="bg-brand-500"] { background-color: #1e9be0 !important; }
+
+/* Campos */
+html.light input, html.light select, html.light textarea { border-color: #dde3ea !important; }
+html.light input:focus, html.light select:focus, html.light textarea:focus { border-color: #1e9be0 !important; box-shadow: 0 0 0 3px rgba(30,155,224,.15) !important; }
+
+/* Tabelas: cabeçalho discreto em caixa alta */
+html.light table thead tr { background-color: transparent !important; }
+html.light table thead th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #8a97a3 !important; font-weight: 600; }
+html.light table tbody tr:hover { background-color: #f7f9fb !important; }
+
+/* Fundos translúcidos claros viram cinza-azulado bem leve */
+html.light :not(.nav-dark *):is([class~="bg-white/5"],[class~="bg-white/[0.02]"],[class~="bg-white/[0.03]"],[class~="bg-white/[0.04]"],[class~="bg-white/[0.055]"],[class~="bg-white/[0.06]"],[class~="bg-white/[0.09]"],[class~="bg-white/10"]) { background-color: #f3f6f9 !important; }
+html.light .nav-dark a:not(.nav-ativo) { background-color: transparent !important; }
+
+/* Modais */
+html.light [role="dialog"] .glass,
+html.light [role="dialog"] .glass-strong { box-shadow: 0 24px 48px rgba(14, 26, 36, .16) !important; }
+
+/* Chip de ícone (StatCard, Início) */
+.chip-icone { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9px; flex: none; }
+
+/* Kanban: coluna branca com faixa colorida no topo, cards brancos */
+html.light .kanban-col { background-color: #ffffff !important; border-top-color: var(--cor) !important; }
+html.light .kanban-card { background-color: #ffffff !important; border-color: #e3e8ee !important; }
+html.light .kanban-card:hover { border-color: #1e9be0 !important; }
+
+/* Abas segmentadas */
+html.light .tabs-clean { background-color: #ffffff !important; border-color: #e3e8ee !important; }
+html.light .tabs-clean .tab-ativa { background-color: #eef5fb !important; color: #0b5d8c !important; box-shadow: inset 0 0 0 1px #cfe6f6; }
+
+/* Chips de ícone em tom suave no claro */
+html.light .chip-icone[class*="bg-brand-500/10"] { background-color: #e6f4fc !important; }
+html.light .chip-icone[class*="bg-emerald-500/10"] { background-color: #e8f7ee !important; }
+html.light .chip-icone[class*="bg-red-500/10"] { background-color: #fdecec !important; }
+html.light .chip-icone[class*="bg-amber-500/10"] { background-color: #fdf3e3 !important; }

@@ -11,8 +11,8 @@ export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 pb-1">
       <div className="min-w-0">
-        <h1 className="text-xl font-semibold tracking-tight text-white">{glassify(title)}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-slate-400">{glassify(subtitle)}</p>}
+        <h1 className="text-[26px] font-bold leading-tight tracking-[-0.02em] text-white">{glassify(title)}</h1>
+        {subtitle && <p className="mt-1 text-sm text-slate-400">{glassify(subtitle)}</p>}
       </div>
       {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
     </div>

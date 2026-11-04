@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { podeAcessarModulo } from '@/shared/auth/permissions';
-import { BrandMark } from '@/shared/ui/BrandMark';
 
 interface ModuloCard {
   numero: string;
@@ -9,25 +8,26 @@ interface ModuloCard {
   icone: string;
   to: string;
   modulo: string;
+  desc: string;
 }
 
 const OPERACIONAL: ModuloCard[] = [
-  { numero: '01', label: 'Gestão de Clientes', icone: '01_gestao_de_clientes', to: '/clientes',           modulo: 'clientes' },
-  { numero: '02', label: 'Gestor de Tráfego',  icone: '02_gestor_de_trafego', to: '/trafego',            modulo: 'diretoria' },
-  { numero: '16', label: 'Painel do Gestor',   icone: '16_painel_do_gestor', to: '/painel-gestor',      modulo: 'diretoria' },
-  { numero: '03', label: 'CRM · WhatsApp',     icone: '03_crm_whatsapp', to: '/crm',                modulo: 'crm' },
-  { numero: '04', label: 'Designer',           icone: '04_designer', to: '/designer',           modulo: 'conteudo' },
-  { numero: '05', label: 'Demandas',           icone: '05_demandas', to: '/demandas',           modulo: 'demandas' },
-  { numero: '07', label: 'Financeiro',         icone: '07_financeiro', to: '/financeiro',         modulo: 'financeiro' },
-  { numero: '08', label: 'Otimizações',        icone: '08_otimizacoes', to: '/otimizacoes',        modulo: 'otimizacoes' },
-  { numero: '10', label: 'Painel TV',          icone: '10_painel_tv', to: '/painel-tv',          modulo: 'painel-tv' },
-  { numero: '11', label: 'Ideias/Anotações',   icone: '11_ideias_anotacoes', to: '/ideias',            modulo: 'ideias' },
-  { numero: '12', label: 'Gestão de Conteúdo', icone: '12_gestao_de_conteudos', to: '/gestao-conteudo',   modulo: 'gestao-conteudo' },
-  { numero: '14', label: 'CS Clientes',        icone: '14_cs_clientes', to: '/cs-clientes',        modulo: 'cs-clientes' },
+  { numero: '01', label: 'Gestão de Clientes', icone: '01_gestao_de_clientes', to: '/clientes',           modulo: 'clientes', desc: 'Cadastro, materiais e workspace de cada cliente.' },
+  { numero: '02', label: 'Gestor de Tráfego',  icone: '02_gestor_de_trafego', to: '/trafego',            modulo: 'diretoria', desc: 'Contas de anúncio, campanhas e resultados.' },
+  { numero: '16', label: 'Painel do Gestor',   icone: '16_painel_do_gestor', to: '/painel-gestor',      modulo: 'diretoria', desc: 'Visão consolidada de performance por gestor.' },
+  { numero: '03', label: 'CRM · WhatsApp',     icone: '03_crm_whatsapp', to: '/crm',                modulo: 'crm', desc: 'Inbox do WhatsApp, leads e funil comercial.' },
+  { numero: '04', label: 'Designer',           icone: '04_designer', to: '/designer',           modulo: 'conteudo', desc: 'Fila de artes e vídeos com prioridade.' },
+  { numero: '05', label: 'Demandas',           icone: '05_demandas', to: '/demandas',           modulo: 'demandas', desc: 'Tarefas da equipe por setor e responsável.' },
+  { numero: '07', label: 'Financeiro',         icone: '07_financeiro', to: '/financeiro',         modulo: 'financeiro', desc: 'MRR, despesas, contas a pagar e saldo.' },
+  { numero: '08', label: 'Otimizações',        icone: '08_otimizacoes', to: '/otimizacoes',        modulo: 'otimizacoes', desc: 'Registro das otimizações feitas nas contas.' },
+  { numero: '10', label: 'Painel TV',          icone: '10_painel_tv', to: '/painel-tv',          modulo: 'painel-tv', desc: 'Indicadores da agência para a TV do escritório.' },
+  { numero: '11', label: 'Ideias/Anotações',   icone: '11_ideias_anotacoes', to: '/ideias',            modulo: 'ideias', desc: 'Anotações e ideias soltas da equipe.' },
+  { numero: '12', label: 'Gestão de Conteúdo', icone: '12_gestao_de_conteudos', to: '/gestao-conteudo',   modulo: 'gestao-conteudo', desc: 'Calendário editorial, pautas e aprovação.' },
+  { numero: '14', label: 'CS Clientes',        icone: '14_cs_clientes', to: '/cs-clientes',        modulo: 'cs-clientes', desc: 'Saúde dos clientes e acompanhamento de CS.' },
 ];
 
 const GERENCIAL: ModuloCard[] = [
-  { numero: '15', label: 'Contratos',         icone: '15_contratos', to: '/contratos',          modulo: 'contratos' },
+  { numero: '15', label: 'Contratos',         icone: '15_contratos', to: '/contratos',          modulo: 'contratos', desc: 'Contratos ativos, vigência e renovação.' },
 ];
 
 function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCard[]; profile: Parameters<typeof podeAcessarModulo>[0] }) {
@@ -35,27 +35,22 @@ function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCa
   if (visiveis.length === 0) return null;
   return (
     <section>
-      <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-        {titulo}
-      </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+      <h2 className="mb-3 text-base font-semibold text-slate-100">{titulo}</h2>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {visiveis.map((m) => (
           <Link
             key={m.to}
             to={m.to}
-            className="group flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-400/40 hover:bg-brand-500/5"
+            className="glass group flex items-center gap-3.5 p-4 transition-colors hover:border-brand-400"
           >
-            <img src={`/icones-inicio/${m.icone}.webp`} alt="" width={44} height={44} className="h-11 w-11 shrink-0 select-none object-contain transition-transform group-hover:scale-105" draggable={false} />
+            <span className="chip-icone h-11 w-11 bg-brand-500/10">
+              <img src={`/icones-inicio/${m.icone}.webp`} alt="" width={30} height={30} className="h-[30px] w-[30px] select-none object-contain" draggable={false} />
+            </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">
-                {m.numero} · ÁREA
-              </div>
-              <div className="mt-0.5 truncate text-sm font-medium text-slate-100">{m.label}</div>
-              <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-brand-300 opacity-0 transition-opacity group-hover:opacity-100">
-                Acessar →
-              </div>
+              <div className="truncate text-sm font-semibold text-slate-100">{m.label}</div>
+              <div className="mt-0.5 line-clamp-2 text-xs text-slate-400">{m.desc}</div>
             </div>
+            <span className="text-slate-400 transition-transform group-hover:translate-x-0.5" aria-hidden>→</span>
           </Link>
         ))}
       </div>
@@ -66,41 +61,25 @@ function GridSecao({ titulo, itens, profile }: { titulo: string; itens: ModuloCa
 export function InicioPage() {
   const { profile } = useAuth();
   const nome = profile?.nome?.split(' ')[0] ?? 'equipe';
+  const hoje = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
   return (
-    <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(260px,320px)_1fr]">
-      {/* Coluna esquerda — identidade */}
-      <aside className="flex flex-col justify-between gap-6">
-        <div>
-          <BrandMark sub="" className="mb-6 [&_img]:h-16" />
-          <span className="inline-flex rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
-            Central de Ferramentas
-          </span>
-          <h1 className="mt-4 text-3xl font-semibold leading-tight text-slate-100">
-            Olá, {nome}. <br />
-            Toda a operação.
-            <br />
-            <span className="text-brand-300">Num só lugar.</span>
-          </h1>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-400">
-            Selecione uma área para acessar as ferramentas da equipe Startip —
-            atendimento, mídia, produção, financeiro e diretoria, todas integradas.
-          </p>
-        </div>
-        <footer className="hidden lg:block">
-          <div className="text-xs font-semibold text-slate-300">Startip OS</div>
-          <div className="mt-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            Sistema ativo
-          </div>
-        </footer>
-      </aside>
+    <div className="mx-auto flex max-w-6xl flex-col gap-8">
+      <header className="flex flex-col gap-2">
+        <span className="self-start rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold capitalize text-brand-300">
+          {hoje}
+        </span>
+        <h1 className="text-[34px] font-bold leading-tight tracking-[-0.03em] text-slate-100">
+          Olá, <span className="text-brand-400">{nome}</span>.
+        </h1>
+        <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
+          Toda a operação da Startip num só lugar: atendimento, mídia, produção, financeiro e diretoria.
+          Escolha uma área para começar.
+        </p>
+      </header>
 
-      {/* Coluna direita — grid de módulos */}
-      <div className="space-y-6">
-        <GridSecao titulo="Operacional" itens={OPERACIONAL} profile={profile} />
-        <GridSecao titulo="Gerencial"   itens={GERENCIAL}   profile={profile} />
-      </div>
+      <GridSecao titulo="Operacional" itens={OPERACIONAL} profile={profile} />
+      <GridSecao titulo="Gerencial" itens={GERENCIAL} profile={profile} />
     </div>
   );
 }

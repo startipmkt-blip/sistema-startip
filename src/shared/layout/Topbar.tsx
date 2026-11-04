@@ -12,7 +12,7 @@ export function Topbar({ onAbrirMenu, ocultarHamburguer = false }: { onAbrirMenu
   const papelLabel = isCliente ? 'Cliente' : isAdmin ? 'Admin' : 'Funcionário';
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0e151d] px-3 sm:px-6">
+    <header className="topbar-clean flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0e151d] px-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
         {/* Botão hambúrguer — só no mobile e quando há sidebar */}
         <button
