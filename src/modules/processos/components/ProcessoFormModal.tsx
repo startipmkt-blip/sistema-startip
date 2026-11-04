@@ -10,7 +10,7 @@ import { CapaUpload } from '@/shared/ui/form/CapaUpload';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import {
-  BotaoTracejado, Campo, JanelaFormulario, SubtituloForm, Texto,
+  CampoLink, BotaoTracejado, Campo, JanelaFormulario, SubtituloForm, Texto,
 } from '@/shared/ui/form/FormKit';
 import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
 
@@ -209,7 +209,7 @@ export function ProcessoFormModal({ open, onClose, doc, categoriaInicial }: Prop
         <EditorRico linhas={2} placeholder="Ex: Notion, Figma, Tabela de referências..." value={form.materiais ?? ''} onChange={(v) => set('materiais', v)} />
       </Campo>
       <Campo label="Vídeo Explicativo (URL)">
-        <Texto type="url" prefixoIcone="video" placeholder="https://..." value={form.video_url ?? ''} onChange={(e) => set('video_url', e.target.value)} />
+        <CampoLink prefixoIcone="video" value={form.video_url ?? ''} onChange={(v) => set('video_url', v)} />
       </Campo>
       <Campo label="Anexos (PDF, DOC, imagem)">
         <AnexoUploader bucket="anexos-internos" anexos={(form.anexos ?? []) as Anexo[]} onChange={(a) => set('anexos', a)} />

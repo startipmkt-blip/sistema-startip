@@ -10,7 +10,7 @@ import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import type { ConteudoTipo } from '@/modules/conteudo/types';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import {
-  AreaTexto, Campo, Chips, EditorCenas, Escolha, FORMATOS_CONTEUDO, FUNIL, GATILHOS, JanelaFormulario, OpcoesCartao,
+  CampoLink, AreaTexto, Campo, Chips, EditorCenas, Escolha, FORMATOS_CONTEUDO, FUNIL, GATILHOS, JanelaFormulario, OpcoesCartao,
   PLATAFORMAS, Rotulo, Secao, Texto, type Cena,
 } from '@/shared/ui/form/FormKit';
 import { TIPOS_ROTEIRO, roteiros, type Roteiro, type TipoRoteiro } from './roteirosApi';
@@ -230,7 +230,7 @@ export function RoteiroFormModal({ onClose, mes, clientes, clienteId, roteiro, i
 
         <Secao icone="paperclip" titulo="Referências" subtitulo="Opcional — tudo aqui é opcional">
           <Campo label="Link de Inspiração" icone="link">
-            <Texto type="url" placeholder="https://..." value={form.link_inspiracao} onChange={(e) => set('link_inspiracao', e.target.value)} />
+            <CampoLink value={form.link_inspiracao ?? ''} onChange={(v) => set('link_inspiracao', v)} />
           </Campo>
           <Campo label="Anexar Arquivo" icone="paperclip">
             <AnexosCriativo anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CapaUpload } from '@/shared/ui/form/CapaUpload';
-import { Campo, Escolha, JanelaFormulario, Secao, Texto } from '@/shared/ui/form/FormKit';
+import { CampoLink, Campo, Escolha, JanelaFormulario, Secao, Texto } from '@/shared/ui/form/FormKit';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { ClienteGestao } from '@/modules/gestao-conteudo/utils';
 import {
@@ -110,7 +110,7 @@ export function InspiracaoFormModal({ onClose, inspiracao, clientes, clienteInic
 
       <Secao icone="link" titulo="Conteúdo" subtitulo="Link e imagem de referência">
         <Campo label="Link (YouTube, Instagram, site...)" icone="link">
-          <Texto type="url" placeholder="https://..." value={form.link} onChange={(e) => set('link', e.target.value)} />
+          <CampoLink value={form.link ?? ''} onChange={(v) => set('link', v)} />
         </Campo>
         <Campo label="Capa" obrigatorio>
           <CapaUpload valor={form.capa} onChange={(c) => set('capa', c)} onNovo={setCapaNova} />

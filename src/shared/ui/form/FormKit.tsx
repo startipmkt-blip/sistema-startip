@@ -286,6 +286,42 @@ export function ListaLinks({ valores, onChange, placeholder = 'https://...' }: {
   );
 }
 
+/** Campo de um link só: depois de colar, vira link azul clicável (abre em nova aba), com lápis para editar. */
+export function CampoLink({ value, onChange, placeholder = 'https://...', prefixoIcone = 'link' }: {
+  value: string; onChange: (v: string) => void; placeholder?: string; prefixoIcone?: string;
+}) {
+  // Mostra como link enquanto o campo não está em foco; colar já confirma.
+  const [foco, setFoco] = useState(false);
+  const v = value.trim();
+  const url = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  if (v && !foco) {
+    return (
+      <div className="campo-form flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm">
+        <GlassIcon name={prefixoIcone} className="h-4 w-4 shrink-0" />
+        <a href={url} target="_blank" rel="noreferrer" title="Abrir link em nova aba"
+          className="min-w-0 flex-1 truncate font-medium text-brand-500 underline-offset-2 hover:underline">{v}</a>
+        <button type="button" onClick={() => setFoco(true)} className="rounded p-1 text-slate-400 hover:bg-white/10" aria-label="Editar link" title="Editar link">
+          <GlassIcon name="pencil" className="h-3.5 w-3.5" />
+        </button>
+        <button type="button" onClick={() => onChange('')} className="rounded p-1 text-slate-400 hover:text-red-400" aria-label="Remover link" title="Remover link">
+          <GlassIcon name="x" className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+  return (
+    <Texto
+      type="url" inputMode="url" prefixoIcone={prefixoIcone} placeholder={placeholder} value={value}
+      autoFocus={foco}
+      onChange={(e) => onChange(e.target.value)}
+      onFocus={() => setFoco(true)}
+      onBlur={() => setFoco(false)}
+      onPaste={(e) => { const el = e.currentTarget; setTimeout(() => { if (el.value.trim()) el.blur(); }, 0); }}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+    />
+  );
+}
+
 /** Lista simples de textos (subtarefas, restrições). Enter ou "+" adiciona. */
 export function ListaItens({ valores, onChange, placeholder, comCheck = false, marcados = [], onMarcar }: {
   valores: string[]; onChange: (v: string[]) => void; placeholder: string;

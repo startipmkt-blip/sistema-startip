@@ -26,6 +26,8 @@ export interface Roteiro extends Registro {
   legenda: string;
   data_publicacao: string | null;
   status: StatusRoteiro;
+  /** Quando foi marcado como usado; null = ainda disponível. */
+  usado_em?: string | null;
 }
 
 export const TIPOS_ROTEIRO: { id: TipoRoteiro; label: string; icone: string }[] = [

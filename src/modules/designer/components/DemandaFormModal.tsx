@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Campo, Chips, Escolha, JanelaFormulario, OpcoesCartao, Rotulo, SeletorPrioridade, Texto,
+  CampoLink, Campo, Chips, Escolha, JanelaFormulario, OpcoesCartao, Rotulo, SeletorPrioridade, Texto,
 } from '@/shared/ui/form/FormKit';
 import { useClientes } from '@/modules/clientes/api/clientesApi';
 import { useOperadores } from '@/modules/crm/api/atendimentoApi';
@@ -289,11 +289,10 @@ ${r.cronometroErro}`);
       </Campo>
 
       <Campo label="Link do conteúdo pronto (Drive)" caixaAlta>
-        <Texto
-          type="url" prefixoIcone="link"
+        <CampoLink
           placeholder="Cole o link depois de subir o arquivo. Vai junto para a Gestão de Conteúdo."
           value={linkConteudo}
-          onChange={(e) => setLinkConteudo(e.target.value)}
+          onChange={setLinkConteudo}
         />
       </Campo>
 
