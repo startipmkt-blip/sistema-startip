@@ -6,7 +6,6 @@ import {
 } from '@/modules/demandas/api/demandasApi';
 import { modelosDemanda } from '@/modules/demandas/api/modelosApi';
 import {
-  DEMANDA_CATEGORIAS,
   DEMANDA_COLUNAS,
   DEMANDA_SETORES,
   RESPONSAVEIS,
@@ -25,7 +24,7 @@ import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import { confirmar } from '@/shared/ui/ConfirmDialog';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import {
-  Campo, Chips, Escolha, JanelaFormulario, ListaItens, ListaLinks, OpcoesCartao,
+  Campo, Escolha, JanelaFormulario, ListaItens, ListaLinks, OpcoesCartao,
   Rotulo, SeletorPrioridade, Texto,
 } from '@/shared/ui/form/FormKit';
 import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
@@ -55,13 +54,15 @@ function iniciais(nome: string) {
   return nome.split(/\s+/).map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 }
 
-/** Escolha de pessoas por avatar (responsável principal: um; secundários: vários). */
-function SeletorPessoas({ valores, onChange, multi, excluir }: {
-  valores: string[]; onChange: (v: string[]) => void; multi: boolean; excluir?: string;
+const RESPONSAVEIS_SOCIOS = ['Iuri', 'Domini'];
+
+/** Escolha do responsável principal por avatar. */
+function SeletorPessoas({ valores, onChange, multi, opcoes }: {
+  valores: string[]; onChange: (v: string[]) => void; multi: boolean; opcoes: readonly string[];
 }) {
   return (
     <div className="flex flex-wrap gap-2">
-      {RESPONSAVEIS.filter((r) => r !== excluir).map((r) => {
+      {opcoes.map((r) => {
         const ativo = valores.includes(r);
         return (
           <button
@@ -222,8 +223,6 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       prioridade: (d.prioridade as DemandaPrioridade | undefined) ?? f.prioridade,
       renovacao: (d.renovacao as Renovacao | undefined) ?? f.renovacao,
       quem_responsavel: d.quem_responsavel ?? f.quem_responsavel,
-      responsaveis_secundarios: d.responsaveis_secundarios ?? f.responsaveis_secundarios,
-      categoria: d.categoria ?? f.categoria,
       tempo_estimado_min: d.tempo_estimado_min != null ? String(d.tempo_estimado_min) : f.tempo_estimado_min,
       links: d.links ?? f.links,
       subtarefas: (d.subtarefas ?? f.subtarefas).map((t) => ({ ...t, feita: false })),
@@ -231,6 +230,9 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
   }
 
   const setores = DEMANDA_SETORES;
+  // Demanda nova não nasce concluída; colunas dos sócios só existem na aba Sócios.
+  const colunas = DEMANDA_COLUNAS.filter((c) =>
+    (demanda || c.id !== 'concluida') && (!c.socios_only || form.setor === 'socios' || c.id === form.status));
   const podeSalvar = Boolean(form.titulo.trim()) && !faltaTocador && !salvar.isPending;
 
   return (
@@ -312,7 +314,16 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
             value={form.setor}
             onChange={(e) => {
               const novoSetor = e.target.value as DemandaSetor;
-              setForm((f) => ({ ...f, setor: novoSetor, privada: novoSetor === 'socios' }));
+              setForm((f) => {
+                const sairDosSocios = novoSetor !== 'socios';
+                return {
+                  ...f,
+                  setor: novoSetor,
+                  privada: novoSetor === 'socios',
+                  responsavel: novoSetor === 'socios' && !RESPONSAVEIS_SOCIOS.includes(f.responsavel) ? '' : f.responsavel,
+                  status: sairDosSocios && (f.status === 'iuri' || f.status === 'domini') ? 'aberta' : f.status,
+                };
+              });
             }}
           />
         </Campo>
@@ -325,34 +336,14 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
       <Campo label="Responsável principal" caixaAlta>
         <SeletorPessoas
           multi={false}
+          opcoes={form.setor === 'socios' ? RESPONSAVEIS_SOCIOS : RESPONSAVEIS}
           valores={form.responsavel ? [form.responsavel] : []}
-          onChange={(v) => setForm((f) => ({
-            ...f, responsavel: v[0] ?? '', responsaveis_secundarios: f.responsaveis_secundarios.filter((x) => x !== v[0]),
-          }))}
+          onChange={(v) => set('responsavel', v[0] ?? '')}
         />
       </Campo>
-
-      <div className="flex flex-col gap-1.5">
-        <Rotulo caixaAlta dica="opcional, vários">Responsáveis secundários</Rotulo>
-        <SeletorPessoas
-          multi
-          excluir={form.responsavel}
-          valores={form.responsaveis_secundarios}
-          onChange={(v) => set('responsaveis_secundarios', v)}
-        />
-      </div>
 
       <Campo label="Prioridade" caixaAlta>
         <SeletorPrioridade valor={form.prioridade} onChange={(v) => set('prioridade', v)} />
-      </Campo>
-
-      <Campo label="Categoria" caixaAlta>
-        <Chips
-          multi={false}
-          opcoes={DEMANDA_CATEGORIAS}
-          valores={form.categoria ? [form.categoria] : []}
-          onChange={(v) => set('categoria', v[0] ?? '')}
-        />
       </Campo>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -368,15 +359,13 @@ export function DemandaFormModal({ open, onClose, demanda, setorInicial }: Props
         </Campo>
       </div>
 
-      {demanda && (
-        <Campo label="Status" caixaAlta>
-          <Escolha
-            opcoes={DEMANDA_COLUNAS.map((c) => ({ value: c.id, label: c.label }))}
-            value={form.status}
-            onChange={(e) => set('status', e.target.value as typeof form.status)}
-          />
-        </Campo>
-      )}
+      <Campo label={demanda ? 'Status' : 'Vai para a coluna'} caixaAlta>
+        <Escolha
+          opcoes={colunas.map((c) => ({ value: c.id, label: c.label }))}
+          value={form.status}
+          onChange={(e) => set('status', e.target.value as typeof form.status)}
+        />
+      </Campo>
       {precisaTocador && (
         <Campo label="Quem vai tocar essa demanda? (inicia o cronômetro)" obrigatorio caixaAlta>
           <Escolha
