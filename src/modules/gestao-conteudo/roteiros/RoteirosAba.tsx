@@ -186,6 +186,14 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
                     <GlassIcon name={r.usado_em ? 'undo' : 'check-circle'} className="h-3.5 w-3.5" />
                     {r.usado_em ? 'Desfazer' : 'Usado'}
                   </button>
+                  <button
+                    onClick={() => void baixarPdfRoteiros({
+                      titulo: 'Roteiro de Produção', mes, roteiros: [r], arquivo: r.titulo,
+                      nomeCliente: (id) => nomeCliente.get(id) ?? '', nomePilar: (id) => (id ? pilares.get(id)?.nome ?? '' : ''),
+                    })}
+                    className="rounded p-1.5 text-slate-400 hover:bg-white/10" aria-label="Baixar PDF deste roteiro" title="Baixar PDF deste roteiro">
+                    <GlassIcon name="download" className="h-4 w-4" />
+                  </button>
                   <button onClick={() => setForm({ roteiro: r })} className="rounded p-1.5 text-slate-400 hover:bg-white/10" aria-label="Editar" title="Editar"><GlassIcon name="pencil" className="h-4 w-4" /></button>
                   <button onClick={() => void apagar(r)} className="rounded p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-400" aria-label="Excluir" title="Excluir"><GlassIcon name="trash" className="h-4 w-4" /></button>
                 </div>

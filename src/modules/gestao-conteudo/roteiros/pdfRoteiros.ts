@@ -80,7 +80,7 @@ function paraBlocos(valor: string): Bloco[] {
 
 /** PDF com os roteiros filtrados: um bloco por roteiro, com briefing e cenas. */
 export async function baixarPdfRoteiros(p: {
-  titulo: string; mes: string; roteiros: Roteiro[];
+  titulo: string; mes: string; roteiros: Roteiro[]; arquivo?: string;
   nomeCliente: (id: string) => string; nomePilar: (id: string | null) => string;
 }) {
   const { jsPDF } = await import('jspdf');
@@ -150,5 +150,6 @@ export async function baixarPdfRoteiros(p: {
     if (r.legenda) { linha('Legenda:', 9.5, true); rico(r.legenda, 9.5); }
     y += 4;
   });
-  doc.save(`roteiros-${p.mes}.pdf`);
+  const slug = p.arquivo?.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  doc.save(slug ? `roteiro-${slug}.pdf` : `roteiros-${p.mes}.pdf`);
 }
