@@ -59,7 +59,7 @@ export function AgendaPage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <header className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold text-white">Agenda</h1>
         <div className="ml-auto flex items-center gap-2">

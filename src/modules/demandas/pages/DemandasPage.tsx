@@ -82,6 +82,8 @@ export function DemandasPage() {
   const [responsavel, setResponsavel] = useState('');
   const [rapido, setRapido] = useState<FiltroRapido>('todas');
   const [prioridade, setPrioridade] = useState<DemandaPrioridade | ''>('');
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const filtrosAtivos = [clienteId, responsavel, prioridade].filter(Boolean).length;
   const [rapida, setRapida] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editando, setEditando] = useState<DemandaView | undefined>();
@@ -235,7 +237,7 @@ export function DemandasPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {([
           { id: 'quadro',      label: 'Quadro (aberta / andamento)' },
           { id: 'concluidas',  label: `Concluídas${concluidas.length ? ` (${concluidas.length})` : ''}` },
@@ -258,40 +260,63 @@ export function DemandasPage() {
       ) : (
         <>
           <PageHeader title="Demandas da equipe" subtitle="Arraste os cards entre as colunas ou clique no círculo para concluir.">
-            <Select options={clienteOptions} value={clienteId} onChange={(e) => setClienteId(e.target.value)} />
-            <Button onClick={() => { setEditando(undefined); setFormOpen(true); }}>+ Nova demanda</Button>
+            <div className="hidden sm:block">
+              <Select options={clienteOptions} value={clienteId} onChange={(e) => setClienteId(e.target.value)} />
+            </div>
+            <Button className="w-full sm:w-auto" onClick={() => { setEditando(undefined); setFormOpen(true); }}>+ Nova demanda</Button>
           </PageHeader>
 
           <div className="flex flex-wrap items-center gap-2">
-            <input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar por título, cliente ou responsável"
-              className="w-72 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
-            />
-            <Select
-              options={[{ value: '', label: 'Todos os responsáveis' }, ...RESPONSAVEIS.map((r) => ({ value: r, label: r }))]}
-              value={responsavel}
-              onChange={(e) => setResponsavel(e.target.value)}
-            />
+            <div className="flex w-full gap-2 sm:w-auto">
+              <input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar por título, cliente ou responsável"
+                className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none sm:w-72 sm:flex-none"
+              />
+              {/* Celular: filtros recolhidos atrás de um botão, com contador dos ativos. */}
+              <button
+                type="button"
+                onClick={() => setFiltrosAbertos((v) => !v)}
+                aria-expanded={filtrosAbertos}
+                className={`flex shrink-0 items-center gap-1.5 rounded-md border px-3 text-sm font-medium sm:hidden ${
+                  filtrosAbertos || filtrosAtivos ? 'border-brand-400/50 bg-brand-500/15 text-brand-200' : 'border-white/10 bg-white/5 text-slate-300'
+                }`}
+              >
+                <GlassIcon name="filter" /> Filtros{filtrosAtivos ? ` · ${filtrosAtivos}` : ''}
+              </button>
+            </div>
+            <div className={`w-full flex-col gap-2 sm:contents ${filtrosAbertos ? 'flex' : 'hidden'}`}>
+              <div className="sm:hidden">
+                <Select options={clienteOptions} value={clienteId} onChange={(e) => setClienteId(e.target.value)} className="w-full" />
+              </div>
+              <Select
+                options={[{ value: '', label: 'Todos os responsáveis' }, ...RESPONSAVEIS.map((r) => ({ value: r, label: r }))]}
+                value={responsavel}
+                onChange={(e) => setResponsavel(e.target.value)}
+                className="w-full sm:w-auto"
+              />
+              <Select
+                options={[
+                  { value: '', label: 'Toda importância' },
+                  { value: 'urgente', label: 'Urgente' },
+                  { value: 'alta', label: 'Importância alta' },
+                  { value: 'media', label: 'Importância média' },
+                  { value: 'baixa', label: 'Importância baixa' },
+                ]}
+                value={prioridade}
+                onChange={(e) => setPrioridade(e.target.value as DemandaPrioridade | '')}
+                className="w-full sm:w-auto"
+              />
+            </div>
             <input
               value={rapida}
               onChange={(e) => setRapida(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') criarRapida(); }}
               disabled={salvar.isPending}
+              enterKeyHint="done"
               placeholder="＋ Criação rápida: digite e aperte Enter"
-              className="min-w-[260px] flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
-            />
-            <Select
-              options={[
-                { value: '', label: 'Toda importância' },
-                { value: 'urgente', label: 'Urgente' },
-                { value: 'alta', label: 'Importância alta' },
-                { value: 'media', label: 'Importância média' },
-                { value: 'baixa', label: 'Importância baixa' },
-              ]}
-              value={prioridade}
-              onChange={(e) => setPrioridade(e.target.value as DemandaPrioridade | '')}
+              className="w-full flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none sm:w-auto sm:min-w-[260px]"
             />
           </div>
 
@@ -312,7 +337,7 @@ export function DemandasPage() {
                   key={f.id}
                   type="button"
                   onClick={() => setRapido(f.id)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  className={`min-h-[32px] rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                     ativo ? tom : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
                   }`}
                 >
@@ -323,7 +348,7 @@ export function DemandasPage() {
           </div>
 
           {/* Abas por setor */}
-          <div className="flex flex-wrap gap-1 border-b border-white/10">
+          <div className="abas-linha flex gap-1 border-b border-white/10">
             {setoresVisiveis.map((s) => (
               <button
                 key={s.id}

@@ -89,7 +89,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar empresa ou texto…"
-          className="w-48 rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
+          className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs sm:w-48 text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
         />
       </div>
 
@@ -125,7 +125,7 @@ export function SolicitacoesTab({ onAbrirConversa }: { onAbrirConversa: (leadId:
         ) : filtradas.length === 0 ? (
           <EmptyState message="Nenhuma solicitação nesse filtro. Ative 'Monitorar Agente' num grupo para começar." />
         ) : (
-          <table className="w-full text-sm">
+          <table className="tabela-empilhada w-full text-sm">
             <thead className="sticky top-0 bg-slate-900/95 text-left text-xs text-slate-400">
               <tr>
                 <th className="p-2">Empresa</th>

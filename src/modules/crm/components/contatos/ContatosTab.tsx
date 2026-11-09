@@ -97,7 +97,44 @@ export function ContatosTab({
             />
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <>
+          {/* Celular: um cartão por contato, com as ações à mão. */}
+          <ul className="space-y-2 p-1 md:hidden">
+            {filtrados.map((l) => (
+              <li key={l.id} className="cartao-linha rounded-xl border border-white/[0.08] bg-white/[0.02] p-3">
+                <button onClick={() => onEditarLead(l)} className="block w-full text-left">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 truncate text-[15px] font-medium text-slate-100">
+                      {l.nome || <span className="italic text-slate-400">sem nome</span>}
+                    </span>
+                    <span className="shrink-0 text-xs text-slate-400">{l.created_at ? formatData(l.created_at) : ''}</span>
+                  </div>
+                  <div className="mt-0.5 truncate text-sm text-slate-300">
+                    {l.telefone || '—'}{l.empresa ? ` · ${l.empresa}` : ''}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-slate-300">{l.origem || 'Manual'}</span>
+                    <span className="text-slate-400">{l.etapa}</span>
+                  </div>
+                </button>
+                <div className="mt-2.5 grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => onAbrirConversa(l.id)}
+                    className="min-h-[40px] rounded-lg bg-brand-500/15 px-2 text-sm font-medium text-brand-200"
+                  >
+                    <GlassIcon name="message" /> Conversa
+                  </button>
+                  <button
+                    onClick={() => onConverterCliente(l)}
+                    className="min-h-[40px] rounded-lg bg-white/5 px-2 text-sm font-medium text-slate-200"
+                  >
+                    <GlassIcon name="plus" /> Virar cliente
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <table className="hidden w-full text-sm md:table">
             <thead className="sticky top-0 bg-slate-900/95 text-left text-xs uppercase tracking-wider text-slate-400">
               <tr>
                 <th className="px-4 py-2 font-medium">Nome</th>
@@ -158,6 +195,7 @@ export function ContatosTab({
               ))}
             </tbody>
           </table>
+          </>
         )}
       </div>
     </div>

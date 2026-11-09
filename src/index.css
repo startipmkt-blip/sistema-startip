@@ -705,3 +705,141 @@ html.light .editor-rico .editor-area { color: #0e1a24 !important; }
 html.light .editor-rico .barra-editor button[aria-pressed="false"],
 html.light .editor-rico .barra-editor button:not([aria-pressed]),
 html.light .editor-rico .barra-editor select { color: #2b3a47 !important; }
+
+/* =====================================================================
+   RESPONSIVO (celular / tablet)
+   --nav-inferior é a altura da barra de navegação inferior do celular. Ela só
+   existe dentro da AppShell (a BottomNav liga a classe no <html>) e some com o
+   teclado aberto, para a área de digitação não ficar espremida.
+   ===================================================================== */
+:root {
+  --topo: calc(3.5rem + env(safe-area-inset-top));
+  --nav-inferior: 0px;
+}
+html.com-nav-inferior { --nav-inferior: calc(3.75rem + env(safe-area-inset-bottom)); }
+html.com-nav-inferior.teclado-aberto { --nav-inferior: 0px; }
+@media (min-width: 1024px) {
+  html.com-nav-inferior { --nav-inferior: 0px; }
+}
+
+/* Tela cheia dentro da AppShell (CRM, mapa mental…): desconta topo e barra inferior. */
+html.com-faixa-demo { --faixa-demo: 1.5rem; }
+.tela-cheia { height: calc(100dvh - var(--topo) - var(--nav-inferior) - var(--faixa-demo, 0px)); }
+/* Elementos flutuantes (toasts, avisos) ficam acima da barra inferior. */
+.acima-nav { bottom: calc(var(--nav-inferior) + 1rem) !important; }
+.pb-seguro { padding-bottom: env(safe-area-inset-bottom); }
+.pt-seguro { padding-top: env(safe-area-inset-top); }
+
+/* Rolagem horizontal sem barra visível (abas e chips no celular). */
+.rolagem-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.rolagem-x::-webkit-scrollbar { display: none; }
+
+html { -webkit-text-size-adjust: 100%; }
+button, a, [role="button"], [role="tab"], label, summary, select { touch-action: manipulation; }
+* { -webkit-tap-highlight-color: transparent; }
+
+@media (max-width: 639px) {
+  /* Abaixo de 16px o iOS dá zoom na tela ao focar o campo. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea,
+  [contenteditable="true"] { font-size: 16px !important; }
+}
+
+/* Dedo, não mouse: alvo de toque mínimo de ~40px nos controles principais. */
+@media (pointer: coarse) {
+  .alvo-toque { min-height: 40px; min-width: 40px; }
+  /* Ações que só aparecem no hover ficam sempre visíveis no toque. */
+  .mostrar-no-toque { opacity: 1 !important; visibility: visible !important; }
+}
+
+/* Gaveta do menu e folhas (bottom sheet) */
+@keyframes entra-esquerda { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes entra-baixo { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+.anim-gaveta { animation: entra-esquerda .22s cubic-bezier(.2,.8,.2,1); }
+@media (max-width: 639px) { .anim-folha { animation: entra-baixo .24s cubic-bezier(.2,.8,.2,1); } }
+.anim-fundo { animation: aparece .2s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-gaveta, .anim-folha, .anim-fundo { animation: none; }
+}
+
+/* Barra inferior do celular */
+.nav-inferior { background-color: #0e151d; border-color: rgba(255,255,255,.08); }
+html.light .nav-inferior { background-color: #ffffff !important; border-color: #e3e8ee !important; }
+html.light .nav-inferior .item-nav { color: #6b7a87 !important; }
+html.light .nav-inferior .item-nav[aria-current="page"] { color: #0b5d8c !important; }
+html.light .nav-inferior .item-nav[aria-current="page"] .pilula-nav { background-color: #e6f4fc !important; }
+
+/* Tabela virando cartões no celular */
+html.light .cartao-linha { background-color: #ffffff !important; border-color: #e3e8ee !important; }
+
+/* Abas sublinhadas das telas: uma linha só, rolando de lado quando não cabem. */
+.abas-linha {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.abas-linha::-webkit-scrollbar { display: none; }
+.abas-linha > * { flex-shrink: 0; white-space: nowrap; }
+
+/* No toque, botões de texto pequenos (chips, "Editar", "Excluir") ganham altura mínima. */
+@media (pointer: coarse) {
+  main button[class*="px-"],
+  main a[class*="px-"][class*="py-"],
+  [role="dialog"] button[class*="px-"] { min-height: 32px; }
+}
+
+/* Tabelas soltas nas telas: no celular rolam de lado dentro delas mesmas, sem
+   empurrar a página. Telas que já têm versão em cartões escondem a tabela. */
+@media (max-width: 767px) {
+  main table:not(.tabela-fixa),
+  [role="dialog"] table:not(.tabela-fixa) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  main table:not(.tabela-fixa) th,
+  main table:not(.tabela-fixa) td { white-space: nowrap; }
+}
+
+/* Tabela empilhada: no celular cada linha vira um cartão e cada célula uma linha.
+   Células com data-label mostram o rótulo antes do valor. */
+@media (max-width: 767px) {
+  table.tabela-empilhada { display: block; overflow: visible; }
+  table.tabela-empilhada thead { display: none; }
+  table.tabela-empilhada tbody { display: flex; flex-direction: column; gap: .5rem; padding: .25rem; }
+  table.tabela-empilhada tr {
+    display: flex; flex-direction: column; gap: .35rem;
+    border: 1px solid rgba(255,255,255,.08); border-radius: .75rem; padding: .75rem;
+    background: rgba(255,255,255,.02);
+  }
+  table.tabela-empilhada td { display: block; padding: 0 !important; white-space: normal !important; text-align: left !important; }
+  table.tabela-empilhada td[data-label]::before {
+    content: attr(data-label); display: block; font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 1px;
+  }
+  table.tabela-empilhada td:last-child > div { justify-content: flex-start; flex-wrap: wrap; }
+  table.tabela-empilhada td:last-child { margin-top: .25rem; padding-top: .5rem !important; border-top: 1px solid rgba(255,255,255,.06); }
+  html.light table.tabela-empilhada tr { background: #fff; border-color: #e3e8ee; }
+  html.light table.tabela-empilhada td:last-child { border-color: #eef1f5; }
+}
+
+/* Celular: espaçamentos internos de desktop (24–32px) comem a tela de 360px. */
+@media (max-width: 639px) {
+  main .p-6, main .p-8 { padding: 1rem; }
+  main .p-5 { padding: .875rem; }
+  main .px-6, main .px-8 { padding-left: 1rem; padding-right: 1rem; }
+  main .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+}
+
+/* Véu atrás de gaveta e modais: a regra genérica do tema claro pintava bg-slate-950 de branco. */
+html.light .fundo-escuro.fundo-escuro { background-color: rgba(14, 26, 36, 0.45) !important; }

@@ -4,7 +4,7 @@ import { useAuth } from '@/shared/auth/AuthProvider';
 import { useConversas, useOperadores, useInboxRealtime } from '@/modules/crm/api/atendimentoApi';
 import type { FiltroInbox, CrmConversa } from '@/modules/crm/types';
 import { ETAPAS_ATIVAS } from '@/modules/crm/types';
-import { InboxSidebar } from './InboxSidebar';
+import { InboxSidebar, InboxFiltrosMobile } from './InboxSidebar';
 import { InboxLista } from './InboxLista';
 import { InboxConversa } from './InboxConversa';
 import { useInboxBadge } from '@/modules/crm/hooks/useInboxBadge';
@@ -76,6 +76,13 @@ export function AtendimentoTab({ onIrParaFunil }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  function fecharConversa() {
+    setSelecionadaId(null);
+    const next = new URLSearchParams(searchParams);
+    next.delete('leadId');
+    setSearchParams(next, { replace: true });
+  }
+
   function selecionar(id: string) {
     setSelecionadaId(id);
     const next = new URLSearchParams(searchParams);
@@ -88,7 +95,7 @@ export function AtendimentoTab({ onIrParaFunil }: Props) {
     ?? null;
 
   return (
-    <div className="flex h-full min-h-0 gap-3 p-3">
+    <div className="flex h-full min-h-0 gap-3 p-2 sm:p-3">
       <InboxSidebar
         filtro={filtro}
         atendente={atendente}
@@ -100,21 +107,34 @@ export function AtendimentoTab({ onIrParaFunil }: Props) {
       />
 
       <div className="flex min-w-0 flex-1 gap-4">
-        <InboxLista
+        {/* Celular: ou a lista ou a conversa aberta, nunca as duas (como no app do WhatsApp). */}
+        <div className={`min-h-0 min-w-0 flex-1 flex-col md:flex md:w-80 md:flex-none lg:w-96 ${conversaAberta ? 'hidden' : 'flex'}`}>
+          <InboxFiltrosMobile
+            filtro={filtro}
+            atendente={atendente}
+            operadores={operadores ?? []}
+            contagens={contagens}
+            meuId={profile?.id ?? null}
+            onFiltro={setFiltro}
+            onAtendente={setAtendente}
+          />
+          <InboxLista
           conversas={filtradas}
           isLoading={isLoading}
           buscaTexto={busca}
           selecionadaId={selecionadaId}
           onBuscar={setBusca}
           onSelecionar={selecionar}
-        />
+          />
+        </div>
 
-        <div className="hidden min-w-0 flex-1 border-l border-white/5 pl-4 md:flex">
+        <div className={`min-w-0 flex-1 md:flex md:border-l md:border-white/5 md:pl-4 ${conversaAberta ? 'flex' : 'hidden'}`}>
           {conversaAberta ? (
             <InboxConversa
               key={conversaAberta.id}
               conversa={conversaAberta}
               onIrParaFunil={() => onIrParaFunil(conversaAberta.id)}
+              onVoltar={fecharConversa}
             />
           ) : (
             <div className="flex flex-1 items-center justify-center text-center text-sm text-slate-400">

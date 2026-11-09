@@ -77,7 +77,7 @@ export function LinksCadastroPage() {
   const linksArquivados = (links ?? []).filter((l) => l.status === 'arquivado');
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <header className="flex flex-wrap items-center gap-3">
         <div>
           <h1 className="text-xl font-semibold text-white">Links de cadastro</h1>

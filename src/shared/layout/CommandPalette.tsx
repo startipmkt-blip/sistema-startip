@@ -140,14 +140,14 @@ export function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 pt-[10vh] backdrop-blur-sm"
+      className="anim-fundo fixed inset-0 z-[100] flex items-start justify-center bg-black/60 sm:pt-[10vh]"
       onClick={() => setAberto(false)}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-slate-900 shadow-2xl"
+        className="pt-seguro flex h-[100dvh] w-full max-w-xl flex-col overflow-hidden border-white/10 bg-slate-900 shadow-2xl sm:h-auto sm:rounded-xl sm:border"
       >
-        <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
+        <div className="flex shrink-0 items-center gap-2 border-b border-white/10 px-3 py-2">
           <span className="text-slate-400"><GlassIcon name="search" /></span>
           <input
             ref={inputRef}
@@ -155,11 +155,17 @@ export function CommandPalette() {
             onChange={(e) => setBusca(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Buscar módulo, cliente, lead ou ação…"
-            className="flex-1 bg-transparent py-1 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none sm:py-1"
           />
-          <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-xs text-slate-400">ESC</kbd>
+          <kbd className="hidden rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-xs text-slate-400 sm:inline">ESC</kbd>
+          <button
+            onClick={() => setAberto(false)}
+            className="-mr-1 rounded-lg px-2 py-2 text-sm font-medium text-brand-300 sm:hidden"
+          >
+            Cancelar
+          </button>
         </div>
-        <ul className="max-h-[60vh] overflow-y-auto py-1">
+        <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-1 sm:max-h-[60vh] sm:flex-none">
           {filtradas.length === 0 && (
             <li className="p-6 text-center text-xs text-slate-400">Nada encontrado para "{busca}".</li>
           )}
@@ -176,7 +182,7 @@ export function CommandPalette() {
                 <button
                   onClick={() => executar(i)}
                   onMouseEnter={() => setCursor(i)}
-                  className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm ${
+                  className={`flex w-full items-center gap-3 px-3 py-3 text-left text-sm sm:py-2 ${
                     i === cursor ? 'bg-brand-500/20 text-white' : 'text-slate-200 hover:bg-white/5'
                   }`}
                 >
@@ -188,7 +194,7 @@ export function CommandPalette() {
             );
           })}
         </ul>
-        <div className="flex items-center justify-between border-t border-white/10 px-3 py-1.5 text-xs text-slate-400">
+        <div className="hidden items-center justify-between border-t border-white/10 px-3 py-1.5 text-xs text-slate-400 sm:flex">
           <span>↑↓ navegar · ↵ abrir</span>
           <span>Ctrl+K para alternar</span>
         </div>

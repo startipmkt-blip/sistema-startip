@@ -3,7 +3,7 @@
 // blocos com ícone, rótulos discretos, escolhas em cards e chips.
 // Use estas peças em todo formulário novo para manter o mesmo visual.
 // =============================================================
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 
@@ -26,11 +26,19 @@ const LARGURAS = { md: 'max-w-[560px]', lg: 'max-w-[660px]', xl: 'max-w-[880px]'
 
 /** Fecha só pelo X ou pelos botões (clicar fora não perde o que foi digitado). */
 export function JanelaFormulario({ open, onClose, titulo, subtitulo, icone, largura = 'md', topo, rodape, children }: JanelaProps) {
+  useEffect(() => {
+    if (!open) return;
+    const antes = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = antes; };
+  }, [open]);
+
   if (!open) return null;
+  // Celular: ocupa a tela toda (formulário longo + teclado não cabem numa janela flutuante).
   return createPortal(
-    <div className="janela-fundo fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3">
-      <div className={`janela-form flex max-h-[94vh] w-full ${LARGURAS[largura]} flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#121a24] shadow-pop`}>
-        <div className="flex shrink-0 items-start justify-between gap-3 px-6 pb-3 pt-5">
+    <div className="janela-fundo anim-fundo fixed inset-0 z-50 flex items-stretch justify-center bg-slate-950/60 sm:items-center sm:p-3" role="dialog" aria-modal="true">
+      <div className={`janela-form pt-seguro flex h-[100dvh] w-full ${LARGURAS[largura]} flex-col overflow-hidden border-white/10 bg-[#121a24] shadow-pop sm:h-auto sm:max-h-[94dvh] sm:rounded-2xl sm:border sm:pt-0`}>
+        <div className="flex shrink-0 items-start justify-between gap-3 px-4 pb-3 pt-4 sm:px-6 sm:pt-5">
           <div className="min-w-0">
             <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-white">
               {icone && <GlassIcon name={icone} className="h-5 w-5" />}
@@ -38,15 +46,19 @@ export function JanelaFormulario({ open, onClose, titulo, subtitulo, icone, larg
             </h2>
             {subtitulo && <p className="mt-0.5 text-sm text-slate-400">{subtitulo}</p>}
           </div>
-          <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-slate-200" aria-label="Fechar">
+          <button onClick={onClose} className="-mr-2 -mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-white/10 hover:text-slate-200" aria-label="Fechar">
             <GlassIcon name="x" />
           </button>
         </div>
-        {topo && <div className="shrink-0 px-6 pb-3">{topo}</div>}
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
+        {topo && <div className="shrink-0 px-4 pb-3 sm:px-6">{topo}</div>}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4 sm:px-6">
           <div className="flex flex-col gap-4">{children}</div>
         </div>
-        {rodape && <div className="flex shrink-0 items-center justify-end gap-2 px-6 pb-5 pt-2">{rodape}</div>}
+        {rodape && (
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-white/[0.06] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 max-sm:[&>button]:min-h-[44px] max-sm:[&>button]:flex-1 sm:border-0 sm:px-6 sm:pb-5 sm:pt-2">
+            {rodape}
+          </div>
+        )}
       </div>
     </div>,
     document.body,

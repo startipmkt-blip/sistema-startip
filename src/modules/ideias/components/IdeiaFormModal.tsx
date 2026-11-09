@@ -146,7 +146,7 @@ export function IdeiaFormModal({ open, onClose, ideia }: Props) {
         {/* Tipo */}
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-300">Essa ideia é para:</label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-3">
             {TIPOS.map((t) => (
               <button
                 key={t.value}

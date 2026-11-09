@@ -12,7 +12,7 @@ export function OtimizacoesListaPage() {
   const mesLabel = `${MESES_PT[hoje.getMonth()]} ${hoje.getFullYear()}`;
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <PageHeader
         title="📈 Otimização de Campanhas"
         subtitle={`Registro diário de tudo que foi otimizado em cada conta. Mês atual: ${mesLabel}.`}

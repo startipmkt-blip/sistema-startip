@@ -42,12 +42,18 @@ const EmojiPicker = lazy(() => import('./EmojiPicker'));
 interface Props {
   conversa: CrmConversa;
   onIrParaFunil: () => void;
+  /** Celular: volta para a lista de conversas. */
+  onVoltar?: () => void;
 }
 
 // Emojis mais comuns pra reação rápida (padrão WhatsApp).
 const REACOES_RAPIDAS = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥'];
 
-export function InboxConversa({ conversa, onIrParaFunil }: Props) {
+export function InboxConversa({ conversa, onIrParaFunil, onVoltar }: Props) {
+  // Celular: as ações do cabeçalho ficam recolhidas atrás de um botão.
+  const [acoesAbertas, setAcoesAbertas] = useState(false);
+  // No teclado do celular o Enter quebra linha (como no WhatsApp); envia pelo botão.
+  const toque = useMemo(() => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches, []);
   const { data: mensagens, isLoading } = useCrmMensagens(conversa.id);
   const { data: etapas } = useEtapasCrm();
   const { data: operadores } = useOperadores();
@@ -172,10 +178,19 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
   return (
     <div className="flex min-w-0 flex-1 flex-col">
       {/* Cabeçalho */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-white/10 pb-3">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-2 md:gap-3 md:pb-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-none md:gap-3">
+          {onVoltar && (
+            <button
+              onClick={onVoltar}
+              className="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10 md:hidden"
+              aria-label="Voltar para as conversas"
+            >
+              <GlassIcon name="chevron-left" className="h-5 w-5" tone="slate" />
+            </button>
+          )}
           <div
-            className={`flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold ${
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold md:h-11 md:w-11 ${
               conversa.is_grupo ? 'bg-amber-500/15 text-amber-300' : 'bg-brand-500/15 text-brand-200'
             }`}
           >
@@ -186,13 +201,23 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
               <span className="truncate text-sm font-semibold text-slate-100">{conversa.nome}</span>
               {conversa.is_grupo && <Badge tone="amber">Grupo</Badge>}
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="truncate text-xs text-slate-400">
               <GlassIcon name="phone" /> {conversa.telefone} {conversa.origem ? `· ${conversa.origem}` : ''}
             </div>
           </div>
         </div>
 
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setAcoesAbertas((v) => !v)}
+          aria-expanded={acoesAbertas}
+          className={`flex h-10 shrink-0 items-center gap-1 rounded-lg border px-3 text-xs font-medium md:hidden ${
+            acoesAbertas ? 'border-brand-400/50 bg-brand-500/15 text-brand-200' : 'border-white/10 bg-white/5 text-slate-200'
+          }`}
+        >
+          Ações <GlassIcon name="chevron-down" className={`h-4 w-4 transition-transform ${acoesAbertas ? 'rotate-180' : ''}`} tone="slate" />
+        </button>
+
+        <div className={`w-full flex-wrap items-center gap-2 md:ml-auto md:flex md:w-auto ${acoesAbertas ? 'flex' : 'hidden'}`}>
           <label className="flex items-center gap-1 text-xs text-slate-400">
             Etapa:
             <select
@@ -346,7 +371,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                 className={`group flex ${enviada ? 'justify-end' : 'justify-start'}`}
                 onMouseLeave={() => menuMsgId === m.id && setMenuMsgId(null)}
               >
-                <div className="relative max-w-[70%]">
+                <div className="relative max-w-[85%] md:max-w-[70%]">
                   {/* Menu de ações (ao passar mouse) */}
                   {m.wa_message_id && (
                     <button
@@ -535,7 +560,7 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
       )}
 
       {/* Compositor */}
-      <div className="relative mt-2 flex items-end gap-2 border-t border-white/10 pt-3">
+      <div className="relative mt-2 flex items-end gap-1.5 border-t border-white/10 pt-2 md:gap-2 md:pt-3">
         {gravandoAudio && gravandoAudio !== true && (
           <div className="flex-1">
             <AudioRecorder
@@ -564,49 +589,49 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
           </div>
         )}
         {anexoMenuOpen && (
-          <div className="absolute bottom-full left-12 z-30 mb-2 rounded-md border border-white/10 bg-slate-900 py-1 text-sm shadow-2xl">
-            <button onClick={() => abrirAnexo('imagem')} className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5">
+          <div className="absolute bottom-full left-0 z-30 mb-2 max-h-[60dvh] overflow-y-auto rounded-md border border-white/10 bg-slate-900 py-1 text-sm shadow-2xl md:left-12">
+            <button onClick={() => abrirAnexo('imagem')} className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2">
               <GlassIcon name="image" /> Galeria (foto/vídeo)
             </button>
-            <button onClick={() => abrirAnexo('camera')} className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5">
+            <button onClick={() => abrirAnexo('camera')} className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2">
               <GlassIcon name="camera" /> Câmera (tirar foto)
             </button>
-            <button onClick={() => abrirAnexo('documento')} className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5">
+            <button onClick={() => abrirAnexo('documento')} className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2">
               <GlassIcon name="paperclip" /> Documento
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setContatoOpen(true); }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2"
             >
               <GlassIcon name="user" /> Contato
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setEnqueteOpen(true); }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2"
             >
               <GlassIcon name="bar-chart" /> Enquete
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setEventoOpen(true); }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2"
             >
               <GlassIcon name="calendar" /> Evento
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setLocalOpen(true); }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2"
             >
               <GlassIcon name="map-pin" /> Localização
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setBotoesOpen(true); }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2"
             >
               <GlassIcon name="orb-gray" /> Botões (até 3)
             </button>
             <button
               onClick={() => { setAnexoMenuOpen(false); setListaOpen(true); }}
-              className="flex w-full items-center gap-2 px-4 py-2 text-slate-200 hover:bg-white/5"
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-slate-200 hover:bg-white/5 md:py-2"
             >
               <GlassIcon name="clipboard" /> Lista interativa
             </button>
@@ -682,13 +707,13 @@ export function InboxConversa({ conversa, onIrParaFunil }: Props) {
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.key === 'Enter' && !e.shiftKey && !toque) {
                   e.preventDefault();
                   handleEnviar();
                 }
               }}
-              rows={2}
-              placeholder="Escreva uma resposta… (Enter envia, Shift+Enter quebra linha)"
+              rows={toque ? 1 : 2}
+              placeholder={toque ? 'Mensagem' : 'Escreva uma resposta… (Enter envia, Shift+Enter quebra linha)'}
               className="min-h-11 flex-1 resize-none rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
             />
             {texto.trim() ? (

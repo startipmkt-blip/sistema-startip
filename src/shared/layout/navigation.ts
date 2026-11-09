@@ -75,3 +75,19 @@ export const navItems: NavItem[] = navGrupos.flatMap((g) => g.itens);
 export function moduloKey(item: NavItem): string {
   return item.to.replace('/', '');
 }
+
+// Atalhos da barra inferior do celular, em ordem de prioridade. Mostramos os 4
+// primeiros que o usuário pode acessar; o 5º botão é sempre "Menu".
+export const atalhosMobile: string[] = ['/inicio', '/crm', '/demandas', '/clientes', '/gestao-conteudo', '/designer', '/ideias'];
+
+// Rótulos curtos para caber na barra inferior.
+export const rotuloCurto: Record<string, string> = {
+  '/gestao-conteudo': 'Conteúdo',
+  '/ideias': 'Ideias',
+};
+
+export function itemDaRota(pathname: string): NavItem | undefined {
+  return navItems
+    .filter((i) => pathname === i.to || pathname.startsWith(`${i.to}/`))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+}

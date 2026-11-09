@@ -125,7 +125,7 @@ function DashboardExecutivo({ onSair }: { onSair: () => void }) {
   const sync = useSincronizarMeta();
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <header className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold text-white"><GlassIcon name="crown" /> Diretoria</h1>
         <span className="text-xs text-slate-400">Visão executiva consolidada</span>
@@ -137,7 +137,7 @@ function DashboardExecutivo({ onSair }: { onSair: () => void }) {
         </div>
       </header>
 
-      <nav className="flex gap-1 border-b border-white/10">
+      <nav className="abas-linha flex gap-1 border-b border-white/10">
         {([
           ['visao',    '📊 Visão geral'],
           ['carteira', '👥 Carteira de clientes'],

@@ -48,7 +48,7 @@ export function MetaAdsPage() {
   }, [contas.data, clientes.data]);
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <PageHeader
         title="📊 Meta Ads"
         subtitle="Configure e sincronize as contas de anúncio Meta dos clientes com tráfego pago."

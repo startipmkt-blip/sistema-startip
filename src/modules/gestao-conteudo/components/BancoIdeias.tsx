@@ -207,7 +207,7 @@ export function BancoIdeias({ clienteId, mes, ideias, carregando }: {
         <Button className="ml-auto" onClick={() => setForm({})}>+ Nova ideia geral</Button>
       </div>
 
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {([['livres', `Ideias (${livres.length})`], ['usadas', `Já usadas (${usadas.length})`]] as const).map(([id, txt]) => (
           <button
             key={id} type="button" onClick={() => setSub(id)}

@@ -27,7 +27,7 @@ export function MarketplaceAdminPage() {
   );
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <header className="flex flex-wrap items-center gap-3">
         <div>
           <h1 className="text-xl font-semibold text-white"><GlassIcon name="shopping-bag" /> Marketplace</h1>

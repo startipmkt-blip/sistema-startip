@@ -27,7 +27,7 @@ export function InboxSidebar({
 }: Props) {
   const push = usePushDesktop();
   return (
-    <aside className="hidden w-56 shrink-0 flex-col gap-6 border-r border-white/5 pr-3 sm:flex">
+    <aside className="hidden w-56 shrink-0 flex-col gap-6 border-r border-white/5 pr-3 xl:flex">
       {/* Categorias */}
       <div>
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -139,5 +139,51 @@ export function InboxSidebar({
         )}
       </div>
     </aside>
+  );
+}
+
+// Celular, tablet e notebook pequeno: os mesmos filtros da barra lateral em chips
+// roláveis + seletor de atendente, em cima da lista de conversas.
+export function InboxFiltrosMobile({
+  filtro, atendente, operadores, contagens, meuId, onFiltro, onAtendente,
+}: Props) {
+  return (
+    <div className="mb-2 space-y-2 xl:hidden">
+      <div className="rolagem-x -mx-1 flex gap-1.5 px-1">
+        {FILTROS.map((f) => {
+          const ativo = filtro === f.id;
+          const n = contagens[f.id] ?? 0;
+          return (
+            <button
+              key={f.id}
+              onClick={() => onFiltro(f.id)}
+              aria-pressed={ativo}
+              className={`flex min-h-[34px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-xs font-medium transition-colors ${
+                ativo ? 'border-brand-400/50 bg-brand-500/15 text-brand-200' : 'border-white/10 bg-white/[0.03] text-slate-300'
+              }`}
+            >
+              <GlassIcon emoji={f.icone} />
+              {f.label}
+              {n > 0 && (
+                <span className={`rounded-full px-1.5 text-[11px] font-semibold ${f.id === 'nao_lidas' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 text-slate-300'}`}>
+                  {n}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <select
+        value={atendente}
+        onChange={(e) => onAtendente(e.target.value as string | 'todas' | 'nao_atribuidas')}
+        aria-label="Filtrar por atendente"
+        className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 [&>option]:bg-slate-900"
+      >
+        <option value="todas">Todos os atendentes</option>
+        <option value="nao_atribuidas">Não atribuídas</option>
+        {meuId && <option value={meuId}>Minhas conversas</option>}
+        {operadores.filter((o) => o.id !== meuId).map((o) => <option key={o.id} value={o.id}>{o.nome}</option>)}
+      </select>
+    </div>
   );
 }

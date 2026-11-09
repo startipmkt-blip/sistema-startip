@@ -21,7 +21,7 @@ export function AreaClientePage() {
   const [aba, setAba] = useState<SubAba>('relatorios');
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {([
           { id: 'relatorios', label: '📊 Relatórios' },
           { id: 'painel', label: '🗂️ Painel do cliente' },
@@ -112,7 +112,7 @@ function RelatoriosView() {
                   </span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-4 gap-3 text-center">
+                <div className="mt-4 grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
                   <Metric label="ROAS" value={`${num(res.roas)}x`} />
                   <Metric label="Investimento" value={formatMoney(r.investimento)} />
                   <Metric label="Leads" value={String(r.leads)} />

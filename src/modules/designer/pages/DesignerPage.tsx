@@ -47,7 +47,7 @@ export function DesignerPage() {
   useDemandasRealtime();
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <PageHeader
         title="🎨 Designer"
         subtitle="Demandas, produção e funções do designer."
@@ -125,15 +125,21 @@ function AbaDemandas() {
   return (
     <div className="space-y-3">
       <Card className="flex flex-wrap items-center gap-3 p-3">
-        <Input id="q" placeholder="buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="w-52" />
-        <Select
-          id="c" value={clienteId} onChange={(e) => setClienteId(e.target.value)}
-          options={[{ value: '', label: 'todos os clientes' }, ...(clientesDoGrupo.map((c) => ({ value: c.id, label: c.nome })))]}
-        />
-        <Select
-          id="r" value={responsavelId} onChange={(e) => setResponsavelId(e.target.value)}
-          options={[{ value: '', label: 'todos os responsáveis' }, ...((operadores ?? []).map((op) => ({ value: op.id, label: op.nome })))]}
-        />
+        <div className="w-full sm:w-auto">
+          <Input id="q" placeholder="buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} className="w-full sm:w-52" />
+        </div>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:gap-3">
+          <Select
+            id="c" value={clienteId} onChange={(e) => setClienteId(e.target.value)}
+            options={[{ value: '', label: 'todos os clientes' }, ...(clientesDoGrupo.map((c) => ({ value: c.id, label: c.nome })))]}
+            className="w-full min-w-0"
+          />
+          <Select
+            id="r" value={responsavelId} onChange={(e) => setResponsavelId(e.target.value)}
+            options={[{ value: '', label: 'todos os responsáveis' }, ...((operadores ?? []).map((op) => ({ value: op.id, label: op.nome })))]}
+            className="w-full min-w-0"
+          />
+        </div>
         <div className="ml-auto flex items-center gap-3 text-xs text-slate-400">
           <span>{stats.total} demanda(s)</span>
           {stats.hoje > 0 && <span className="rounded bg-amber-500/20 px-2 py-0.5 text-amber-300"><GlassIcon name="calendar" /> {stats.hoje} hoje</span>}
@@ -182,7 +188,7 @@ function AbaDemandas() {
 
       <PeriodoSeletor mes={mes} semana={semana} onMes={setMes} onSemana={setSemana} />
 
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {([
           { id: 'quadro', label: '📋 Quadro' },
           { id: 'historico', label: '✅ Histórico (o que foi feito)' },

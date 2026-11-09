@@ -17,7 +17,7 @@ const styles: Record<Variant, string> = {
 
 const sizes: Record<Size, string> = {
   sm: 'px-3 py-1.5 text-xs',
-  md: 'px-4 py-2 text-sm',
+  md: 'min-h-[40px] px-4 py-2 text-sm sm:min-h-0',
 };
 
 export function Button({

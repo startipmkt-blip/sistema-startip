@@ -57,7 +57,7 @@ export function ContratosPage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <header className="flex flex-wrap items-center gap-3">
         <div>
           <h1 className="text-xl font-semibold text-white">Contratos</h1>
@@ -71,7 +71,7 @@ export function ContratosPage() {
       </header>
 
       {/* Abas */}
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {([
           { id: 'contratos', label: 'Contratos' },
           { id: 'modelos',   label: 'Modelos de contrato' },
@@ -118,7 +118,7 @@ export function ContratosPage() {
         ) : !contratos || contratos.length === 0 ? (
           <EmptyState message="Nenhum contrato ainda. Clique em '+ Novo contrato' pra começar." />
         ) : (
-          <table className="w-full text-sm">
+          <table className="tabela-empilhada w-full text-sm">
             <thead className="border-b border-white/5 text-left text-xs text-slate-400">
               <tr>
                 <th className="p-3">Cliente</th>
@@ -136,13 +136,13 @@ export function ContratosPage() {
                     <div className="font-medium text-slate-100">{c.razao_social || c.titulo}</div>
                     <div className="text-xs text-slate-400">{c.signer_name || c.signer_email || '—'}</div>
                   </td>
-                  <td className="p-3 text-xs text-slate-300">
+                  <td className="p-3 text-xs text-slate-300" data-label="Vigência">
                     {fmtData(c.start_date)} → {fmtData(c.end_date)}
                     <div className="text-xs text-slate-400">{c.duration_months}m</div>
                   </td>
-                  <td className="p-3 text-slate-200">{formatMoney(Number(c.onboarding_value ?? 0))}</td>
-                  <td className="p-3 text-slate-200">{formatMoney(Number(c.monthly_value ?? 0))}</td>
-                  <td className="p-3">
+                  <td className="p-3 text-slate-200" data-label="Onboarding">{formatMoney(Number(c.onboarding_value ?? 0))}</td>
+                  <td className="p-3 text-slate-200" data-label="Mensalidade">{formatMoney(Number(c.monthly_value ?? 0))}</td>
+                  <td className="p-3" data-label="Status">
                     <Badge tone={TABS.find((t) => t.id === c.status)?.tone ?? 'slate'}>{c.status}</Badge>
                   </td>
                   <td className="p-3">

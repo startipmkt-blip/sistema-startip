@@ -90,7 +90,7 @@ function PainelEmpresas({ onSair }: { onSair: () => void }) {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <header className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold text-white"><GlassIcon name="building" /> Empresas</h1>
         <span className="text-xs text-slate-400">Cadastro consolidado</span>

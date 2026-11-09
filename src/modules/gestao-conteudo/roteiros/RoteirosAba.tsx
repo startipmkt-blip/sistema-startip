@@ -72,7 +72,7 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
         <Button onClick={() => setForm({})}><GlassIcon name="plus" className="h-4 w-4" /> Novo Roteiro</Button>
       </div>
 
-      <div className="flex gap-1 border-b border-white/10" role="tablist" aria-label="Roteiros">
+      <div className="abas-linha flex gap-1 border-b border-white/10" role="tablist" aria-label="Roteiros">
         {([['producao', 'Em produção', 'clapperboard', doPeriodo.length], ['usados', 'Usados', 'archive', usados.length]] as const).map(([id, label, icone, n]) => (
           <button key={id} role="tab" aria-selected={subAba === id} onClick={() => setSubAba(id)}
             className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-semibold transition-colors ${

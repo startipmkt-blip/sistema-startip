@@ -302,7 +302,40 @@ function AbaTransacoes({ transacoes, mesLabel, onEditar, onAlternarPago, onNovaR
       {visiveis.length === 0 ? (
         <EmptyState message={`Nenhuma transação em ${mesLabel}${termo ? ' para essa busca' : ''}.`} />
       ) : (
-        <div className="overflow-x-auto">
+        <>
+        {/* Celular: lista no estilo extrato de banco; toque na linha para editar. */}
+        <ul className="divide-y divide-white/[0.06] border-t border-white/10 md:hidden">
+          {visiveis.map((t) => (
+            <li key={t.id} className="flex items-center gap-3 px-4 py-3">
+              <span className={`chip-icone h-9 w-9 ${t.tipo === 'entrada' ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                <GlassIcon name={t.tipo === 'entrada' ? 'trending-up' : 'card'} className="h-4 w-4" />
+              </span>
+              <button onClick={() => onEditar(t)} className="min-w-0 flex-1 text-left">
+                <div className="truncate text-sm font-medium text-slate-100">{t.descricao}</div>
+                <div className="truncate text-xs text-slate-400">{formatDate(t.data)} · {t.categoria}</div>
+              </button>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <span className={`whitespace-nowrap text-sm font-bold tabular-nums ${t.tipo === 'entrada' ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {t.tipo === 'entrada' ? '+' : '−'} {formatMoney(t.valor)}
+                </span>
+                {t.despesa ? (
+                  <button onClick={() => onAlternarPago(t)} aria-label={`Status: ${t.statusLabel}. Toque para alternar`}>
+                    <Badge tone={t.pago ? 'green' : 'amber'}>{t.statusLabel}</Badge>
+                  </button>
+                ) : (
+                  <Badge tone={t.pago ? 'green' : 'red'}>{t.statusLabel}</Badge>
+                )}
+              </div>
+            </li>
+          ))}
+          <li className="flex items-center justify-between px-4 py-3 text-sm">
+            <span className="font-semibold text-slate-300">Saldo de {mesLabel}</span>
+            <span className={`font-bold tabular-nums ${totalEntradas - totalSaidas >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {formatMoney(totalEntradas - totalSaidas)}
+            </span>
+          </li>
+        </ul>
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-y border-white/10 text-left text-xs font-medium text-slate-400">
@@ -356,6 +389,7 @@ function AbaTransacoes({ transacoes, mesLabel, onEditar, onAlternarPago, onNovaR
             </tfoot>
           </table>
         </div>
+        </>
       )}
     </Card>
   );
@@ -393,7 +427,7 @@ function AbaRecorrentes({ receitas, despesas, onEditarReceita, onEditarDespesa, 
                     <div className="text-xs text-slate-400">Todo dia {r.dia_vencimento}</div>
                   </div>
                   <Badge tone={r.ativo ? 'blue' : 'slate'}>{r.ativo ? 'Ativo' : 'Inativo'}</Badge>
-                  <span className="w-24 text-right text-sm font-bold tabular-nums text-emerald-400">{formatMoney(r.valor_mensal)}</span>
+                  <span className="text-right text-sm font-bold tabular-nums text-emerald-400 sm:w-24">{formatMoney(r.valor_mensal)}</span>
                   <button className="text-xs font-semibold text-brand-300 hover:underline" onClick={() => onEditarReceita(r)}>Editar</button>
                 </li>
               ))}

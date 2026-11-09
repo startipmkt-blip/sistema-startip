@@ -100,7 +100,7 @@ export function GestaoConteudoPage() {
       </PageHeader>
 
       {/* Sub-abas: produção (conteúdos prontos) | ideias a aprovar antes de produzir */}
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {ABAS.map((a) => (
           <button
             key={a.id}

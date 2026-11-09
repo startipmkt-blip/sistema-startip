@@ -155,6 +155,13 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const dedos = useRef(new Map<number, { x: number; y: number }>());
+  const pinca = useRef<number | null>(null);
+  function distanciaDedos() {
+    const [a, b] = [...dedos.current.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y) || 1;
+  }
+
   function zoomEm(fator: number, cx?: number, cy?: number) {
     const el = area.current;
     if (!el) return;
@@ -269,7 +276,7 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
   }, []);
 
   return (
-    <div className="flex h-[calc(100vh-8.5rem)] min-h-[520px] flex-col gap-3">
+    <div className="flex h-[calc(100dvh-var(--topo)-var(--nav-inferior)-2.5rem)] min-h-[420px] flex-col gap-3 sm:h-[calc(100dvh-var(--topo)-var(--nav-inferior)-3.5rem)] lg:h-[calc(100dvh-var(--topo)-5rem)] lg:min-h-[520px]">
       <div className="flex flex-wrap items-center gap-3">
         <Link to="/mapa-mental" className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm font-semibold text-slate-100 hover:bg-white/10">
           <GlassIcon name="chevron-left" className="h-4 w-4" /> Mapas
@@ -280,7 +287,7 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
             aria-label="Nome do mapa"
-            className="w-64 max-w-full rounded-md bg-transparent px-1 text-[15px] font-bold text-slate-100 hover:bg-white/[0.04] focus:bg-white/[0.06] focus:outline-none"
+            className="w-full max-w-64 rounded-md bg-transparent px-1 text-[15px] font-bold text-slate-100 hover:bg-white/[0.04] focus:bg-white/[0.06] focus:outline-none"
           />
           <div className="flex items-center gap-2 px-1 text-xs text-slate-400">
             <span className={salvo === 'erro' ? 'text-red-400' : ''}>
@@ -298,17 +305,30 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
         onKeyDown={teclado}
         onPointerDown={(e) => {
           if ((e.target as HTMLElement).closest('[data-no], [data-ui]')) return;
+          dedos.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+          if (dedos.current.size === 2) { arraste.current = null; pinca.current = distanciaDedos(); return; }
           area.current?.focus();
           setSelecionado(null);
           arraste.current = { x: e.clientX, y: e.clientY, vx: vista.x, vy: vista.y };
-          (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
         }}
         onPointerMove={(e) => {
+          if (dedos.current.has(e.pointerId)) dedos.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          // Pinça com dois dedos: zoom em torno do ponto médio.
+          if (dedos.current.size === 2 && pinca.current) {
+            const d = distanciaDedos();
+            const [a, b] = [...dedos.current.values()];
+            const r = area.current!.getBoundingClientRect();
+            zoomEm(d / pinca.current, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
+            pinca.current = d;
+            return;
+          }
           const a = arraste.current;
           if (a) setVista((v) => ({ ...v, x: a.vx + e.clientX - a.x, y: a.vy + e.clientY - a.y }));
         }}
-        onPointerUp={() => { arraste.current = null; }}
-        className="canvas-mapa relative flex-1 cursor-grab overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] outline-none active:cursor-grabbing"
+        onPointerUp={(e) => { dedos.current.delete(e.pointerId); pinca.current = null; arraste.current = null; }}
+        onPointerCancel={(e) => { dedos.current.delete(e.pointerId); pinca.current = null; arraste.current = null; }}
+        className="canvas-mapa relative flex-1 touch-none cursor-grab overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] outline-none active:cursor-grabbing"
         style={pontos ? { backgroundImage: 'radial-gradient(circle, rgba(148,163,184,0.35) 1px, transparent 1.2px)', backgroundSize: `${22 * vista.zoom}px ${22 * vista.zoom}px`, backgroundPosition: `${vista.x}px ${vista.y}px` } : undefined}
       >
         <div className="absolute left-0 top-0 origin-top-left" style={{ transform: `translate(${vista.x}px, ${vista.y}px) scale(${vista.zoom})` }}>
@@ -440,13 +460,13 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
 
         {/* Barra inferior */}
         <div data-ui className="barra-mapa absolute bottom-3 left-3 flex items-center gap-0.5 rounded-xl border border-white/10 bg-[#121a24] p-1 shadow-sm">
-          <button type="button" onClick={() => zoomEm(1 / 1.2)} className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10" aria-label="Diminuir zoom"><GlassIcon name="minus" className="h-4 w-4" /></button>
+          <button type="button" onClick={() => zoomEm(1 / 1.2)} className="rounded-lg p-2 text-slate-300 hover:bg-white/10 sm:p-1.5" aria-label="Diminuir zoom"><GlassIcon name="minus" className="h-4 w-4" /></button>
           <span className="w-11 text-center text-xs font-semibold tabular-nums text-slate-300">{Math.round(vista.zoom * 100)}%</span>
-          <button type="button" onClick={() => zoomEm(1.2)} className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10" aria-label="Aumentar zoom"><GlassIcon name="plus" className="h-4 w-4" /></button>
+          <button type="button" onClick={() => zoomEm(1.2)} className="rounded-lg p-2 text-slate-300 hover:bg-white/10 sm:p-1.5" aria-label="Aumentar zoom"><GlassIcon name="plus" className="h-4 w-4" /></button>
           <span className="mx-1 h-5 w-px bg-white/10" />
-          <button type="button" onClick={ajustar} className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10" title="Ajustar à tela" aria-label="Ajustar à tela"><GlassIcon name="maximize" className="h-4 w-4" /></button>
+          <button type="button" onClick={ajustar} className="rounded-lg p-2 text-slate-300 hover:bg-white/10 sm:p-1.5" title="Ajustar à tela" aria-label="Ajustar à tela"><GlassIcon name="maximize" className="h-4 w-4" /></button>
           <button type="button" onClick={() => setPontos((p) => !p)} className={`rounded-lg p-1.5 hover:bg-white/10 ${pontos ? 'text-brand-300' : 'text-slate-300'}`} title="Mostrar/ocultar pontos" aria-label="Mostrar ou ocultar a grade de pontos"><GlassIcon name="grid" className="h-4 w-4" /></button>
-          <button type="button" onClick={() => exportarPng(caixas, titulo)} className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10" title="Baixar imagem (PNG)" aria-label="Baixar imagem do mapa"><GlassIcon name="download" className="h-4 w-4" /></button>
+          <button type="button" onClick={() => exportarPng(caixas, titulo)} className="rounded-lg p-2 text-slate-300 hover:bg-white/10 sm:p-1.5" title="Baixar imagem (PNG)" aria-label="Baixar imagem do mapa"><GlassIcon name="download" className="h-4 w-4" /></button>
         </div>
 
         {/* Minimapa */}
@@ -491,7 +511,10 @@ function Editor({ mapaId, tituloInicial, dadosIniciais, atualizado }: {
         )}
       </div>
 
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-400 [@media(pointer:fine)]:hidden">
+        Toque num card para selecionar e ver as ações · toque duas vezes para editar · arraste o fundo com um dedo para mover e use dois dedos para dar zoom.
+      </p>
+      <p className="text-xs text-slate-400 [@media(pointer:coarse)]:hidden">
         Atalhos: <kbd>Tab</kbd> novo filho · <kbd>Enter</kbd> novo irmão · <kbd>F2</kbd> ou duplo clique edita · <kbd>Del</kbd> exclui · <kbd>Ctrl+Z</kbd> desfaz · arraste um card para mudar ele de lugar (os filhos vão junto) · Ctrl + rolagem dá zoom, arraste o fundo para mover a tela.
       </p>
 

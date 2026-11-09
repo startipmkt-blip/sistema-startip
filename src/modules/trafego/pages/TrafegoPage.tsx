@@ -45,7 +45,7 @@ export function TrafegoPage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <PageHeader
         title="🎯 Tráfego Pago"
         subtitle="Checklist diário, otimizações da semana e saldo consolidado de todos os clientes."

@@ -31,7 +31,7 @@ export function DetalheIdeias(props: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {aba('mes', `📅 Linha editorial de ${mesLabel(props.mes)}`)}
         {aba('banco', `💡 Banco de ideias (${livres})`)}
       </div>

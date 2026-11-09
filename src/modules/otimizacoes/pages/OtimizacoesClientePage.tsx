@@ -94,7 +94,7 @@ export function OtimizacoesClientePage() {
   const linkUrl = link ? `${window.location.origin}/otim/${link.token}` : null;
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <div className="text-sm">
         <Link to="/otimizacoes" className="text-slate-400 hover:text-brand-400">← Todos os clientes</Link>
       </div>

@@ -52,7 +52,7 @@ export function MetaAdsGestorPage() {
     : { preset };
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 sm:p-4">
       <PageHeader
         title="🎯 Meta Ads — Gestor de Tráfego"
         subtitle="Controle das campanhas Meta de todos os clientes num só lugar."
@@ -86,7 +86,7 @@ export function MetaAdsGestorPage() {
 
       {/* Abas internas quando cliente selecionado */}
       {contaSelecionada && aba !== 'config' && (
-        <nav className="flex gap-1 border-b border-white/10">
+        <nav className="abas-linha flex gap-1 border-b border-white/10">
           {([['painel','📊 Painel'],['campanhas','🎯 Campanhas'],['anuncios','🖼 Anúncios']] as [Aba, string][]).map(([id, label]) => (
             <button key={id} onClick={() => setAba(id)}
               className={`rounded-t-md px-4 py-2 text-sm font-medium transition-colors ${

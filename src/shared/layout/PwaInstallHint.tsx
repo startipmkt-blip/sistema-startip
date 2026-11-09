@@ -50,7 +50,7 @@ export function PwaInstallHint() {
   if (!prompt && !mostrarIos) return null;
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md rounded-2xl border border-white/10 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-xl">
+    <div className="acima-nav fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md rounded-2xl border border-white/10 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-xl">
       <div className="flex items-start gap-3">
         <span className="text-2xl"><GlassIcon name="smartphone" /></span>
         <div className="min-w-0 flex-1">

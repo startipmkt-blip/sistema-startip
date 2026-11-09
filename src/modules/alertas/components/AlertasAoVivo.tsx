@@ -39,7 +39,7 @@ export function AlertasAoVivo() {
   if (!habilitado || (novos.length === 0 && !convidar)) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2" role="alert">
+    <div className="acima-nav fixed bottom-4 right-4 z-[60] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2" role="alert">
       {convidar && (
         <div className="rounded-xl border border-brand-400/50 bg-slate-900/90 p-3 shadow-glass backdrop-blur-xl">
           <div className="text-sm font-medium text-white">Receber avisos de clientes sem resposta pelo Windows?</div>

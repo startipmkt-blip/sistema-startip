@@ -129,7 +129,7 @@ export function AnotacoesPage() {
       </div>
 
       {/* Abas */}
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="abas-linha flex gap-1 border-b border-white/10">
         {([
           { id: 'pendentes', label: 'Pendentes' },
           { id: 'feitas',    label: 'Feitas' },

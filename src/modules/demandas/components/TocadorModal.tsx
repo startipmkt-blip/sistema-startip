@@ -24,7 +24,7 @@ export function TocadorModal({ titulo, onEscolher, onCancelar }: Props) {
       <p className="mb-4 text-xs text-slate-400">
         Escolha a pessoa para iniciar o cronômetro. A demanda só vai para "Em andamento" depois disso.
       </p>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {TOCADORES.map((nome) => (
           <button
             key={nome}

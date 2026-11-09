@@ -48,10 +48,10 @@ export function ClienteDetailPage() {
         ← Clientes
       </Link>
 
-      <Card className="p-6">
-        <div className="flex items-start justify-between gap-4">
+      <Card className="p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <ClienteHeader cliente={cliente} />
-          <Button variant="secondary" onClick={() => setEditando(true)}>
+          <Button variant="secondary" className="shrink-0" onClick={() => setEditando(true)}>
             Editar
           </Button>
         </div>

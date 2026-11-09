@@ -67,7 +67,7 @@ export function PainelClientePage() {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-1 border-b border-white/10">
+          <div className="abas-linha flex gap-1 border-b border-white/10">
             {([
               { id: 'entregas',    label: '📦 Entregas' },
               { id: 'otimizacoes', label: '⚡ Otimizações' },

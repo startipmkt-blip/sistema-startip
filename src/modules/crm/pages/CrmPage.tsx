@@ -85,11 +85,14 @@ export function CrmPage() {
 
   return (
     // As margens negativas cancelam o padding do <main> da AppShell → ocupa tela cheia.
-    // A altura calc(100vh - 3.5rem) descarta a altura do Topbar (h-14).
-    <div className="-m-4 flex h-[calc(100vh-3.5rem)] flex-col sm:-m-6 lg:-m-8">
+    // .tela-cheia desconta o topo e a barra inferior do celular.
+    <div className="tela-cheia -m-4 flex flex-col sm:-m-6 lg:-m-8">
       {/* Barra superior compacta — título + abas + ações */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 pt-2">
-        <span className="text-base font-semibold text-white">CRM</span>
+      {/* Celular com conversa aberta: a barra some para o chat ganhar a tela (volta pelo "<" da conversa). */}
+      <div className={`flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-2 pt-2 sm:px-4 md:flex ${
+        sub === 'atendimento' && searchParams.get('leadId') ? 'hidden' : 'flex'
+      }`}>
+        <span className="hidden text-base font-semibold text-white md:inline">CRM</span>
 
         <Tabs
           className="border-b-0"
