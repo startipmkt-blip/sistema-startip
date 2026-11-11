@@ -56,18 +56,31 @@ serve(async (req) => {
   const userId = novo.user?.id;
   if (!userId) return json({ error: 'não retornou userId' }, 500);
 
-  // Atualiza ou insere o profile. O trigger padrão do Supabase pode já
-  // ter criado uma linha vazia — usamos upsert por id.
-  const { error: e2 } = await sbAdmin.from('profiles').upsert({
-    id: userId,
+  const dados = {
     nome: nome.trim(),
     cargo: cargo ?? '',
     tipo: 'equipe',
     papel: papel ?? 'operador',
     status: status ?? 'ativo',
     permissoes: permissoes ?? [],
-  } as any, { onConflict: 'id' });
-  if (e2) return json({ error: e2.message, hint: 'user criado no Auth mas profile falhou' }, 500);
+  };
+
+  // O trigger handle_new_user já cria a linha do profile. O UPDATE precisa
+  // rodar com a sessão do admin: o trigger profiles_bloqueia_escalonamento
+  // rejeita (403) mudança de cargo/status/permissões vinda do service role.
+  const { data: atualizados, error: e2 } = await sbUser
+    .from('profiles').update(dados as any).eq('id', userId).select('id');
+  let erroPerfil = e2;
+  if (!erroPerfil && (atualizados?.length ?? 0) === 0) {
+    // Sem linha pré-criada: INSERT não passa pelo trigger de UPDATE.
+    const { error: e3 } = await sbAdmin.from('profiles').insert({ id: userId, ...dados } as any);
+    erroPerfil = e3;
+  }
+  if (erroPerfil) {
+    // Desfaz o login para o e-mail não ficar "já cadastrado" na nova tentativa.
+    await sbAdmin.auth.admin.deleteUser(userId);
+    return json({ error: erroPerfil.message }, 500);
+  }
 
   return json({ ok: true, user_id: userId });
 });
