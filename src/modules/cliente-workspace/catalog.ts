@@ -25,6 +25,7 @@ export const DOC_ITENS: DocItem[] = [
   { chave: 'referencias', titulo: 'Referências', icon: '🔗', grupo: 'materiais' },
   { chave: 'dores', titulo: 'Dores / mecanismo único / diferenciais', icon: '⚡', grupo: 'materiais' },
   { chave: 'reunioes', titulo: 'Reuniões (PDFs e resumos)', icon: '📁', grupo: 'materiais' },
+  { chave: 'documentos', titulo: 'Documentos', icon: '📄', grupo: 'materiais' },
   // Itens com tela própria (listas estruturadas, não texto livre)
   { chave: 'identidade', titulo: 'Identidade visual', icon: '🎨', grupo: 'materiais' },
   { chave: 'regras', titulo: 'Regras do cliente (briefing)', icon: '📋', grupo: 'materiais' },

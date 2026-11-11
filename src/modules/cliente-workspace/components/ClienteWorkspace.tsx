@@ -10,6 +10,7 @@ import {
   type DocItem,
 } from '@/modules/cliente-workspace/catalog';
 import { DnaCliente } from '@/modules/cliente-workspace/components/DnaCliente';
+import { DocumentosCliente } from '@/modules/cliente-workspace/components/DocumentosCliente';
 import { ReunioesPanel } from '@/modules/reunioes/ReunioesPanel';
 import { FormulariosAba } from '@/modules/formularios/pages/FormulariosAba';
 import { RegrasCliente } from '@/modules/cliente-perfil/components/RegrasCliente';
@@ -139,6 +140,8 @@ export function ClienteWorkspace({ clienteId, clienteNome }: { clienteId: string
         <RegrasCliente clienteId={clienteId} />
       ) : item.chave === 'pautas' ? (
         <PautasCliente clienteId={clienteId} clienteNome={clienteNome ?? 'cliente'} />
+      ) : item.chave === 'documentos' ? (
+        <DocumentosCliente clienteId={clienteId} />
       ) : item.chave === 'reunioes' ? (
         <Card className="p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">

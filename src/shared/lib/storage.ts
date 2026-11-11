@@ -16,7 +16,16 @@ export type BucketId =
   | 'reunioes'
   | 'anexos-internos';
 
+export interface ArquivoListado {
+  path: string;
+  nome: string;
+  tamanho: number;
+  criadoEm: string;
+}
+
 interface UploadParams {
+  /** subpasta opcional dentro da pasta do cliente (ex.: "documentos"). */
+  pasta?: string;
   bucket: BucketId;
   clienteId?: string; // obrigatório para buckets privados
   file: File;
@@ -48,7 +57,7 @@ function extensao(nome: string): string {
  * (o modo demo não conversa com o Supabase).
  */
 export async function uploadArquivo(p: UploadParams): Promise<UploadResult> {
-  const { bucket, clienteId, file } = p;
+  const { bucket, clienteId, file, pasta } = p;
 
   if (IS_DEMO) {
     // Sem servidor: usa Object URL local só para conseguir exibir/testar.
@@ -61,8 +70,9 @@ export async function uploadArquivo(p: UploadParams): Promise<UploadResult> {
 
   const nome = sanitizarNome(file.name.replace(extensao(file.name), ''));
   const ext = extensao(file.name);
+  const sub = pasta ? `${sanitizarNome(pasta)}/` : '';
   const path = clienteId
-    ? `${clienteId}/${crypto.randomUUID()}-${nome}${ext}`
+    ? `${clienteId}/${sub}${crypto.randomUUID()}-${nome}${ext}`
     : `_/${crypto.randomUUID()}-${nome}${ext}`;
 
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
@@ -74,6 +84,23 @@ export async function uploadArquivo(p: UploadParams): Promise<UploadResult> {
 
   const url = await urlDoArquivo(bucket, path);
   return { path, url };
+}
+
+/** Lista os arquivos (não recursivo) de uma pasta do bucket, mais recentes primeiro. */
+export async function listarArquivos(bucket: BucketId, prefixo: string): Promise<ArquivoListado[]> {
+  if (IS_DEMO) return [];
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .list(prefixo, { limit: 1000, sortBy: { column: 'created_at', order: 'desc' } });
+  if (error) throw error;
+  return (data ?? [])
+    .filter((o) => o.id && o.name !== '.emptyFolderPlaceholder') // pastas vêm com id null
+    .map((o) => ({
+      path: `${prefixo}/${o.name}`,
+      nome: o.name.replace(/^[0-9a-f-]{36}-/i, ''),
+      tamanho: Number((o.metadata as { size?: number } | null)?.size ?? 0),
+      criadoEm: o.created_at ?? '',
+    }));
 }
 
 /**
