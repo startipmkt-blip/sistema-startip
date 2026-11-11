@@ -62,7 +62,6 @@ serve(async (req) => {
     id: userId,
     nome: nome.trim(),
     cargo: cargo ?? '',
-    email: email.trim(),
     tipo: 'equipe',
     papel: papel ?? 'operador',
     status: status ?? 'ativo',
