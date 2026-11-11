@@ -54,10 +54,10 @@ function iniciais(nome: string) {
   return nome.split(/\s+/).map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 }
 
-const RESPONSAVEIS_SOCIOS = ['Iuri', 'Domini'];
+export const RESPONSAVEIS_SOCIOS = ['Iuri', 'Domini'];
 
 /** Escolha do responsável principal por avatar. */
-function SeletorPessoas({ valores, onChange, multi, opcoes }: {
+export function SeletorPessoas({ valores, onChange, multi, opcoes }: {
   valores: string[]; onChange: (v: string[]) => void; multi: boolean; opcoes: readonly string[];
 }) {
   return (

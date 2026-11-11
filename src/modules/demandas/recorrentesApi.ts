@@ -1,7 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
-import { CATEGORIA_RECORRENTE } from '@/modules/demandas/types';
+import {
+  CATEGORIA_RECORRENTE,
+  type DemandaPrioridade,
+  type DemandaQuem,
+  type DemandaSetor,
+  type Subtarefa,
+} from '@/modules/demandas/types';
+import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 
 export type RecorrenciaTipo = 'diaria' | 'semanal' | 'mensal';
 
@@ -16,7 +23,24 @@ export interface TarefaRecorrente {
   horario: string; // opcional, ex.: '09:00-11:00'
   ultima_conclusao: string | null; // 'YYYY-MM-DD'
   ultima_geracao?: string | null; // último dia em que virou demanda no quadro
+  // Mesmas opções de uma demanda — copiadas para o card criado no quadro.
+  quem_responsavel: DemandaQuem;
+  cliente_id: string | null;
+  setor: DemandaSetor;
+  privada: boolean;
+  prioridade: DemandaPrioridade;
+  tempo_estimado_min: number | null;
+  /** 'auto' = coluna pelo responsável (Iuri / Dhomini / Aberta). */
+  status_destino: 'auto' | 'aberta' | 'iuri' | 'domini' | 'fazendo';
+  links: string[];
+  anexos: CriativoAnexo[];
+  subtarefas: Subtarefa[];
 }
+
+export const CAMPOS_DEMANDA_PADRAO: Pick<TarefaRecorrente, 'quem_responsavel' | 'cliente_id' | 'setor' | 'privada' | 'prioridade' | 'tempo_estimado_min' | 'status_destino' | 'links' | 'anexos' | 'subtarefas'> = {
+  quem_responsavel: 'agencia', cliente_id: null, setor: 'geral', privada: false, prioridade: 'media',
+  tempo_estimado_min: null, status_destino: 'auto', links: [], anexos: [], subtarefas: [],
+};
 
 export const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
@@ -71,12 +95,17 @@ export function estaAtrasada(t: TarefaRecorrente): boolean {
 
 // Store demo (em memória) — só usado quando IS_DEMO.
 let demoTarefas: TarefaRecorrente[] = [
-  { id: 't1', titulo: 'Análise de campanhas de todos os clientes', descricao: '', responsaveis: ['Gestor de tráfego'], tipo: 'semanal', dias_semana: [2], dia_mes: null, horario: '09:00-11:00', ultima_conclusao: null },
-  { id: 't2', titulo: 'Postar stories dos clientes', descricao: '', responsaveis: ['Social media'], tipo: 'diaria', dias_semana: [], dia_mes: null, horario: '', ultima_conclusao: null },
-  { id: 't3', titulo: 'Revisar metas da semana', descricao: '', responsaveis: ['Iuri', 'Domini'], tipo: 'semanal', dias_semana: [1], dia_mes: null, horario: '', ultima_conclusao: null },
+  { id: 't1', titulo: 'Análise de campanhas de todos os clientes', descricao: '', responsaveis: ['Gestor de tráfego'], tipo: 'semanal', dias_semana: [2], dia_mes: null, horario: '09:00-11:00', ultima_conclusao: null, ...CAMPOS_DEMANDA_PADRAO },
+  { id: 't2', titulo: 'Postar stories dos clientes', descricao: '', responsaveis: ['Social media'], tipo: 'diaria', dias_semana: [], dia_mes: null, horario: '', ultima_conclusao: null, ...CAMPOS_DEMANDA_PADRAO },
+  { id: 't3', titulo: 'Revisar metas da semana', descricao: '', responsaveis: ['Iuri', 'Domini'], tipo: 'semanal', dias_semana: [1], dia_mes: null, horario: '', ultima_conclusao: null, ...CAMPOS_DEMANDA_PADRAO },
 ];
 
-export type RecorrenteForm = Pick<TarefaRecorrente, 'titulo' | 'descricao' | 'responsaveis' | 'tipo' | 'dias_semana' | 'dia_mes' | 'horario'>;
+export type RecorrenteForm = Pick<
+  TarefaRecorrente,
+  'titulo' | 'descricao' | 'responsaveis' | 'tipo' | 'dias_semana' | 'dia_mes' | 'horario'
+  | 'quem_responsavel' | 'cliente_id' | 'setor' | 'privada' | 'prioridade' | 'tempo_estimado_min'
+  | 'status_destino' | 'links' | 'anexos' | 'subtarefas'
+>;
 
 const KEY = ['recorrentes'] as const;
 
@@ -84,7 +113,7 @@ async function fetchRecorrentes(): Promise<TarefaRecorrente[]> {
   if (IS_DEMO) return [...demoTarefas];
   const { data, error } = await supabase
     .from('tarefas_recorrentes')
-    .select('id, titulo, descricao, responsaveis, tipo, dias_semana, dia_mes, horario, ultima_conclusao, ultima_geracao')
+    .select('id, titulo, descricao, responsaveis, tipo, dias_semana, dia_mes, horario, ultima_conclusao, ultima_geracao, quem_responsavel, cliente_id, setor, privada, prioridade, tempo_estimado_min, status_destino, links, anexos, subtarefas')
     .order('created_at');
   if (error) throw error;
   return (data ?? []) as unknown as TarefaRecorrente[];
@@ -155,14 +184,17 @@ export async function gerarDemandasRecorrentesDeHoje(): Promise<number> {
     if (errClaim) throw errClaim;
     if (!claim || claim.length === 0) continue; // outro usuário já gerou hoje
     const desc = [t.horario ? `Horário: ${t.horario}` : '', t.descricao].filter(Boolean).join('\n\n');
-    // As colunas Iuri/Dhomini só existem no setor Sócios (privado); "Aberta" fica no Geral, visível a todos.
-    const status = colunaDaRecorrente(t.responsaveis);
-    const dosSocios = status !== 'aberta';
+    // As colunas Iuri/Dhomini só existem no setor Sócios (privado); nas demais, vale o setor escolhido na tarefa.
+    const status = t.status_destino && t.status_destino !== 'auto' ? t.status_destino : colunaDaRecorrente(t.responsaveis);
+    const dosSocios = status === 'iuri' || status === 'domini';
     const { error: errIns } = await supabase.from('demandas').insert({
-      cliente_id: null, setor: dosSocios ? 'socios' : 'geral', privada: dosSocios, titulo: t.titulo, descricao: desc,
-      responsavel: t.responsaveis.join(', ') || 'Equipe', prioridade: 'media',
+      cliente_id: t.cliente_id, setor: dosSocios ? 'socios' : t.setor, privada: dosSocios || t.privada,
+      titulo: t.titulo, descricao: desc,
+      responsavel: t.responsaveis.join(', ') || 'Equipe', prioridade: t.prioridade,
       status, prazo: hoje, renovacao: 'nenhuma', categoria: CATEGORIA_RECORRENTE,
-      quem_responsavel: 'agencia', responsaveis_secundarios: [], links: [], subtarefas: [],
+      quem_responsavel: t.quem_responsavel, responsaveis_secundarios: [],
+      tempo_estimado_min: t.tempo_estimado_min, links: t.links ?? [], anexos: t.anexos ?? [],
+      subtarefas: (t.subtarefas ?? []).map((x) => ({ ...x, feita: false })),
     } as never);
     if (errIns) {
       await supabase.from('tarefas_recorrentes').update({ ultima_geracao: t.ultima_geracao ?? null } as never).eq('id', t.id);
