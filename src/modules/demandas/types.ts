@@ -36,7 +36,11 @@ export interface Demanda {
   created_at: string;
 }
 
+/** Marca as demandas geradas automaticamente a partir de uma tarefa recorrente. */
+export const CATEGORIA_RECORRENTE = 'recorrente';
+
 export const DEMANDA_CATEGORIAS: { id: string; label: string; icone: string }[] = [
+  { id: CATEGORIA_RECORRENTE, label: 'Recorrente', icone: 'repeat' },
   { id: 'aprovacao', label: 'Aprovação', icone: 'check-circle' },
   { id: 'conteudo', label: 'Conteúdo', icone: 'file-text' },
   { id: 'planilha', label: 'Planilha', icone: 'grid' },

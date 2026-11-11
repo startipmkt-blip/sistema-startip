@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
+import { CATEGORIA_RECORRENTE } from '@/modules/demandas/types';
 
 export type RecorrenciaTipo = 'diaria' | 'semanal' | 'mensal';
 
@@ -160,7 +161,7 @@ export async function gerarDemandasRecorrentesDeHoje(): Promise<number> {
     const { error: errIns } = await supabase.from('demandas').insert({
       cliente_id: null, setor: dosSocios ? 'socios' : 'geral', privada: dosSocios, titulo: t.titulo, descricao: desc,
       responsavel: t.responsaveis.join(', ') || 'Equipe', prioridade: 'media',
-      status, prazo: hoje, renovacao: 'nenhuma',
+      status, prazo: hoje, renovacao: 'nenhuma', categoria: CATEGORIA_RECORRENTE,
       quem_responsavel: 'agencia', responsaveis_secundarios: [], links: [], subtarefas: [],
     } as never);
     if (errIns) {

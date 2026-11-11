@@ -5,6 +5,7 @@ import { useDemandas, useAtualizarStatusDemanda, useSalvarDemanda } from '@/modu
 import {
   DEMANDA_COLUNAS,
   DEMANDA_SETORES,
+  CATEGORIA_RECORRENTE,
   PRIORIDADE_LABEL,
   PRIORIDADE_TONE,
   RESPONSAVEIS,
@@ -135,7 +136,10 @@ export function DemandasPage() {
     return doSetor;
   }, [doSetor, rapido, hoje]);
 
-  const quadro   = filtradas.filter((d) => d.status !== 'concluida');
+  // Recorrentes ficam no topo de cada coluna (sort é estável: o resto mantém a ordem por prazo).
+  const quadro   = filtradas
+    .filter((d) => d.status !== 'concluida')
+    .sort((a, b) => Number(b.categoria === CATEGORIA_RECORRENTE) - Number(a.categoria === CATEGORIA_RECORRENTE));
   const concluidas = filtradas.filter((d) => d.status === 'concluida');
 
   // Agrupamento de concluídas por semana.
@@ -218,6 +222,11 @@ export function DemandasPage() {
         <button onClick={() => { setEditando(d); setFormOpen(true); }} className="min-w-0 flex-1 text-left">
           <div className="flex items-start justify-between gap-2">
             <span className="text-[13px] font-medium leading-snug text-slate-100">
+              {d.categoria === CATEGORIA_RECORRENTE && (
+                <span className="mr-1.5 inline-flex items-center gap-1 rounded-full border border-brand-400/40 bg-brand-500/15 px-1.5 py-0 align-middle text-[10px] font-semibold uppercase tracking-wide text-brand-300" title="Tarefa recorrente">
+                  <GlassIcon name="repeat" /> Recorrente
+                </span>
+              )}
               {d.privada && <span title="Privada"><GlassIcon name="lock" /> </span>}
               {d.titulo}
               {!!d.anexos?.length && (
