@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { gerarDemandasRecorrentesDeHoje } from '@/modules/demandas/recorrentesApi';
 import { useDemandas, useAtualizarStatusDemanda, useSalvarDemanda } from '@/modules/demandas/api/demandasApi';
 import {
   DEMANDA_COLUNAS,
@@ -91,6 +93,14 @@ export function DemandasPage() {
   // Demanda aguardando a escolha de quem vai tocá-la (antes de ir para "Em andamento").
   const [iniciando, setIniciando] = useState<DemandaView | null>(null);
   const { data: tempos } = useTempoDemandas();
+  const qc = useQueryClient();
+
+  // Ao abrir Demandas, as recorrentes que vencem hoje viram cards no quadro (uma vez por dia).
+  useEffect(() => {
+    gerarDemandasRecorrentesDeHoje()
+      .then((n) => { if (n > 0) qc.invalidateQueries({ queryKey: ['demandas'] }); })
+      .catch((e) => console.error('Falha ao gerar demandas recorrentes:', e));
+  }, [qc]);
 
   const setoresVisiveis = DEMANDA_SETORES.filter((s) => !s.adminOnly || isAdmin);
   const [setor, setSetor] = useState<DemandaSetor>(setoresVisiveis[0]?.id ?? 'geral');

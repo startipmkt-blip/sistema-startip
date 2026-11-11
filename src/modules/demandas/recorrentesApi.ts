@@ -14,6 +14,7 @@ export interface TarefaRecorrente {
   dia_mes: number | null; // 1–31 (usado quando mensal; mês curto cai no último dia)
   horario: string; // opcional, ex.: '09:00-11:00'
   ultima_conclusao: string | null; // 'YYYY-MM-DD'
+  ultima_geracao?: string | null; // último dia em que virou demanda no quadro
 }
 
 export const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -82,7 +83,7 @@ async function fetchRecorrentes(): Promise<TarefaRecorrente[]> {
   if (IS_DEMO) return [...demoTarefas];
   const { data, error } = await supabase
     .from('tarefas_recorrentes')
-    .select('id, titulo, descricao, responsaveis, tipo, dias_semana, dia_mes, horario, ultima_conclusao')
+    .select('id, titulo, descricao, responsaveis, tipo, dias_semana, dia_mes, horario, ultima_conclusao, ultima_geracao')
     .order('created_at');
   if (error) throw error;
   return (data ?? []) as unknown as TarefaRecorrente[];
@@ -122,6 +123,53 @@ async function excluirRecorrente(id: string): Promise<void> {
   }
   const { error } = await supabase.from('tarefas_recorrentes').delete().eq('id', id);
   if (error) throw error;
+}
+
+// Coluna do quadro conforme quem faz: só Iuri → "iuri"; só Dhomini → "domini"; ninguém/ambos/outros → "aberta".
+export function colunaDaRecorrente(responsaveis: string[]): 'aberta' | 'iuri' | 'domini' {
+  const norm = responsaveis.map((r) => r.trim().toLowerCase());
+  const iuri = norm.includes('iuri');
+  const domini = norm.some((r) => r === 'domini' || r === 'dhomini');
+  if (iuri && !domini) return 'iuri';
+  if (domini && !iuri) return 'domini';
+  return 'aberta';
+}
+
+// Cria no quadro de Demandas as recorrentes que vencem hoje (uma vez por dia).
+// O update condicional em ultima_geracao é atômico: se dois usuários abrirem a tela ao mesmo tempo, só um cria.
+// Retorna quantas demandas foram criadas.
+export async function gerarDemandasRecorrentesDeHoje(): Promise<number> {
+  if (IS_DEMO) return 0;
+  const hoje = hojeStr();
+  const lista = await fetchRecorrentes();
+  let criadas = 0;
+  for (const t of lista) {
+    if (!ehParaHoje(t) || t.ultima_geracao === hoje) continue;
+    const { data: claim, error: errClaim } = await supabase
+      .from('tarefas_recorrentes')
+      .update({ ultima_geracao: hoje } as never)
+      .eq('id', t.id)
+      .or(`ultima_geracao.is.null,ultima_geracao.lt.${hoje}`)
+      .select('id');
+    if (errClaim) throw errClaim;
+    if (!claim || claim.length === 0) continue; // outro usuário já gerou hoje
+    const desc = [t.horario ? `Horário: ${t.horario}` : '', t.descricao].filter(Boolean).join('\n\n');
+    // As colunas Iuri/Dhomini só existem no setor Sócios (privado); "Aberta" fica no Geral, visível a todos.
+    const status = colunaDaRecorrente(t.responsaveis);
+    const dosSocios = status !== 'aberta';
+    const { error: errIns } = await supabase.from('demandas').insert({
+      cliente_id: null, setor: dosSocios ? 'socios' : 'geral', privada: dosSocios, titulo: t.titulo, descricao: desc,
+      responsavel: t.responsaveis.join(', ') || 'Equipe', prioridade: 'media',
+      status, prazo: hoje, renovacao: 'nenhuma',
+      quem_responsavel: 'agencia', responsaveis_secundarios: [], links: [], subtarefas: [],
+    } as never);
+    if (errIns) {
+      await supabase.from('tarefas_recorrentes').update({ ultima_geracao: t.ultima_geracao ?? null } as never).eq('id', t.id);
+      throw errIns;
+    }
+    criadas++;
+  }
+  return criadas;
 }
 
 export function useRecorrentes() {
