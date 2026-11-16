@@ -62,6 +62,11 @@ export function useTempoTotal(tempo?: TempoDemanda): number {
 export const reprovadaPeloCliente = (d: DesignerDemanda) =>
   !!d.reprovado_em && (d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento');
 
+const dataCurta = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+};
+
 export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
   const { profile } = useAuth();
   const bloqueado = briefingBloqueado(d, profile);
@@ -161,6 +166,15 @@ ${d.briefing ?? ''}`;
         <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-300">
           <GlassIcon name="timer" /> {aberto.quem || 'Alguém'} {aberto.pausado ? 'pausou' : 'está tocando'} · {formatarDuracao(total)}
         </div>
+      )}
+
+      {(d.iniciado_em || d.concluido_em) && (
+        <p className="mt-1.5 flex flex-wrap gap-x-3 text-xs text-slate-400">
+          {d.iniciado_em && <span title="Dia em que começou a ser feita">Tocada {dataCurta(d.iniciado_em)}</span>}
+          {d.status === 'concluido' && d.concluido_em && (
+            <span className="text-emerald-300" title="Dia em que foi finalizada">Feita {dataCurta(d.concluido_em)}</span>
+          )}
+        </p>
       )}
 
       <div className="mt-2 flex min-h-6 items-center gap-2.5 text-xs text-slate-400">
