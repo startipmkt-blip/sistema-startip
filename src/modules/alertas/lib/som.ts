@@ -89,6 +89,19 @@ function sintetizado(nivel: 1 | 2 | 3, volume: number): boolean {
   return true;
 }
 
+// Aviso de designer parado: quatro notas descendentes, diferente dos alertas de cliente.
+export function tocarAvisoOcioso(volume = 0.8): boolean {
+  const c = contexto();
+  if (!c) return false;
+  if (c.state === 'suspended') void c.resume();
+  if (c.state !== 'running') return false;
+  const t = c.currentTime + 0.02;
+  const v = Math.min(1, Math.max(0, volume)) * 0.6;
+  [659, 523, 392].forEach((f, i) => nota(c, f, t + i * 0.28, 0.4, v, 'sawtooth'));
+  nota(c, 262, t + 0.9, 0.7, v, 'sawtooth');
+  return true;
+}
+
 // Retorna true se o arquivo começou a tocar ou o som sintetizado foi usado.
 // Se o arquivo falhar (rede, bloqueio), cai no som sintetizado.
 export function tocarAlerta(nivel: 1 | 2 | 3, volume = 0.8): boolean {

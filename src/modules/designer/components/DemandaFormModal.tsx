@@ -9,7 +9,7 @@ import { RegrasResumo } from '@/modules/cliente-perfil/components/RegrasResumo';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import type { CriativoAnexo } from '@/modules/ideias/criativos/types';
 import {
-  useSalvarDemanda, useExcluirDemanda,
+  useSalvarDemanda, useExcluirDemanda, useMoverStatus,
   TIPO_LABEL, TIPO_LABEL_CRIATIVO, TIPOS_CRIATIVO, STATUS_COLUNAS,
   type DesignerDemanda, type DesignerTipo, type DesignerStatus, type DesignerCategoria, type DesignerPrioridade,
 } from '../api/demandasApi';
@@ -18,6 +18,8 @@ import { opcoesDeSemana } from '../lib/periodo';
 import { RENOVACAO_OPTIONS, type Renovacao } from '@/modules/demandas/lib/renovacao';
 import { confirmar } from '@/shared/ui/ConfirmDialog';
 import { EditorRico } from '@/shared/ui/texto-rico/EditorRico';
+import { useAuth } from '@/shared/auth/AuthProvider';
+import { briefingBloqueado } from '../lib/bloqueio';
 
 interface Props {
   open: boolean;
@@ -34,6 +36,10 @@ interface Props {
 export function DemandaFormModal({ open, onClose, demanda, statusInicial = 'a_fazer', semanaSugerida, categoriaInicial = 'organico' }: Props) {
   const salvar = useSalvarDemanda();
   const excluir = useExcluirDemanda();
+  const mover = useMoverStatus();
+  const { profile } = useAuth();
+  // Os campos continuam no estado (salvar não apaga nada); só ficam escondidos.
+  const bloqueado = !!demanda && briefingBloqueado(demanda, profile);
   const { data: clientes } = useClientes('');
   const { data: operadores } = useOperadores();
 
@@ -198,7 +204,37 @@ ${r.cronometroErro}`);
         </p>
       )}
 
-      {demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'alteracao' || demanda.status === 'em_andamento') && (
+      {bloqueado && demanda && (
+        <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-100">
+          <p className="mb-1 flex items-center gap-1.5 font-semibold"><GlassIcon name="lock" /> Briefing bloqueado</p>
+          <p className="text-xs text-amber-200">
+            A descrição, o briefing, os áudios e os arquivos só aparecem depois que a demanda vai para Em andamento.
+          </p>
+          <button
+            type="button"
+            disabled={mover.isPending}
+            onClick={() => mover.mutate(
+              {
+                id: demanda.id, status: 'em_andamento', titulo: demanda.titulo, de: demanda.status,
+                iniciado_em: demanda.iniciado_em, responsavel_nome: demanda.responsavel_nome ?? null,
+              },
+              {
+                onSuccess: (r) => {
+                  if (r?.cronometroErro) alert(`A demanda foi movida, mas o cronômetro não acompanhou:
+
+${r.cronometroErro}`);
+                  onClose();
+                },
+              },
+            )}
+            className="mt-2 rounded-lg bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+          >
+            {mover.isPending ? 'Movendo…' : 'Passar para Em andamento'}
+          </button>
+        </div>
+      )}
+
+      {!bloqueado && demanda?.reprovado_em && (demanda.status === 'a_fazer' || demanda.status === 'alteracao' || demanda.status === 'em_andamento') && (
         <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-100">
           <p className="mb-1 font-semibold">Reprovado pelo cliente: o que precisa ser refeito</p>
           <p className="whitespace-pre-line">{demanda.reprovado_justificativa || '(sem justificativa)'}</p>
@@ -208,7 +244,7 @@ ${r.cronometroErro}`);
         </div>
       )}
 
-      {(status === 'alteracao' || ((status === 'a_fazer' || status === 'em_andamento') && alteracaoObs.trim())) && (
+      {!bloqueado && (status === 'alteracao' || ((status === 'a_fazer' || status === 'em_andamento') && alteracaoObs.trim())) && (
         <Campo label="Alteração: o que precisa ser alterado" caixaAlta>
           <EditorRico
             linhas={3}
@@ -223,13 +259,17 @@ ${r.cronometroErro}`);
         <Texto placeholder="O que precisa ser feito?" value={titulo} onChange={(e) => setTitulo(e.target.value)} autoFocus />
       </Campo>
 
-      <Campo label="Descrição" caixaAlta>
-        <EditorRico linhas={3} placeholder="O que é a demanda, em poucas linhas." value={descricao} onChange={setDescricao} />
-      </Campo>
+      {!bloqueado && (
+        <>
+          <Campo label="Descrição" caixaAlta>
+            <EditorRico linhas={3} placeholder="O que é a demanda, em poucas linhas." value={descricao} onChange={setDescricao} />
+          </Campo>
 
-      <Campo label="Briefing" caixaAlta>
-        <EditorRico linhas={4} placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar." value={briefing} onChange={setBriefing} />
-      </Campo>
+          <Campo label="Briefing" caixaAlta>
+            <EditorRico linhas={4} placeholder="Como fazer: texto da arte, formato, objetivo, o que não pode faltar." value={briefing} onChange={setBriefing} />
+          </Campo>
+        </>
+      )}
 
       <Campo label="Cliente" caixaAlta>
         <Escolha
@@ -296,10 +336,12 @@ ${r.cronometroErro}`);
         />
       </Campo>
 
-      <div className="flex flex-col gap-1.5">
-        <Rotulo caixaAlta dica="vários">Arquivos</Rotulo>
-        <AnexosDemanda anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />
-      </div>
+      {!bloqueado && (
+        <div className="flex flex-col gap-1.5">
+          <Rotulo caixaAlta dica="vários">Arquivos</Rotulo>
+          <AnexosDemanda anexos={anexos} onChange={setAnexos} novos={novos} onNovos={setNovos} />
+        </div>
+      )}
     </JanelaFormulario>
   );
 }

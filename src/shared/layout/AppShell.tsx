@@ -1,3 +1,4 @@
+import { DesignerOciosoAviso } from '@/modules/designer/components/DesignerOciosoAviso';
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '@/shared/layout/Sidebar';
@@ -40,6 +41,7 @@ export function AppShell() {
       <CommandPalette />
       <PwaInstallHint />
       <AlertasAoVivo />
+      <DesignerOciosoAviso />
     </div>
   );
 }

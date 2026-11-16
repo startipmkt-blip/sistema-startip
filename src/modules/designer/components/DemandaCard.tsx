@@ -7,6 +7,8 @@ import {
 } from '../api/demandasApi';
 import { GlassIcon } from '@/shared/ui/GlassIcon';
 import { LogoCliente } from '@/shared/ui/LogoCliente';
+import { useAuth } from '@/shared/auth/AuthProvider';
+import { briefingBloqueado } from '../lib/bloqueio';
 
 interface Props {
   d: DesignerDemanda;
@@ -61,6 +63,8 @@ export const reprovadaPeloCliente = (d: DesignerDemanda) =>
   !!d.reprovado_em && (d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento');
 
 export function DemandaCard({ d, tempo, onEditar, onDragStart }: Props) {
+  const { profile } = useAuth();
+  const bloqueado = briefingBloqueado(d, profile);
   const prazo = prazoChip(d);
   // Normal é o padrão: sem etiqueta para não poluir o cartão.
   const prioridade = d.prioridade && d.prioridade !== 'normal' ? PRIORIDADES.find((p) => p.id === d.prioridade) : undefined;
@@ -79,10 +83,10 @@ ${d.briefing ?? ''}`;
   if (audios > 0) material.push({ chave: 'audio', texto: audios === 1 ? 'Áudio' : `${audios} áudios`, icone: 'mic' });
   if (arquivos > 0) material.push({ chave: 'arq', texto: arquivos === 1 ? '1 arquivo' : `${arquivos} arquivos`, icone: 'paperclip' });
   const reprovada = reprovadaPeloCliente(d);
-  const obsAlteracao = textoPuro(d.alteracao_obs).trim();
+  const obsAlteracao = bloqueado ? '' : textoPuro(d.alteracao_obs).trim();
   const emRevisao = d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento';
   // Em Alteração sem nenhum texto (nem do cliente nem da equipe): a barra pede para descrever.
-  const faltaDescrever = d.status === 'alteracao' && !obsAlteracao && !reprovada;
+  const faltaDescrever = !bloqueado && d.status === 'alteracao' && !obsAlteracao && !reprovada;
   return (
     <div
       draggable
@@ -117,7 +121,12 @@ ${d.briefing ?? ''}`;
           <span className="truncate">{d.cliente_nome}</span>
         </p>
       )}
-      {material.length > 0 && (
+      {bloqueado && (
+        <p className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-300 ring-1 ring-amber-500/30">
+          <GlassIcon name="lock" /> Briefing liberado em Em andamento
+        </p>
+      )}
+      {!bloqueado && material.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1" title="O que já foi enviado para o designer">
           {material.map((m) => (
             <span
@@ -139,7 +148,7 @@ ${d.briefing ?? ''}`;
           <strong>Alteração:</strong> clique e descreva o que precisa mudar.
         </p>
       )}
-      {reprovada && d.reprovado_justificativa && (
+      {reprovada && !bloqueado && d.reprovado_justificativa && (
         <p className="mt-1.5 rounded bg-red-500/10 p-1.5 text-xs leading-snug text-red-200 line-clamp-4">
           <strong>Refazer:</strong> {d.reprovado_justificativa}
         </p>
