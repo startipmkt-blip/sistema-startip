@@ -10,6 +10,7 @@ import { useOperadores } from '@/modules/crm/api/atendimentoApi';
 import { useDemandas, useDemandasRealtime, type DesignerCategoria, type DesignerDemanda, type DesignerStatus } from '../api/demandasApi';
 import { DemandasKanban } from '../components/DemandasKanban';
 import { HistoricoDesigner } from '../components/HistoricoDesigner';
+import { DiaDesigner } from '../components/DiaDesigner';
 import { ResumoDesigner } from '../components/ResumoDesigner';
 import { FuncoesDesigner } from '../components/FuncoesDesigner';
 import { PeriodoSeletor } from '../components/PeriodoSeletor';
@@ -81,7 +82,7 @@ function AbaDemandas() {
   }, [mes, semana]);
   // Semana aberta no quadro vira a semana padrão da demanda nova (início da semana).
   const semanaSugerida = semana === null ? undefined : periodo.ini;
-  const [visao, setVisao] = useState<'quadro' | 'historico'>('quadro');
+  const [visao, setVisao] = useState<'quadro' | 'historico' | 'dia'>('quadro');
   const [modalAberto, setModalAberto] = useState(false);
   const [gerarAberto, setGerarAberto] = useState(false);
   const [editando, setEditando] = useState<DesignerDemanda | null>(null);
@@ -192,6 +193,7 @@ function AbaDemandas() {
         {([
           { id: 'quadro', label: '📋 Quadro' },
           { id: 'historico', label: '✅ Histórico (o que foi feito)' },
+          { id: 'dia', label: '📅 Por dia (tocadas e finalizadas)' },
         ] as const).map((v) => (
           <button
             key={v.id}
@@ -214,6 +216,15 @@ function AbaDemandas() {
           onEditar={abrir}
           onNova={(status) => abrir(null, status)}
           onGerarSemana={() => setGerarAberto(true)}
+        />
+      ) : visao === 'dia' ? (
+        <DiaDesigner
+          clienteId={clienteId || null}
+          responsavelId={responsavelId || null}
+          q={busca}
+          clienteIds={clienteIds}
+          categoria={categoriaFiltro}
+          onEditar={abrir}
         />
       ) : (
         <HistoricoDesigner
