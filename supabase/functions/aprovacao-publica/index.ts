@@ -63,7 +63,16 @@ const TIPO_DESIGNER: Record<string, string> = { reels: 'reels', carrossel: 'carr
 // Nunca derruba a decisão do cliente.
 async function devolverAoDesigner(sb: any, post: any, justificativa: string): Promise<void> {
   try {
-    const motivo = { reprovado_justificativa: justificativa, reprovado_em: new Date().toISOString() };
+    // A alteração sempre cai na semana ATUAL do designer (domingo a sábado, horário de Brasília),
+    // mesmo que o conteúdo tenha sido criado em semana/mês anterior; semana_ref vence prazo e criação.
+    const br = new Date(Date.now() - 3 * 3600_000);
+    br.setUTCDate(br.getUTCDate() - br.getUTCDay());
+    const semanaAtual = br.toISOString().slice(0, 10);
+    const motivo = {
+      reprovado_justificativa: justificativa,
+      reprovado_em: new Date().toISOString(),
+      semana_ref: semanaAtual,
+    };
     if (post.designer_demanda_id) {
       await sb.from('designer_demandas')
         .update({ status: 'alteracao', concluido_em: null, ...motivo } as any)
