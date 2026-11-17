@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { IS_DEMO } from '@/shared/lib/env';
@@ -12,7 +12,7 @@ const EXPEDIENTE = { inicio: 9, fim: 18 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
-const CHAVE_AVISADO = 'startip-designer-ocioso';
+const CHAVE_AVISADO = 'startip-designer-ocioso-ultimo-toque';
 
 interface Estado { rodando: boolean; desde: string | null }
 
@@ -91,22 +91,23 @@ export function useDesignerOcioso(habilitado: boolean, onAbrir?: () => void) {
     };
   }, [habilitado]);
 
+  // Trava rígida: no máximo um toque a cada 15 min por navegador, aconteça o que acontecer
+  // com os dados (o último toque fica em memória e no localStorage).
+  const ultimoToque = useRef<number>(0);
+  if (ultimoToque.current === 0) {
+    try { ultimoToque.current = Number(localStorage.getItem(CHAVE_AVISADO)) || 0; } catch { /* ignora */ }
+  }
+
   useEffect(() => {
     if (!habilitado || !q.data) return;
-    if (q.data.rodando) {
-      setAviso(null);
-      try { localStorage.removeItem(CHAVE_AVISADO); } catch { /* ignora */ }
-      return;
-    }
+    if (q.data.rodando) { setAviso(null); return; }
     const min = minutosOciososNoExpediente(q.data.desde, new Date());
-    const faixa = Math.floor(min / LIMITE_OCIOSO_MIN); // 1 = 15 min, 2 = 30 min…
-    if (faixa < 1) return;
-    // Uma vez por faixa de 15 min e por período parado (chave = desde quando está parado).
-    const chave = `${q.data.desde ?? 'expediente'}#${faixa}`;
-    let ja: string | null = null;
-    try { ja = localStorage.getItem(CHAVE_AVISADO); } catch { /* ignora */ }
-    if (ja === chave) return;
-    try { localStorage.setItem(CHAVE_AVISADO, chave); } catch { /* ignora */ }
+    if (min < LIMITE_OCIOSO_MIN) return;
+    const agora = Date.now();
+    if (agora - ultimoToque.current < LIMITE_OCIOSO_MIN * 60_000) return;
+    ultimoToque.current = agora;
+    try { localStorage.setItem(CHAVE_AVISADO, String(agora)); } catch { /* ignora */ }
+    const chave = String(agora);
 
     const minutos = Math.round(min);
     setAviso({ id: chave, minutos });
