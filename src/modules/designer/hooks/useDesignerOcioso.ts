@@ -19,19 +19,31 @@ interface Estado { rodando: boolean; desde: string | null }
 // Está tocando algo agora? Timer aberto e não pausado = sim. Senão, ocioso desde o fim
 // do último timer (ou desde o início da pausa).
 async function lerEstado(): Promise<Estado> {
+  // O quadro manda: demanda dele (ou sem responsável) em "Em andamento" = trabalhando,
+  // mesmo que o timer esteja pausado, fechado ou aberto em outro nome.
+  const { data: designers } = await db.from('profiles').select('id').neq('papel', 'admin').ilike('cargo', '%designer%');
+  const ids = new Set<string>(((designers ?? []) as { id: string }[]).map((p) => p.id));
+  const { data: andamento, error: eA } = await db.from('designer_demandas').select('responsavel_id').eq('status', 'em_andamento');
+  if (eA) return { rodando: true, desde: null }; // sem leitura confiável, não avisa
+  const naMao = ((andamento ?? []) as { responsavel_id: string | null }[])
+    .some((d) => !d.responsavel_id || ids.has(d.responsavel_id));
+  if (naMao) return { rodando: true, desde: null };
+
   const { data: u } = await db.from('usuarios').select('id').eq('nome', DESIGNER_NOME).maybeSingle();
   if (!u) return { rodando: true, desde: null }; // sem cadastro no cronômetro: não dá para medir
-  const { data: aberto } = await db
+  const { data: aberto, error: eB } = await db
     .from('registros_tempo').select('pausado, inicio_pausa').eq('usuario_id', u.id).is('fim', null)
     .order('inicio', { ascending: false }).limit(1).maybeSingle();
+  if (eB) return { rodando: true, desde: null };
   if (aberto) {
     return aberto.pausado && aberto.inicio_pausa
       ? { rodando: false, desde: aberto.inicio_pausa }
       : { rodando: true, desde: null };
   }
-  const { data: ultimo } = await db
+  const { data: ultimo, error: eC } = await db
     .from('registros_tempo').select('fim').eq('usuario_id', u.id).not('fim', 'is', null)
     .order('fim', { ascending: false }).limit(1).maybeSingle();
+  if (eC) return { rodando: true, desde: null };
   return { rodando: false, desde: ultimo?.fim ?? null };
 }
 
