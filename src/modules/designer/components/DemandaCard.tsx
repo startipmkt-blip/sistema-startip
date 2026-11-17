@@ -87,6 +87,8 @@ ${d.briefing ?? ''}`;
   if (/https?:\/\//i.test(textoLivre)) material.push({ chave: 'link', texto: 'Link do material', icone: 'link' });
   if (audios > 0) material.push({ chave: 'audio', texto: audios === 1 ? 'Áudio' : `${audios} áudios`, icone: 'mic' });
   if (arquivos > 0) material.push({ chave: 'arq', texto: arquivos === 1 ? '1 arquivo' : `${arquivos} arquivos`, icone: 'paperclip' });
+  // Trancado: o designer só vê SE há conteúdo (tag Descrição), nunca o texto em si. Sem conteúdo, nada aparece.
+  const temConteudo = !!(d.descricao?.trim() || d.briefing?.trim());
   const reprovada = reprovadaPeloCliente(d);
   const obsAlteracao = bloqueado ? '' : textoPuro(d.alteracao_obs).trim();
   const emRevisao = d.status === 'a_fazer' || d.status === 'alteracao' || d.status === 'em_andamento';
@@ -126,10 +128,15 @@ ${d.briefing ?? ''}`;
           <span className="truncate">{d.cliente_nome}</span>
         </p>
       )}
-      {bloqueado && (
-        <p className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-300 ring-1 ring-amber-500/30">
-          <GlassIcon name="lock" /> Briefing liberado em Em andamento
-        </p>
+      {bloqueado && temConteudo && (
+        <div className="mt-1.5 flex flex-wrap gap-1" title="Já tem conteúdo; o briefing abre em Em andamento">
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-xs font-medium text-emerald-300 ring-1 ring-emerald-500/30">
+            <GlassIcon name="note" /> Descrição
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-300 ring-1 ring-amber-500/30">
+            <GlassIcon name="lock" /> Briefing liberado em Em andamento
+          </span>
+        </div>
       )}
       {!bloqueado && material.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1" title="O que já foi enviado para o designer">
