@@ -5,6 +5,7 @@ import { Badge } from '@/shared/ui/Badge';
 import {
   linkAprovacaoIdeias, useEnviarIdeias, useExcluirIdeia, useLembrarIdeias, useMoverIdeia, useRecolherIdeia,
 } from '@/modules/gestao-conteudo/api/ideiasApi';
+import { useEnviarParaDesigner } from '@/modules/gestao-conteudo/api/enviarParaDesigner';
 import { pilaresEditoriais } from '@/modules/gestao-conteudo/api/pilaresApi';
 import { SEMANA_EXTRA, STATUS_IDEIA, mesLabel, type Ideia, type StatusIdeia } from '@/modules/gestao-conteudo/types';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
@@ -39,6 +40,7 @@ function dm(iso: string) {
 /** Quadro "Linha Editorial": semanas do mês + conteúdo extra, com envio para o cliente aprovar. */
 export function LinhaEditorial({ cliente, mes, ideias }: Props) {
   const enviar = useEnviarIdeias();
+  const paraDesigner = useEnviarParaDesigner();
   const lembrar = useLembrarIdeias();
   const excluir = useExcluirIdeia();
   const recolher = useRecolherIdeia();
@@ -80,6 +82,24 @@ export function LinhaEditorial({ cliente, mes, ideias }: Props) {
     enviar.mutate(
       { clienteId: cliente.id, clienteNome: cliente.nome, slug: cliente.central_slug, mes, ids: selecionadas },
       { onSuccess: () => { setSelecionadas([]); ok('Enviado! O cliente recebeu o link da linha editorial no WhatsApp.'); }, onError: erro },
+    );
+  }
+
+  async function enviarDesigner() {
+    const itens = ideias.filter((i) => selecionadas.includes(i.id));
+    if (!(await confirmar(`Enviar ${itens.length} item(ns) como demanda para o Gabriel (designer)?`))) return;
+    setAviso(null);
+    paraDesigner.mutate(
+      { clienteId: cliente.id, mes, itens },
+      {
+        onSuccess: (r) => {
+          setSelecionadas([]);
+          ok(r.jaExistiam > 0
+            ? `${r.criadas} demanda(s) criada(s) para o Gabriel. ${r.jaExistiam} já tinha(m) sido enviada(s) antes.`
+            : `${r.criadas} demanda(s) criada(s) para o Gabriel na aba Designer.`);
+        },
+        onError: erro,
+      },
     );
   }
 
@@ -142,6 +162,9 @@ export function LinhaEditorial({ cliente, mes, ideias }: Props) {
         <Button size="sm" onClick={enviarSelecionadas} disabled={selecionadas.length === 0 || enviar.isPending || !cliente.whatsapp_chat_id}
           title={!cliente.whatsapp_chat_id ? 'Cliente sem WhatsApp cadastrado' : undefined}>
           <GlassIcon name="send" className="h-4 w-4" /> {enviar.isPending ? 'Enviando…' : `Enviar para aprovação (${selecionadas.length})`}
+        </Button>
+        <Button variant="secondary" size="sm" onClick={enviarDesigner} disabled={selecionadas.length === 0 || paraDesigner.isPending}>
+          <GlassIcon name="palette" className="h-4 w-4" /> {paraDesigner.isPending ? 'Enviando…' : `Enviar p/ designer (${selecionadas.length})`}
         </Button>
         {enviaveis.length > 0 && (
           <button className="text-xs font-semibold text-brand-300 hover:underline" onClick={() => setSelecionadas(enviaveis.map((i) => i.id))}>
