@@ -40,7 +40,7 @@ export function useEnviarParaDesigner() {
   return useMutation({
     mutationFn: async (v: { clienteId: string; mes: string; itens: Ideia[] }): Promise<ResultadoEnvioDesigner> => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const db = supabase.from as any;
+      const db = (tabela: string) => (supabase.from as any)(tabela);
       const { data: gab } = await db('profiles').select('id').ilike('nome', `${DESIGNER_NOME}%`).limit(1);
       const responsavelId = (gab?.[0]?.id as string | undefined) ?? null;
 
