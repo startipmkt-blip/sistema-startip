@@ -5,7 +5,7 @@ import { Badge } from '@/shared/ui/Badge';
 import {
   linkAprovacaoIdeias, useEnviarIdeias, useExcluirIdeia, useLembrarIdeias, useMoverIdeia, useRecolherIdeia,
 } from '@/modules/gestao-conteudo/api/ideiasApi';
-import { useEnviarParaDesigner } from '@/modules/gestao-conteudo/api/enviarParaDesigner';
+import { useEnviarParaDesigner, useIdeiasNoDesigner } from '@/modules/gestao-conteudo/api/enviarParaDesigner';
 import { pilaresEditoriais } from '@/modules/gestao-conteudo/api/pilaresApi';
 import { SEMANA_EXTRA, STATUS_IDEIA, mesLabel, type Ideia, type StatusIdeia } from '@/modules/gestao-conteudo/types';
 import { semanasRotuladas } from '@/modules/gestao-conteudo/lib/semanas';
@@ -41,6 +41,7 @@ function dm(iso: string) {
 export function LinhaEditorial({ cliente, mes, ideias }: Props) {
   const enviar = useEnviarIdeias();
   const paraDesigner = useEnviarParaDesigner();
+  const noDesigner = useIdeiasNoDesigner(ideias.map((i) => i.id)).data;
   const lembrar = useLembrarIdeias();
   const excluir = useExcluirIdeia();
   const recolher = useRecolherIdeia();
@@ -254,6 +255,11 @@ export function LinhaEditorial({ cliente, mes, ideias }: Props) {
                           <input type="checkbox" checked={marcada} onChange={() => alternar(i.id)} aria-label="Selecionar para enviar ao cliente" />
                         )}
                         <Badge tone={st.tone}>{st.label}</Badge>
+                        {noDesigner?.has(i.id) && (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-pink-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-pink-300" title="Já virou demanda do designer">
+                            <GlassIcon name="palette" className="h-3 w-3" /> No designer
+                          </span>
+                        )}
                         {(i.cenas?.length ?? 0) > 0 && <span className="text-[11px] text-slate-400">{i.cenas!.length} cenas</span>}
                         <span className="ml-auto flex items-center">
                           {i.status === 'enviada' && (

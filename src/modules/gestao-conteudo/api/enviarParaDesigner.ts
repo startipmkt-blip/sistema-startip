@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabaseClient';
 import { useAuth } from '@/shared/auth/AuthProvider';
 import { textoPuro } from '@/shared/ui/texto-rico/regras';
@@ -71,5 +71,19 @@ export function useEnviarParaDesigner() {
       return { criadas: novos.length, jaExistiam: v.itens.length - novos.length };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['designer'] }),
+  });
+}
+
+/** Ids das ideias que já viraram demanda do designer (para marcar "Enviada p/ designer"). */
+export function useIdeiasNoDesigner(ids: string[]) {
+  return useQuery({
+    queryKey: ['designer', 'ideias-enviadas', ids],
+    enabled: ids.length > 0,
+    queryFn: async (): Promise<Set<string>> => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.from as any)('designer_demandas').select('ideia_id').in('ideia_id', ids);
+      if (error) throw error;
+      return new Set((data ?? []).map((d: { ideia_id: string }) => d.ideia_id));
+    },
   });
 }
