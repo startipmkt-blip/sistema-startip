@@ -8,8 +8,9 @@ import { pilaresEditoriais } from '@/modules/gestao-conteudo/api/pilaresApi';
 import { descartarAnexo } from '@/modules/ideias/criativos/criativosApi';
 import { SEMANA_EXTRA, mesLabel } from '@/modules/gestao-conteudo/types';
 import { FaixaDestaque } from '@/modules/gestao-conteudo/components/FaixaDestaque';
-import { roteiros, TIPOS_ROTEIRO, type Roteiro, type TipoRoteiro } from './roteirosApi';
+import { roteiros, roteiroDemandas, TIPOS_ROTEIRO, type Roteiro, type RoteiroDemanda, type TipoRoteiro } from './roteirosApi';
 import { RoteiroFormModal } from './RoteiroFormModal';
+import { DemandaRoteirosModal } from './DemandaRoteirosModal';
 import { baixarPdfRoteiros } from './pdfRoteiros';
 import { textoPuro } from '@/shared/ui/texto-rico/regras';
 
@@ -35,11 +36,31 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
   const [visao, setVisao] = useState<'lista' | 'grade'>('lista');
   const [subAba, setSubAba] = useState<'producao' | 'usados'>('producao');
   const [form, setForm] = useState<{ roteiro?: Roteiro } | null>(null);
+  const demandasQ = roteiroDemandas.useLista({ mes_referencia: mes });
+  const excluirDemanda = roteiroDemandas.useExcluir();
+  const [formDemanda, setFormDemanda] = useState<{ demanda?: RoteiroDemanda } | null>(null);
 
   const pilares = useMemo(() => new Map((pilaresQ.data ?? []).map((p) => [p.id, p])), [pilaresQ.data]);
   const nomeCliente = useMemo(() => new Map(clientes.map((c) => [c.id, c.nome])), [clientes]);
 
-  const filtrados = (lista.data ?? []).filter((r) => (!clienteId || r.cliente_id === clienteId) && (tipo === 'todos' || r.tipo === tipo));
+  const doGrupo = useMemo(() => {
+    const m = new Map<string, Roteiro[]>();
+    for (const r of lista.data ?? []) if (r.demanda_id) m.set(r.demanda_id, [...(m.get(r.demanda_id) ?? []), r]);
+    for (const l of m.values()) l.sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0) || a.created_at.localeCompare(b.created_at));
+    return m;
+  }, [lista.data]);
+  const demandas = (demandasQ.data ?? []).filter((d) => (!clienteId || d.cliente_id === clienteId) && (tipo === 'todos' || d.tipo === tipo));
+  const mostraDemandas = subAba === 'producao' && status === 'todos' && !pilar;
+
+  async function apagarDemanda(d: RoteiroDemanda) {
+    const n = doGrupo.get(d.id)?.length ?? 0;
+    if (!(await confirmar(`Excluir a demanda "${d.titulo}" e ${n === 1 ? 'o roteiro' : `os ${n} roteiros`} dentro dela?`))) return;
+    const anexos = (doGrupo.get(d.id) ?? []).flatMap((r) => r.anexos);
+    await excluirDemanda.mutateAsync(d.id);
+    for (const a of anexos) void descartarAnexo(a.path);
+  }
+
+  const filtrados = (lista.data ?? []).filter((r) => !r.demanda_id && (!clienteId || r.cliente_id === clienteId) && (tipo === 'todos' || r.tipo === tipo));
   const usados = filtrados.filter((r) => r.usado_em);
   const doPeriodo = filtrados.filter((r) => !r.usado_em);
   const daAba = subAba === 'usados' ? usados : doPeriodo;
@@ -69,7 +90,10 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
           <h2 className="text-lg font-bold text-slate-100">Roteiros de Produção</h2>
           <p className="text-xs text-slate-400">Central de produção organizada por roteiro · {mesLabel(mes)}</p>
         </div>
-        <Button onClick={() => setForm({})}><GlassIcon name="plus" className="h-4 w-4" /> Novo Roteiro</Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => setFormDemanda({})}><GlassIcon name="layers" className="h-4 w-4" /> Nova Demanda</Button>
+          <Button onClick={() => setForm({})}><GlassIcon name="plus" className="h-4 w-4" /> Novo Roteiro</Button>
+        </div>
       </div>
 
       <div className="abas-linha flex gap-1 border-b border-white/10" role="tablist" aria-label="Roteiros">
@@ -130,11 +154,59 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
         }
       />}
 
+      {mostraDemandas && demandas.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-xs font-bold uppercase tracking-wide text-slate-400">Demandas</h3>
+          <div className={visao === 'grade' ? 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3' : 'flex flex-col gap-2'}>
+            {demandas.map((d) => {
+              const itens = doGrupo.get(d.id) ?? [];
+              return (
+                <Card key={d.id} className="relative flex items-start gap-3 overflow-hidden p-4 pl-5">
+                  <span className="absolute inset-y-0 left-0 w-1 bg-brand-400" aria-hidden />
+                  <button onClick={() => setFormDemanda({ demanda: d })} className="min-w-0 flex-1 text-left">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className={`rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${d.tipo === 'trafego' ? 'bg-orange-500/10 text-orange-300' : 'bg-pink-500/10 text-pink-300'}`}>
+                        {d.tipo === 'trafego' ? 'Tráfego pago' : 'Orgânico'}
+                      </span>
+                      <span className="text-[11px] text-slate-400">{itens.length} {itens.length === 1 ? 'roteiro' : 'roteiros'}</span>
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-slate-100">{d.titulo}</div>
+                    {!clienteId && <div className="text-xs text-slate-400">{nomeCliente.get(d.cliente_id) ?? 'Cliente'}</div>}
+                    {itens.length > 0 && (
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {itens.slice(0, 6).map((r) => (
+                          <span key={r.id} className="max-w-[10rem] truncate rounded-md bg-white/[0.05] px-1.5 py-0.5 text-[11px] text-slate-300">{r.titulo}</span>
+                        ))}
+                        {itens.length > 6 && <span className="text-[11px] text-slate-400">+{itens.length - 6}</span>}
+                      </div>
+                    )}
+                  </button>
+                  <div className="flex shrink-0 items-center">
+                    <button
+                      disabled={itens.length === 0}
+                      onClick={() => void baixarPdfRoteiros({
+                        titulo: d.titulo, mes, roteiros: itens, arquivo: d.titulo,
+                        nomeCliente: (id) => nomeCliente.get(id) ?? '', nomePilar: (id) => (id ? pilares.get(id)?.nome ?? '' : ''),
+                      })}
+                      className="rounded p-1.5 text-slate-400 hover:bg-white/10 disabled:opacity-40" aria-label="Baixar PDF da demanda" title="Baixar todos os roteiros em um PDF">
+                      <GlassIcon name="download" className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => setFormDemanda({ demanda: d })} className="rounded p-1.5 text-slate-400 hover:bg-white/10" aria-label="Editar" title="Editar"><GlassIcon name="pencil" className="h-4 w-4" /></button>
+                    <button onClick={() => void apagarDemanda(d)} className="rounded p-1.5 text-slate-400 hover:bg-red-500/10 hover:text-red-400" aria-label="Excluir" title="Excluir"><GlassIcon name="trash" className="h-4 w-4" /></button>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+          {visiveis.length > 0 && <h3 className="pt-2 text-xs font-bold uppercase tracking-wide text-slate-400">Roteiros avulsos</h3>}
+        </div>
+      )}
+
       {lista.isLoading ? (
         <Card className="flex justify-center p-12"><Spinner /></Card>
       ) : lista.error ? (
         <Card className="p-4 text-sm text-red-300">Erro ao carregar: {(lista.error as Error).message}. Se citar "roteiros", aplique a migration 0091.</Card>
-      ) : visiveis.length === 0 ? (
+      ) : visiveis.length === 0 && mostraDemandas && demandas.length > 0 ? null : visiveis.length === 0 ? (
         <Card className="flex flex-col items-center gap-2 px-6 py-14 text-center">
           <span className="chip-icone h-11 w-11 bg-brand-500/10"><GlassIcon name="clapperboard" tone="brand" className="h-5 w-5" /></span>
           <p className="text-sm text-slate-400">{daAba.length ? 'Nenhum roteiro com esses filtros.'
@@ -201,6 +273,18 @@ export function RoteirosAba({ clientes, clienteId, mes, onCliente }: Props) {
             );
           })}
         </div>
+      )}
+
+      {formDemanda && (
+        <DemandaRoteirosModal
+          onClose={() => setFormDemanda(null)}
+          mes={mes}
+          clientes={clientes}
+          clienteId={clienteId || undefined}
+          tipoInicial={tipo !== 'todos' ? tipo : undefined}
+          demanda={formDemanda.demanda}
+          existentes={formDemanda.demanda ? doGrupo.get(formDemanda.demanda.id) : undefined}
+        />
       )}
 
       {form && (

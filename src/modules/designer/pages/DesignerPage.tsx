@@ -23,16 +23,16 @@ import { GlassIcon, glassify } from '@/shared/ui/GlassIcon';
 type GrupoCliente = 'todos' | 'organico' | 'trafego';
 type FiltroCategoria = 'todas' | DesignerCategoria;
 
-const CATEGORIAS: Array<{ id: FiltroCategoria; label: string; ajuda: string }> = [
-  { id: 'todas',    label: 'Todas as demandas',            ajuda: 'Orgânico e criativos juntos' },
-  { id: 'organico', label: '📱 Conteúdo orgânico',          ajuda: 'Posts, carrosséis, reels e stories das redes sociais' },
-  { id: 'criativo', label: '🎯 Criativos de tráfego pago',  ajuda: 'Criativos que vão para a aba Criativos da Gestão de Conteúdo' },
+const CATEGORIAS: Array<{ id: FiltroCategoria; label: string; resumo: string; ajuda: string }> = [
+  { id: 'todas',    label: 'Todas as demandas',            resumo: 'Todas as demandas',  ajuda: 'Orgânico e criativos juntos' },
+  { id: 'organico', label: '📱 Conteúdo orgânico',          resumo: 'Conteúdo orgânico',  ajuda: 'Posts, carrosséis, reels e stories das redes sociais' },
+  { id: 'criativo', label: '🎯 Criativos de tráfego pago',  resumo: 'Criativos de tráfego', ajuda: 'Criativos que vão para a aba Criativos da Gestão de Conteúdo' },
 ];
 
-const GRUPOS: Array<{ id: GrupoCliente; label: string; ajuda: string }> = [
-  { id: 'todos',    label: '👥 Todos os clientes',        ajuda: 'Todos os clientes' },
-  { id: 'organico', label: '📱 Com rede social (orgânico)', ajuda: 'Clientes com Social Mídia: posts, carrosséis, reels e stories' },
-  { id: 'trafego',  label: '🎯 Só tráfego pago (criativos)', ajuda: 'Clientes só com Tráfego Pago: edição de criativos, quando houver demanda' },
+const GRUPOS: Array<{ id: GrupoCliente; label: string; resumo: string; ajuda: string }> = [
+  { id: 'todos',    label: '👥 Todos os clientes',        resumo: 'Todos os clientes', ajuda: 'Todos os clientes' },
+  { id: 'organico', label: '📱 Com rede social (orgânico)', resumo: 'Clientes orgânico', ajuda: 'Clientes com Social Mídia: posts, carrosséis, reels e stories' },
+  { id: 'trafego',  label: '🎯 Só tráfego pago (criativos)', resumo: 'Clientes só tráfego', ajuda: 'Clientes só com Tráfego Pago: edição de criativos, quando houver demanda' },
 ];
 
 type Aba = 'demandas' | 'producao' | 'funcoes';
@@ -75,6 +75,8 @@ function AbaDemandas() {
   const [grupo, setGrupo] = useState<GrupoCliente>('todos');
   const [categoria, setCategoria] = useState<FiltroCategoria>('todas');
   const categoriaFiltro = categoria === 'todas' ? null : categoria;
+  const [filtrosAberto, setFiltrosAberto] = useState(false);
+  const filtrosAtivos = (grupo !== 'todos' ? 1 : 0) + (categoria !== 'todas' ? 1 : 0);
   const periodo = useMemo(() => {
     if (semana === null) return periodoDoMes(mes);
     const s = semanasDoMes(mes).find((x) => x.numero === semana);
@@ -151,40 +153,78 @@ function AbaDemandas() {
 
       <ResumoDesigner />
 
-      <div className="flex flex-wrap gap-1.5">
-        {GRUPOS.map((g) => (
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            key={g.id}
             type="button"
-            title={g.ajuda}
-            onClick={() => trocarGrupo(g.id)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              grupo === g.id
+            onClick={() => setFiltrosAberto((v) => !v)}
+            aria-expanded={filtrosAberto}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              filtrosAberto || filtrosAtivos > 0
                 ? 'border-brand-400 bg-brand-500/20 text-brand-100'
                 : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
           >
-            {glassify(g.label)}{g.id !== 'todos' && grupo === g.id ? ` · ${clientesDoGrupo.length}` : ''}
+            Filtros
+            {filtrosAtivos > 0 && (
+              <span className="rounded-full bg-brand-500/40 px-1.5 text-[10px]">{filtrosAtivos}</span>
+            )}
+            <span className={`transition-transform ${filtrosAberto ? 'rotate-180' : ''}`}>▾</span>
           </button>
-        ))}
-      </div>
+          {!filtrosAberto && filtrosAtivos > 0 && (
+            <span className="text-xs text-slate-400">
+              {[
+                grupo !== 'todos' ? GRUPOS.find((g) => g.id === grupo)?.resumo : null,
+                categoria !== 'todas' ? CATEGORIAS.find((c) => c.id === categoria)?.resumo : null,
+              ].filter(Boolean).join(' · ')}
+            </span>
+          )}
+        </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        {CATEGORIAS.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            title={c.ajuda}
-            onClick={() => setCategoria(c.id)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              categoria === c.id
-                ? 'border-orange-400 bg-orange-500/20 text-orange-100'
-                : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
-            }`}
-          >
-            {glassify(c.label)}
-          </button>
-        ))}
+        {filtrosAberto && (
+          <Card className="space-y-3 p-3">
+            <div>
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Clientes</div>
+              <div className="flex flex-wrap gap-1.5">
+                {GRUPOS.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    title={g.ajuda}
+                    onClick={() => trocarGrupo(g.id)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      grupo === g.id
+                        ? 'border-brand-400 bg-brand-500/20 text-brand-100'
+                        : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                    }`}
+                  >
+                    {glassify(g.label)}{g.id !== 'todos' && grupo === g.id ? ` · ${clientesDoGrupo.length}` : ''}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Demandas</div>
+              <div className="flex flex-wrap gap-1.5">
+                {CATEGORIAS.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    title={c.ajuda}
+                    onClick={() => setCategoria(c.id)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      categoria === c.id
+                        ? 'border-orange-400 bg-orange-500/20 text-orange-100'
+                        : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                    }`}
+                  >
+                    {glassify(c.label)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
 
       <PeriodoSeletor mes={mes} semana={semana} onMes={setMes} onSemana={setSemana} />

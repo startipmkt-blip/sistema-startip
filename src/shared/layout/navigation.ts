@@ -17,6 +17,8 @@ export interface NavGrupo {
   itens: NavItem[];
 }
 
+// Arquivados (fora do menu; rotas e código mantidos): Indicação (/indicacao),
+// Área do Cliente (/area-cliente) e Tráfego Pago (/trafego).
 export const navGrupos: NavGrupo[] = [
   {
     titulo: null,
@@ -27,7 +29,6 @@ export const navGrupos: NavGrupo[] = [
     itens: [
       { label: 'CRM', to: '/crm', icon: 'crm', comingSoon: false },
       { label: 'Contratos', to: '/contratos', icon: 'contratos', comingSoon: false },
-      { label: 'Indicação', to: '/indicacao', icon: 'indicacao', comingSoon: false },
     ],
   },
   {
@@ -35,7 +36,6 @@ export const navGrupos: NavGrupo[] = [
     itens: [
       { label: 'Clientes', to: '/clientes', icon: 'clientes', comingSoon: false },
       { label: 'CS Clientes', to: '/cs-clientes', icon: 'star', comingSoon: false, equipeOnly: true },
-      { label: 'Área do Cliente', to: '/area-cliente', icon: 'area-cliente', comingSoon: false },
       { label: 'Onboarding', to: '/onboarding', icon: 'onboarding', comingSoon: false },
     ],
   },
@@ -54,7 +54,6 @@ export const navGrupos: NavGrupo[] = [
   {
     titulo: 'Performance',
     itens: [
-      { label: 'Tráfego Pago', to: '/trafego', icon: 'target', comingSoon: false, equipeOnly: true },
       { label: 'Painel do Gestor', to: '/painel-gestor', icon: 'bar-chart', comingSoon: false, equipeOnly: true },
       { label: 'Otimizações', to: '/otimizacoes', icon: 'trending-up', comingSoon: false, equipeOnly: true },
       { label: 'Alertas', to: '/alertas', icon: 'bell', comingSoon: false, equipeOnly: true },

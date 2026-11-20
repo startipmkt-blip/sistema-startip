@@ -28,7 +28,23 @@ export interface Roteiro extends Registro {
   status: StatusRoteiro;
   /** Quando foi marcado como usado; null = ainda disponível. */
   usado_em?: string | null;
+  /** Demanda (documento) a que pertence; null = roteiro avulso. */
+  demanda_id?: string | null;
+  ordem?: number;
 }
+
+export interface RoteiroDemanda extends Registro {
+  cliente_id: string;
+  mes_referencia: string;
+  tipo: TipoRoteiro;
+  titulo: string;
+}
+
+export const roteiroDemandas = criarCrud<RoteiroDemanda>({
+  tabela: 'roteiro_demandas',
+  chave: ['gestao-conteudo', 'roteiro-demandas'],
+  ordem: [{ coluna: 'created_at', asc: false }],
+});
 
 export const TIPOS_ROTEIRO: { id: TipoRoteiro; label: string; icone: string }[] = [
   { id: 'organico', label: 'Orgânico', icone: 'smartphone' },

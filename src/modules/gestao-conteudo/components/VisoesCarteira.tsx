@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
-import { Badge } from '@/shared/ui/Badge';
 import { Spinner } from '@/shared/ui/Spinner';
 import { useMudarEtapa, usePostsPeriodo } from '@/modules/gestao-conteudo/api/gestaoApi';
 import {
@@ -44,11 +43,10 @@ export function VisaoCarteira({ clientes, posts, mes, mesAtual, onAbrir }: BaseP
 
   return (
     <div className="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
-      {ordenados.map(({ c, meus, alertas }) => {
+      {ordenados.map(({ c, meus }) => {
         const n = contar(meus);
         const meta = c.posts_por_mes ?? 0;
         const base = Math.max(meus.length, meta, 1);
-        const tempo = textoTempoMedio(meus);
         return (
           <Card
             key={c.id}
@@ -64,8 +62,6 @@ export function VisaoCarteira({ clientes, posts, mes, mesAtual, onAbrir }: BaseP
                   {c.conteudos_por_semana > 0 && ` · meta ${c.conteudos_por_semana}/semana`}
                 </p>
               </div>
-              {alertas.length === 0 && meus.length > 0 && <Badge tone="green">Em dia</Badge>}
-              {alertas.some((a) => a.gravidade === 'alta') && <Badge tone="red">Atenção</Badge>}
             </div>
 
             <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-white/5" title={`Etapas de ${mes}`}>
@@ -74,22 +70,6 @@ export function VisaoCarteira({ clientes, posts, mes, mesAtual, onAbrir }: BaseP
               ))}
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {ETAPAS.filter((e) => n[e.id] > 0).map((e) => (
-                <Badge key={e.id} tone={e.tone}><GlassIcon emoji={e.emoji} /> {n[e.id]} {e.label.toLowerCase()}</Badge>
-              ))}
-              {meus.length === 0 && <span className="text-xs text-slate-400">Nenhum conteúdo planejado.</span>}
-            </div>
-
-            {tempo && <p className="mt-2 text-xs text-slate-400"><GlassIcon name="timer" /> Responde em média em {tempo}</p>}
-
-            {alertas.length > 0 && (
-              <ul className="mt-2 space-y-0.5 text-xs">
-                {alertas.map((a) => (
-                  <li key={a.texto} className={a.gravidade === 'alta' ? 'text-red-300' : 'text-amber-300'}><GlassIcon name="alert" /> {a.texto}</li>
-                ))}
-              </ul>
-            )}
           </Card>
         );
       })}
